@@ -1,39 +1,39 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T20:58:28Z",
+  "generated_at": "2026-08-23T21:24:56Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 102,
+    "open_total": 104,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 7.8
+        "percentage": 7.7
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 75,
-        "percentage": 73.5
+        "count": 77,
+        "percentage": 74.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 5.9
+        "percentage": 5.8
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 6,
-        "percentage": 5.9
+        "percentage": 5.8
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 3.9
+        "percentage": 3.8
       },
       {
         "category": "Build",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 96
+        "count": 98
       },
       {
         "status": "done",
@@ -1710,6 +1710,36 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
     },
     {
+      "number": 3403,
+      "title": "Accept an instantiate whitelist on @hydra.main",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3403"
+    },
+    {
+      "number": 3404,
+      "title": "Rename the target whitelist API to instantiate whitelist",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3404"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1874,6 +1904,20 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T21:24:56Z",
+      "kind": "new",
+      "issue": 3404,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3404",
+      "title": "Rename the target whitelist API to instantiate whitelist"
+    },
+    {
+      "ts": "2026-08-23T21:24:56Z",
+      "kind": "new",
+      "issue": 3403,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3403",
+      "title": "Accept an instantiate whitelist on @hydra.main"
+    },
     {
       "ts": "2026-08-23T20:58:28Z",
       "kind": "new",
@@ -3460,21 +3504,6 @@
         "number": 3317,
         "url": "https://github.com/facebookresearch/hydra/pull/3317"
       }
-    },
-    {
-      "ts": "2026-07-25T12:59:39Z",
-      "kind": "closed",
-      "issue": 2364,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2364",
-      "title": "[Feature Request] Preserve dataclasses as instantiate-arguments"
-    },
-    {
-      "ts": "2026-07-25T11:01:47Z",
-      "kind": "pr",
-      "issue": 3229,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3229",
-      "title": "Defaults-list overrides in appended configs do not override earlier overrides",
-      "detail": "linked #3315"
     }
   ]
 }
