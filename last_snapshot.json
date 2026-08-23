@@ -1,5 +1,6 @@
 {
   "closed_at": {
+    "2762": "2026-08-23",
     "3385": "2026-08-12",
     "3386": "2026-08-12",
     "3395": "2026-08-15",
@@ -7,7 +8,7 @@
     "3397": "2026-08-15",
     "3398": "2026-08-15"
   },
-  "generated_at": "2026-08-23T18:02:13Z",
+  "generated_at": "2026-08-23T18:21:58Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -297,19 +298,6 @@
       "status": "not started",
       "title": "[Feature Request] Dry run option for sweeper / launcher",
       "updated_at": "2026-08-11T17:24:43Z"
-    },
-    "2762": {
-      "category": "Enhancement",
-      "created_at": "2023-10-06T21:56:43Z",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "New Release Version?",
-      "updated_at": "2026-07-15T13:16:25Z"
     },
     "2765": {
       "category": "Enhancement",
@@ -1379,6 +1367,19 @@
     }
   },
   "recent_done": {
+    "2762": {
+      "category": "Enhancement",
+      "created_at": "2023-10-06T21:56:43Z",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "New Release Version?",
+      "updated_at": "2026-07-15T13:16:25Z"
+    },
     "3385": {
       "category": "Enhancement",
       "created_at": "2026-08-12T20:26:17Z",

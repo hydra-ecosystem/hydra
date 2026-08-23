@@ -710,3 +710,4 @@
 {"ts": "2026-08-23T16:36:15Z", "kind": "new", "issue": 3400, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3400", "title": "[Bug] dev8 deprecation warning about internal usage?"}
 {"ts": "2026-08-23T17:44:53Z", "kind": "new", "issue": 3401, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3401", "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5"}
 {"ts": "2026-08-23T18:02:13Z", "kind": "label", "issue": 3400, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3400", "title": "[Bug] dev8 deprecation warning about internal usage?", "detail": "added \"awaiting_response\""}
+{"ts": "2026-08-23T18:21:58Z", "kind": "closed", "issue": 2762, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2762", "title": "New Release Version?"}

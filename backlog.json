@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T18:02:13Z",
+  "generated_at": "2026-08-23T18:21:58Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 106,
+    "open_total": 105,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 7.5
+        "percentage": 7.6
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 80,
-        "percentage": 75.5
+        "count": 79,
+        "percentage": 75.2
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 5,
-        "percentage": 4.7
+        "percentage": 4.8
       },
       {
         "category": "Question",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 2.8
+        "percentage": 2.9
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 100
+        "count": 99
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 6
+        "count": 7
       }
     ]
   },
@@ -684,22 +684,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2759"
-    },
-    {
-      "number": 2762,
-      "title": "New Release Version?",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-10-06",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2762"
     },
     {
       "number": 2765,
@@ -1856,9 +1840,32 @@
       "updated": "2026-08-14",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3398"
+    },
+    {
+      "number": 2762,
+      "title": "New Release Version?",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-10-06",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2762"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T18:21:58Z",
+      "kind": "closed",
+      "issue": 2762,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2762",
+      "title": "New Release Version?"
+    },
     {
       "ts": "2026-08-23T18:02:13Z",
       "kind": "label",
@@ -3464,14 +3471,6 @@
       "issue": 2980,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2980",
       "title": "Can hydra be used for programming languages other than Python?"
-    },
-    {
-      "ts": "2026-07-25T03:20:24Z",
-      "kind": "label",
-      "issue": 3158,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3158",
-      "title": "Evaluate AWS CI mocks for automated testing of the Ray Launcher Plugin",
-      "detail": "added \"maintenance\", \"plugin\", \"ray-launcher\", \"tests\"; removed \"triage\""
     }
   ]
 }
