@@ -715,3 +715,4 @@
 {"ts": "2026-08-23T19:46:59Z", "kind": "closed", "issue": 2767, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2767", "title": "[Feature Request] Allow optional and override keywords to work together."}
 {"ts": "2026-08-23T20:10:07Z", "kind": "closed", "issue": 2770, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2770", "title": "Experiment Tracker with Hydra"}
 {"ts": "2026-08-23T20:34:20Z", "kind": "closed", "issue": 2775, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2775", "title": "[Feature Request] Problem with Overwriting dict config of existing configuration"}
+{"ts": "2026-08-23T20:58:28Z", "kind": "new", "issue": 3402, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3402", "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior"}

@@ -12,7 +12,7 @@
     "3397": "2026-08-15",
     "3398": "2026-08-15"
   },
-  "generated_at": "2026-08-23T20:34:20Z",
+  "generated_at": "2026-08-23T20:58:28Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -1155,6 +1155,18 @@
       "status": "not started",
       "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5",
       "updated_at": "2026-08-23T17:43:36Z"
+    },
+    "3402": {
+      "category": "Documentation",
+      "created_at": "2026-08-23T20:57:04Z",
+      "labels": [
+        "documentation"
+      ],
+      "pr_numbers": [],
+      "state": "OPEN",
+      "status": "not started",
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior",
+      "updated_at": "2026-08-23T20:57:05Z"
     },
     "385": {
       "category": "Enhancement",

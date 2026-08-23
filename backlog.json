@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T20:34:20Z",
+  "generated_at": "2026-08-23T20:58:28Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 101,
+    "open_total": 102,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 7.9
+        "percentage": 7.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 75,
-        "percentage": 74.3
+        "percentage": 73.5
       },
       {
         "category": "Documentation",
         "emoji": "📄",
-        "count": 5,
-        "percentage": 5.0
+        "count": 6,
+        "percentage": 5.9
       },
       {
         "category": "Question",
@@ -33,13 +33,13 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 4.0
+        "percentage": 3.9
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 3.0
+        "percentage": 2.9
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 95
+        "count": 96
       },
       {
         "status": "done",
@@ -1695,6 +1695,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3401"
     },
     {
+      "number": 3402,
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "documentation"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1758,6 +1773,22 @@
         "triage"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2770"
+    },
+    {
+      "number": 2775,
+      "title": "[Feature Request] Problem with Overwriting dict config of existing configuration",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-10-27",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2775"
     },
     {
       "number": 3385,
@@ -1840,25 +1871,16 @@
       "updated": "2026-08-14",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3398"
-    },
-    {
-      "number": 2775,
-      "title": "[Feature Request] Problem with Overwriting dict config of existing configuration",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2023-10-27",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2775"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T20:58:28Z",
+      "kind": "new",
+      "issue": 3402,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3402",
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior"
+    },
     {
       "ts": "2026-08-23T20:34:20Z",
       "kind": "closed",
@@ -3453,14 +3475,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3229",
       "title": "Defaults-list overrides in appended configs do not override earlier overrides",
       "detail": "linked #3315"
-    },
-    {
-      "ts": "2026-07-25T11:01:47Z",
-      "kind": "pr",
-      "issue": 2364,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2364",
-      "title": "[Feature Request] Preserve dataclasses as instantiate-arguments",
-      "detail": "linked #3316"
     }
   ]
 }
