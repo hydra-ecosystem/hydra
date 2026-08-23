@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T17:44:53Z",
+  "generated_at": "2026-08-23T18:02:13Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 106,
@@ -1754,7 +1754,8 @@
       "created": "2026-08-23",
       "updated": "2026-08-23",
       "labels": [
-        "bug"
+        "bug",
+        "awaiting_response"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3400"
     },
@@ -1858,6 +1859,14 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T18:02:13Z",
+      "kind": "label",
+      "issue": 3400,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3400",
+      "title": "[Bug] dev8 deprecation warning about internal usage?",
+      "detail": "added \"awaiting_response\""
+    },
     {
       "ts": "2026-08-23T17:44:53Z",
       "kind": "new",
@@ -3463,14 +3472,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3158",
       "title": "Evaluate AWS CI mocks for automated testing of the Ray Launcher Plugin",
       "detail": "added \"maintenance\", \"plugin\", \"ray-launcher\", \"tests\"; removed \"triage\""
-    },
-    {
-      "ts": "2026-07-25T03:12:57Z",
-      "kind": "label",
-      "issue": 1890,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1890",
-      "title": "HPO config standardization",
-      "detail": "removed \"triage\""
     }
   ]
 }
