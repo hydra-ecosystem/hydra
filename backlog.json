@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T18:21:58Z",
+  "generated_at": "2026-08-23T18:38:09Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 105,
+    "open_total": 104,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 7.6
+        "percentage": 7.7
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 79,
-        "percentage": 75.2
+        "count": 78,
+        "percentage": 75.0
       },
       {
         "category": "Documentation",
@@ -27,7 +27,7 @@
         "category": "Question",
         "emoji": "❓",
         "count": 6,
-        "percentage": 5.7
+        "percentage": 5.8
       },
       {
         "category": "Refactor",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 99
+        "count": 98
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 7
+        "count": 8
       }
     ]
   },
@@ -684,23 +684,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2759"
-    },
-    {
-      "number": 2765,
-      "title": "[Feature Request] Loguru and Hydra ",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-10-09",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "awaiting_response",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2765"
     },
     {
       "number": 2767,
@@ -1760,6 +1743,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3401"
     },
     {
+      "number": 2762,
+      "title": "New Release Version?",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-10-06",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2762"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1842,23 +1841,31 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3398"
     },
     {
-      "number": 2762,
-      "title": "New Release Version?",
+      "number": 2765,
+      "title": "[Feature Request] Loguru and Hydra ",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2023-10-06",
+      "created": "2023-10-09",
       "updated": "2026-07-15",
       "labels": [
+        "awaiting_response",
         "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2762"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2765"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T18:38:09Z",
+      "kind": "closed",
+      "issue": 2765,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2765",
+      "title": "[Feature Request] Loguru and Hydra "
+    },
     {
       "ts": "2026-08-23T18:21:58Z",
       "kind": "closed",
@@ -3464,13 +3471,6 @@
       "issue": 3314,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3314",
       "title": "Add REFUTE scientific critique + calibration benchmark"
-    },
-    {
-      "ts": "2026-07-25T03:20:24Z",
-      "kind": "closed",
-      "issue": 2980,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2980",
-      "title": "Can hydra be used for programming languages other than Python?"
     }
   ]
 }
