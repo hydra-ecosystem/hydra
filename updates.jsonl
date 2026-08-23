@@ -719,3 +719,6 @@
 {"ts": "2026-08-23T21:24:56Z", "kind": "new", "issue": 3403, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3403", "title": "Accept an instantiate whitelist on @hydra.main"}
 {"ts": "2026-08-23T21:24:56Z", "kind": "new", "issue": 3404, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3404", "title": "Rename the target whitelist API to instantiate whitelist"}
 {"ts": "2026-08-23T21:28:32Z", "kind": "new", "issue": 3405, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3405", "title": "Reject optional and override on the same Defaults List entry"}
+{"ts": "2026-08-23T21:53:36Z", "kind": "new", "issue": 3406, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406", "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin"}
+{"ts": "2026-08-23T21:53:36Z", "kind": "closed", "issue": 2782, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2782", "title": "[Feature Request] Add an additional node to the defaults tree"}
+{"ts": "2026-08-23T21:53:36Z", "kind": "closed", "issue": 3402, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3402", "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior"}

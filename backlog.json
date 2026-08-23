@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T21:28:32Z",
+  "generated_at": "2026-08-23T21:53:36Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 105,
+    "open_total": 104,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 8.6
+        "percentage": 8.7
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 77,
-        "percentage": 73.3
+        "count": 76,
+        "percentage": 73.1
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 5.7
+        "percentage": 5.8
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 6,
-        "percentage": 5.7
+        "percentage": 5.8
       },
       {
         "category": "Refactor",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 99
+        "count": 98
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 11
+        "count": 13
       }
     ]
   },
@@ -684,22 +684,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2759"
-    },
-    {
-      "number": 2782,
-      "title": "[Feature Request] Add an additional node to the defaults tree",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-10-30",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2782"
     },
     {
       "number": 2786,
@@ -1695,21 +1679,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3401"
     },
     {
-      "number": 3402,
-      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-23",
-      "updated": "2026-08-23",
-      "labels": [
-        "documentation"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
-    },
-    {
       "number": 3403,
       "title": "Accept an instantiate whitelist on @hydra.main",
       "category": "Enhancement",
@@ -1754,6 +1723,21 @@
         "defaults list"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
+    },
+    {
+      "number": 3406,
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "documentation"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3406"
     },
     {
       "number": 2762,
@@ -1917,9 +1901,61 @@
       "updated": "2026-08-14",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3398"
+    },
+    {
+      "number": 2782,
+      "title": "[Feature Request] Add an additional node to the defaults tree",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-10-30",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2782"
+    },
+    {
+      "number": 3402,
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "documentation"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T21:53:36Z",
+      "kind": "closed",
+      "issue": 3402,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3402",
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior"
+    },
+    {
+      "ts": "2026-08-23T21:53:36Z",
+      "kind": "closed",
+      "issue": 2782,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2782",
+      "title": "[Feature Request] Add an additional node to the defaults tree"
+    },
+    {
+      "ts": "2026-08-23T21:53:36Z",
+      "kind": "new",
+      "issue": 3406,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin"
+    },
     {
       "ts": "2026-08-23T21:28:32Z",
       "kind": "new",
@@ -3492,29 +3528,6 @@
       "issue": 1431,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1431",
       "title": "PrettyErrors doesn't work with Hydra"
-    },
-    {
-      "ts": "2026-07-25T18:45:16Z",
-      "kind": "closed",
-      "issue": 1872,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1872",
-      "title": "[Feature Request] Interpolate cmd options before passing to override_dirname for sweep"
-    },
-    {
-      "ts": "2026-07-25T18:32:15Z",
-      "kind": "label",
-      "issue": 1869,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1869",
-      "title": "Add more examples to the submitit plugin",
-      "detail": "removed \"triage\""
-    },
-    {
-      "ts": "2026-07-25T18:23:54Z",
-      "kind": "pr",
-      "issue": 1431,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1431",
-      "title": "PrettyErrors doesn't work with Hydra",
-      "detail": "linked #3317"
     }
   ]
 }
