@@ -1,6 +1,6 @@
 {
-  "generated_on": "2026-08-22",
-  "generated_at": "2026-08-22T07:14:50Z",
+  "generated_on": "2026-08-23",
+  "generated_at": "2026-08-23T07:15:55Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 104,
@@ -140,6 +140,24 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2237"
     },
     {
+      "number": 3364,
+      "title": "Make Compose API initialization contexts nestable and self-contained",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "community PR",
+      "status_emoji": "🤝",
+      "prs": [
+        {
+          "number": 3399,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3399"
+        }
+      ],
+      "created": "2026-08-09",
+      "updated": "2026-08-09",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3364"
+    },
+    {
       "number": 3369,
       "title": "Remove redundant setup-xcode step from macOS CI",
       "category": "Refactor",
@@ -174,24 +192,6 @@
       "updated": "2026-08-11",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3375"
-    },
-    {
-      "number": 3364,
-      "title": "Make Compose API initialization contexts nestable and self-contained",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3399,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3399"
-        }
-      ],
-      "created": "2026-08-09",
-      "updated": "2026-08-09",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3364"
     },
     {
       "number": 385,
