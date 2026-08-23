@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T16:36:15Z",
+  "generated_at": "2026-08-23T17:44:53Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 105,
+    "open_total": 106,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 7.6
+        "percentage": 7.5
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 80,
-        "percentage": 76.2
+        "percentage": 75.5
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 5,
-        "percentage": 4.8
+        "percentage": 4.7
       },
       {
         "category": "Question",
@@ -32,14 +32,14 @@
       {
         "category": "Refactor",
         "emoji": "🔧",
-        "count": 3,
-        "percentage": 2.9
+        "count": 4,
+        "percentage": 3.8
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 2.9
+        "percentage": 2.8
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 99
+        "count": 100
       },
       {
         "status": "done",
@@ -1556,7 +1556,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2026-06-29",
-      "updated": "2026-06-29",
+      "updated": "2026-08-23",
       "labels": [
         "enhancement"
       ],
@@ -1759,6 +1759,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3400"
     },
     {
+      "number": 3401,
+      "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "maintenance",
+        "callbacks"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3401"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1842,6 +1858,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T17:44:53Z",
+      "kind": "new",
+      "issue": 3401,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3401",
+      "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5"
+    },
     {
       "ts": "2026-08-23T16:36:15Z",
       "kind": "new",
@@ -3448,13 +3471,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1890",
       "title": "HPO config standardization",
       "detail": "removed \"triage\""
-    },
-    {
-      "ts": "2026-07-24T23:37:50Z",
-      "kind": "new",
-      "issue": 3314,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3314",
-      "title": "Add REFUTE scientific critique + calibration benchmark"
     }
   ]
 }
