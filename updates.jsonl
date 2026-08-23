@@ -707,3 +707,4 @@
 {"ts": "2026-08-15T07:12:57Z", "kind": "closed", "issue": 3398, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3398", "title": "password"}
 {"ts": "2026-08-22T07:14:50Z", "kind": "status", "issue": 3364, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364", "title": "Make Compose API initialization contexts nestable and self-contained", "detail": "not started → community PR", "pr": {"number": 3399, "url": "https://github.com/hydra-ecosystem/hydra/pull/3399"}}
 {"ts": "2026-08-22T07:14:50Z", "kind": "pr", "issue": 3364, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364", "title": "Make Compose API initialization contexts nestable and self-contained", "detail": "linked #3399"}
+{"ts": "2026-08-23T16:36:15Z", "kind": "new", "issue": 3400, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3400", "title": "[Bug] dev8 deprecation warning about internal usage?"}

@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T07:15:55Z",
+  "generated_at": "2026-08-23T16:36:15Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 104,
+    "open_total": 105,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 7,
-        "percentage": 6.7
+        "count": 8,
+        "percentage": 7.6
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 80,
-        "percentage": 76.9
+        "percentage": 76.2
       },
       {
         "category": "Documentation",
@@ -27,7 +27,7 @@
         "category": "Question",
         "emoji": "❓",
         "count": 6,
-        "percentage": 5.8
+        "percentage": 5.7
       },
       {
         "category": "Refactor",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 98
+        "count": 99
       },
       {
         "status": "done",
@@ -1744,6 +1744,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3389"
     },
     {
+      "number": 3400,
+      "title": "[Bug] dev8 deprecation warning about internal usage?",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "bug"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3400"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1827,6 +1842,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T16:36:15Z",
+      "kind": "new",
+      "issue": 3400,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3400",
+      "title": "[Bug] dev8 deprecation warning about internal usage?"
+    },
     {
       "ts": "2026-08-22T07:14:50Z",
       "kind": "pr",
@@ -3433,13 +3455,6 @@
       "issue": 3314,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3314",
       "title": "Add REFUTE scientific critique + calibration benchmark"
-    },
-    {
-      "ts": "2026-07-24T20:37:25Z",
-      "kind": "closed",
-      "issue": 3308,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3308",
-      "title": "[Bug]"
     }
   ]
 }
