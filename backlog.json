@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T19:46:59Z",
+  "generated_at": "2026-08-23T20:10:07Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 103,
+    "open_total": 102,
     "by_category": [
       {
         "category": "Bug",
@@ -14,8 +14,8 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 77,
-        "percentage": 74.8
+        "count": 76,
+        "percentage": 74.5
       },
       {
         "category": "Documentation",
@@ -27,7 +27,7 @@
         "category": "Question",
         "emoji": "❓",
         "count": 6,
-        "percentage": 5.8
+        "percentage": 5.9
       },
       {
         "category": "Refactor",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 97
+        "count": 96
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 9
+        "count": 10
       }
     ]
   },
@@ -684,22 +684,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2759"
-    },
-    {
-      "number": 2770,
-      "title": "Experiment Tracker with Hydra",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-10-16",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2770"
     },
     {
       "number": 2775,
@@ -1760,6 +1744,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2765"
     },
     {
+      "number": 2767,
+      "title": "[Feature Request] Allow optional and override keywords to work together.",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-10-11",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2767"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1842,23 +1842,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3398"
     },
     {
-      "number": 2767,
-      "title": "[Feature Request] Allow optional and override keywords to work together.",
+      "number": 2770,
+      "title": "Experiment Tracker with Hydra",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2023-10-11",
+      "created": "2023-10-16",
       "updated": "2026-07-15",
       "labels": [
         "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2767"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2770"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T20:10:07Z",
+      "kind": "closed",
+      "issue": 2770,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2770",
+      "title": "Experiment Tracker with Hydra"
+    },
     {
       "ts": "2026-08-23T19:46:59Z",
       "kind": "closed",
@@ -3458,18 +3465,6 @@
       "pr": {
         "number": 3315,
         "url": "https://github.com/facebookresearch/hydra/pull/3315"
-      }
-    },
-    {
-      "ts": "2026-07-25T11:01:47Z",
-      "kind": "status",
-      "issue": 2364,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2364",
-      "title": "[Feature Request] Preserve dataclasses as instantiate-arguments",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3316,
-        "url": "https://github.com/facebookresearch/hydra/pull/3316"
       }
     }
   ]
