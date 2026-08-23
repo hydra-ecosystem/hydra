@@ -712,3 +712,4 @@
 {"ts": "2026-08-23T18:02:13Z", "kind": "label", "issue": 3400, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3400", "title": "[Bug] dev8 deprecation warning about internal usage?", "detail": "added \"awaiting_response\""}
 {"ts": "2026-08-23T18:21:58Z", "kind": "closed", "issue": 2762, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2762", "title": "New Release Version?"}
 {"ts": "2026-08-23T18:38:09Z", "kind": "closed", "issue": 2765, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2765", "title": "[Feature Request] Loguru and Hydra "}
+{"ts": "2026-08-23T19:46:59Z", "kind": "closed", "issue": 2767, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2767", "title": "[Feature Request] Allow optional and override keywords to work together."}

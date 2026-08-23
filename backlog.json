@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T18:38:09Z",
+  "generated_at": "2026-08-23T19:46:59Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 104,
+    "open_total": 103,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 7.7
+        "percentage": 7.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 78,
-        "percentage": 75.0
+        "count": 77,
+        "percentage": 74.8
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 5,
-        "percentage": 4.8
+        "percentage": 4.9
       },
       {
         "category": "Question",
@@ -33,7 +33,7 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 3.8
+        "percentage": 3.9
       },
       {
         "category": "Build",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 98
+        "count": 97
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 8
+        "count": 9
       }
     ]
   },
@@ -684,22 +684,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2759"
-    },
-    {
-      "number": 2767,
-      "title": "[Feature Request] Allow optional and override keywords to work together.",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-10-11",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2767"
     },
     {
       "number": 2770,
@@ -1759,6 +1743,23 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2762"
     },
     {
+      "number": 2765,
+      "title": "[Feature Request] Loguru and Hydra ",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-10-09",
+      "updated": "2026-07-15",
+      "labels": [
+        "awaiting_response",
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2765"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1841,24 +1842,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3398"
     },
     {
-      "number": 2765,
-      "title": "[Feature Request] Loguru and Hydra ",
+      "number": 2767,
+      "title": "[Feature Request] Allow optional and override keywords to work together.",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2023-10-09",
+      "created": "2023-10-11",
       "updated": "2026-07-15",
       "labels": [
-        "awaiting_response",
         "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2765"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2767"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T19:46:59Z",
+      "kind": "closed",
+      "issue": 2767,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2767",
+      "title": "[Feature Request] Allow optional and override keywords to work together."
+    },
     {
       "ts": "2026-08-23T18:38:09Z",
       "kind": "closed",
@@ -3464,13 +3471,6 @@
         "number": 3316,
         "url": "https://github.com/facebookresearch/hydra/pull/3316"
       }
-    },
-    {
-      "ts": "2026-07-25T03:24:12Z",
-      "kind": "closed",
-      "issue": 3314,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3314",
-      "title": "Add REFUTE scientific critique + calibration benchmark"
     }
   ]
 }
