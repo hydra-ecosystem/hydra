@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T21:24:56Z",
+  "generated_at": "2026-08-23T21:28:32Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 104,
+    "open_total": 105,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 8,
-        "percentage": 7.7
+        "count": 9,
+        "percentage": 8.6
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 77,
-        "percentage": 74.0
+        "percentage": 73.3
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 5.8
+        "percentage": 5.7
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 6,
-        "percentage": 5.8
+        "percentage": 5.7
       },
       {
         "category": "Refactor",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 98
+        "count": 99
       },
       {
         "status": "done",
@@ -1740,6 +1740,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3404"
     },
     {
+      "number": 3405,
+      "title": "Reject optional and override on the same Defaults List entry",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "bug",
+        "defaults list"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1904,6 +1920,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T21:28:32Z",
+      "kind": "new",
+      "issue": 3405,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3405",
+      "title": "Reject optional and override on the same Defaults List entry"
+    },
     {
       "ts": "2026-08-23T21:24:56Z",
       "kind": "new",
@@ -3492,18 +3515,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1431",
       "title": "PrettyErrors doesn't work with Hydra",
       "detail": "linked #3317"
-    },
-    {
-      "ts": "2026-07-25T18:23:54Z",
-      "kind": "status",
-      "issue": 1431,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1431",
-      "title": "PrettyErrors doesn't work with Hydra",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3317,
-        "url": "https://github.com/facebookresearch/hydra/pull/3317"
-      }
     }
   ]
 }
