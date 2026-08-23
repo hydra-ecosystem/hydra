@@ -4,6 +4,7 @@
     "2765": "2026-08-23",
     "2767": "2026-08-23",
     "2770": "2026-08-23",
+    "2775": "2026-08-23",
     "3385": "2026-08-12",
     "3386": "2026-08-12",
     "3395": "2026-08-15",
@@ -11,7 +12,7 @@
     "3397": "2026-08-15",
     "3398": "2026-08-15"
   },
-  "generated_at": "2026-08-23T20:10:07Z",
+  "generated_at": "2026-08-23T20:34:20Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -301,19 +302,6 @@
       "status": "not started",
       "title": "[Feature Request] Dry run option for sweeper / launcher",
       "updated_at": "2026-08-11T17:24:43Z"
-    },
-    "2775": {
-      "category": "Enhancement",
-      "created_at": "2023-10-27T21:42:58Z",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "[Feature Request] Problem with Overwriting dict config of existing configuration",
-      "updated_at": "2026-07-15T13:16:23Z"
     },
     "2782": {
       "category": "Enhancement",
@@ -1382,6 +1370,19 @@
       "status": "done",
       "title": "Experiment Tracker with Hydra",
       "updated_at": "2026-07-15T13:16:24Z"
+    },
+    "2775": {
+      "category": "Enhancement",
+      "created_at": "2023-10-27T21:42:58Z",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "[Feature Request] Problem with Overwriting dict config of existing configuration",
+      "updated_at": "2026-07-15T13:16:23Z"
     },
     "3385": {
       "category": "Enhancement",

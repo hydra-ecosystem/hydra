@@ -714,3 +714,4 @@
 {"ts": "2026-08-23T18:38:09Z", "kind": "closed", "issue": 2765, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2765", "title": "[Feature Request] Loguru and Hydra "}
 {"ts": "2026-08-23T19:46:59Z", "kind": "closed", "issue": 2767, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2767", "title": "[Feature Request] Allow optional and override keywords to work together."}
 {"ts": "2026-08-23T20:10:07Z", "kind": "closed", "issue": 2770, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2770", "title": "Experiment Tracker with Hydra"}
+{"ts": "2026-08-23T20:34:20Z", "kind": "closed", "issue": 2775, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2775", "title": "[Feature Request] Problem with Overwriting dict config of existing configuration"}

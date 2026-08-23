@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T20:10:07Z",
+  "generated_at": "2026-08-23T20:34:20Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 102,
+    "open_total": 101,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 7.8
+        "percentage": 7.9
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 76,
-        "percentage": 74.5
+        "count": 75,
+        "percentage": 74.3
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 5,
-        "percentage": 4.9
+        "percentage": 5.0
       },
       {
         "category": "Question",
@@ -33,13 +33,13 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 3.9
+        "percentage": 4.0
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 2.9
+        "percentage": 3.0
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 96
+        "count": 95
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 10
+        "count": 11
       }
     ]
   },
@@ -684,22 +684,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2759"
-    },
-    {
-      "number": 2775,
-      "title": "[Feature Request] Problem with Overwriting dict config of existing configuration",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-10-27",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2775"
     },
     {
       "number": 2782,
@@ -1760,6 +1744,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2767"
     },
     {
+      "number": 2770,
+      "title": "Experiment Tracker with Hydra",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-10-16",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2770"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1842,23 +1842,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3398"
     },
     {
-      "number": 2770,
-      "title": "Experiment Tracker with Hydra",
+      "number": 2775,
+      "title": "[Feature Request] Problem with Overwriting dict config of existing configuration",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2023-10-16",
+      "created": "2023-10-27",
       "updated": "2026-07-15",
       "labels": [
         "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2770"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2775"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-23T20:34:20Z",
+      "kind": "closed",
+      "issue": 2775,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2775",
+      "title": "[Feature Request] Problem with Overwriting dict config of existing configuration"
+    },
     {
       "ts": "2026-08-23T20:10:07Z",
       "kind": "closed",
@@ -3454,18 +3461,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2364",
       "title": "[Feature Request] Preserve dataclasses as instantiate-arguments",
       "detail": "linked #3316"
-    },
-    {
-      "ts": "2026-07-25T11:01:47Z",
-      "kind": "status",
-      "issue": 3229,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3229",
-      "title": "Defaults-list overrides in appended configs do not override earlier overrides",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3315,
-        "url": "https://github.com/facebookresearch/hydra/pull/3315"
-      }
     }
   ]
 }
