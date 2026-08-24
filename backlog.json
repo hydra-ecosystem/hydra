@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T17:02:09Z",
+  "generated_at": "2026-08-24T18:15:01Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 101,
+    "open_total": 102,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 8.9
+        "percentage": 8.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 73,
-        "percentage": 72.3
+        "count": 74,
+        "percentage": 72.5
       },
       {
         "category": "Documentation",
@@ -27,19 +27,19 @@
         "category": "Question",
         "emoji": "❓",
         "count": 5,
-        "percentage": 5.0
+        "percentage": 4.9
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 4.0
+        "percentage": 3.9
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 4,
-        "percentage": 4.0
+        "percentage": 3.9
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 95
+        "count": 96
       },
       {
         "status": "done",
@@ -1689,6 +1689,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3410"
     },
     {
+      "number": 3411,
+      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-24",
+      "updated": "2026-08-24",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1961,6 +1974,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T18:15:01Z",
+      "kind": "new",
+      "issue": 3411,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
+      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets"
+    },
     {
       "ts": "2026-08-24T17:02:09Z",
       "kind": "new",
@@ -3542,13 +3562,6 @@
       "issue": 1174,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1174",
       "title": "[Bug][configen] Generates unquoted str defaults when type hints include Optional[  ]"
-    },
-    {
-      "ts": "2026-07-26T17:33:09Z",
-      "kind": "closed",
-      "issue": 1241,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1241",
-      "title": "[Configen][Bug] Configs for abstract classes with Generic Type"
     }
   ]
 }
