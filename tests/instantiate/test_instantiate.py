@@ -3797,3 +3797,182 @@ def test_whitelist_wildcard_still_blocks_alias_after_exact_reexport_rule() -> No
         match="not in the instantiate target whitelist",
     ):
         _instantiate2.instantiate(cfg, _target_whitelist_="logging.*")
+
+
+@mark.parametrize(
+    "target",
+    [
+        "pickle.loads",
+        "pickle.load",
+        "pickle.Unpickler",
+        "_pickle.loads",  # canonical C spelling must be blocked too
+        "_pickle.load",
+        "marshal.loads",
+        "marshal.load",
+        "shelve.open",
+        "trace.CoverageResults",
+        "tracemalloc.Snapshot.load",
+    ],
+)
+def test_deserialization_sinks_are_blocklisted(target: str) -> None:
+    # Direct-instantiate unpickle sinks are refused on the legacy path. This
+    # removes the trivial inline RCE vector; the target whitelist remains the
+    # boundary, and users who genuinely need to deserialize wrap it in their own
+    # callable.
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+def test_pickle_base64_chain_is_blocklisted() -> None:
+    # The reporter's inline vector: pickle.loads(base64.b64decode("...")). The
+    # outer pickle.loads target is refused before the chain runs.
+    cfg = OmegaConf.create(
+        {
+            "_target_": "pickle.loads",
+            "_args_": [{"_target_": "base64.b64decode", "_args_": ["gA=="]}],
+        }
+    )
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    [
+        "timeit.timeit",
+        "timeit.repeat",
+        "timeit.Timer.timeit",
+        "timeit.Timer.repeat",
+        "timeit.Timer.autorange",
+        "cProfile.run",
+        "cProfile.runctx",
+        "cProfile.Profile.run",
+        "cProfile.Profile.runctx",
+        "profile.run",
+        "profile.runctx",
+        "profile.Profile.run",
+        "profile.Profile.runctx",
+        "bdb.Bdb.run",
+        "bdb.Bdb.runeval",
+        "bdb.Bdb.runctx",
+        "pdb.run",
+        "pdb.runeval",
+        "pdb.Pdb.run",
+        "pdb.Pdb.runeval",
+        "pdb.Pdb.runctx",
+        "trace.Trace.run",
+        "trace.Trace.runctx",
+        "code.interact",
+        "code.InteractiveInterpreter.runsource",
+        "code.InteractiveInterpreter.runcode",
+        "code.InteractiveConsole.push",
+        "doctest.DocTestRunner.run",
+        "doctest.DebugRunner.run",
+        "doctest.DocTestCase.runTest",
+        "doctest.DocTestCase.debug",
+        "doctest.debug_src",
+        "doctest.debug_script",
+        "doctest.testfile",
+        "typing.ForwardRef._evaluate",
+        "typing._eval_type",
+        "typing.evaluate_forward_ref",
+        "typing.get_type_hints",
+        "annotationlib.ForwardRef._evaluate",
+        "annotationlib.ForwardRef.evaluate",
+        "annotationlib.get_annotations",
+        "inspect.get_annotations",
+        "inspect.signature",
+        "inspect.Signature.from_callable",
+        "logging.config.dictConfig",
+        "logging.config.fileConfig",
+        "optparse.Values.read_file",
+    ],
+)
+def test_exec_wrapper_targets_are_blocklisted(target: str) -> None:
+    # Standard-library functions that exec/eval a user-supplied string. They have
+    # no legitimate instantiate() use, so they are blocked directly (this is what
+    # closed the reporter's timeit.timeit vector). The whitelist stays the boundary.
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "cfg",
+    [
+        {
+            "_target_": "bdb.Bdb.run",
+            "_args_": [
+                {"_target_": "bdb.Bdb"},
+                "raise RuntimeError('must not execute')",
+            ],
+        },
+        {
+            "_target_": "timeit.Timer.timeit",
+            "_args_": [
+                {
+                    "_target_": "timeit.Timer",
+                    "stmt": "raise RuntimeError('must not execute')",
+                },
+                1,
+            ],
+        },
+        {
+            "_target_": "doctest.debug_script",
+            "_args_": ["raise RuntimeError('must not execute')"],
+        },
+        {
+            "_target_": "typing.ForwardRef._evaluate",
+            "_args_": [
+                {
+                    "_target_": "typing.ForwardRef",
+                    "_args_": [
+                        "(_ for _ in ()).throw(RuntimeError('must not execute'))"
+                    ],
+                },
+                {},
+                {},
+            ],
+            "recursive_guard": {"_target_": "builtins.set"},
+        },
+        {
+            "_target_": "inspect.get_annotations",
+            "obj": {
+                "_target_": "builtins.type",
+                "_args_": [
+                    "Probe",
+                    {"_target_": "builtins.tuple"},
+                    {
+                        "__annotations__": {
+                            "payload": "(_ for _ in ()).throw(RuntimeError('must not execute'))"
+                        }
+                    },
+                ],
+                "_convert_": "all",
+            },
+            "eval_str": True,
+        },
+    ],
+)
+def test_exec_wrapper_chains_are_blocklisted(cfg: Any) -> None:
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    [
+        # pure-Python fallbacks — must not slip past the pickle block
+        "pickle._load",
+        "pickle._loads",
+        "pickle._Unpickler",
+        # exec-string siblings of cProfile.run / profile.run
+        "cProfile.runctx",
+        "profile.runctx",
+    ],
+)
+def test_blocklist_covers_alternate_sink_spellings(target: str) -> None:
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)

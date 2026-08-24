@@ -87,6 +87,81 @@ DEFAULT_BLOCKLISTED_MODULES = {
     "sys.modules.resource",
     "sys.modules.psutil",
     "sys.modules.tkinter",
+    # Unsafe deserialization sinks: unpickling untrusted data is arbitrary code
+    # execution. This blocks only the direct instantiate() vector (e.g. the
+    # inline pickle.loads(base64.b64decode(...)) chain); it is not a claim that
+    # deserialization is safe. The target whitelist remains the real boundary,
+    # and whitelisted loaders (e.g. torch.load) or user wrappers are unaffected.
+    # Both the friendly and canonical C spellings are listed so the resolved
+    # identity (pickle.loads -> _pickle.loads) is caught either way.
+    "pickle.load",
+    "pickle.loads",
+    "pickle.Unpickler",
+    "pickle._load",
+    "pickle._loads",
+    "pickle._Unpickler",
+    "_pickle.load",
+    "_pickle.loads",
+    "_pickle.Unpickler",
+    "marshal.load",
+    "marshal.loads",
+    "shelve.open",
+    "trace.CoverageResults",
+    "tracemalloc.Snapshot.load",
+    "dill.load",
+    "dill.loads",
+    "cloudpickle.load",
+    "cloudpickle.loads",
+    # Exec/eval wrappers: standard-library functions that run a user-supplied
+    # string as code. They have no legitimate instantiate() use (like the already
+    # blocked builtins.exec), so the direct vector is blocked; the whitelist
+    # remains the boundary.
+    "timeit.timeit",
+    "timeit.repeat",
+    "timeit.Timer.timeit",
+    "timeit.Timer.repeat",
+    "timeit.Timer.autorange",
+    "cProfile.run",
+    "cProfile.runctx",
+    "cProfile.Profile.run",
+    "cProfile.Profile.runctx",
+    "profile.run",
+    "profile.runctx",
+    "profile.Profile.run",
+    "profile.Profile.runctx",
+    "bdb.Bdb.run",
+    "bdb.Bdb.runeval",
+    "bdb.Bdb.runctx",
+    "pdb.run",
+    "pdb.runeval",
+    "trace.Trace.run",
+    "trace.Trace.runctx",
+    "code.interact",
+    "code.InteractiveInterpreter.runsource",
+    "code.InteractiveInterpreter.runcode",
+    "code.InteractiveConsole.push",
+    "doctest.DocTestRunner.run",
+    "doctest.DebugRunner.run",
+    "doctest.DocTestCase.runTest",
+    "doctest.DocTestCase.debug",
+    "doctest.debug_src",
+    "doctest.debug_script",
+    "doctest.testfile",
+    # Annotation evaluators: these execute string annotations as expressions.
+    # Include compatibility and canonical spellings across Python versions.
+    "typing.ForwardRef._evaluate",
+    "typing._eval_type",
+    "typing.evaluate_forward_ref",
+    "typing.get_type_hints",
+    "annotationlib.ForwardRef._evaluate",
+    "annotationlib.ForwardRef.evaluate",
+    "annotationlib.get_annotations",
+    "inspect.get_annotations",
+    "inspect.signature",
+    "inspect.Signature.from_callable",
+    "logging.config.dictConfig",
+    "logging.config.fileConfig",
+    "optparse.Values.read_file",
 }
 
 DEFAULT_BLOCKLISTED_MODULE_PREFIXES = (

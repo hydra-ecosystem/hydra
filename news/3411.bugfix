@@ -1,0 +1,1 @@
+``hydra.utils.instantiate()`` now blocks additional known deserialization and code-execution targets in legacy mode. The blocklist remains defense in depth; use ``_target_whitelist_`` as the security boundary.
