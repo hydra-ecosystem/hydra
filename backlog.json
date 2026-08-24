@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T08:22:42Z",
+  "generated_at": "2026-08-24T10:57:32Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 99,
+    "open_total": 100,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.1
+        "percentage": 9.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 72,
-        "percentage": 72.7
+        "count": 73,
+        "percentage": 73.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.1
+        "percentage": 6.0
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 5,
-        "percentage": 5.1
+        "percentage": 5.0
       },
       {
         "category": "Refactor",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 93
+        "count": 94
       },
       {
         "status": "done",
@@ -1663,6 +1663,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3406"
     },
     {
+      "number": 3408,
+      "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-24",
+      "updated": "2026-08-24",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3408"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1935,6 +1948,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T10:57:32Z",
+      "kind": "new",
+      "issue": 3408,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3408",
+      "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates"
+    },
     {
       "ts": "2026-08-24T08:22:42Z",
       "kind": "label",
@@ -3516,14 +3536,6 @@
       "issue": 1228,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1228",
       "title": "[Hydra doc] Improvement to doc search."
-    },
-    {
-      "ts": "2026-07-26T07:51:18Z",
-      "kind": "pr",
-      "issue": 3318,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3318",
-      "title": "Dangling Defaults List override can override a command-line append",
-      "detail": "linked #3319"
     }
   ]
 }
