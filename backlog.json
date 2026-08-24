@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T06:25:37Z",
+  "generated_at": "2026-08-24T07:26:26Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 100,
@@ -1821,6 +1821,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2794"
     },
     {
+      "number": 2797,
+      "title": "Use output_subdir on multirun",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-11-17",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2797"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1916,22 +1932,6 @@
         "documentation"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
-    },
-    {
-      "number": 2797,
-      "title": "Use output_subdir on multirun",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2023-11-17",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2797"
     }
   ],
   "updates": [
