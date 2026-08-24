@@ -1,0 +1,1 @@
+``instantiate()`` blocks more unsafe targets and hardens generic callable selection and dispatch.
