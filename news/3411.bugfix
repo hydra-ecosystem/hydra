@@ -1,0 +1,1 @@
+``instantiate()`` blocks more unsafe targets and checks callables selected by discovery helpers, ``getattr``, and direct ``partial`` targets.

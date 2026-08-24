@@ -462,6 +462,7 @@ obj_all = instantiate(cfg_all, _target_whitelist_="__main__.*")
 ```
 
 ### Partial Instantiation
+
 Sometimes you may not set all parameters needed to instantiate an object from the configuration, in this case you can set
 `_partial_` to be `True` to get a `functools.partial` wrapped object or method, then complete initializing the object in
 the application code. Here is an example:
@@ -557,6 +558,40 @@ assert bar1.foo is bar2.foo  # the `Foo` instance is re-used here
 This does not apply if `_partial_=False`,
 in which case a new `Foo` instance would be created with each call to `instantiate`.
 
+<details>
+<summary>Security considerations</summary>
+
+Use the native `_partial_: true` option instead of configuring
+`_target_: functools.partial`. Direct `functools.partial` targets and equivalent
+constructor spellings such as `functools.partial.__new__` are deprecated. When
+used with `_target_whitelist_`, both the partial constructor and its effective
+callable must be authorized. Direct partial targets cannot themselves use
+`_partial_: true` with a real target whitelist because validation would be
+deferred. Equivalent constructor spellings also cannot construct partial
+subclasses while safety checks are active because subclass overrides can hide
+their invocation behavior.
+
+If a config targets `hydra.utils.get_class`, `get_method`,
+`get_static_method`, or `get_object`, whitelist both the discovery helper and
+the dotpath in its `path` argument. Hydra applies the same target policy to the
+selected path and to the canonical identity of a callable result. Discovery
+helpers cannot use `_partial_: true` with a real target whitelist because the
+path could be supplied after authorization has finished. Hydra's `instantiate`
+and `call` functions cannot themselves be authorized as config targets; invoke
+them from trusted Python code.
+
+When `builtins.getattr` returns a callable, Hydra applies the active target
+policy to that callable's canonical identity. Non-callable attribute values are
+returned normally. `builtins.getattr` cannot use `_partial_: true` with a real
+target whitelist because its result would be selected after authorization.
+
+Hydra also refuses to authorize `operator.call`, `operator.attrgetter`, and
+`operator.methodcaller`, which delegate callable invocation, attribute
+selection, or method selection to config data. Set `_target_` to the intended
+callable instead. These generic operator targets are also blocklisted on the
+legacy no-whitelist path.
+
+</details>
 
 ### Instantiation of builtins
 

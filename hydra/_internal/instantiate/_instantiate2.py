@@ -3,6 +3,7 @@
 import copy
 import functools
 import inspect
+import operator
 import re
 from contextvars import ContextVar
 from enum import Enum
@@ -18,6 +19,16 @@ from hydra._internal.utils import _locate
 from hydra.errors import InstantiationException
 from hydra.types import ConvertMode
 
+# This blocklist is a best-effort, defense-in-depth stopgap that refuses the
+# most obvious dangerous _target_ values on the legacy (no _target_whitelist_)
+# path. It is NOT a security boundary and is intentionally not exhaustive.
+#
+# Known limitation - indirect dispatch: user-defined targets can invoke a
+# blocked method without ever naming it as a _target_. The method name is data,
+# not a target, so name-based blocking cannot see it. Hydra blocks the generic
+# standard-library dispatch primitives identified here, but cannot exhaustively
+# identify equivalent application wrappers. The target whitelist
+# (_target_whitelist_) is the real security boundary.
 DEFAULT_BLOCKLISTED_MODULES = {
     "_sitebuiltins._Helper",
     "_sitebuiltins.Quitter",
@@ -27,6 +38,15 @@ DEFAULT_BLOCKLISTED_MODULES = {
     "builtins.compile",
     "builtins.exit",
     "builtins.quit",
+    # Generic dispatch primitives delegate the effective callable or method
+    # name to config data instead of naming it as _target_. Include public and
+    # canonical C-module spellings.
+    "operator.call",
+    "operator.attrgetter",
+    "operator.methodcaller",
+    "_operator.call",
+    "_operator.attrgetter",
+    "_operator.methodcaller",
     "ctypes.CDLL",
     "ctypes.LibraryLoader.LoadLibrary",
     "ctypes.OleDLL",
@@ -87,12 +107,140 @@ DEFAULT_BLOCKLISTED_MODULES = {
     "sys.modules.resource",
     "sys.modules.psutil",
     "sys.modules.tkinter",
+    # Unsafe deserialization sinks: unpickling untrusted data is arbitrary code
+    # execution. This blocks only the direct instantiate() vector (e.g. the
+    # inline pickle.loads(base64.b64decode(...)) chain); it is not a claim that
+    # deserialization is safe. The target whitelist remains the real boundary,
+    # and whitelisted loaders (e.g. torch.load) or user wrappers are unaffected.
+    # Both the friendly and canonical C spellings are listed so the resolved
+    # identity (pickle.loads -> _pickle.loads) is caught either way.
+    "pickle.load",
+    "pickle.loads",
+    "pickle.Unpickler",
+    "pickle._load",
+    "pickle._loads",
+    "pickle._Unpickler",
+    "_pickle.load",
+    "_pickle.loads",
+    "_pickle.Unpickler",
+    "marshal.load",
+    "marshal.loads",
+    "tracemalloc.Snapshot.load",
+    "dill.load",
+    "dill.loads",
+    "cloudpickle.load",
+    "cloudpickle.loads",
+    # Exec/eval wrappers: standard-library functions that run a user-supplied
+    # string as code. They have no legitimate instantiate() use (like the already
+    # blocked builtins.exec), so the direct vector is blocked; the whitelist
+    # remains the boundary.
+    "timeit.timeit",
+    "timeit.repeat",
+    "timeit.main",
+    "timeit.Timer.timeit",
+    "timeit.Timer.repeat",
+    "timeit.Timer.autorange",
+    "cProfile.run",
+    "cProfile.runctx",
+    "cProfile.Profile.run",
+    "cProfile.Profile.runctx",
+    "profile.run",
+    "profile.runctx",
+    "profile.Profile.run",
+    "profile.Profile.runctx",
+    "code.interact",
+    "code.InteractiveInterpreter.runsource",
+    "code.InteractiveInterpreter.runcode",
+    "code.InteractiveConsole.push",
+    # Annotation evaluators: these execute string annotations as expressions.
+    # Include compatibility and canonical spellings across Python versions.
+    "typing.ForwardRef._evaluate",
+    "typing._eval_type",
+    "typing.evaluate_forward_ref",
+    "typing.get_type_hints",
+    "annotationlib.ForwardRef._evaluate",
+    "annotationlib.ForwardRef.evaluate",
+    "annotationlib.get_annotations",
+    "optparse.Values.read_file",
+    "optparse.Values.read_module",
 }
 
 DEFAULT_BLOCKLISTED_MODULE_PREFIXES = (
     "os.exec",
     "os.spawn",
+    # Whole logging.config namespace: dictConfig/fileConfig and every
+    # BaseConfigurator/DictConfigurator method resolve and call config-named
+    # factories (arbitrary code) on the legacy/no-whitelist path. Block the
+    # family with one prefix instead of enumerating methods. Stopgap only; the
+    # permanent control for logging config is the target whitelist (GHSA-c3wx).
+    # Hydra's own logging calls logging.config.dictConfig directly (not via
+    # instantiate), so this does not affect it.
+    "logging.config.",
+    # doctest executes example code from docstrings/files (run_docstring_examples,
+    # testmod, testfile, DocTestRunner.run, ...). Block the family by default;
+    # inert constructors used to assemble tests are excepted below.
+    "doctest.",
+    # Whole-module deserialization/tracing machinery. shelve.* shelf classes
+    # unpickle values on access; trace.* delegates to CoverageResults which
+    # unpickles a counts file. The inert Trace constructor is excepted below.
+    "shelve.",
+    "trace.",
+    # pydoc imports/executes modules and files (importfile runs a file,
+    # safeimport imports by name). Inert documentation formatters are excepted
+    # below.
+    "pydoc.",
+    # Debugger machinery: pdb/bdb run/eval user strings (pdb.run/runeval,
+    # Pdb._getval/_getval_except/default, Bdb.run/runeval/runctx). Whole
+    # families; no legitimate instantiate() use.
+    "pdb.",
+    "bdb.",
 )
+
+# Exact legitimate constructors within otherwise blocked module families. Exact
+# entries in DEFAULT_BLOCKLISTED_MODULES still take precedence over exceptions.
+# An exception permits only the named target, not its methods or descendants.
+DEFAULT_BLOCKLISTED_MODULE_PREFIX_EXCEPTIONS = {
+    "doctest.DocTest",
+    "doctest.DocTestParser",
+    "doctest.Example",
+    "pydoc.HTMLDoc",
+    "pydoc.TextDoc",
+    "trace.Trace",
+}
+
+# These callables cannot be safely authorized by the target-name whitelist.
+# Some retain temporary legacy compatibility while users migrate; generic
+# dispatch primitives are also blocked on the legacy path.
+NON_WHITELISTABLE_TARGETS = {
+    "operator.call",
+    "operator.attrgetter",
+    "operator.methodcaller",
+    "_operator.call",
+    "_operator.attrgetter",
+    "_operator.methodcaller",
+    "hydra._internal.instantiate._instantiate2.instantiate",
+}
+
+# These targets resolve another object from a config-controlled dotpath. The
+# selected path is itself an authorization boundary, independent of whether the
+# helper is called immediately or returned through Hydra-native partial support.
+DISCOVERY_TARGETS = {
+    "hydra.utils.get_class",
+    "hydra.utils.get_method",
+    # get_static_method is currently an alias of get_method; list it explicitly
+    # so gating does not depend on that aliasing implementation detail.
+    "hydra.utils.get_static_method",
+    "hydra.utils.get_object",
+}
+
+# These targets may return a callable selected by config data. Non-callable
+# results remain ordinary values; callable results must independently satisfy
+# the active target policy before they can flow into another config target.
+CALLABLE_RESULT_TARGETS = {
+    "builtins.getattr",
+    "functools.partial",
+}
+DEFERRED_CALLABLE_SELECTION_TARGETS = DISCOVERY_TARGETS | CALLABLE_RESULT_TARGETS
 
 
 class _UnsafeAllowAllTargets:
@@ -149,10 +297,11 @@ def _is_target(x: Any) -> bool:
 
 def _is_blocklisted_target(target: str) -> bool:
     canonical_target = _get_os_alias_target(target)
-    return (
-        canonical_target in DEFAULT_BLOCKLISTED_MODULES
-        or canonical_target.startswith(DEFAULT_BLOCKLISTED_MODULE_PREFIXES)
-    )
+    if canonical_target in DEFAULT_BLOCKLISTED_MODULES:
+        return True
+    if canonical_target in DEFAULT_BLOCKLISTED_MODULE_PREFIX_EXCEPTIONS:
+        return False
+    return canonical_target.startswith(DEFAULT_BLOCKLISTED_MODULE_PREFIXES)
 
 
 def _validate_target_whitelist_pattern(pattern: Any) -> str:
@@ -311,6 +460,25 @@ def _warn_legacy_target_whitelist(target: str) -> None:
     )
 
 
+def _warn_direct_functools_partial_target() -> None:
+    stacklevel = 1
+    frame = inspect.currentframe()
+    while frame is not None:
+        if frame.f_code.co_filename != __file__:
+            break
+        stacklevel += 1
+        frame = frame.f_back
+    deprecation_warning(
+        dedent(
+            """\
+            Using '_target_: functools.partial' is deprecated. Set '_target_' to
+            the effective callable and use '_partial_: true' instead. Direct
+            functools.partial targets will become an error in Hydra 1.5."""
+        ),
+        stacklevel=stacklevel,
+    )
+
+
 def _extract_pos_args(input_args: Any, kwargs: Any) -> Tuple[Any, Any]:
     config_args = kwargs.pop(_Keys.ARGS, ())
     output_args = config_args
@@ -336,6 +504,7 @@ def _call_target(
     args: Tuple[Any, ...],
     kwargs: Dict[str, Any],
     full_key: str,
+    target_whitelist: NormalizedTargetWhitelist,
 ) -> Any:
     """Call target (type) with args and kwargs."""
     try:
@@ -347,10 +516,47 @@ def _call_target(
         )
         raise InstantiationException(_with_full_key(msg, full_key)) from e
 
+    resolved_target_name = _get_resolved_target_name_for_check(_target_)
+    if (
+        _partial_
+        and resolved_target_name in DEFERRED_CALLABLE_SELECTION_TARGETS
+        and target_whitelist is not None
+        and target_whitelist is not UNSAFE_ALLOW_ALL_TARGETS
+    ):
+        msg = dedent(
+            f"""\
+            Target '{resolved_target_name}' cannot use '_partial_: true' with the
+            instantiate target whitelist because its effective callable could be
+            selected after authorization. Resolve the callable immediately or use a
+            trusted Python wrapper."""
+        )
+        raise InstantiationException(_with_full_key(msg, full_key))
+
+    discovery_path = _authorize_discovery_path(
+        _target_, args, kwargs, full_key, target_whitelist
+    )
+    # For a deferred discovery partial on the legacy path, eagerly resolve and
+    # blocklist-check the selected target so a partial cannot smuggle a blocked
+    # callable past the stopgap. UNSAFE_ALLOW_ALL_TARGETS opts out of all checks
+    # and keeps discovery fully deferred.
+    if (
+        discovery_path is not None
+        and _partial_
+        and target_whitelist is not UNSAFE_ALLOW_ALL_TARGETS
+    ):
+        try:
+            discovered = _locate(discovery_path)
+        except Exception as e:
+            msg = f"Error locating discovered target '{discovery_path}'"
+            raise InstantiationException(_with_full_key(msg, full_key)) from e
+        if callable(discovered):
+            _authorize_discovery_result(
+                discovery_path, discovered, full_key, target_whitelist
+            )
     try:
         if _partial_:
             return functools.partial(_target_, *args, **kwargs)
-        return _target_(*args, **kwargs)
+        result = _target_(*args, **kwargs)
     except Exception as e:
         if _partial_:
             msg = (
@@ -360,6 +566,34 @@ def _call_target(
         else:
             msg = f"Error in call to target '{_convert_target_to_string(_target_)}':\n{repr(e)}"
         raise InstantiationException(_with_full_key(msg, full_key)) from e
+
+    if discovery_path is not None and callable(result):
+        _authorize_discovery_result(discovery_path, result, full_key, target_whitelist)
+    if resolved_target_name == "builtins.getattr" and callable(result):
+        _authorize_callable_result(
+            result, resolved_target_name, full_key, target_whitelist
+        )
+    if resolved_target_name == "functools.partial" and isinstance(
+        result, functools.partial
+    ):
+        if (
+            target_whitelist is not UNSAFE_ALLOW_ALL_TARGETS
+            and type(result) is not functools.partial
+        ):
+            msg = dedent(
+                """\
+                Direct functools.partial targets cannot construct partial subclasses
+                because overrides can hide their invocation behavior. Set '_target_'
+                to the effective callable and use '_partial_: true' instead."""
+            )
+            raise InstantiationException(_with_full_key(msg, full_key))
+        _authorize_callable_result(
+            functools.partial.func.__get__(result),
+            resolved_target_name,
+            full_key,
+            target_whitelist,
+        )
+    return result
 
 
 def _convert_target_to_string(t: Any) -> Any:
@@ -383,17 +617,34 @@ def _get_target_name_for_check(target: Union[str, type, Callable[..., Any]]) -> 
 def _get_resolved_target_name_for_check(target: Callable[..., Any]) -> str:
     """Return the security identity of a resolved callable.
 
-    Bound ``__call__`` attributes must be authorized as the callable they wrap,
-    not as a generic method or method-wrapper. Unwrap recursively because
-    repeated ``.__call__`` traversal creates another bound wrapper each time.
+    Bound ``__call__`` attributes, ``functools.partial`` objects, and unbound
+    descriptors owned by denied operator types must be authorized as the
+    callable they wrap or expose, not as generic callable containers. Unwrap
+    recursively because either wrapper form can wrap the other.
     """
     seen: set[int] = set()
-    while id(target) not in seen and getattr(target, "__name__", None) == "__call__":
+    while id(target) not in seen:
         seen.add(id(target))
-        owner = getattr(target, "__self__", None)
-        if owner is None or not callable(owner):
-            break
-        target = owner
+        if getattr(target, "__name__", None) == "__call__":
+            owner = getattr(target, "__self__", None)
+            if owner is not None and callable(owner):
+                target = owner
+                continue
+        if isinstance(target, functools.partial):
+            target = target.func
+            continue
+        break
+    descriptor_owner = getattr(target, "__objclass__", None)
+    if descriptor_owner is operator.attrgetter:
+        return "operator.attrgetter"
+    if descriptor_owner is operator.methodcaller:
+        return "operator.methodcaller"
+    if target is functools.partial.__new__:
+        return "functools.partial"
+    if target is operator.attrgetter.__new__:
+        return "operator.attrgetter"
+    if target is operator.methodcaller.__new__:
+        return "operator.methodcaller"
     return _get_target_name_for_check(target)
 
 
@@ -461,6 +712,21 @@ def _resolved_from_note(target_name: str, resolved_from: str) -> str:
 
 def _blocklisted_target_message(target_name: str, resolved_from: str) -> str:
     resolved_note = _resolved_from_note(target_name, resolved_from)
+    if target_name in {
+        "operator.call",
+        "operator.attrgetter",
+        "operator.methodcaller",
+        "_operator.call",
+        "_operator.attrgetter",
+        "_operator.methodcaller",
+    }:
+        return dedent(
+            f"""\
+            Target '{target_name}'{resolved_note} is blocklisted because it performs
+            generic selection or dispatch using config data.
+            Set '_target_' to the intended callable instead. Pass
+            UNSAFE_ALLOW_ALL_TARGETS only to explicitly disable target safety checks."""
+        )
     return dedent(
         f"""\
         Target '{target_name}'{resolved_note} is blocklisted and cannot be instantiated from config
@@ -476,6 +742,57 @@ def _not_whitelisted_message(target_name: str, resolved_from: str) -> str:
         Target '{target_name}'{resolved_note} is not in the instantiate target whitelist.
         Pass _target_whitelist_ from trusted code to allow expected targets."""
     )
+
+
+def _non_whitelistable_target_message(target_name: str, resolved_from: str) -> str:
+    resolved_note = _resolved_from_note(target_name, resolved_from)
+    if target_name == "hydra._internal.instantiate._instantiate2.instantiate":
+        return dedent(
+            f"""\
+            Target '{target_name}'{resolved_note} cannot be authorized by the instantiate
+            target whitelist because reentrant instantiate calls do not safely inherit
+            the effective whitelist. Call instantiate() from trusted Python code instead."""
+        )
+    if target_name in {
+        "operator.call",
+        "operator.attrgetter",
+        "operator.methodcaller",
+        "_operator.call",
+        "_operator.attrgetter",
+        "_operator.methodcaller",
+    }:
+        return dedent(
+            f"""\
+            Target '{target_name}'{resolved_note} cannot be authorized by the instantiate
+            target whitelist because it performs generic selection or dispatch using
+            config data.
+            Set '_target_' to the intended callable instead."""
+        )
+    return dedent(
+        f"""\
+        Target '{target_name}'{resolved_note} cannot be authorized by the instantiate
+        target whitelist because it delegates the effective operation to config data.
+        Set '_target_' to the intended callable instead."""
+    )
+
+
+def _reject_non_whitelistable_target(
+    target_name: str,
+    resolved_from: str,
+    full_key: str,
+    target_whitelist: NormalizedTargetWhitelist,
+) -> None:
+    if (
+        target_whitelist is not None
+        and target_whitelist is not UNSAFE_ALLOW_ALL_TARGETS
+        and target_name in NON_WHITELISTABLE_TARGETS
+    ):
+        raise InstantiationException(
+            _with_full_key(
+                _non_whitelistable_target_message(target_name, resolved_from),
+                full_key,
+            )
+        )
 
 
 def _is_exactly_whitelisted(target: str, target_whitelist: Tuple[str, ...]) -> bool:
@@ -521,6 +838,9 @@ def _authorize_target_name(
     """
     if target_whitelist is UNSAFE_ALLOW_ALL_TARGETS:
         return
+    _reject_non_whitelistable_target(
+        target_name, resolved_from, full_key, target_whitelist
+    )
     if target_whitelist is None:
         if _is_blocklisted_target(target_name):
             raise InstantiationException(
@@ -536,6 +856,51 @@ def _authorize_target_name(
                 _not_whitelisted_message(target_name, resolved_from), full_key
             )
         )
+
+
+def _authorize_discovery_path(
+    target: Callable[..., Any],
+    args: Tuple[Any, ...],
+    kwargs: Dict[str, Any],
+    full_key: str,
+    target_whitelist: NormalizedTargetWhitelist,
+) -> Optional[str]:
+    """Authorize the dotpath consumed by a Hydra discovery helper."""
+    target_name = _get_resolved_target_name_for_check(target)
+    if target_name not in DISCOVERY_TARGETS:
+        return None
+
+    path = args[0] if args else kwargs.get("path")
+    if not isinstance(path, str):
+        return None
+    _authorize_target_name(path, path, full_key, target_whitelist)
+    return path
+
+
+def _authorize_discovery_result(
+    path: str,
+    result: Callable[..., Any],
+    full_key: str,
+    target_whitelist: NormalizedTargetWhitelist,
+) -> None:
+    """Recheck a discovered callable by its canonical security identity."""
+    resolved_name = _get_os_alias_target(_get_resolved_target_name_for_check(result))
+    _reject_non_whitelistable_target(resolved_name, path, full_key, target_whitelist)
+    if resolved_name != path and _requires_resolved_authorization(
+        path, target_whitelist
+    ):
+        _authorize_target_name(resolved_name, path, full_key, target_whitelist)
+
+
+def _authorize_callable_result(
+    result: Callable[..., Any],
+    resolved_from: str,
+    full_key: str,
+    target_whitelist: NormalizedTargetWhitelist,
+) -> None:
+    """Authorize a callable selected as another target's runtime result."""
+    resolved_name = _get_os_alias_target(_get_resolved_target_name_for_check(result))
+    _authorize_target_name(resolved_name, resolved_from, full_key, target_whitelist)
 
 
 def _resolve_target(
@@ -555,6 +920,7 @@ def _resolve_target(
         # already-resolved callable by its canonical identity.
         _authorize_target_name(target_name, target_name, full_key, target_whitelist)
 
+        resolved_name = target_name
         if isinstance(target, str):
             try:
                 target = _locate(target)
@@ -570,6 +936,9 @@ def _resolve_target(
             resolved_name = _get_os_alias_target(
                 _get_resolved_target_name_for_check(target)
             )
+            _reject_non_whitelistable_target(
+                resolved_name, target_name, full_key, target_whitelist
+            )
             if resolved_name != target_name and _requires_resolved_authorization(
                 target_name, target_whitelist
             ):
@@ -577,6 +946,8 @@ def _resolve_target(
                     resolved_name, target_name, full_key, target_whitelist
                 )
 
+        if resolved_name == "functools.partial":
+            _warn_direct_functools_partial_target()
         if target_whitelist is None:
             _warn_legacy_target_whitelist(target_name)
     if not callable(target):
@@ -1222,7 +1593,9 @@ def instantiate_node(
                     )
                     kwargs[key] = _convert_node(value, convert)
 
-            return _call_target(_target_, partial, args, kwargs, full_key)
+            return _call_target(
+                _target_, partial, args, kwargs, full_key, target_whitelist
+            )
         else:
             object_type = node._metadata.object_type
             if isinstance(overrides, DictConfig):
