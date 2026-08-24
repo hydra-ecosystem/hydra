@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T07:26:26Z",
+  "generated_at": "2026-08-24T07:59:01Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 100,
+    "open_total": 99,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.0
+        "percentage": 9.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 73,
-        "percentage": 73.0
+        "count": 72,
+        "percentage": 72.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.0
+        "percentage": 6.1
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 5,
-        "percentage": 5.0
+        "percentage": 5.1
       },
       {
         "category": "Refactor",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 94
+        "count": 93
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 17
+        "count": 18
       }
     ]
   },
@@ -703,21 +703,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2793"
-    },
-    {
-      "number": 2810,
-      "title": "hydra.errors.MissingConfigException: In 'hydra/config': Could not find 'hydra/sweeper/hgemm'",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-12-01",
-      "updated": "2026-07-15",
-      "labels": [
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2810"
     },
     {
       "number": 2814,
@@ -1932,9 +1917,31 @@
         "documentation"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
+    },
+    {
+      "number": 2810,
+      "title": "hydra.errors.MissingConfigException: In 'hydra/config': Could not find 'hydra/sweeper/hgemm'",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-12-01",
+      "updated": "2026-07-15",
+      "labels": [
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2810"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T07:59:01Z",
+      "kind": "closed",
+      "issue": 2810,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2810",
+      "title": "hydra.errors.MissingConfigException: In 'hydra/config': Could not find 'hydra/sweeper/hgemm'"
+    },
     {
       "ts": "2026-08-24T06:25:37Z",
       "kind": "closed",
@@ -3521,13 +3528,6 @@
         "number": 3319,
         "url": "https://github.com/facebookresearch/hydra/pull/3319"
       }
-    },
-    {
-      "ts": "2026-07-25T20:42:37Z",
-      "kind": "closed",
-      "issue": 1291,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1291",
-      "title": "ray launcher improvements"
     }
   ]
 }
