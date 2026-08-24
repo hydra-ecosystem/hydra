@@ -1,9 +1,9 @@
 {
-  "generated_on": "2026-08-23",
-  "generated_at": "2026-08-23T21:53:36Z",
+  "generated_on": "2026-08-24",
+  "generated_at": "2026-08-24T03:56:54Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 104,
+    "open_total": 103,
     "by_category": [
       {
         "category": "Bug",
@@ -15,7 +15,7 @@
         "category": "Enhancement",
         "emoji": "✨",
         "count": 76,
-        "percentage": 73.1
+        "percentage": 73.8
       },
       {
         "category": "Documentation",
@@ -26,14 +26,14 @@
       {
         "category": "Question",
         "emoji": "❓",
-        "count": 6,
-        "percentage": 5.8
+        "count": 5,
+        "percentage": 4.9
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 3.8
+        "percentage": 3.9
       },
       {
         "category": "Build",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 98
+        "count": 97
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 13
+        "count": 14
       }
     ]
   },
@@ -684,21 +684,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2759"
-    },
-    {
-      "number": 2786,
-      "title": "Hydra + Submitit Help",
-      "category": "Question",
-      "category_emoji": "❓",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-11-07",
-      "updated": "2026-07-15",
-      "labels": [
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2786"
     },
     {
       "number": 2791,
@@ -1821,6 +1806,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2775"
     },
     {
+      "number": 2782,
+      "title": "[Feature Request] Add an additional node to the defaults tree",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-10-30",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2782"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1903,22 +1904,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3398"
     },
     {
-      "number": 2782,
-      "title": "[Feature Request] Add an additional node to the defaults tree",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2023-10-30",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2782"
-    },
-    {
       "number": 3402,
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior",
       "category": "Documentation",
@@ -1932,9 +1917,31 @@
         "documentation"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
+    },
+    {
+      "number": 2786,
+      "title": "Hydra + Submitit Help",
+      "category": "Question",
+      "category_emoji": "❓",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-11-07",
+      "updated": "2026-07-15",
+      "labels": [
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2786"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T03:56:54Z",
+      "kind": "closed",
+      "issue": 2786,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2786",
+      "title": "Hydra + Submitit Help"
+    },
     {
       "ts": "2026-08-23T21:53:36Z",
       "kind": "closed",
@@ -3521,13 +3528,6 @@
       "issue": 3318,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3318",
       "title": "Dangling Defaults List override can override a command-line append"
-    },
-    {
-      "ts": "2026-07-25T19:19:05Z",
-      "kind": "closed",
-      "issue": 1431,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1431",
-      "title": "PrettyErrors doesn't work with Hydra"
     }
   ]
 }

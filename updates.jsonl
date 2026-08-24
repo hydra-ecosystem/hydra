@@ -722,3 +722,4 @@
 {"ts": "2026-08-23T21:53:36Z", "kind": "new", "issue": 3406, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406", "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin"}
 {"ts": "2026-08-23T21:53:36Z", "kind": "closed", "issue": 2782, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2782", "title": "[Feature Request] Add an additional node to the defaults tree"}
 {"ts": "2026-08-23T21:53:36Z", "kind": "closed", "issue": 3402, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3402", "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior"}
+{"ts": "2026-08-24T03:56:54Z", "kind": "closed", "issue": 2786, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2786", "title": "Hydra + Submitit Help"}

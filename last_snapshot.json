@@ -6,6 +6,7 @@
     "2770": "2026-08-23",
     "2775": "2026-08-23",
     "2782": "2026-08-23",
+    "2786": "2026-08-24",
     "3385": "2026-08-12",
     "3386": "2026-08-12",
     "3395": "2026-08-15",
@@ -14,7 +15,7 @@
     "3398": "2026-08-15",
     "3402": "2026-08-23"
   },
-  "generated_at": "2026-08-23T21:53:36Z",
+  "generated_at": "2026-08-24T03:56:54Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -304,18 +305,6 @@
       "status": "not started",
       "title": "[Feature Request] Dry run option for sweeper / launcher",
       "updated_at": "2026-08-11T17:24:43Z"
-    },
-    "2786": {
-      "category": "Question",
-      "created_at": "2023-11-07T18:41:29Z",
-      "labels": [
-        "triage"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "Hydra + Submitit Help",
-      "updated_at": "2026-07-15T13:16:22Z"
     },
     "2791": {
       "category": "Enhancement",
@@ -1434,6 +1423,18 @@
       "status": "done",
       "title": "[Feature Request] Add an additional node to the defaults tree",
       "updated_at": "2026-07-15T13:16:23Z"
+    },
+    "2786": {
+      "category": "Question",
+      "created_at": "2023-11-07T18:41:29Z",
+      "labels": [
+        "triage"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Hydra + Submitit Help",
+      "updated_at": "2026-07-15T13:16:22Z"
     },
     "3385": {
       "category": "Enhancement",
