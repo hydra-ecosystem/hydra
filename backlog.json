@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T18:15:01Z",
+  "generated_at": "2026-08-24T20:01:14Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 102,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 96
+        "count": 95
       },
       {
         "status": "done",
@@ -71,6 +71,24 @@
     ]
   },
   "issues": [
+    {
+      "number": 3411,
+      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3412,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3412"
+        }
+      ],
+      "created": "2026-08-24",
+      "updated": "2026-08-24",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
+    },
     {
       "number": 802,
       "title": "Improve Hydra test coverage to 100%",
@@ -1677,7 +1695,7 @@
     },
     {
       "number": 3410,
-      "title": "Backport instantiate aliasing fix (#3409) to 1.3.6 and release 1.4.0.dev9",
+      "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9",
       "category": "Build",
       "category_emoji": "🏗️",
       "status": "not started",
@@ -1687,19 +1705,6 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3410"
-    },
-    {
-      "number": 3411,
-      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-24",
-      "updated": "2026-08-24",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
     },
     {
       "number": 2762,
@@ -1974,6 +1979,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T20:01:14Z",
+      "kind": "pr",
+      "issue": 3411,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
+      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
+      "detail": "linked #3412"
+    },
+    {
+      "ts": "2026-08-24T20:01:14Z",
+      "kind": "status",
+      "issue": 3411,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
+      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3412,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3412"
+      }
+    },
     {
       "ts": "2026-08-24T18:15:01Z",
       "kind": "new",
@@ -3548,20 +3573,6 @@
       "issue": 1112,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1112",
       "title": "Nightly builds"
-    },
-    {
-      "ts": "2026-07-26T18:48:13Z",
-      "kind": "closed",
-      "issue": 1164,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1164",
-      "title": "Move non-user facing tools out of `hydra/tools`"
-    },
-    {
-      "ts": "2026-07-26T18:27:03Z",
-      "kind": "closed",
-      "issue": 1174,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1174",
-      "title": "[Bug][configen] Generates unquoted str defaults when type hints include Optional[  ]"
     }
   ]
 }
