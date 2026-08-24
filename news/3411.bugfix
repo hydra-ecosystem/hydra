@@ -1,0 +1,2 @@
+``instantiate()`` blocks unsafe targets and refuses to whitelist
+config-controlled execution surfaces.

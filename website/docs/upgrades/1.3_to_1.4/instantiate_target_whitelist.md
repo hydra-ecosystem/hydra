@@ -88,7 +88,103 @@ as `my_app.*` allows any importable target under that Python namespace, includin
 modules contributed by other installed distributions. For shared namespaces,
 prefer exact target names or narrower prefixes.
 
+## Migrate direct `functools.partial` targets
+
+Do not use `functools.partial` as `_target_`. It accepts the effective callable
+as config data. Hydra checks the completed partial's effective callable against
+the active target policy, so a target whitelist must authorize both the direct
+`functools.partial` spelling and the effective callable. Equivalent constructor
+spellings such as `functools.partial.__new__` receive the same check.
+
+Use Hydra's native partial support instead. Replace:
+
+```yaml
+_target_: functools.partial
+_args_:
+  - _target_: hydra.utils.get_class
+    path: my_app.Optimizer
+lr: 0.01
+```
+
+with:
+
+```yaml
+_target_: my_app.Optimizer
+_partial_: true
+lr: 0.01
+```
+
+Direct `functools.partial` targets remain deprecated and will become an error in
+Hydra 1.5. They cannot use `_partial_: true` with a real target whitelist
+because construction—and therefore validation of the effective callable—would
+be deferred. The explicit `UNSAFE_ALLOW_ALL_TARGETS` escape hatch permits that
+deferred behavior outside the target whitelist's security guarantee.
+Equivalent constructor spellings cannot construct partial subclasses while
+safety checks are active because subclass overrides can hide their invocation
+behavior.
+
+## Replace generic operator dispatch
+
+Hydra blocklists generic `operator` dispatch and selection targets on the legacy
+path and refuses to authorize them through `_target_whitelist_`. This includes
+`call`, `attrgetter`, `methodcaller`, `getitem`, `itemgetter`, `setitem`,
+`delitem`, and `contains`, plus their canonical `_operator` spellings. These
+targets let config data select the effective callable, attribute, method, or
+item operation instead of naming it as `_target_`, which can extend a narrow
+whitelist entry into generic selection or dispatch authority. Set `_target_` to
+the intended callable, or call it from trusted Python code, instead.
+
+## Authorize config-selected callable results
+
+When `hydra.utils.get_class`, `get_method`, `get_static_method`, or
+`get_object` is itself an instantiate target, its `path` value selects another
+object. Authorize both the helper and the selected path from trusted code:
+
+```python
+obj = instantiate(
+    {
+        "_target_": "hydra.utils.get_method",
+        "path": "my_app.make_model",
+    },
+    _target_whitelist_=[
+        "hydra.utils.get_method",
+        "my_app.make_model",
+    ],
+)
+```
+
+Hydra applies the active blocklist or whitelist to the selected path and
+rechecks callable results by canonical identity. This prevents a trusted
+whitelist entry for the helper from authorizing an unrelated callable selected
+by config data.
+
+Hydra does not authorize `builtins.getattr`, `hasattr`, `setattr`, or `delattr`
+through a real target whitelist. Attribute operations can execute property or
+custom descriptor code before Hydra can inspect and authorize the operation.
+Access or mutate the intended attribute from trusted Python code instead. The
+equivalent `object.__getattribute__` and `type.__getattribute__` dispatch targets
+cannot be authorized either.
+
+Discovery helpers cannot use `_partial_: true` with a real target whitelist.
+The partial could receive its selected path after instantiate's authorization
+has finished. Resolve the value immediately, or expose a narrow trusted Python
+wrapper for the intended operation. The explicit `UNSAFE_ALLOW_ALL_TARGETS`
+escape hatch keeps discovery and attribute access unrestricted. On the legacy
+no-whitelist path, immediately selected callables are still checked against the
+blocklist and ordinary non-callable attribute values remain unchanged.
+
+Do not configure `hydra.utils.instantiate`, `hydra.utils.call`, or the internal
+`instantiate` function as `_target_`. Hydra refuses to authorize these aliases
+because a reentrant call cannot yet safely inherit the effective whitelist.
+Call `instantiate()` from trusted Python code instead.
+
 ## Legacy behavior
+
+The legacy blocklist has two policy levels. Generally problematic operations
+are blocked by default but can be explicitly authorized from trusted Python
+code. Targets that let config data control executable behavior, unsafe loading,
+imports, or generic dispatch are blocked in legacy mode and cannot be
+authorized by a normal target whitelist. Use a narrow trusted wrapper instead.
 
 To preserve legacy all-target behavior, use `UNSAFE_ALLOW_ALL_TARGETS`
 explicitly:

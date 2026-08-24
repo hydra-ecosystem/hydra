@@ -1,9 +1,12 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import asyncio
 import copy
 import inspect
+import operator
 import os
 import pickle
 import re
+import warnings
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from textwrap import dedent
@@ -68,6 +71,68 @@ from tests.instantiate import (
     partial_equal,
     recisinstance,
 )
+
+operator_attrgetter = operator.attrgetter
+operator_itemgetter = operator.itemgetter
+operator_methodcaller = operator.methodcaller
+object_getattribute = object.__getattribute__
+type_getattribute = type.__getattribute__
+builtin_delattr = delattr
+builtin_hasattr = hasattr
+builtin_setattr = setattr
+
+
+class GetattrDescriptorProbe:
+    descriptor_accessed = False
+    descriptor_deleted = False
+    descriptor_set = False
+
+    @property
+    def payload(self) -> int:
+        type(self).descriptor_accessed = True
+        return 10
+
+    @payload.setter
+    def payload(self, value: int) -> None:
+        type(self).descriptor_set = True
+
+    @payload.deleter
+    def payload(self) -> None:
+        type(self).descriptor_deleted = True
+
+
+class GetattributeMeta(type):
+    descriptor_accessed = False
+
+    @property
+    def payload(cls) -> int:
+        type(cls).descriptor_accessed = True
+        return 10
+
+
+class GetattributeTypeProbe(metaclass=GetattributeMeta):
+    pass
+
+
+class ItemOperationProbe:
+    item_accessed = False
+    item_deleted = False
+    item_set = False
+    membership_checked = False
+
+    def __getitem__(self, key: str) -> int:
+        type(self).item_accessed = True
+        return 10
+
+    def __setitem__(self, key: str, value: int) -> None:
+        type(self).item_set = True
+
+    def __delitem__(self, key: str) -> None:
+        type(self).item_deleted = True
+
+    def __contains__(self, item: object) -> bool:
+        type(self).membership_checked = True
+        return False
 
 
 @fixture(
@@ -2737,7 +2802,6 @@ def test_cannot_locate_target(instantiate_func: Any) -> None:
         "ctypes.windll.LoadLibrary",
         "importlib.import_module",
         "os.execl",
-        "os.getcwd",
         "os.popen",
         "os.posix_spawn",
         "posix.kill",
@@ -2756,13 +2820,7 @@ def test_blocklisted_target_fails(target: str) -> None:
     cfg = OmegaConf.create({"foo": {"_target_": target}})
     with raises(
         InstantiationException,
-        match=re.escape(
-            dedent(f"""\
-                Target '{target}' is blocklisted and cannot be instantiated from config
-                to prevent security vulnerabilities.
-                Pass _target_whitelist_ from trusted code to allow expected targets.
-                full_key: foo""")
-        ),
+        match=rf"Target '{re.escape(target)}'.*blocklisted",
     ) as exc_info:
         _instantiate2.instantiate(cfg)
     err = exc_info.value
@@ -2771,10 +2829,95 @@ def test_blocklisted_target_fails(target: str) -> None:
     assert chained is None
 
 
+@mark.parametrize(
+    "target",
+    [
+        "importlib.machinery.ExtensionFileLoader.create_module",
+        "importlib.machinery.ExtensionFileLoader.exec_module",
+        "importlib.machinery.ExtensionFileLoader.load_module",
+        "importlib.machinery.SourceFileLoader.exec_module",
+        "importlib.machinery.SourceFileLoader.load_module",
+        "importlib.machinery.SourcelessFileLoader.exec_module",
+        "importlib.machinery.SourcelessFileLoader.load_module",
+        "_frozen_importlib_external.ExtensionFileLoader.create_module",
+        "_frozen_importlib_external.ExtensionFileLoader.exec_module",
+        "_frozen_importlib_external.FileLoader.load_module",
+        "_frozen_importlib_external._LoaderBasics.exec_module",
+    ],
+)
+def test_importlib_loader_execution_targets_are_blocklisted(target: str) -> None:
+    with (
+        warnings.catch_warnings(),
+        raises(InstantiationException, match="blocklisted"),
+    ):
+        warnings.simplefilter("ignore")
+        _instantiate2.instantiate({"_target_": target})
+
+
+@mark.parametrize(
+    "target",
+    [
+        "importlib.machinery.SourceFileLoader.load_module",
+        "_frozen_importlib_external.FileLoader.load_module",
+    ],
+)
+def test_importlib_source_loader_is_blocked_before_execution(
+    target: str, tmp_path: Any
+) -> None:
+    source = tmp_path / "payload.py"
+    marker = tmp_path / "executed"
+    source.write_text(
+        f"from pathlib import Path\nPath({str(marker)!r}).write_text('executed')\n"
+    )
+    cfg = {
+        "_target_": target,
+        "_args_": [
+            {
+                "_target_": "importlib.machinery.SourceFileLoader",
+                "_args_": ["hydra_loader_payload", str(source)],
+            }
+        ],
+    }
+
+    with (
+        warnings.catch_warnings(),
+        raises(InstantiationException, match="blocklisted"),
+    ):
+        warnings.simplefilter("ignore")
+        _instantiate2.instantiate(cfg)
+
+    assert not marker.exists()
+
+
 def test_target_whitelist_warns_in_legacy_mode() -> None:
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10, "b": 20, "c": 30}
     with warns(UserWarning, match=r"This\s+warning will become an error in Hydra 1\.5"):
         assert _instantiate2.instantiate(cfg) == AClass(a=10, b=20, c=30)
+
+
+def test_direct_functools_partial_target_warns_in_legacy_mode() -> None:
+    cfg = {"_target_": "functools.partial", "_args_": [pow], "exp": 2}
+
+    with warns(UserWarning) as records:
+        factory = _instantiate2.instantiate(cfg)
+
+    assert factory(3) == 9
+    assert any(
+        "Using '_target_: functools.partial' is deprecated" in str(record.message)
+        and "use '_partial_: true' instead" in str(record.message)
+        for record in records
+    )
+
+
+def test_direct_functools_partial_target_warns_with_unsafe_allow_all() -> None:
+    cfg = {"_target_": "functools.partial", "_args_": [pow], "exp": 2}
+
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        factory = _instantiate2.instantiate(
+            cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+        )
+
+    assert factory(3) == 9
 
 
 def test_target_whitelist_warning_points_to_user_callsite() -> None:
@@ -2971,6 +3114,32 @@ def test_target_whitelist_context_reset_replaces_outer_context() -> None:
         assert _instantiate2.instantiate(cfg) == AClass(a=10, b=20, c=30)
 
 
+def test_target_whitelist_policy_isolates_overlapping_async_contexts() -> None:
+    policy = target_whitelist("tests.instantiate.AClass")
+    first_entered = asyncio.Event()
+    second_entered = asyncio.Event()
+    first_exited = asyncio.Event()
+
+    async def first() -> None:
+        try:
+            with policy:
+                first_entered.set()
+                await second_entered.wait()
+        finally:
+            first_exited.set()
+
+    async def second() -> None:
+        await first_entered.wait()
+        with policy:
+            second_entered.set()
+            await first_exited.wait()
+
+    async def run() -> None:
+        await asyncio.gather(first(), second())
+
+    asyncio.run(run())
+
+
 def test_target_whitelist_policy_can_be_passed_to_instantiate(
     instantiate_func: Any,
 ) -> None:
@@ -3039,8 +3208,919 @@ def test_target_whitelist_in_config_is_rejected(instantiate_func: Any) -> None:
 def test_target_whitelist_can_explicitly_allow_blocklisted_targets(
     instantiate_func: Any,
 ) -> None:
-    cfg = {"_target_": "builtins.eval", "_args_": ["1+2"]}
-    assert instantiate_func(cfg, _target_whitelist_="builtins.eval") == 3
+    assert _instantiate2._is_blocklisted_target("_sitebuiltins.Quitter")
+    assert not _instantiate2._is_non_whitelistable_target("_sitebuiltins.Quitter")
+    cfg = {
+        "_target_": "_sitebuiltins.Quitter",
+        "_args_": ["probe", None],
+    }
+    result = instantiate_func(cfg, _target_whitelist_="_sitebuiltins.Quitter")
+    assert type(result).__module__ == "_sitebuiltins"
+    assert type(result).__qualname__ == "Quitter"
+
+
+@mark.parametrize("target", sorted(_instantiate2.UNCONTROLLED_EXECUTION_TARGETS))
+def test_uncontrolled_execution_targets_cannot_be_whitelisted(target: str) -> None:
+    assert _instantiate2._is_blocklisted_target(target)
+    assert _instantiate2._is_non_whitelistable_target(target)
+    cfg = {"_target_": target}
+
+    with raises(InstantiationException, match="cannot be authorized"):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+
+
+@mark.parametrize(
+    "target",
+    [
+        "os.execl",
+        "os.spawnl",
+        "logging.config.valid_ident",
+        "doctest.OutputChecker",
+        "shelve.open",
+        "trace.main",
+        "pydoc.cram",
+        "pdb.help",
+        "bdb.Bdb",
+    ],
+)
+def test_uncontrolled_execution_families_cannot_be_whitelisted(target: str) -> None:
+    assert _instantiate2._is_blocklisted_target(target)
+    assert _instantiate2._is_non_whitelistable_target(target)
+    with raises(InstantiationException, match="cannot be authorized"):
+        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+
+
+def test_getcwd_is_not_blocklisted() -> None:
+    with warns(UserWarning, match="with no\n_target_whitelist_"):
+        assert _instantiate2.instantiate({"_target_": "os.getcwd"}) == os.getcwd()
+
+    assert (
+        _instantiate2.instantiate(
+            {"_target_": "os.getcwd"}, _target_whitelist_="os.getcwd"
+        )
+        == os.getcwd()
+    )
+
+
+def test_ineffective_sys_modules_entries_are_not_in_policy() -> None:
+    for target in (
+        "sys.modules.ipdb",
+        "sys.modules.joblib",
+        "sys.modules.resource",
+        "sys.modules.psutil",
+        "sys.modules.tkinter",
+    ):
+        assert target not in _instantiate2.DEFAULT_BLOCKLISTED_MODULES
+        assert target not in _instantiate2.UNCONTROLLED_EXECUTION_TARGETS
+
+
+def test_blocklist_policy_sections_are_disjoint() -> None:
+    assert _instantiate2.DEFAULT_BLOCKLISTED_MODULES.isdisjoint(
+        _instantiate2.UNCONTROLLED_EXECUTION_TARGETS
+    )
+
+
+@mark.parametrize(
+    "target",
+    [
+        "operator.call",
+        "operator.contains",
+        "operator.delitem",
+        "operator.attrgetter",
+        "operator.getitem",
+        "operator.itemgetter",
+        "operator.methodcaller",
+        "operator.setitem",
+        "_operator.call",
+        "_operator.contains",
+        "_operator.delitem",
+        "_operator.attrgetter",
+        "_operator.getitem",
+        "_operator.itemgetter",
+        "_operator.methodcaller",
+        "_operator.setitem",
+    ],
+)
+def test_operator_dispatch_targets_are_blocklisted(target: str) -> None:
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate({"_target_": target})
+
+
+@mark.parametrize(
+    "target",
+    [
+        "operator.call",
+        "operator.contains",
+        "operator.delitem",
+        "operator.attrgetter",
+        "operator.getitem",
+        "operator.itemgetter",
+        "operator.methodcaller",
+        "operator.setitem",
+        "_operator.call",
+        "_operator.contains",
+        "_operator.delitem",
+        "_operator.attrgetter",
+        "_operator.getitem",
+        "_operator.itemgetter",
+        "_operator.methodcaller",
+        "_operator.setitem",
+    ],
+)
+def test_target_whitelist_cannot_authorize_operator_dispatch(target: str) -> None:
+    with raises(
+        InstantiationException,
+        match=r"generic selection or dispatch using\s+config data",
+    ):
+        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+
+
+@mark.parametrize(
+    ("target", "target_whitelist"),
+    [
+        (
+            "operator.methodcaller.__new__",
+            "operator.methodcaller.__new__",
+        ),
+        ("operator.methodcaller.__new__", "operator.*"),
+        (
+            "operator.methodcaller.__new__.__call__",
+            "operator.methodcaller.__new__.__call__",
+        ),
+        (
+            "tests.instantiate.test_instantiate.operator_methodcaller.__new__",
+            "tests.instantiate.test_instantiate.operator_methodcaller.__new__",
+        ),
+    ],
+)
+def test_target_whitelist_cannot_authorize_methodcaller_constructor(
+    target: str, target_whitelist: str
+) -> None:
+    with raises(
+        InstantiationException,
+        match=r"Target 'operator\.methodcaller'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(
+            {"_target_": target}, _target_whitelist_=target_whitelist
+        )
+
+
+def test_target_whitelist_rejects_methodcaller_constructor_callable() -> None:
+    with raises(
+        InstantiationException,
+        match=r"Target 'operator\.methodcaller'.*cannot be authorized",
+    ):
+        _resolve_target(
+            operator.methodcaller.__new__,
+            full_key="",
+            target_whitelist=("operator.methodcaller",),
+        )
+
+
+def test_methodcaller_constructor_alias_is_blocklisted() -> None:
+    with raises(
+        InstantiationException,
+        match=r"Target 'operator\.methodcaller'.*resolved from.*blocklisted",
+    ):
+        _instantiate2.instantiate({"_target_": "operator.methodcaller.__new__"})
+
+
+@mark.parametrize(
+    ("target", "target_whitelist"),
+    [
+        ("operator.attrgetter.__new__", "operator.attrgetter.__new__"),
+        ("operator.attrgetter.__new__", "operator.*"),
+        (
+            "operator.attrgetter.__new__.__call__",
+            "operator.attrgetter.__new__.__call__",
+        ),
+        (
+            "tests.instantiate.test_instantiate.operator_attrgetter.__new__",
+            "tests.instantiate.test_instantiate.operator_attrgetter.__new__",
+        ),
+    ],
+)
+def test_target_whitelist_cannot_authorize_attrgetter_constructor(
+    target: str, target_whitelist: str
+) -> None:
+    with raises(
+        InstantiationException,
+        match=r"Target 'operator\.attrgetter'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(
+            {"_target_": target}, _target_whitelist_=target_whitelist
+        )
+
+
+def test_target_whitelist_rejects_attrgetter_constructor_callable() -> None:
+    with raises(
+        InstantiationException,
+        match=r"Target 'operator\.attrgetter'.*cannot be authorized",
+    ):
+        _resolve_target(
+            operator.attrgetter.__new__,
+            full_key="",
+            target_whitelist=("operator.attrgetter",),
+        )
+
+
+def test_attrgetter_constructor_alias_is_blocklisted() -> None:
+    with raises(
+        InstantiationException,
+        match=r"Target 'operator\.attrgetter'.*resolved from.*blocklisted",
+    ):
+        _instantiate2.instantiate({"_target_": "operator.attrgetter.__new__"})
+
+
+@mark.parametrize(
+    "target",
+    [
+        "operator.itemgetter.__new__",
+        "tests.instantiate.test_instantiate.operator_itemgetter.__new__",
+    ],
+)
+def test_target_whitelist_cannot_authorize_itemgetter_constructor(
+    target: str,
+) -> None:
+    with raises(
+        InstantiationException,
+        match=r"Target 'operator\.itemgetter'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+
+
+def test_itemgetter_constructor_alias_is_blocklisted() -> None:
+    with raises(
+        InstantiationException,
+        match=r"Target 'operator\.itemgetter'.*resolved from.*blocklisted",
+    ):
+        _instantiate2.instantiate({"_target_": "operator.itemgetter.__new__"})
+
+
+@mark.parametrize(
+    ("target", "descriptor", "canonical_target"),
+    [
+        (
+            "operator.attrgetter.__call__",
+            operator.attrgetter.__call__,
+            "operator.attrgetter",
+        ),
+        (
+            "operator.attrgetter.__reduce__",
+            operator.attrgetter.__reduce__,
+            "operator.attrgetter",
+        ),
+        (
+            "operator.itemgetter.__call__",
+            operator.itemgetter.__call__,
+            "operator.itemgetter",
+        ),
+        (
+            "operator.itemgetter.__reduce__",
+            operator.itemgetter.__reduce__,
+            "operator.itemgetter",
+        ),
+        (
+            "operator.methodcaller.__call__",
+            operator.methodcaller.__call__,
+            "operator.methodcaller",
+        ),
+        (
+            "operator.methodcaller.__reduce__",
+            operator.methodcaller.__reduce__,
+            "operator.methodcaller",
+        ),
+    ],
+)
+def test_target_whitelist_cannot_authorize_operator_dispatch_descriptors(
+    target: str, descriptor: Any, canonical_target: str
+) -> None:
+    match = rf"Target '{canonical_target}'.*cannot be authorized"
+    with raises(InstantiationException, match=match):
+        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+
+    with raises(InstantiationException, match=match):
+        _resolve_target(descriptor, full_key="", target_whitelist=(target,))
+
+
+@mark.parametrize(
+    ("target", "canonical_target"),
+    [
+        ("operator.attrgetter.__call__", "operator.attrgetter"),
+        ("operator.itemgetter.__call__", "operator.itemgetter"),
+        ("operator.methodcaller.__call__", "operator.methodcaller"),
+    ],
+)
+def test_operator_dispatch_descriptors_are_blocklisted(
+    target: str, canonical_target: str
+) -> None:
+    with raises(
+        InstantiationException,
+        match=rf"Target '{canonical_target}'.*resolved from.*blocklisted",
+    ):
+        _instantiate2.instantiate({"_target_": target})
+
+
+def test_legacy_operator_error_does_not_recommend_target_whitelist() -> None:
+    with raises(InstantiationException) as exc_info:
+        _instantiate2.instantiate({"_target_": "operator.methodcaller"})
+
+    message = str(exc_info.value)
+    assert "_target_whitelist_" not in message
+    assert "UNSAFE_ALLOW_ALL_TARGETS" in message
+    assert "Set '_target_' to the intended callable instead" in message
+
+
+@mark.parametrize(
+    ("target", "receiver", "marker_owner", "target_whitelist"),
+    [
+        (
+            "builtins.object.__getattribute__",
+            {"_target_": "tests.instantiate.test_instantiate.GetattrDescriptorProbe"},
+            GetattrDescriptorProbe,
+            [
+                "builtins.object.__getattribute__",
+                "tests.instantiate.test_instantiate.GetattrDescriptorProbe",
+            ],
+        ),
+        (
+            "tests.instantiate.test_instantiate.object_getattribute",
+            {"_target_": "tests.instantiate.test_instantiate.GetattrDescriptorProbe"},
+            GetattrDescriptorProbe,
+            [
+                "tests.instantiate.test_instantiate.object_getattribute",
+                "tests.instantiate.test_instantiate.GetattrDescriptorProbe",
+            ],
+        ),
+        (
+            "builtins.type.__getattribute__",
+            {
+                "_target_": "hydra.utils.get_class",
+                "path": "tests.instantiate.test_instantiate.GetattributeTypeProbe",
+            },
+            GetattributeMeta,
+            [
+                "builtins.type.__getattribute__",
+                "hydra.utils.get_class",
+                "tests.instantiate.test_instantiate.GetattributeTypeProbe",
+            ],
+        ),
+        (
+            "tests.instantiate.test_instantiate.type_getattribute",
+            {
+                "_target_": "hydra.utils.get_class",
+                "path": "tests.instantiate.test_instantiate.GetattributeTypeProbe",
+            },
+            GetattributeMeta,
+            [
+                "tests.instantiate.test_instantiate.type_getattribute",
+                "hydra.utils.get_class",
+                "tests.instantiate.test_instantiate.GetattributeTypeProbe",
+            ],
+        ),
+    ],
+)
+def test_target_whitelist_rejects_getattribute_before_descriptor_access(
+    target: str,
+    receiver: Dict[str, Any],
+    marker_owner: Any,
+    target_whitelist: List[str],
+) -> None:
+    marker_owner.descriptor_accessed = False
+    cfg = {"_target_": target, "_args_": [receiver, "payload"]}
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.(?:object|type)\.__getattribute__'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target_whitelist)
+
+    assert not marker_owner.descriptor_accessed
+
+
+def test_target_whitelist_rejects_getattr_before_descriptor_access() -> None:
+    GetattrDescriptorProbe.descriptor_accessed = False
+    probe_target = "tests.instantiate.test_instantiate.GetattrDescriptorProbe"
+    cfg = {
+        "_target_": "builtins.getattr",
+        "_args_": [
+            {"_target_": probe_target},
+            "payload",
+        ],
+    }
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.getattr'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=[
+                "builtins.getattr",
+                probe_target,
+            ],
+        )
+
+    assert not GetattrDescriptorProbe.descriptor_accessed
+
+
+@mark.parametrize(
+    ("target", "canonical_target", "args", "marker"),
+    [
+        ("builtins.hasattr", "builtins.hasattr", ["payload"], "descriptor_accessed"),
+        (
+            "tests.instantiate.test_instantiate.builtin_hasattr",
+            "builtins.hasattr",
+            ["payload"],
+            "descriptor_accessed",
+        ),
+        ("builtins.setattr", "builtins.setattr", ["payload", 20], "descriptor_set"),
+        (
+            "tests.instantiate.test_instantiate.builtin_setattr",
+            "builtins.setattr",
+            ["payload", 20],
+            "descriptor_set",
+        ),
+        ("builtins.delattr", "builtins.delattr", ["payload"], "descriptor_deleted"),
+        (
+            "tests.instantiate.test_instantiate.builtin_delattr",
+            "builtins.delattr",
+            ["payload"],
+            "descriptor_deleted",
+        ),
+    ],
+)
+def test_target_whitelist_rejects_attribute_dispatch_before_descriptor_access(
+    target: str, canonical_target: str, args: List[Any], marker: str
+) -> None:
+    probe_target = "tests.instantiate.test_instantiate.GetattrDescriptorProbe"
+    setattr(GetattrDescriptorProbe, marker, False)
+    cfg = {
+        "_target_": target,
+        "_args_": [{"_target_": probe_target}, *args],
+    }
+
+    with raises(
+        InstantiationException,
+        match=rf"Target '{re.escape(canonical_target)}'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=[target, probe_target],
+        )
+
+    assert not getattr(GetattrDescriptorProbe, marker)
+
+
+@mark.parametrize(
+    ("target", "args", "marker"),
+    [
+        ("operator.getitem", ["payload"], "item_accessed"),
+        ("_operator.getitem", ["payload"], "item_accessed"),
+        ("operator.setitem", ["payload", 20], "item_set"),
+        ("_operator.setitem", ["payload", 20], "item_set"),
+        ("operator.delitem", ["payload"], "item_deleted"),
+        ("_operator.delitem", ["payload"], "item_deleted"),
+        ("operator.contains", ["payload"], "membership_checked"),
+        ("_operator.contains", ["payload"], "membership_checked"),
+    ],
+)
+def test_target_whitelist_rejects_item_dispatch_before_receiver_access(
+    target: str, args: List[Any], marker: str
+) -> None:
+    probe_target = "tests.instantiate.test_instantiate.ItemOperationProbe"
+    setattr(ItemOperationProbe, marker, False)
+    cfg = {
+        "_target_": target,
+        "_args_": [{"_target_": probe_target}, *args],
+    }
+
+    with raises(
+        InstantiationException,
+        match=r"Target '_?operator\.(?:contains|delitem|getitem|setitem)'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=[target, probe_target],
+        )
+
+    assert not getattr(ItemOperationProbe, marker)
+
+
+def test_getattr_allows_non_callable_result_in_legacy_mode() -> None:
+    cfg = {
+        "_target_": "builtins.getattr",
+        "_args_": [
+            {"_target_": "types.SimpleNamespace", "value": 10},
+            "value",
+        ],
+    }
+
+    with warns(UserWarning, match="_target_whitelist_"):
+        assert _instantiate2.instantiate(cfg) == 10
+
+
+def test_getattr_callable_result_applies_legacy_blocklist() -> None:
+    cfg = {
+        "_target_": "builtins.getattr",
+        "_args_": [
+            {"_target_": "timeit.Timer", "stmt": "40 + 2"},
+            "timeit",
+        ],
+    }
+
+    with (
+        warns(UserWarning, match="_target_whitelist_"),
+        raises(
+            InstantiationException,
+            match=r"Target 'timeit\.Timer\.timeit'.*blocklisted",
+        ),
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_getattr_unwraps_partial_callable_result() -> None:
+    cfg = {
+        "_target_": "builtins.getattr",
+        "_args_": [partial(eval), "__call__"],
+    }
+
+    with (
+        warns(UserWarning, match="_target_whitelist_"),
+        raises(
+            InstantiationException,
+            match=r"Target 'builtins\.eval'.*blocklisted",
+        ),
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_target_whitelist_cannot_authorize_getattr_callable_result() -> None:
+    cfg = {
+        "_target_": "builtins.getattr",
+        "_args_": [
+            {"_target_": "timeit.Timer", "stmt": "40 + 2"},
+            "timeit",
+        ],
+    }
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.getattr'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=[
+                "builtins.getattr",
+                "timeit.Timer",
+                "timeit.Timer.timeit",
+            ],
+        )
+
+
+def test_getattr_map_dispatch_chain_is_rejected() -> None:
+    cfg = {
+        "_target_": "builtins.list",
+        "_args_": [
+            {
+                "_target_": "builtins.map",
+                "_args_": [
+                    {
+                        "_target_": "builtins.getattr",
+                        "_args_": [
+                            {"_target_": "timeit.Timer", "stmt": "40 + 2"},
+                            "timeit",
+                        ],
+                    },
+                    [1],
+                ],
+            }
+        ],
+    }
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.getattr'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=[
+                "builtins.getattr",
+                "builtins.list",
+                "builtins.map",
+                "timeit.Timer",
+            ],
+        )
+
+
+def test_getattr_cannot_be_partial_with_target_whitelist() -> None:
+    cfg = {"_target_": "builtins.getattr", "_partial_": True}
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.getattr'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.getattr")
+
+
+def test_unsafe_allow_all_permits_partial_getattr() -> None:
+    cfg = {"_target_": "builtins.getattr", "_partial_": True}
+
+    factory = _instantiate2.instantiate(
+        cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+    )
+    assert factory(str, "upper") is str.upper
+
+
+@mark.parametrize(
+    ("target", "target_whitelist"),
+    [
+        ("functools.partial", "functools.partial"),
+        ("functools.partial", "functools.*"),
+        (
+            "tests.instantiate.test_instantiate.partial",
+            "tests.instantiate.test_instantiate.partial",
+        ),
+    ],
+)
+def test_target_whitelist_authorizes_functools_partial_and_effective_callable(
+    target: str, target_whitelist: str
+) -> None:
+    cfg = {"_target_": target, "_args_": [pow], "exp": 2}
+
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        factory = _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=[target_whitelist, "builtins.pow"],
+        )
+
+    assert factory(3) == 9
+
+
+def test_target_whitelist_checks_functools_partial_effective_callable() -> None:
+    cfg = {"_target_": "functools.partial", "_args_": [pow], "exp": 2}
+
+    with (
+        warns(UserWarning, match=r"Using '_target_: functools\.partial'"),
+        raises(
+            InstantiationException,
+            match=r"Target 'builtins\.pow'.*not in the instantiate target whitelist",
+        ),
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="functools.partial")
+
+
+@mark.parametrize(
+    ("target", "target_whitelist"),
+    [
+        ("functools.partial.__new__", "functools.partial.__new__"),
+        ("functools.partial.__new__", "functools.*"),
+        (
+            "tests.instantiate.test_instantiate.partial.__new__",
+            "tests.instantiate.test_instantiate.partial.__new__",
+        ),
+    ],
+)
+def test_target_whitelist_authorizes_functools_partial_constructor(
+    target: str, target_whitelist: str
+) -> None:
+    cfg = {"_target_": target, "_args_": [partial, pow], "exp": 2}
+
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        factory = _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=[target_whitelist, "builtins.pow"],
+        )
+
+    assert factory(3) == 9
+
+
+@mark.parametrize(
+    "target_whitelist", [None, ["functools.partial.__new__", "builtins.len"]]
+)
+def test_functools_partial_constructor_rejects_subclass_with_spoofed_func(
+    target_whitelist: Any,
+) -> None:
+    spoofed_partial = type(
+        "SpoofedPartial",
+        (partial,),
+        {"func": property(lambda _: len)},
+    )
+    cfg = {
+        "_target_": "functools.partial.__new__",
+        "_args_": [spoofed_partial, eval],
+    }
+
+    with (
+        warns(UserWarning),
+        raises(InstantiationException, match="cannot construct partial subclasses"),
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target_whitelist)
+
+
+def test_unsafe_allow_all_permits_functools_partial_subclass() -> None:
+    spoofed_partial = type(
+        "SpoofedPartial",
+        (partial,),
+        {"func": property(lambda _: len)},
+    )
+    cfg = {
+        "_target_": "functools.partial.__new__",
+        "_args_": [spoofed_partial, eval],
+    }
+
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        factory = _instantiate2.instantiate(
+            cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+        )
+
+    assert factory("1 + 2") == 3
+
+
+def test_direct_functools_partial_applies_legacy_blocklist_to_callable() -> None:
+    cfg = {"_target_": "functools.partial", "_args_": [eval]}
+
+    with (
+        warns(UserWarning),
+        raises(
+            InstantiationException,
+            match=r"Target 'builtins\.eval'.*blocklisted",
+        ),
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_unsafe_allow_all_permits_blocklisted_functools_partial_callable() -> None:
+    cfg = {"_target_": "functools.partial", "_args_": [eval]}
+
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        factory = _instantiate2.instantiate(
+            cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+        )
+
+    assert factory("1 + 2") == 3
+
+
+def test_direct_functools_partial_cannot_be_deferred_with_target_whitelist() -> None:
+    cfg = {"_target_": "functools.partial", "_partial_": True}
+
+    with (
+        warns(UserWarning, match=r"Using '_target_: functools\.partial'"),
+        raises(
+            InstantiationException,
+            match=r"cannot use '_partial_: true'",
+        ),
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="functools.partial")
+
+
+def test_native_partial_remains_whitelistable() -> None:
+    cfg = {
+        "_target_": "tests.instantiate.module_function",
+        "_partial_": True,
+        "x": 10,
+    }
+
+    factory = _instantiate2.instantiate(
+        cfg, _target_whitelist_="tests.instantiate.module_function"
+    )
+
+    assert factory() == 10
+
+
+@mark.parametrize(
+    ("target", "target_whitelist"),
+    [
+        ("hydra.utils.instantiate", "hydra.utils.instantiate"),
+        ("hydra.utils.call", "hydra.utils.*"),
+        (
+            "hydra._internal.instantiate._instantiate2.instantiate",
+            "hydra._internal.instantiate._instantiate2.instantiate",
+        ),
+    ],
+)
+def test_target_whitelist_cannot_authorize_instantiate_reentry(
+    target: str, target_whitelist: str
+) -> None:
+    cfg = {"_target_": target, "_recursive_": False, "config": {}}
+
+    with raises(
+        InstantiationException,
+        match=r"reentrant instantiate calls do not safely inherit",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target_whitelist)
+
+
+@mark.parametrize(
+    ("target", "path", "expected"),
+    [
+        (
+            "hydra._internal.utils._locate",
+            "tests.instantiate.module_function",
+            module_function,
+        ),
+        ("hydra.utils.get_class", "tests.instantiate.AClass", AClass),
+        (
+            "hydra.utils.get_method",
+            "tests.instantiate.module_function",
+            module_function,
+        ),
+        (
+            "hydra.utils.get_static_method",
+            "tests.instantiate.module_function",
+            module_function,
+        ),
+        (
+            "hydra.utils.get_object",
+            "tests.instantiate.module_function",
+            module_function,
+        ),
+    ],
+)
+def test_discovery_targets_require_selected_path_authorization(
+    target: str, path: str, expected: Any
+) -> None:
+    cfg = {"_target_": target, "path": path}
+
+    with raises(
+        InstantiationException,
+        match=rf"Target '{re.escape(path)}' is not in the instantiate target whitelist",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+
+    assert _instantiate2.instantiate(cfg, _target_whitelist_=[target, path]) is expected
+
+
+def test_internal_locate_requires_selected_path_authorization() -> None:
+    cfg = {
+        "_target_": "hydra._internal.utils._locate",
+        "path": "tests.instantiate.module_function",
+    }
+
+    with raises(
+        InstantiationException,
+        match="Target 'tests.instantiate.module_function' is not in the instantiate target whitelist",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="hydra.*")
+
+
+def test_discovery_target_applies_legacy_blocklist_to_selected_path() -> None:
+    cfg = {"_target_": "hydra.utils.get_method", "path": "builtins.eval"}
+
+    with (
+        warns(UserWarning, match="_target_whitelist_"),
+        raises(
+            InstantiationException,
+            match="Target 'builtins.eval' is blocklisted",
+        ),
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    [
+        "hydra._internal.utils._locate",
+        "hydra.utils.get_class",
+        "hydra.utils.get_method",
+        "hydra.utils.get_static_method",
+        "hydra.utils.get_object",
+    ],
+)
+def test_discovery_target_cannot_be_partial_with_target_whitelist(target: str) -> None:
+    cfg = {"_target_": target, "_partial_": True}
+
+    with raises(
+        InstantiationException,
+        match=r"cannot use '_partial_: true'",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+
+
+def test_partial_discovery_target_applies_legacy_blocklist() -> None:
+    cfg = {
+        "_target_": "hydra.utils.get_method",
+        "_partial_": True,
+        "path": "logging.os.system",
+    }
+
+    with (
+        warns(UserWarning, match="_target_whitelist_"),
+        raises(
+            InstantiationException,
+            match=r"Target 'os\.system'.*blocklisted",
+        ),
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_unsafe_allow_all_permits_partial_discovery_target() -> None:
+    cfg = {"_target_": "hydra.utils.get_method", "_partial_": True}
+
+    factory = _instantiate2.instantiate(
+        cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+    )
+
+    assert factory("builtins.str") is str
 
 
 def test_target_whitelist_unsafe_allows_all_targets(instantiate_func: Any) -> None:
@@ -3743,7 +4823,7 @@ def test_whitelist_blocks_module_attribute_aliases() -> None:
     cfg = OmegaConf.create({"_target_": "logging.os.system", "_args_": ["true"]})
     with raises(
         InstantiationException,
-        match="not in the instantiate target whitelist",
+        match="cannot be authorized by the",
     ):
         _instantiate2.instantiate(cfg, _target_whitelist_="logging.*")
 
@@ -3767,11 +4847,17 @@ def test_whitelist_allows_os_callable_objects(target: Callable[..., Any]) -> Non
     assert _resolve_target(target, "", ("os.*",)) is target
 
 
-@mark.parametrize("target", ["posix.system", "ntpath.join"])
-def test_whitelist_does_not_alias_literal_target_strings(target: str) -> None:
-    with raises(
-        InstantiationException, match="not in the instantiate target whitelist"
-    ):
+@mark.parametrize(
+    ("target", "message"),
+    [
+        ("posix.system", "cannot be authorized by the"),
+        ("ntpath.join", "not in the instantiate target whitelist"),
+    ],
+)
+def test_whitelist_does_not_alias_literal_target_strings(
+    target: str, message: str
+) -> None:
+    with raises(InstantiationException, match=message):
         _resolve_target(target, "", ("os.*",))
 
 
@@ -3794,6 +4880,319 @@ def test_whitelist_wildcard_still_blocks_alias_after_exact_reexport_rule() -> No
     cfg = OmegaConf.create({"_target_": "logging.os.system", "_args_": ["true"]})
     with raises(
         InstantiationException,
-        match="not in the instantiate target whitelist",
+        match="cannot be authorized by the",
     ):
         _instantiate2.instantiate(cfg, _target_whitelist_="logging.*")
+
+
+@mark.parametrize(
+    "target",
+    [
+        "pickle.loads",
+        "pickle.load",
+        "pickle.Unpickler",
+        "_pickle.loads",  # canonical C spelling must be blocked too
+        "_pickle.load",
+        "marshal.loads",
+        "marshal.load",
+        "shelve.open",
+        "trace.CoverageResults",
+        "tracemalloc.Snapshot.load",
+        "dill.load",
+        "dill.loads",
+        "cloudpickle.load",
+        "cloudpickle.loads",
+    ],
+)
+def test_deserialization_sinks_are_blocklisted(target: str) -> None:
+    # Direct-instantiate unpickle sinks are refused on the legacy path. This
+    # removes the trivial inline RCE vector; the target whitelist remains the
+    # boundary, and users who genuinely need to deserialize wrap it in their own
+    # callable.
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+def test_pickle_base64_chain_is_blocklisted() -> None:
+    # The reporter's inline vector: pickle.loads(base64.b64decode("...")). The
+    # outer pickle.loads target is refused before the chain runs.
+    cfg = OmegaConf.create(
+        {
+            "_target_": "pickle.loads",
+            "_args_": [{"_target_": "base64.b64decode", "_args_": ["gA=="]}],
+        }
+    )
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    [
+        "timeit.timeit",
+        "timeit.repeat",
+        "timeit.main",
+        "timeit.Timer.timeit",
+        "timeit.Timer.repeat",
+        "timeit.Timer.autorange",
+        "cProfile.run",
+        "cProfile.runctx",
+        "cProfile.Profile.run",
+        "cProfile.Profile.runctx",
+        "profile.run",
+        "profile.runctx",
+        "profile.Profile.run",
+        "profile.Profile.runctx",
+        "bdb.Bdb.run",
+        "bdb.Bdb.runeval",
+        "bdb.Bdb.runctx",
+        "pdb.run",
+        "pdb.runeval",
+        "pdb.Pdb.run",
+        "pdb.Pdb.runeval",
+        "pdb.Pdb.runctx",
+        "trace.Trace.run",
+        "trace.Trace.runctx",
+        "code.interact",
+        "code.InteractiveInterpreter.runsource",
+        "code.InteractiveInterpreter.runcode",
+        "code.InteractiveConsole.push",
+        "typing.ForwardRef._evaluate",
+        "typing._eval_type",
+        "typing.evaluate_forward_ref",
+        "typing.get_type_hints",
+        "annotationlib.ForwardRef._evaluate",
+        "annotationlib.ForwardRef.evaluate",
+        "annotationlib.get_annotations",
+        "optparse.Values.read_file",
+    ],
+)
+def test_exec_wrapper_targets_are_blocklisted(target: str) -> None:
+    # Standard-library functions that exec/eval a user-supplied string. They have
+    # no legitimate instantiate() use, so they are blocked directly (this is what
+    # closed the reporter's timeit.timeit vector). The whitelist stays the boundary.
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "cfg",
+    [
+        {
+            "_target_": "bdb.Bdb.run",
+            "_args_": [
+                {"_target_": "bdb.Bdb"},
+                "raise RuntimeError('must not execute')",
+            ],
+        },
+        {
+            "_target_": "timeit.Timer.timeit",
+            "_args_": [
+                {
+                    "_target_": "timeit.Timer",
+                    "stmt": "raise RuntimeError('must not execute')",
+                },
+                1,
+            ],
+        },
+        {
+            "_target_": "doctest.debug_script",
+            "_args_": ["raise RuntimeError('must not execute')"],
+        },
+        {
+            "_target_": "typing.ForwardRef._evaluate",
+            "_args_": [
+                {
+                    "_target_": "typing.ForwardRef",
+                    "_args_": [
+                        "(_ for _ in ()).throw(RuntimeError('must not execute'))"
+                    ],
+                },
+                {},
+                {},
+            ],
+            "recursive_guard": {"_target_": "builtins.set"},
+        },
+        {
+            "_target_": "typing.get_type_hints",
+            "_args_": [
+                {
+                    "_target_": "builtins.type",
+                    "_args_": [
+                        "Probe",
+                        {"_target_": "builtins.tuple"},
+                        {
+                            "__annotations__": {
+                                "payload": "(_ for _ in ()).throw(RuntimeError('must not execute'))"
+                            }
+                        },
+                    ],
+                    "_convert_": "all",
+                }
+            ],
+        },
+    ],
+)
+def test_exec_wrapper_chains_are_blocklisted(cfg: Any) -> None:
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    [
+        # pure-Python fallbacks — must not slip past the pickle block
+        "pickle._load",
+        "pickle._loads",
+        "pickle._Unpickler",
+        # exec-string siblings of cProfile.run / profile.run
+        "cProfile.runctx",
+        "profile.runctx",
+    ],
+)
+def test_blocklist_covers_alternate_sink_spellings(target: str) -> None:
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    [
+        "logging.config.dictConfig",
+        "logging.config.fileConfig",
+        "logging.config.BaseConfigurator.configure_custom",
+        "logging.config.DictConfigurator.configure",
+        "logging.config.DictConfigurator.configure_handler",
+        "logging.config.DictConfigurator.configure_formatter",
+        "logging.config.DictConfigurator.configure_filter",
+    ],
+)
+def test_logging_config_family_is_blocklisted(target: str) -> None:
+    # The whole logging.config namespace resolves/calls config-named factories
+    # (arbitrary code) on the legacy path. Covered by one prefix rather than
+    # enumerating configurator methods. Permanent control is the whitelist
+    # (GHSA-c3wx); this is the stopgap for 1.3 and the 1.4 legacy path.
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    [
+        "doctest.run_docstring_examples",
+        "doctest.testmod",
+        "doctest.testfile",
+        "doctest.Example.__init__",
+        "doctest.DocTestRunner.run",
+        "doctest.DebugRunner.run",
+        "doctest.debug_script",
+    ],
+)
+def test_doctest_family_is_blocklisted(target: str) -> None:
+    # doctest executes example code from docstrings/files; the whole family is
+    # covered by one prefix (no legitimate instantiate() use).
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    [
+        "shelve.open",
+        "shelve.DbfilenameShelf",
+        "shelve.Shelf",
+        "trace.CoverageResults",
+        "trace.Trace.results",
+        "trace.Trace.run",
+    ],
+)
+def test_shelve_and_trace_families_are_blocklisted(target: str) -> None:
+    # shelve shelf classes unpickle on access; trace delegates to CoverageResults
+    # which unpickles. Whole families covered by prefixes rather than one entry.
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    ["pydoc.importfile", "pydoc.safeimport", "pydoc.render_doc"],
+)
+def test_pydoc_family_is_blocklisted(target: str) -> None:
+    # pydoc imports/executes modules and files; covered by a prefix.
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "cfg",
+    [
+        {
+            "_target_": "doctest.Example",
+            "source": "pass\n",
+            "want": "",
+        },
+        {
+            "_target_": "doctest.DocTest",
+            "_args_": [[], {}, "probe", "probe.py", 0, ""],
+            "_convert_": "all",
+        },
+        {"_target_": "doctest.DocTestParser"},
+        {"_target_": "pydoc.HTMLDoc"},
+        {"_target_": "pydoc.TextDoc"},
+        {"_target_": "trace.Trace"},
+    ],
+)
+def test_blocklist_prefix_exceptions_are_allowed(cfg: Dict[str, Any]) -> None:
+    with warns(UserWarning, match="with no\n_target_whitelist_"):
+        result = _instantiate2.instantiate(cfg)
+    assert result is not None
+
+    target = cfg["_target_"]
+    assert _instantiate2.instantiate(cfg, _target_whitelist_=target) is not None
+
+
+def test_exact_blocklist_takes_precedence_over_prefix_exception(
+    monkeypatch: Any,
+) -> None:
+    monkeypatch.setattr(
+        _instantiate2,
+        "DEFAULT_BLOCKLISTED_MODULES",
+        {*_instantiate2.DEFAULT_BLOCKLISTED_MODULES, "trace.CoverageResults"},
+    )
+    monkeypatch.setattr(
+        _instantiate2,
+        "UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS",
+        {
+            *_instantiate2.UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
+            "trace.CoverageResults",
+        },
+    )
+    assert _instantiate2._is_blocklisted_target("trace.CoverageResults")
+
+
+@mark.parametrize(
+    "target",
+    [
+        "pdb.run",
+        "pdb.runeval",
+        "pdb.Pdb._getval",
+        "pdb.Pdb._getval_except",
+        "pdb.Pdb.default",
+        "pdb.Pdb.run",
+        "bdb.Bdb.run",
+        "bdb.Bdb.runeval",
+        "bdb.Bdb.runctx",
+    ],
+)
+def test_debugger_families_are_blocklisted(target: str) -> None:
+    # pdb/bdb evaluate/execute user strings; whole families covered by prefix.
+    cfg = OmegaConf.create({"foo": {"_target_": target}})
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
