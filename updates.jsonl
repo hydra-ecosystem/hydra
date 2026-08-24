@@ -727,3 +727,4 @@
 {"ts": "2026-08-24T04:59:58Z", "kind": "closed", "issue": 2794, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2794", "title": "Merge compose API and `@hydra.main`"}
 {"ts": "2026-08-24T06:25:37Z", "kind": "closed", "issue": 2797, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2797", "title": "Use output_subdir on multirun"}
 {"ts": "2026-08-24T07:59:01Z", "kind": "closed", "issue": 2810, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2810", "title": "hydra.errors.MissingConfigException: In 'hydra/config': Could not find 'hydra/sweeper/hgemm'"}
+{"ts": "2026-08-24T08:22:42Z", "kind": "label", "issue": 2824, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2824", "title": "Option to raise exception upon first failure in multirun", "detail": "added \"sweep\"; removed \"triage\""}

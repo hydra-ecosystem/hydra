@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T07:59:01Z",
+  "generated_at": "2026-08-24T08:22:42Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 99,
@@ -729,10 +729,10 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2023-12-22",
-      "updated": "2026-07-15",
+      "updated": "2026-08-24",
       "labels": [
         "enhancement",
-        "triage"
+        "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2824"
     },
@@ -1822,6 +1822,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2797"
     },
     {
+      "number": 2810,
+      "title": "hydra.errors.MissingConfigException: In 'hydra/config': Could not find 'hydra/sweeper/hgemm'",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-12-01",
+      "updated": "2026-07-15",
+      "labels": [
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2810"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1917,24 +1932,17 @@
         "documentation"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
-    },
-    {
-      "number": 2810,
-      "title": "hydra.errors.MissingConfigException: In 'hydra/config': Could not find 'hydra/sweeper/hgemm'",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2023-12-01",
-      "updated": "2026-07-15",
-      "labels": [
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2810"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T08:22:42Z",
+      "kind": "label",
+      "issue": 2824,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2824",
+      "title": "Option to raise exception upon first failure in multirun",
+      "detail": "added \"sweep\"; removed \"triage\""
+    },
     {
       "ts": "2026-08-24T07:59:01Z",
       "kind": "closed",
@@ -3516,18 +3524,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3318",
       "title": "Dangling Defaults List override can override a command-line append",
       "detail": "linked #3319"
-    },
-    {
-      "ts": "2026-07-26T07:51:18Z",
-      "kind": "status",
-      "issue": 3318,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3318",
-      "title": "Dangling Defaults List override can override a command-line append",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3319,
-        "url": "https://github.com/facebookresearch/hydra/pull/3319"
-      }
     }
   ]
 }
