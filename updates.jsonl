@@ -725,3 +725,4 @@
 {"ts": "2026-08-24T03:56:54Z", "kind": "closed", "issue": 2786, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2786", "title": "Hydra + Submitit Help"}
 {"ts": "2026-08-24T04:43:39Z", "kind": "closed", "issue": 2791, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2791", "title": "Permission issues with the outputs folder when script is run by multiple users"}
 {"ts": "2026-08-24T04:59:58Z", "kind": "closed", "issue": 2794, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2794", "title": "Merge compose API and `@hydra.main`"}
+{"ts": "2026-08-24T06:25:37Z", "kind": "closed", "issue": 2797, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2797", "title": "Use output_subdir on multirun"}

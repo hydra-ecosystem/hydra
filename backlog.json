@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T04:59:58Z",
+  "generated_at": "2026-08-24T06:25:37Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 101,
+    "open_total": 100,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 8.9
+        "percentage": 9.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 74,
-        "percentage": 73.3
+        "count": 73,
+        "percentage": 73.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 5.9
+        "percentage": 6.0
       },
       {
         "category": "Question",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 95
+        "count": 94
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 16
+        "count": 17
       }
     ]
   },
@@ -703,22 +703,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2793"
-    },
-    {
-      "number": 2797,
-      "title": "Use output_subdir on multirun",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-11-17",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2797"
     },
     {
       "number": 2810,
@@ -1821,6 +1805,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2791"
     },
     {
+      "number": 2794,
+      "title": "Merge compose API and `@hydra.main`",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-11-16",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2794"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1918,23 +1918,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
     },
     {
-      "number": 2794,
-      "title": "Merge compose API and `@hydra.main`",
+      "number": 2797,
+      "title": "Use output_subdir on multirun",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2023-11-16",
+      "created": "2023-11-17",
       "updated": "2026-07-15",
       "labels": [
         "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2794"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2797"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T06:25:37Z",
+      "kind": "closed",
+      "issue": 2797,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2797",
+      "title": "Use output_subdir on multirun"
+    },
     {
       "ts": "2026-08-24T04:59:58Z",
       "kind": "closed",
@@ -3521,13 +3528,6 @@
       "issue": 1291,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1291",
       "title": "ray launcher improvements"
-    },
-    {
-      "ts": "2026-07-25T20:28:29Z",
-      "kind": "closed",
-      "issue": 3229,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3229",
-      "title": "Defaults-list overrides in appended configs do not override earlier overrides"
     }
   ]
 }
