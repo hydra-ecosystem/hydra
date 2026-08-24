@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T04:43:39Z",
+  "generated_at": "2026-08-24T04:59:58Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 102,
+    "open_total": 101,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 8.8
+        "percentage": 8.9
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 75,
-        "percentage": 73.5
+        "count": 74,
+        "percentage": 73.3
       },
       {
         "category": "Documentation",
@@ -27,19 +27,19 @@
         "category": "Question",
         "emoji": "❓",
         "count": 5,
-        "percentage": 4.9
+        "percentage": 5.0
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 3.9
+        "percentage": 4.0
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 2.9
+        "percentage": 3.0
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 96
+        "count": 95
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 15
+        "count": 16
       }
     ]
   },
@@ -703,22 +703,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2793"
-    },
-    {
-      "number": 2794,
-      "title": "Merge compose API and `@hydra.main`",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-11-16",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2794"
     },
     {
       "number": 2797,
@@ -1822,6 +1806,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2786"
     },
     {
+      "number": 2791,
+      "title": "Permission issues with the outputs folder when script is run by multiple users",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-11-10",
+      "updated": "2026-07-15",
+      "labels": [
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2791"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1919,22 +1918,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
     },
     {
-      "number": 2791,
-      "title": "Permission issues with the outputs folder when script is run by multiple users",
+      "number": 2794,
+      "title": "Merge compose API and `@hydra.main`",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2023-11-10",
+      "created": "2023-11-16",
       "updated": "2026-07-15",
       "labels": [
+        "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2791"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2794"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T04:59:58Z",
+      "kind": "closed",
+      "issue": 2794,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2794",
+      "title": "Merge compose API and `@hydra.main`"
+    },
     {
       "ts": "2026-08-24T04:43:39Z",
       "kind": "closed",
@@ -3521,13 +3528,6 @@
       "issue": 3229,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3229",
       "title": "Defaults-list overrides in appended configs do not override earlier overrides"
-    },
-    {
-      "ts": "2026-07-25T20:28:29Z",
-      "kind": "closed",
-      "issue": 1367,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1367",
-      "title": "[Feature Request] [Configen] Multiple path patterns"
     }
   ]
 }

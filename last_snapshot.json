@@ -8,6 +8,7 @@
     "2782": "2026-08-23",
     "2786": "2026-08-24",
     "2791": "2026-08-24",
+    "2794": "2026-08-24",
     "3385": "2026-08-12",
     "3386": "2026-08-12",
     "3395": "2026-08-15",
@@ -16,7 +17,7 @@
     "3398": "2026-08-15",
     "3402": "2026-08-23"
   },
-  "generated_at": "2026-08-24T04:43:39Z",
+  "generated_at": "2026-08-24T04:59:58Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -322,19 +323,6 @@
       "status": "not started",
       "title": "[Optuna Sweeper] Support persisted studies for analysis and resume",
       "updated_at": "2026-07-31T06:15:11Z"
-    },
-    "2794": {
-      "category": "Enhancement",
-      "created_at": "2023-11-16T08:49:26Z",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "Merge compose API and `@hydra.main`",
-      "updated_at": "2026-07-15T13:16:20Z"
     },
     "2797": {
       "category": "Enhancement",
@@ -1436,6 +1424,19 @@
       "status": "done",
       "title": "Permission issues with the outputs folder when script is run by multiple users",
       "updated_at": "2026-07-15T13:16:22Z"
+    },
+    "2794": {
+      "category": "Enhancement",
+      "created_at": "2023-11-16T08:49:26Z",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Merge compose API and `@hydra.main`",
+      "updated_at": "2026-07-15T13:16:20Z"
     },
     "3385": {
       "category": "Enhancement",
