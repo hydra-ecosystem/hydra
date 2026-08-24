@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T03:56:54Z",
+  "generated_at": "2026-08-24T04:43:39Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 103,
+    "open_total": 102,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 8.7
+        "percentage": 8.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 76,
-        "percentage": 73.8
+        "count": 75,
+        "percentage": 73.5
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 5.8
+        "percentage": 5.9
       },
       {
         "category": "Question",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 97
+        "count": 96
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 14
+        "count": 15
       }
     ]
   },
@@ -684,21 +684,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2759"
-    },
-    {
-      "number": 2791,
-      "title": "Permission issues with the outputs folder when script is run by multiple users",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-11-10",
-      "updated": "2026-07-15",
-      "labels": [
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2791"
     },
     {
       "number": 2793,
@@ -1822,6 +1807,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2782"
     },
     {
+      "number": 2786,
+      "title": "Hydra + Submitit Help",
+      "category": "Question",
+      "category_emoji": "❓",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-11-07",
+      "updated": "2026-07-15",
+      "labels": [
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2786"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1919,22 +1919,29 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
     },
     {
-      "number": 2786,
-      "title": "Hydra + Submitit Help",
-      "category": "Question",
-      "category_emoji": "❓",
+      "number": 2791,
+      "title": "Permission issues with the outputs folder when script is run by multiple users",
+      "category": "Enhancement",
+      "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2023-11-07",
+      "created": "2023-11-10",
       "updated": "2026-07-15",
       "labels": [
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2786"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2791"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T04:43:39Z",
+      "kind": "closed",
+      "issue": 2791,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2791",
+      "title": "Permission issues with the outputs folder when script is run by multiple users"
+    },
     {
       "ts": "2026-08-24T03:56:54Z",
       "kind": "closed",
@@ -3521,13 +3528,6 @@
       "issue": 1367,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1367",
       "title": "[Feature Request] [Configen] Multiple path patterns"
-    },
-    {
-      "ts": "2026-07-25T19:50:56Z",
-      "kind": "new",
-      "issue": 3318,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3318",
-      "title": "Dangling Defaults List override can override a command-line append"
     }
   ]
 }
