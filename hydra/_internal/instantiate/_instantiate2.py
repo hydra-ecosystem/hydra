@@ -3,7 +3,6 @@
 import copy
 import functools
 import inspect
-import os
 import re
 from contextvars import ContextVar
 from enum import Enum
@@ -20,6 +19,8 @@ from hydra.errors import InstantiationException
 from hydra.types import ConvertMode
 
 DEFAULT_BLOCKLISTED_MODULES = {
+    "_sitebuiltins._Helper",
+    "_sitebuiltins.Quitter",
     "builtins.exec",
     "builtins.eval",
     "builtins.__import__",
@@ -27,6 +28,7 @@ DEFAULT_BLOCKLISTED_MODULES = {
     "builtins.exit",
     "builtins.quit",
     "ctypes.CDLL",
+    "ctypes.LibraryLoader.LoadLibrary",
     "ctypes.OleDLL",
     "ctypes.PyDLL",
     "ctypes.WinDLL",
@@ -114,10 +116,15 @@ def _resolve_instantiate_override(token: str, *, _root_: Any) -> Any:
 
 
 def _get_os_alias_target(target: str) -> str:
-    for module in ("posix", "nt"):
+    for module, public_module in (
+        ("posix", "os"),
+        ("nt", "os"),
+        ("posixpath", "os.path"),
+        ("ntpath", "os.path"),
+    ):
         module_prefix = f"{module}."
         if target.startswith(module_prefix):
-            return f"os.{target[len(module_prefix) :]}"
+            return f"{public_module}.{target[len(module_prefix) :]}"
     return target
 
 
@@ -365,10 +372,29 @@ def _convert_target_to_string(t: Any) -> Any:
 def _get_target_name_for_check(target: Union[str, type, Callable[..., Any]]) -> str:
     if isinstance(target, str):
         return target
-    if hasattr(target, "__qualname__"):
-        return f"{target.__module__}.{target.__qualname__}"
+    module = getattr(target, "__module__", None)
+    qualname = getattr(target, "__qualname__", None)
+    if module is not None and qualname is not None:
+        return f"{module}.{qualname}"
     target_type = type(target)
     return f"{target_type.__module__}.{target_type.__qualname__}"
+
+
+def _get_resolved_target_name_for_check(target: Callable[..., Any]) -> str:
+    """Return the security identity of a resolved callable.
+
+    Bound ``__call__`` attributes must be authorized as the callable they wrap,
+    not as a generic method or method-wrapper. Unwrap recursively because
+    repeated ``.__call__`` traversal creates another bound wrapper each time.
+    """
+    seen: set[int] = set()
+    while id(target) not in seen and getattr(target, "__name__", None) == "__call__":
+        seen.add(id(target))
+        owner = getattr(target, "__self__", None)
+        if owner is None or not callable(owner):
+            break
+        target = owner
+    return _get_target_name_for_check(target)
 
 
 def _prepare_input_container(
@@ -429,6 +455,89 @@ def _validate_callsite_override(value: Any, path: Tuple[Any, ...]) -> None:
             _validate_callsite_override(child, (*path, index))
 
 
+def _resolved_from_note(target_name: str, resolved_from: str) -> str:
+    return "" if resolved_from == target_name else f" (resolved from '{resolved_from}')"
+
+
+def _blocklisted_target_message(target_name: str, resolved_from: str) -> str:
+    resolved_note = _resolved_from_note(target_name, resolved_from)
+    return dedent(
+        f"""\
+        Target '{target_name}'{resolved_note} is blocklisted and cannot be instantiated from config
+        to prevent security vulnerabilities.
+        Pass _target_whitelist_ from trusted code to allow expected targets."""
+    )
+
+
+def _not_whitelisted_message(target_name: str, resolved_from: str) -> str:
+    resolved_note = _resolved_from_note(target_name, resolved_from)
+    return dedent(
+        f"""\
+        Target '{target_name}'{resolved_note} is not in the instantiate target whitelist.
+        Pass _target_whitelist_ from trusted code to allow expected targets."""
+    )
+
+
+def _is_exactly_whitelisted(target: str, target_whitelist: Tuple[str, ...]) -> bool:
+    """True if target matches a non-wildcard (exact) whitelist entry."""
+    return any(
+        not pattern.endswith(".*") and target == pattern for pattern in target_whitelist
+    )
+
+
+def _requires_resolved_authorization(
+    target_name: str, target_whitelist: NormalizedTargetWhitelist
+) -> bool:
+    """Whether the resolved identity must be re-authorized after _locate().
+
+    The resolved-identity recheck is what closes aliasing bypasses, but it must
+    not punish a deliberate exact whitelist entry for a re-exported target
+    (e.g. 'json.JSONDecoder' whose canonical name is 'json.decoder.JSONDecoder').
+    An exact whitelist match on the config string is authoritative; only a
+    wildcard match still needs the recheck. The blocklist path always rechecks.
+    """
+    if target_whitelist is UNSAFE_ALLOW_ALL_TARGETS:
+        return False
+    if target_whitelist is None:
+        return True
+    return not _is_exactly_whitelisted(
+        target_name, cast(Tuple[str, ...], target_whitelist)
+    )
+
+
+def _authorize_target_name(
+    target_name: str,
+    resolved_from: str,
+    full_key: str,
+    target_whitelist: NormalizedTargetWhitelist,
+) -> None:
+    """Authorize a single target name against the active policy.
+
+    Called on the literal pre-resolution string and on resolved callable
+    identities. Checking the resolved identity is what closes module-attribute
+    aliasing bypasses (e.g. ``logging.os.system`` resolving to the blocklisted
+    ``os.system``), since a dotted string can name a callable that lives in a
+    different module than the string's prefix suggests.
+    """
+    if target_whitelist is UNSAFE_ALLOW_ALL_TARGETS:
+        return
+    if target_whitelist is None:
+        if _is_blocklisted_target(target_name):
+            raise InstantiationException(
+                _with_full_key(
+                    _blocklisted_target_message(target_name, resolved_from), full_key
+                )
+            )
+    elif not _is_target_whitelisted(
+        target_name, cast(Tuple[str, ...], target_whitelist)
+    ):
+        raise InstantiationException(
+            _with_full_key(
+                _not_whitelisted_message(target_name, resolved_from), full_key
+            )
+        )
+
+
 def _resolve_target(
     target: Union[str, type, Callable[..., Any]],
     full_key: str,
@@ -436,33 +545,15 @@ def _resolve_target(
 ) -> Union[type, Callable[..., Any]]:
     """Resolve target string, type or callable into type or callable."""
     if isinstance(target, str) or callable(target):
-        target_name = _get_target_name_for_check(target)
-        if target_whitelist is UNSAFE_ALLOW_ALL_TARGETS:
-            pass
-        elif target_whitelist is None:
-            if _is_blocklisted_target(target_name):
-                allowlist = os.environ.get("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "")
-                allowlist_entries = allowlist.split(":")
-                canonical_target = _get_os_alias_target(target_name)
-                if (
-                    target_name not in allowlist_entries
-                    and canonical_target not in allowlist_entries
-                ):
-                    msg = dedent(
-                        f"""\
-                        Target '{target_name}' is blocklisted and cannot be instantiated from config
-                        to prevent security vulnerabilities, set env var
-                        HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE={target_name}:<other allowlisted targets> to bypass"""
-                    )
-                    raise InstantiationException(_with_full_key(msg, full_key))
-            _warn_legacy_target_whitelist(target_name)
-        elif not _is_target_whitelisted(
-            target_name, cast(Tuple[str, ...], target_whitelist)
-        ):
-            msg = dedent(f"""\
-                Target '{target_name}' is not in the instantiate target whitelist.
-                Pass _target_whitelist_ from trusted code to allow expected targets.""")
-            raise InstantiationException(_with_full_key(msg, full_key))
+        target_name = (
+            target
+            if isinstance(target, str)
+            else _get_os_alias_target(_get_resolved_target_name_for_check(target))
+        )
+
+        # Stage 1: authorize a string literally before import, or authorize an
+        # already-resolved callable by its canonical identity.
+        _authorize_target_name(target_name, target_name, full_key, target_whitelist)
 
         if isinstance(target, str):
             try:
@@ -470,6 +561,24 @@ def _resolve_target(
             except Exception as e:
                 msg = f"Error locating target '{target}'"
                 raise InstantiationException(_with_full_key(msg, full_key)) from e
+
+            # Stage 2: authorize the resolved object's canonical identity. This
+            # closes aliasing bypasses where the string passes stage 1 but the
+            # resolved callable lives elsewhere (e.g. logging.os.system -> os.system).
+            # Skipped for an exact whitelist entry, which authoritatively allows a
+            # re-exported target whose canonical module differs from the string.
+            resolved_name = _get_os_alias_target(
+                _get_resolved_target_name_for_check(target)
+            )
+            if resolved_name != target_name and _requires_resolved_authorization(
+                target_name, target_whitelist
+            ):
+                _authorize_target_name(
+                    resolved_name, target_name, full_key, target_whitelist
+                )
+
+        if target_whitelist is None:
+            _warn_legacy_target_whitelist(target_name)
     if not callable(target):
         msg = f"Expected a callable target, got '{target}' of type '{type(target).__name__}'"
         raise InstantiationException(_with_full_key(msg, full_key))

@@ -2759,8 +2759,8 @@ def test_blocklisted_target_fails(target: str) -> None:
         match=re.escape(
             dedent(f"""\
                 Target '{target}' is blocklisted and cannot be instantiated from config
-                to prevent security vulnerabilities, set env var
-                HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE={target}:<other allowlisted targets> to bypass
+                to prevent security vulnerabilities.
+                Pass _target_whitelist_ from trusted code to allow expected targets.
                 full_key: foo""")
         ),
     ) as exc_info:
@@ -2769,28 +2769,6 @@ def test_blocklisted_target_fails(target: str) -> None:
     assert hasattr(err, "__cause__")
     chained = err.__cause__
     assert chained is None
-
-
-def test_allowlist_works(monkeypatch: Any) -> None:
-    cfg = OmegaConf.create(
-        {
-            "foo": {"_target_": "builtins.exec", "_args_": ["5+8"]},
-            "bar": {"_target_": "builtins.eval", "_args_": ["1+2"]},
-        }
-    )
-    monkeypatch.setenv(
-        "HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "builtins.exec:builtins.eval"
-    )
-    with warns(UserWarning, match="_target_whitelist_"):
-        res = _instantiate2.instantiate(cfg)
-    assert res.foo is None
-    assert res.bar == 3
-
-
-def test_allowlist_works_for_prefix_blocked_target(monkeypatch: Any) -> None:
-    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "os.execl")
-    with warns(UserWarning, match="_target_whitelist_"):
-        assert _resolve_target("os.execl", "") is os.execl
 
 
 def test_target_whitelist_warns_in_legacy_mode() -> None:
@@ -2884,6 +2862,20 @@ def test_target_whitelist_applies_to_callable_targets() -> None:
         )
         == "callable class"
     )
+
+
+def test_target_whitelist_preserves_bound_classmethod_identity() -> None:
+    cfg = OmegaConf.create(
+        {"_target_": ASubclass.class_method, "y": 10},
+        flags={"allow_objects": True},
+    )
+
+    result = _instantiate2.instantiate(
+        cfg, _target_whitelist_="tests.instantiate.ASubclass.class_method"
+    )
+
+    assert isinstance(result, ASubclass)
+    assert result.x == 11
 
 
 def test_non_recursive_plain_config_preserves_callable_target(
@@ -3054,13 +3046,6 @@ def test_target_whitelist_can_explicitly_allow_blocklisted_targets(
 def test_target_whitelist_unsafe_allows_all_targets(instantiate_func: Any) -> None:
     cfg = {"_target_": "builtins.eval", "_args_": ["1+2"]}
     assert instantiate_func(cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS) == 3
-
-
-def test_allowlist_works_for_canonical_os_alias(monkeypatch: Any) -> None:
-    alias_target = "nt.system" if os.name == "nt" else "posix.system"
-    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "os.system")
-    with warns(UserWarning, match="no\n_target_whitelist_"):
-        assert _resolve_target(alias_target, "") is os.system
 
 
 @mark.parametrize(
@@ -3719,3 +3704,96 @@ def test_dict_as_none(instantiate_func: Any) -> None:
     cfg = OmegaConf.structured(DictValuesConf)
     obj = instantiate_func(config=cfg)
     assert obj.d is None
+
+
+@mark.parametrize(
+    "alias",
+    [
+        "logging.os.system",  # os.system reached via logging's imported `os`
+        "logging.os.execl",  # prefix-blocked callable reached via an alias
+        "multiprocessing.sharedctypes.ctypes.cdll.LoadLibrary",
+        "multiprocessing.sharedctypes.ctypes.pydll.LoadLibrary",
+        "site.builtins.exit",
+        "site.builtins.help",
+        "site.builtins.exit.__call__",
+        "site.builtins.help.__call__",
+        "site.builtins.exit.__call__.__call__",
+        "os.system.__call__",
+        "logging.os.system.__call__",
+        "builtins.eval.__call__",
+    ],
+)
+def test_blocklist_blocks_module_attribute_aliases(alias: str) -> None:
+    # The alias is not literally in the blocklist, but resolves to a blocklisted
+    # callable. Authorization must be on the resolved identity, not the string.
+    with raises(InstantiationException, match="blocklisted"):
+        _resolve_target(alias, "")
+
+
+@mark.parametrize("target", [os.system.__call__, eval.__call__])
+def test_blocklist_blocks_callable_object_aliases(target: Callable[..., Any]) -> None:
+    with raises(InstantiationException, match="blocklisted"):
+        _resolve_target(target, "")
+
+
+def test_whitelist_blocks_module_attribute_aliases() -> None:
+    # A trailing-'.*' whitelist authorizes by string prefix; the alias
+    # 'logging.os.system' matches 'logging.*' but resolves to os.system and must
+    # be rejected on its resolved identity.
+    cfg = OmegaConf.create({"_target_": "logging.os.system", "_args_": ["true"]})
+    with raises(
+        InstantiationException,
+        match="not in the instantiate target whitelist",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="logging.*")
+
+
+def test_whitelist_allows_genuine_target_under_prefix() -> None:
+    # A genuine target whose resolved identity lives under the whitelisted
+    # prefix keeps working.
+    cfg = {"_target_": "tests.instantiate.AClass", "a": 10, "b": 20, "c": 30}
+    assert _instantiate2.instantiate(
+        cfg, _target_whitelist_="tests.instantiate.*"
+    ) == AClass(a=10, b=20, c=30)
+
+
+@mark.parametrize("target", ["os.getcwd", "os.path.join"])
+def test_whitelist_allows_os_implementation_aliases(target: str) -> None:
+    assert callable(_resolve_target(target, "", ("os.*",)))
+
+
+@mark.parametrize("target", [os.getcwd, os.path.join])
+def test_whitelist_allows_os_callable_objects(target: Callable[..., Any]) -> None:
+    assert _resolve_target(target, "", ("os.*",)) is target
+
+
+@mark.parametrize("target", ["posix.system", "ntpath.join"])
+def test_whitelist_does_not_alias_literal_target_strings(target: str) -> None:
+    with raises(
+        InstantiationException, match="not in the instantiate target whitelist"
+    ):
+        _resolve_target(target, "", ("os.*",))
+
+
+def test_whitelist_allows_exact_reexported_target() -> None:
+    # An exact (non-wildcard) whitelist entry is a deliberate per-target
+    # authorization and must be honored even when the class is re-exported from
+    # a submodule (json.JSONDecoder actually lives in json.decoder), whose
+    # canonical module.qualname differs from the config string.
+    import json
+
+    cfg = OmegaConf.create({"_target_": "json.JSONDecoder"})
+    obj = _instantiate2.instantiate(cfg, _target_whitelist_="json.JSONDecoder")
+    assert isinstance(obj, json.JSONDecoder)
+
+
+def test_whitelist_wildcard_still_blocks_alias_after_exact_reexport_rule() -> None:
+    # The exact-match honoring must not reopen the aliasing bypass for wildcard
+    # entries: 'logging.os.system' matches 'logging.*' only by wildcard, so the
+    # resolved identity (os.system) is still rechecked and rejected.
+    cfg = OmegaConf.create({"_target_": "logging.os.system", "_args_": ["true"]})
+    with raises(
+        InstantiationException,
+        match="not in the instantiate target whitelist",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="logging.*")
