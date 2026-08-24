@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-24",
-  "generated_at": "2026-08-24T15:56:27Z",
+  "generated_at": "2026-08-24T17:02:09Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 100,
+    "open_total": 101,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.0
+        "percentage": 8.9
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 73,
-        "percentage": 73.0
+        "percentage": 72.3
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.0
+        "percentage": 5.9
       },
       {
         "category": "Question",
@@ -38,8 +38,8 @@
       {
         "category": "Build",
         "emoji": "🏗️",
-        "count": 3,
-        "percentage": 3.0
+        "count": 4,
+        "percentage": 4.0
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 94
+        "count": 95
       },
       {
         "status": "done",
@@ -1676,6 +1676,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3408"
     },
     {
+      "number": 3410,
+      "title": "Backport instantiate aliasing fix (#3409) to 1.3.6 and release 1.4.0.dev9",
+      "category": "Build",
+      "category_emoji": "🏗️",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-24",
+      "updated": "2026-08-24",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3410"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1948,6 +1961,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-24T17:02:09Z",
+      "kind": "new",
+      "issue": 3410,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3410",
+      "title": "Backport instantiate aliasing fix (#3409) to 1.3.6 and release 1.4.0.dev9"
+    },
     {
       "ts": "2026-08-24T10:57:32Z",
       "kind": "new",
@@ -3529,13 +3549,6 @@
       "issue": 1241,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1241",
       "title": "[Configen][Bug] Configs for abstract classes with Generic Type"
-    },
-    {
-      "ts": "2026-07-26T17:33:09Z",
-      "kind": "closed",
-      "issue": 1228,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1228",
-      "title": "[Hydra doc] Improvement to doc search."
     }
   ]
 }

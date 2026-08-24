@@ -729,3 +729,4 @@
 {"ts": "2026-08-24T07:59:01Z", "kind": "closed", "issue": 2810, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2810", "title": "hydra.errors.MissingConfigException: In 'hydra/config': Could not find 'hydra/sweeper/hgemm'"}
 {"ts": "2026-08-24T08:22:42Z", "kind": "label", "issue": 2824, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2824", "title": "Option to raise exception upon first failure in multirun", "detail": "added \"sweep\"; removed \"triage\""}
 {"ts": "2026-08-24T10:57:32Z", "kind": "new", "issue": 3408, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3408", "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates"}
+{"ts": "2026-08-24T17:02:09Z", "kind": "new", "issue": 3410, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3410", "title": "Backport instantiate aliasing fix (#3409) to 1.3.6 and release 1.4.0.dev9"}
