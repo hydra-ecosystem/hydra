@@ -19,7 +19,7 @@
     "3398": "2026-08-15",
     "3402": "2026-08-23"
   },
-  "generated_at": "2026-08-24T20:01:14Z",
+  "generated_at": "2026-08-25T07:20:18Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -1155,7 +1155,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9",
-      "updated_at": "2026-08-24T18:29:34Z"
+      "updated_at": "2026-08-24T20:01:54Z"
     },
     "3411": {
       "category": "Enhancement",
