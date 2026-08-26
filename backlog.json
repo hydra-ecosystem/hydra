@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-26",
-  "generated_at": "2026-08-26T07:20:33Z",
+  "generated_at": "2026-08-26T07:22:53Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 102,
+    "open_total": 101,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 8.8
+        "percentage": 8.9
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 74,
-        "percentage": 72.5
+        "count": 73,
+        "percentage": 72.3
       },
       {
         "category": "Documentation",
@@ -27,26 +27,26 @@
         "category": "Question",
         "emoji": "❓",
         "count": 5,
-        "percentage": 4.9
+        "percentage": 5.0
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 3.9
+        "percentage": 4.0
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 4,
-        "percentage": 3.9
+        "percentage": 4.0
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,29 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 18
+        "count": 19
       }
     ]
   },
   "issues": [
-    {
-      "number": 3411,
-      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3412,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3412"
-        }
-      ],
-      "created": "2026-08-24",
-      "updated": "2026-08-24",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
-    },
     {
       "number": 802,
       "title": "Improve Hydra test coverage to 100%",
@@ -1976,9 +1958,34 @@
         "documentation"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
+    },
+    {
+      "number": 3411,
+      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3412,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3412"
+        }
+      ],
+      "created": "2026-08-24",
+      "updated": "2026-08-24",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-26T07:22:53Z",
+      "kind": "closed",
+      "issue": 3411,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
+      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets"
+    },
     {
       "ts": "2026-08-24T20:01:14Z",
       "kind": "pr",
@@ -3566,13 +3573,6 @@
         "number": 3320,
         "url": "https://github.com/facebookresearch/hydra/pull/3320"
       }
-    },
-    {
-      "ts": "2026-07-26T18:57:49Z",
-      "kind": "closed",
-      "issue": 1112,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1112",
-      "title": "Nightly builds"
     }
   ]
 }
