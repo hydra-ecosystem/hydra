@@ -1,8 +1,12 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import builtins
+import contextlib
 import copy
 import os
 import pickle
 import re
+import types
+import _threading_local
 from dataclasses import dataclass
 from functools import partial
 from textwrap import dedent
@@ -13,6 +17,7 @@ from pytest import fixture, mark, param, raises, warns
 
 import hydra
 from hydra import version
+from hydra._internal.instantiate import _instantiate2
 from hydra._internal.instantiate._instantiate2 import _resolve_target
 from hydra.errors import Hydra14MigrationWarning, InstantiationException
 from hydra.test_utils.test_utils import assert_multiline_regex_search
@@ -1504,13 +1509,61 @@ def test_cannot_locate_target(instantiate_func: Any) -> None:
 @mark.parametrize(
     "target",
     [
+        "os.kill",
         "builtins.compile",
+        "builtins.__build_class__",
+        "builtins.classmethod",
+        "builtins.map",
+        "builtins.staticmethod",
+        "builtins.type.__call__",
+        "builtins.type.__new__",
+        "concurrent.futures.Executor.map",
+        "concurrent.futures.Executor.submit",
+        "concurrent.futures.ThreadPoolExecutor.map",
+        "concurrent.futures.ThreadPoolExecutor.submit",
+        "concurrent.futures.ProcessPoolExecutor.map",
+        "concurrent.futures.ProcessPoolExecutor.submit",
+        "contextlib.AsyncContextDecorator.__call__",
+        "contextlib.ContextDecorator.__call__",
+        "functools.cache",
+        "functools.lru_cache",
+        "functools.partialmethod",
+        "functools.partialmethod.__get__",
+        "functools.reduce",
+        "functools.singledispatch",
+        "functools.singledispatchmethod",
+        "functools.singledispatchmethod.__get__",
+        "functools.update_wrapper",
+        "functools.wraps",
+        "types.ClassMethodDescriptorType.__get__",
+        "types.FunctionType.__get__",
+        "types.MethodDescriptorType.__get__",
+        "types.FunctionType",
+        "types.MethodType",
+        "types.WrapperDescriptorType.__get__",
+        "types.new_class",
+        "unittest.mock.AsyncMock",
+        "unittest.mock.MagicMock",
+        "unittest.mock.Mock",
+        "unittest.mock.PropertyMock",
+        "unittest.mock.create_autospec",
+        "unittest.mock.mock_open",
+        "unittest.mock.patch",
+        "unittest.mock.patch.dict",
+        "unittest.mock.patch.multiple",
+        "unittest.mock.patch.object",
+        "itertools.accumulate",
+        "itertools.groupby",
+        "itertools.starmap",
+        "multiprocessing.pool.ThreadPool.apply",
+        "multiprocessing.pool.ThreadPool.apply_async",
+        "multiprocessing.pool.ThreadPool.starmap",
         "ctypes.CDLL",
         "ctypes.WinDLL",
         "ctypes.windll.LoadLibrary",
+        "dataclasses.make_dataclass",
         "importlib.import_module",
         "os.execl",
-        "os.getcwd",
         "os.popen",
         "os.posix_spawn",
         "posix.kill",
@@ -1529,42 +1582,725 @@ def test_blocklisted_target_fails(instantiate_func: Any, target: str) -> None:
     cfg = OmegaConf.create({"foo": {"_target_": target}})
     with raises(
         InstantiationException,
-        match=re.escape(dedent(f"""\
-                Target '{target}' is blocklisted and cannot be instantiated from config
-                to prevent security vulnerabilities, set env var
-                HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE={target}:<other allowlisted targets> to bypass
-                full_key: foo""")),
+        match="blocklisted",
     ) as exc_info:
         instantiate_func(cfg)
     err = exc_info.value
+    assert "full_key: foo" in str(err)
     assert hasattr(err, "__cause__")
     chained = err.__cause__
     assert chained is None
 
 
-def test_allowlist_works(instantiate_func: Any, monkeypatch: Any) -> None:
-    cfg = OmegaConf.create(
-        {
-            "foo": {"_target_": "builtins.exec", "_args_": ["5+8"]},
-            "bar": {"_target_": "builtins.eval", "_args_": ["1+2"]},
-        }
-    )
-    monkeypatch.setenv(
-        "HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "builtins.exec:builtins.eval"
-    )
-    res = instantiate_func(cfg)
-    assert res.foo is None
-    assert res.bar == 3
+def test_allowlist_override_works_for_general_target(monkeypatch: Any) -> None:
+    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "os.kill")
+    assert _resolve_target("os.kill", "") is os.kill
 
 
-def test_allowlist_works_for_prefix_blocked_target(monkeypatch: Any) -> None:
+def test_allowlist_override_cannot_authorize_uncontrolled_prefix(
+    monkeypatch: Any,
+) -> None:
     monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "os.execl")
-    assert _resolve_target("os.execl", "") is os.execl
+    with raises(InstantiationException, match="cannot be authorized"):
+        _resolve_target("os.execl", "")
 
 
 def test_allowlist_works_for_canonical_os_alias(monkeypatch: Any) -> None:
     monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "os.kill")
     assert _resolve_target("posix.kill", "") is os.kill
+
+
+@mark.parametrize("target", sorted(_instantiate2.UNCONTROLLED_EXECUTION_TARGETS))
+def test_uncontrolled_execution_target_ignores_allowlist_override(
+    target: str, monkeypatch: Any
+) -> None:
+    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", target)
+    with raises(InstantiationException, match="cannot be authorized"):
+        _resolve_target(target, "")
+
+
+@mark.parametrize(
+    "target",
+    [
+        "os.execl",
+        "os.spawnl",
+        "logging.config.valid_ident",
+        "doctest.OutputChecker",
+        "shelve.open",
+        "trace.main",
+        "pydoc.cram",
+        "pdb.help",
+        "bdb.Bdb",
+    ],
+)
+def test_uncontrolled_execution_family_ignores_allowlist_override(
+    target: str, monkeypatch: Any
+) -> None:
+    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", target)
+    with raises(InstantiationException, match="cannot be authorized"):
+        _resolve_target(target, "")
+
+
+@mark.parametrize(
+    "target",
+    [
+        "doctest.DocTest",
+        "doctest.DocTestParser",
+        "doctest.Example",
+        "pydoc.HTMLDoc",
+        "pydoc.TextDoc",
+        "trace.Trace",
+    ],
+)
+def test_uncontrolled_execution_prefix_exceptions_are_not_blocklisted(
+    target: str,
+) -> None:
+    assert not _instantiate2._is_blocklisted_target(target)
+
+
+def test_blocklist_policy_sections_are_disjoint() -> None:
+    assert _instantiate2.DEFAULT_BLOCKLISTED_MODULES.isdisjoint(
+        _instantiate2.UNCONTROLLED_EXECUTION_TARGETS
+    )
+
+
+def test_getcwd_is_not_blocklisted() -> None:
+    assert _instantiate2.instantiate({"_target_": "os.getcwd"}) == os.getcwd()
+
+
+def test_ineffective_sys_modules_entries_are_not_in_policy() -> None:
+    for target in (
+        "sys.modules.ipdb",
+        "sys.modules.joblib",
+        "sys.modules.resource",
+        "sys.modules.psutil",
+        "sys.modules.tkinter",
+    ):
+        assert target not in _instantiate2.DEFAULT_BLOCKLISTED_MODULES
+        assert target not in _instantiate2.UNCONTROLLED_EXECUTION_TARGETS
+
+
+@mark.parametrize(
+    "alias",
+    [
+        "logging.os.system",
+        "logging.os.execl",
+        "multiprocessing.sharedctypes.ctypes.cdll.LoadLibrary",
+        "multiprocessing.sharedctypes.ctypes.pydll.LoadLibrary",
+        "site.builtins.exit",
+        "site.builtins.help",
+        "site.builtins.exit.__call__",
+        "site.builtins.help.__call__",
+        "site.builtins.exit.__call__.__call__",
+        "os.system.__call__",
+        "logging.os.system.__call__",
+        "builtins.eval.__call__",
+    ],
+)
+def test_blocklist_blocks_module_attribute_aliases(alias: str) -> None:
+    with raises(InstantiationException, match="blocklisted"):
+        _resolve_target(alias, "")
+
+
+@mark.parametrize(
+    "target",
+    [
+        os.system.__call__,
+        eval.__call__,
+        classmethod(getattr).__get__,
+        types.FunctionType,
+        types.MethodType,
+    ],
+)
+def test_blocklist_blocks_callable_object_aliases(target: Callable[..., Any]) -> None:
+    with raises(InstantiationException, match="blocklisted"):
+        _resolve_target(target, "")
+
+
+@mark.parametrize(
+    ("target", "canonical_target"),
+    [
+        ("operator.attrgetter.__new__", "operator.attrgetter"),
+        ("operator.itemgetter.__new__", "operator.itemgetter"),
+        ("operator.methodcaller.__new__", "operator.methodcaller"),
+        ("operator.attrgetter.__call__", "operator.attrgetter"),
+        ("operator.itemgetter.__call__", "operator.itemgetter"),
+        ("operator.methodcaller.__call__", "operator.methodcaller"),
+        ("builtins.map.__new__", "builtins.map"),
+        ("builtins.map.__call__", "builtins.map"),
+        ("builtins.map.__new__.__call__", "builtins.map"),
+        ("builtins.classmethod.__new__", "builtins.classmethod"),
+        ("builtins.classmethod.__new__.__call__", "builtins.classmethod"),
+        ("builtins.classmethod.__get__", "builtins.classmethod"),
+        ("builtins.classmethod.__get__.__call__", "builtins.classmethod"),
+        *(
+            [("builtins.classmethod.__call__", "builtins.classmethod")]
+            if hasattr(classmethod, "__call__")
+            else []
+        ),
+        ("builtins.staticmethod.__new__", "builtins.staticmethod"),
+        ("builtins.staticmethod.__new__.__call__", "builtins.staticmethod"),
+        *(
+            [("builtins.staticmethod.__call__", "builtins.staticmethod")]
+            if hasattr(staticmethod, "__call__")
+            else []
+        ),
+        ("builtins.type.__new__.__call__", "builtins.type.__new__"),
+        ("builtins.type.__call__.__call__", "builtins.type.__call__"),
+        (
+            "concurrent.futures.Executor.map",
+            "concurrent.futures._base.Executor.map",
+        ),
+        (
+            "concurrent.futures.Executor.submit",
+            "concurrent.futures._base.Executor.submit",
+        ),
+        (
+            "concurrent.futures.ThreadPoolExecutor.map",
+            "concurrent.futures._base.Executor.map",
+        ),
+        (
+            "concurrent.futures.ThreadPoolExecutor.submit",
+            "concurrent.futures.thread.ThreadPoolExecutor.submit",
+        ),
+        (
+            "concurrent.futures.ProcessPoolExecutor.map",
+            "concurrent.futures.process.ProcessPoolExecutor.map",
+        ),
+        (
+            "concurrent.futures.ProcessPoolExecutor.submit",
+            "concurrent.futures.process.ProcessPoolExecutor.submit",
+        ),
+        (
+            "contextlib._GeneratorContextManager.__call__",
+            "contextlib.ContextDecorator.__call__",
+        ),
+        (
+            "contextlib._GeneratorContextManager.__call__.__call__",
+            "contextlib.ContextDecorator.__call__",
+        ),
+        (
+            "contextlib._AsyncGeneratorContextManager.__call__",
+            "contextlib.AsyncContextDecorator.__call__",
+        ),
+        (
+            "contextlib._AsyncGeneratorContextManager.__call__.__call__",
+            "contextlib.AsyncContextDecorator.__call__",
+        ),
+        ("functools.reduce.__call__", "_functools.reduce"),
+        ("functools.partialmethod.__call__", "functools.partialmethod"),
+        (
+            "functools.partialmethod.__get__.__call__",
+            "functools.partialmethod.__get__",
+        ),
+        (
+            "functools.singledispatchmethod.__call__",
+            "functools.singledispatchmethod",
+        ),
+        (
+            "functools.singledispatchmethod.__get__.__call__",
+            "functools.singledispatchmethod.__get__",
+        ),
+        ("types.MethodType.__new__", "types.MethodType"),
+        ("types.MethodType.__call__", "types.MethodType"),
+        ("types.MethodType.__new__.__call__", "types.MethodType"),
+        ("types.FunctionType.__new__", "types.FunctionType"),
+        ("types.FunctionType.__call__", "types.FunctionType"),
+        ("types.FunctionType.__new__.__call__", "types.FunctionType"),
+        ("types.LambdaType", "types.FunctionType"),
+        (
+            "builtins.dict.get.__get__",
+            "types.MethodDescriptorType.__get__",
+        ),
+        (
+            "builtins.dict.get.__get__.__call__",
+            "types.MethodDescriptorType.__get__",
+        ),
+        (
+            "builtins.object.__getattribute__.__get__",
+            "types.WrapperDescriptorType.__get__",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool._map_async",
+            "multiprocessing.pool.Pool._map_async",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.apply",
+            "multiprocessing.pool.Pool.apply",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.apply_async",
+            "multiprocessing.pool.Pool.apply_async",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.imap",
+            "multiprocessing.pool.Pool.imap",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.imap_unordered",
+            "multiprocessing.pool.Pool.imap_unordered",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.map",
+            "multiprocessing.pool.Pool.map",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.map_async",
+            "multiprocessing.pool.Pool.map_async",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.starmap",
+            "multiprocessing.pool.Pool.starmap",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.starmap_async",
+            "multiprocessing.pool.Pool.starmap_async",
+        ),
+        ("itertools.accumulate.__new__", "itertools.accumulate"),
+        ("itertools.accumulate.__call__", "itertools.accumulate"),
+        ("itertools.accumulate.__new__.__call__", "itertools.accumulate"),
+        ("itertools.groupby.__new__", "itertools.groupby"),
+        ("itertools.groupby.__call__", "itertools.groupby"),
+        ("itertools.groupby.__new__.__call__", "itertools.groupby"),
+        ("itertools.starmap.__new__", "itertools.starmap"),
+        ("itertools.starmap.__call__", "itertools.starmap"),
+        ("itertools.starmap.__new__.__call__", "itertools.starmap"),
+    ],
+)
+def test_resolved_target_aliases_are_blocklisted(
+    target: str, canonical_target: str
+) -> None:
+    with raises(
+        InstantiationException,
+        match=rf"Target '{canonical_target}'.*resolved from.*blocklisted",
+    ):
+        _resolve_target(target, "")
+
+
+@mark.parametrize(
+    "target",
+    [
+        "builtins.filter",
+        "builtins.iter",
+        "itertools.dropwhile",
+        "itertools.filterfalse",
+        "itertools.takewhile",
+    ],
+)
+def test_non_result_lazy_callback_targets_are_not_blocklisted(target: str) -> None:
+    assert not _instantiate2._is_blocklisted_target(target)
+
+
+def test_discovery_target_applies_blocklist_to_selected_path() -> None:
+    cfg = {"_target_": "hydra.utils.get_method", "path": "builtins.eval"}
+    with raises(InstantiationException, match="Target 'builtins.eval'.*blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+def test_partial_discovery_target_applies_resolved_blocklist_when_invoked() -> None:
+    cfg = {
+        "_target_": "hydra.utils.get_method",
+        "_partial_": True,
+        "path": "logging.os.system",
+    }
+    deferred = _instantiate2.instantiate(cfg)
+
+    with raises(InstantiationException, match=r"Target 'os\.system'.*blocklisted"):
+        deferred()
+
+
+def test_partial_discovery_target_defers_resolution_and_allows_override() -> None:
+    cfg = {
+        "_target_": "hydra.utils.get_object",
+        "_partial_": True,
+        "path": "does.not.exist",
+    }
+    deferred = _instantiate2.instantiate(cfg)
+
+    assert deferred(path="builtins.pow") is pow
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*blocklisted",
+    ):
+        deferred(path="builtins.eval")
+
+
+def test_partial_discovery_target_reauthorizes_runtime_override(
+    monkeypatch: Any,
+) -> None:
+    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "os.remove")
+    deferred = _instantiate2.instantiate(
+        {
+            "_target_": "hydra.utils.get_object",
+            "_partial_": True,
+            "path": "os.remove",
+        }
+    )
+
+    assert deferred() is os.remove
+    with raises(InstantiationException, match=r"Target 'os\.kill'.*blocklisted"):
+        deferred(path="os.kill")
+
+
+def test_getattr_allows_non_callable_result() -> None:
+    cfg = {
+        "_target_": "builtins.getattr",
+        "_args_": [
+            {"_target_": "types.SimpleNamespace", "value": 10},
+            "value",
+        ],
+    }
+    assert _instantiate2.instantiate(cfg) == 10
+
+
+def test_getattr_callable_result_applies_blocklist() -> None:
+    cfg = {
+        "_target_": "builtins.getattr",
+        "_args_": [
+            {"_target_": "timeit.Timer", "stmt": "40 + 2"},
+            "timeit",
+        ],
+    }
+    with raises(
+        InstantiationException,
+        match=r"Target 'timeit\.Timer\.timeit'.*blocklisted",
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_callable_descriptor_binding_cannot_return_unmediated_selector() -> None:
+    cfg = {
+        "_target_": "builtins.dict.get.__get__",
+        "_args_": [{"eval": eval}],
+        "_convert_": "all",
+    }
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'types\.MethodDescriptorType\.__get__'.*blocklisted",
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_classmethod_wrapper_cannot_defer_callable_selection() -> None:
+    cfg = {
+        "_target_": "builtins.classmethod",
+        "_args_": [getattr],
+    }
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.classmethod'.*blocklisted",
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_context_decorator_cannot_hide_deferred_callable_selection() -> None:
+    context_manager = _threading_local._patch(_threading_local.local())
+    wrapper = contextlib.ContextDecorator.__call__(context_manager, dict.get)
+    assert wrapper(vars(builtins), "eval") is eval
+
+    cfg = {
+        "_target_": "contextlib.ContextDecorator.__call__",
+        "_args_": [context_manager, dict.get],
+        "_convert_": "all",
+    }
+    with raises(
+        InstantiationException,
+        match=r"Target 'contextlib\.ContextDecorator\.__call__'.*blocklisted",
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_type_introspection_is_allowed() -> None:
+    assert _instantiate2.instantiate(
+        {"_target_": "builtins.type", "_args_": [10]}
+    ) is type(10)
+
+
+@mark.parametrize("target", ["builtins.type", "abc.ABCMeta"])
+def test_dynamic_type_construction_is_not_allowed(target: str) -> None:
+    cfg = {
+        "_target_": target,
+        "_args_": ["Selector", [], {"__call__": dict.get}],
+        "_convert_": "all",
+    }
+
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_partial_type_reauthorizes_runtime_arguments() -> None:
+    deferred = _instantiate2.instantiate(
+        {"_target_": "builtins.type", "_partial_": True}
+    )
+
+    assert deferred(10) is int
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        deferred("Selector", (), {"__call__": dict.get})
+
+    deferred_metaclass = _instantiate2.instantiate(
+        {"_target_": "abc.ABCMeta", "_partial_": True}
+    )
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        deferred_metaclass("Selector", (), {"__call__": dict.get})
+
+
+def test_metaclass_constructor_method_is_not_allowed() -> None:
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        _instantiate2.instantiate({"_target_": "abc.ABCMeta.__new__"})
+
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        _instantiate2.instantiate(
+            {"_target_": "abc.ABCMeta.__new__", "_partial_": True}
+        )
+
+
+def test_callable_mock_wrapper_is_not_allowed() -> None:
+    cfg = {
+        "_target_": "unittest.mock.Mock",
+        "side_effect": dict.get,
+    }
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'unittest\.mock\.Mock'.*blocklisted",
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+@mark.parametrize(
+    "target",
+    ["unittest.mock.NonCallableMock", "unittest.mock.NonCallableMagicMock"],
+)
+def test_non_callable_mock_is_allowed(target: str) -> None:
+    mock = _instantiate2.instantiate({"_target_": target, "name": "inert"})
+    assert not callable(mock)
+    assert mock._extract_mock_name() == "inert"
+
+
+def test_non_callable_mock_allows_one_positional_spec() -> None:
+    mock = _instantiate2.instantiate(
+        {
+            "_target_": "unittest.mock.NonCallableMock",
+            "_args_": [[]],
+        }
+    )
+    assert not callable(mock)
+
+
+@mark.parametrize(
+    "unsafe_kwargs",
+    [
+        {"child": dict.get},
+        {"child.side_effect": dict.get},
+        {"wraps": {}},
+    ],
+)
+def test_non_callable_mock_cannot_configure_callable_children(
+    unsafe_kwargs: Dict[str, Any],
+) -> None:
+    cfg = {"_target_": "unittest.mock.NonCallableMock", **unsafe_kwargs}
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_partial_non_callable_mock_reauthorizes_runtime_configuration() -> None:
+    deferred = _instantiate2.instantiate(
+        {"_target_": "unittest.mock.NonCallableMock", "_partial_": True}
+    )
+    assert not callable(deferred(name="inert"))
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        deferred(**{"child.side_effect": dict.get})
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        deferred(None, {})
+
+
+def test_non_callable_mock_rejects_positional_wraps() -> None:
+    cfg = {
+        "_target_": "unittest.mock.NonCallableMock",
+        "_args_": [None, {}],
+    }
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_callable_result_from_any_target_applies_blocklist() -> None:
+    cfg = {
+        "_target_": "builtins.dict.get",
+        "_args_": [{"eval": eval}, "eval"],
+        "_convert_": "all",
+    }
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*blocklisted",
+    ):
+        _instantiate2.instantiate(cfg)
+
+
+def test_callable_result_from_any_target_allows_safe_callable() -> None:
+    cfg = {
+        "_target_": "builtins.dict.get",
+        "_args_": [{"pow": pow}, "pow"],
+        "_convert_": "all",
+    }
+    assert _instantiate2.instantiate(cfg) is pow
+
+
+def test_callable_result_producer_allowlist_does_not_authorize_result(
+    monkeypatch: Any,
+) -> None:
+    monkeypatch.setenv(
+        "HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE",
+        "builtins.dict.get",
+    )
+    cfg = {
+        "_target_": "builtins.dict.get",
+        "_args_": [{"remove": os.remove}, "remove"],
+        "_convert_": "all",
+    }
+
+    with raises(InstantiationException, match=r"Target 'os\.remove'.*blocklisted"):
+        _instantiate2.instantiate(cfg)
+
+
+def test_discovery_result_accepts_allowlisted_alias(monkeypatch: Any) -> None:
+    monkeypatch.setenv(
+        "HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE",
+        "logging.os.kill",
+    )
+    cfg = {
+        "_target_": "hydra.utils.get_method",
+        "path": "logging.os.kill",
+    }
+
+    assert _instantiate2.instantiate(cfg) is os.kill
+
+
+def test_hydra_partial_authorizes_callable_result_when_invoked() -> None:
+    cfg = {
+        "_target_": "builtins.getattr",
+        "_partial_": True,
+        "_args_": [
+            {"_target_": "hydra.utils.get_object", "path": "builtins"},
+        ],
+    }
+    deferred = _instantiate2.instantiate(cfg)
+
+    assert isinstance(deferred, partial)
+    assert deferred.func is getattr
+    assert deferred("pow") is pow
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*blocklisted",
+    ):
+        deferred("eval")
+
+
+def test_hydra_partial_with_runtime_authorization_is_pickleable() -> None:
+    deferred = _instantiate2.instantiate(
+        {"_target_": "builtins.pow", "_partial_": True, "exp": 2}
+    )
+    restored = pickle.loads(pickle.dumps(deferred))
+
+    assert isinstance(restored, partial)
+    assert restored.func is pow
+    assert restored(3) == 9
+
+
+def test_direct_functools_partial_warns() -> None:
+    cfg = {"_target_": "functools.partial", "_args_": [pow], "exp": 2}
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        factory = _instantiate2.instantiate(cfg)
+    assert factory(3) == 9
+
+
+def test_direct_functools_partial_applies_blocklist_to_callable() -> None:
+    cfg = {"_target_": "functools.partial", "_args_": [eval]}
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        with raises(
+            InstantiationException, match=r"Target 'builtins\.eval'.*blocklisted"
+        ):
+            _instantiate2.instantiate(cfg)
+
+
+def test_direct_functools_partial_authorizes_callable_result_when_invoked() -> None:
+    cfg = {
+        "_target_": "functools.partial",
+        "_args_": [
+            getattr,
+            {"_target_": "hydra.utils.get_object", "path": "builtins"},
+        ],
+    }
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        factory = _instantiate2.instantiate(cfg)
+
+    assert isinstance(factory, partial)
+    assert factory("pow") is pow
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*blocklisted",
+    ):
+        factory("eval")
+
+
+def test_hydra_partial_mediates_partial_result_when_invoked() -> None:
+    cfg = {
+        "_target_": "functools.partial",
+        "_partial_": True,
+        "_args_": [
+            getattr,
+            {"_target_": "hydra.utils.get_object", "path": "builtins"},
+        ],
+    }
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        outer = _instantiate2.instantiate(cfg)
+
+    inner = outer()
+    assert isinstance(inner, partial)
+    assert inner("pow") is pow
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*blocklisted",
+    ):
+        inner("eval")
+
+
+def test_mediated_partial_result_preserves_attributes() -> None:
+    factory = _instantiate2.instantiate(
+        {"_target_": "tests.instantiate.make_attributed_partial"}
+    )
+
+    assert factory.__name__ == "square"
+    assert factory.metadata == {"source": "application"}
+    assert factory(3) == 9
 
 
 @mark.parametrize(
