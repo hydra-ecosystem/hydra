@@ -1,0 +1,5 @@
+# SPDX-FileCopyrightText: Contributors to Hydra
+# SPDX-License-Identifier: MIT
+
+defaults:
+  - override optional group1: file1
