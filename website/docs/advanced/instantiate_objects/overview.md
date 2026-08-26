@@ -572,20 +572,20 @@ Use the native `_partial_: true` option instead of configuring
 `_target_: functools.partial`. Direct `functools.partial` targets and equivalent
 constructor spellings such as `functools.partial.__new__` are deprecated. When
 used with `_target_whitelist_`, both the partial constructor and its effective
-callable must be authorized. Direct partial targets cannot themselves use
-`_partial_: true` with a real target whitelist because validation would be
-deferred. Equivalent constructor spellings also cannot construct partial
-subclasses while safety checks are active because subclass overrides can hide
-their invocation behavior.
+callable must be authorized. If a direct partial target also uses
+`_partial_: true`, Hydra rechecks its completed callable and any callable result
+when the deferred factory is invoked. Equivalent constructor spellings cannot
+construct partial subclasses while safety checks are active because subclass
+overrides can hide their invocation behavior.
 
 If a config targets `hydra.utils.get_class`, `get_method`,
 `get_static_method`, or `get_object`, whitelist both the discovery helper and
 the dotpath in its `path` argument. Hydra applies the same target policy to the
 selected path and to the canonical identity of a callable result. Discovery
-helpers cannot use `_partial_: true` with a real target whitelist because the
-path could be supplied after authorization has finished. Hydra's `instantiate`
-and `call` functions cannot themselves be authorized as config targets; invoke
-them from trusted Python code.
+helpers may use `_partial_: true`; Hydra checks the effective path on every
+invocation, including a path supplied or replaced at runtime. Hydra's
+`instantiate` and `call` functions cannot themselves be authorized as config
+targets; invoke them from trusted Python code.
 
 Hydra does not authorize `builtins.getattr`, `hasattr`, `setattr`, or `delattr`
 through a real target whitelist. Attribute operations can execute property or

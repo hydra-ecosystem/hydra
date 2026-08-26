@@ -1,6 +1,10 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import _threading_local
 import asyncio
+import builtins
+import contextlib
 import copy
+import functools
 import inspect
 import operator
 import os
@@ -11,6 +15,7 @@ from dataclasses import InitVar, dataclass, field
 from functools import partial
 from textwrap import dedent
 from typing import Any, Callable, Dict, List, Optional, Tuple, cast
+from unittest.mock import NonCallableMock
 
 import attr
 from omegaconf import (
@@ -66,6 +71,7 @@ from tests.instantiate import (
     UntypedPassthroughConf,
     User,
     add_values,
+    make_attributed_partial,
     module_function,
     module_function2,
     partial_equal,
@@ -3283,6 +3289,171 @@ def test_blocklist_policy_sections_are_disjoint() -> None:
 @mark.parametrize(
     "target",
     [
+        "builtins.filter",
+        "itertools.dropwhile",
+        "itertools.filterfalse",
+        "itertools.takewhile",
+    ],
+)
+def test_non_result_lazy_callback_targets_are_not_blocklisted(target: str) -> None:
+    assert not _instantiate2._is_blocklisted_target(target)
+
+
+def test_one_argument_iter_target_is_allowed() -> None:
+    result = _instantiate2.instantiate(
+        {"_target_": "builtins.iter", "_args_": [[1, 2]]},
+        _target_whitelist_="builtins.iter",
+    )
+
+    assert list(result) == [1, 2]
+
+
+def test_two_argument_iter_callback_is_blocked_in_legacy_mode() -> None:
+    calls: List[str] = []
+
+    def callback() -> int:
+        calls.append("called")
+        return 1
+
+    cfg = {"_target_": "builtins.iter", "_args_": [callback, 2]}
+    with (
+        warns(UserWarning, match="_target_whitelist_"),
+        raises(InstantiationException, match="two-argument callback form"),
+    ):
+        _instantiate2.instantiate(cfg)
+
+    assert calls == []
+
+
+def test_two_argument_iter_callback_cannot_be_whitelisted() -> None:
+    calls: List[str] = []
+
+    def callback() -> int:
+        calls.append("called")
+        return 1
+
+    cfg = {"_target_": "builtins.iter", "_args_": [callback, 2]}
+    with raises(InstantiationException, match="two-argument callback form"):
+        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.iter")
+
+    assert calls == []
+
+
+def test_partial_call_target_cannot_be_whitelisted() -> None:
+    calls: List[str] = []
+
+    def callback() -> None:
+        calls.append("called")
+
+    cfg = {
+        "_target_": "functools.partial.__call__",
+        "_args_": [partial(callback)],
+    }
+    with raises(
+        InstantiationException,
+        match=r"Target 'functools\.partial\.__call__'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="functools.partial.__call__")
+
+    assert calls == []
+
+
+def test_property_get_target_cannot_be_whitelisted() -> None:
+    calls: List[str] = []
+
+    class Receiver:
+        pass
+
+    def getter(_: Receiver) -> int:
+        calls.append("called")
+        return 42
+
+    cfg = {
+        "_target_": "builtins.property.__get__",
+        "_args_": [property(getter), Receiver(), Receiver],
+    }
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.property\.__get__'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.property.__get__")
+
+    assert calls == []
+
+
+@mark.parametrize(
+    ("target", "canonical_target"),
+    [
+        ("builtins.map.__new__", "builtins.map"),
+        ("builtins.map.__call__", "builtins.map"),
+        ("builtins.classmethod.__new__", "builtins.classmethod"),
+        ("builtins.classmethod.__get__", "builtins.classmethod"),
+        ("builtins.staticmethod.__new__", "builtins.staticmethod"),
+        ("builtins.type.__new__.__call__", "builtins.type.__new__"),
+        ("builtins.type.__call__.__call__", "builtins.type.__call__"),
+        (
+            "concurrent.futures.Executor.map",
+            "concurrent.futures._base.Executor.map",
+        ),
+        (
+            "concurrent.futures.ThreadPoolExecutor.submit",
+            "concurrent.futures.thread.ThreadPoolExecutor.submit",
+        ),
+        (
+            "concurrent.futures.ProcessPoolExecutor.submit",
+            "concurrent.futures.process.ProcessPoolExecutor.submit",
+        ),
+        (
+            "contextlib._GeneratorContextManager.__call__",
+            "contextlib.ContextDecorator.__call__",
+        ),
+        (
+            "contextlib._AsyncGeneratorContextManager.__call__",
+            "contextlib.AsyncContextDecorator.__call__",
+        ),
+        ("functools.reduce.__call__", "_functools.reduce"),
+        ("functools.partialmethod.__call__", "functools.partialmethod"),
+        (
+            "functools.singledispatchmethod.__get__.__call__",
+            "functools.singledispatchmethod.__get__",
+        ),
+        ("types.MethodType.__new__", "types.MethodType"),
+        ("types.FunctionType.__new__", "types.FunctionType"),
+        ("types.LambdaType", "types.FunctionType"),
+        (
+            "builtins.dict.get.__get__",
+            "types.MethodDescriptorType.__get__",
+        ),
+        (
+            "builtins.object.__getattribute__.__get__",
+            "types.WrapperDescriptorType.__get__",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.apply_async",
+            "multiprocessing.pool.Pool.apply_async",
+        ),
+        (
+            "multiprocessing.pool.ThreadPool.starmap_async",
+            "multiprocessing.pool.Pool.starmap_async",
+        ),
+        ("itertools.accumulate.__new__", "itertools.accumulate"),
+        ("itertools.groupby.__new__", "itertools.groupby"),
+        ("itertools.starmap.__new__", "itertools.starmap"),
+    ],
+)
+def test_callable_dispatch_aliases_are_non_whitelistable(
+    target: str, canonical_target: str
+) -> None:
+    with raises(
+        InstantiationException,
+        match=rf"Target '{re.escape(canonical_target)}'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+
+
+@mark.parametrize(
+    "target",
+    [
         "operator.call",
         "operator.contains",
         "operator.delitem",
@@ -3799,7 +3970,7 @@ def test_getattr_map_dispatch_chain_is_rejected() -> None:
 
     with raises(
         InstantiationException,
-        match=r"Target 'builtins\.getattr'.*cannot be authorized",
+        match=r"Target 'builtins\.map'.*cannot be authorized",
     ):
         _instantiate2.instantiate(
             cfg,
@@ -3912,7 +4083,7 @@ def test_functools_partial_constructor_rejects_subclass_with_spoofed_func(
 
     with (
         warns(UserWarning),
-        raises(InstantiationException, match="cannot construct partial subclasses"),
+        raises(InstantiationException, match="cannot return partial subclasses"),
     ):
         _instantiate2.instantiate(cfg, _target_whitelist_=target_whitelist)
 
@@ -3960,17 +4131,17 @@ def test_unsafe_allow_all_permits_blocklisted_functools_partial_callable() -> No
     assert factory("1 + 2") == 3
 
 
-def test_direct_functools_partial_cannot_be_deferred_with_target_whitelist() -> None:
+def test_direct_functools_partial_can_be_deferred_with_runtime_authorization() -> None:
     cfg = {"_target_": "functools.partial", "_partial_": True}
 
-    with (
-        warns(UserWarning, match=r"Using '_target_: functools\.partial'"),
-        raises(
-            InstantiationException,
-            match=r"cannot use '_partial_: true'",
-        ),
-    ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="functools.partial")
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        deferred = _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=["functools.partial", "builtins.pow"],
+        )
+
+    factory = deferred(pow, exp=2)
+    assert factory(3) == 9
 
 
 def test_native_partial_remains_whitelistable() -> None:
@@ -3985,6 +4156,383 @@ def test_native_partial_remains_whitelistable() -> None:
     )
 
     assert factory() == 10
+
+
+def test_callable_result_from_any_target_requires_authorization() -> None:
+    cfg = {
+        "_target_": "builtins.dict.get",
+        "_args_": [{"eval": eval}, "eval"],
+        "_convert_": "all",
+    }
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.dict.get")
+
+
+def test_callable_result_from_any_target_allows_authorized_callable() -> None:
+    cfg = {
+        "_target_": "builtins.dict.get",
+        "_args_": [{"pow": pow}, "pow"],
+        "_convert_": "all",
+    }
+
+    assert (
+        _instantiate2.instantiate(
+            cfg, _target_whitelist_=["builtins.dict.get", "builtins.pow"]
+        )
+        is pow
+    )
+
+
+def test_callable_result_producer_whitelist_does_not_authorize_result() -> None:
+    cfg = {
+        "_target_": "builtins.dict.get",
+        "_args_": [{"remove": os.remove}, "remove"],
+        "_convert_": "all",
+    }
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'os\.remove'.*not in the instantiate target whitelist",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.dict.get")
+
+
+def test_native_partial_authorizes_callable_result_when_invoked() -> None:
+    deferred = _instantiate2.instantiate(
+        {
+            "_target_": "builtins.dict.get",
+            "_partial_": True,
+            "_args_": [{"pow": pow, "eval": eval}],
+            "_convert_": "all",
+        },
+        _target_whitelist_=["builtins.dict.get", "builtins.pow"],
+    )
+
+    assert isinstance(deferred, partial)
+    assert deferred("pow") is pow
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*cannot be authorized",
+    ):
+        deferred("eval")
+
+
+def test_native_partial_with_runtime_authorization_is_pickleable() -> None:
+    deferred = _instantiate2.instantiate(
+        {"_target_": "builtins.pow", "_partial_": True, "exp": 2},
+        _target_whitelist_="builtins.pow",
+    )
+    restored = pickle.loads(pickle.dumps(deferred))  # nosec B301
+
+    assert isinstance(restored, partial)
+    assert restored.func is pow
+    assert restored(3) == 9
+
+
+def test_native_partial_preserves_unsafe_policy_when_pickled() -> None:
+    deferred = _instantiate2.instantiate(
+        {"_target_": "builtins.dict.get", "_partial_": True},
+        _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS,
+    )
+    restored = pickle.loads(pickle.dumps(deferred))  # nosec B301
+
+    assert restored({"eval": eval}, "eval") is eval
+
+
+def test_direct_functools_partial_authorizes_result_when_invoked() -> None:
+    cfg = {
+        "_target_": "functools.partial",
+        "_args_": [dict.get, {"pow": pow, "eval": eval}],
+        "_convert_": "all",
+    }
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        factory = _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=[
+                "functools.partial",
+                "builtins.dict.get",
+                "builtins.pow",
+            ],
+        )
+
+    assert factory("pow") is pow
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*cannot be authorized",
+    ):
+        factory("eval")
+
+
+def test_native_partial_mediates_partial_result_when_invoked() -> None:
+    cfg = {
+        "_target_": "functools.partial",
+        "_partial_": True,
+        "_args_": [dict.get, {"pow": pow, "eval": eval}],
+        "_convert_": "all",
+    }
+    with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
+        outer = _instantiate2.instantiate(
+            cfg,
+            _target_whitelist_=[
+                "functools.partial",
+                "builtins.dict.get",
+                "builtins.pow",
+            ],
+        )
+
+    inner = outer()
+    assert isinstance(inner, partial)
+    assert inner("pow") is pow
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*cannot be authorized",
+    ):
+        inner("eval")
+
+
+def test_mediated_partial_result_preserves_attributes() -> None:
+    factory = _instantiate2.instantiate(
+        {"_target_": make_attributed_partial},
+        _target_whitelist_=[
+            "tests.instantiate.make_attributed_partial",
+            "builtins.pow",
+        ],
+    )
+
+    assert factory.__name__ == "square"
+    assert factory.metadata == {"source": "application"}
+    assert factory(3) == 9
+
+
+def test_partial_discovery_target_reauthorizes_runtime_override() -> None:
+    deferred = _instantiate2.instantiate(
+        {
+            "_target_": "hydra.utils.get_object",
+            "_partial_": True,
+            "path": "builtins.pow",
+        },
+        _target_whitelist_=["hydra.utils.get_object", "builtins.pow"],
+    )
+
+    assert deferred() is pow
+    with raises(
+        InstantiationException,
+        match=r"Target 'builtins\.eval'.*cannot be authorized",
+    ):
+        deferred(path="builtins.eval")
+
+
+def test_type_introspection_is_allowed() -> None:
+    assert (
+        _instantiate2.instantiate(
+            {"_target_": "builtins.type", "_args_": [10]},
+            _target_whitelist_=["builtins.type", "builtins.int"],
+        )
+        is int
+    )
+
+
+@mark.parametrize("target", ["builtins.type", "abc.ABCMeta"])
+def test_dynamic_type_construction_is_not_allowed(target: str) -> None:
+    cfg = {
+        "_target_": target,
+        "_args_": ["Selector", [], {"__call__": dict.get}],
+        "_convert_": "all",
+    }
+
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+
+
+def test_partial_type_reauthorizes_runtime_arguments() -> None:
+    deferred = _instantiate2.instantiate(
+        {"_target_": "builtins.type", "_partial_": True},
+        _target_whitelist_=["builtins.type", "builtins.int"],
+    )
+
+    assert deferred(10) is int
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        deferred("Selector", (), {"__call__": dict.get})
+
+
+def test_resolved_partial_target_cannot_bypass_dynamic_type_guard() -> None:
+    initialized_subclasses: List[type] = []
+
+    class Base:
+        def __init_subclass__(cls) -> None:
+            initialized_subclasses.append(cls)
+
+    target = partial(type, "Selector", (Base,), {})
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        _instantiate2.instantiate(
+            {"_target_": target},
+            _target_whitelist_="builtins.type",
+        )
+
+    assert initialized_subclasses == []
+
+
+def test_resolved_partial_target_cannot_bypass_mock_parameter_guard() -> None:
+    target = partial(NonCallableMock, wraps={})
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        _instantiate2.instantiate(
+            {"_target_": target},
+            _target_whitelist_="unittest.mock.NonCallableMock",
+        )
+
+
+@mark.skipif(
+    not hasattr(functools, "Placeholder"),
+    reason="functools.Placeholder requires Python 3.14",
+)
+def test_resolved_partial_target_substitutes_placeholder_before_guard() -> None:
+    initialized_subclasses: List[type] = []
+
+    class Base:
+        def __init_subclass__(cls) -> None:
+            initialized_subclasses.append(cls)
+
+    placeholder = getattr(functools, "Placeholder")
+    target = partial(type, placeholder, (Base,), {})
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        _instantiate2.instantiate(
+            {"_target_": target, "_args_": ["Selector"]},
+            _target_whitelist_="builtins.type",
+        )
+
+    assert initialized_subclasses == []
+
+
+@mark.skipif(
+    not hasattr(functools, "Placeholder"),
+    reason="functools.Placeholder requires Python 3.14",
+)
+def test_resolved_partial_target_preserves_unfilled_placeholder_error() -> None:
+    placeholder = getattr(functools, "Placeholder")
+    target = partial(pow, placeholder, 2)
+
+    with raises(InstantiationException, match="Error in call to target"):
+        _instantiate2.instantiate(
+            {"_target_": target},
+            _target_whitelist_="builtins.pow",
+        )
+
+
+def test_metaclass_constructor_method_is_not_allowed() -> None:
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        _instantiate2.instantiate(
+            {"_target_": "abc.ABCMeta.__new__"},
+            _target_whitelist_="abc.ABCMeta.__new__",
+        )
+
+
+@mark.parametrize(
+    "target",
+    ["unittest.mock.NonCallableMock", "unittest.mock.NonCallableMagicMock"],
+)
+def test_non_callable_mock_is_allowed(target: str) -> None:
+    mock = _instantiate2.instantiate(
+        {"_target_": target, "name": "inert"}, _target_whitelist_=target
+    )
+    assert not callable(mock)
+    assert mock._extract_mock_name() == "inert"
+
+
+def test_non_callable_mock_allows_one_positional_spec() -> None:
+    target = "unittest.mock.NonCallableMock"
+    mock = _instantiate2.instantiate(
+        {"_target_": target, "_args_": [[]]}, _target_whitelist_=target
+    )
+    assert not callable(mock)
+
+
+@mark.parametrize(
+    "unsafe_kwargs",
+    [
+        {"child": dict.get},
+        {"child.side_effect": dict.get},
+        {"wraps": {}},
+    ],
+)
+def test_non_callable_mock_cannot_configure_callable_children(
+    unsafe_kwargs: Dict[str, Any],
+) -> None:
+    target = "unittest.mock.NonCallableMock"
+    cfg = {"_target_": target, **unsafe_kwargs}
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+
+
+def test_non_callable_mock_rejects_positional_wraps() -> None:
+    target = "unittest.mock.NonCallableMock"
+    cfg = {"_target_": target, "_args_": [None, {}]}
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+
+
+def test_partial_non_callable_mock_reauthorizes_runtime_configuration() -> None:
+    target = "unittest.mock.NonCallableMock"
+    deferred = _instantiate2.instantiate(
+        {"_target_": target, "_partial_": True}, _target_whitelist_=target
+    )
+
+    assert not callable(deferred(name="inert"))
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        deferred(**{"child.side_effect": dict.get})
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        deferred(None, {})
+
+
+def test_context_decorator_cannot_hide_deferred_callable_selection() -> None:
+    context_manager = getattr(_threading_local, "_patch")(_threading_local.local())
+    wrapper = contextlib.ContextDecorator.__call__(context_manager, dict.get)
+    assert wrapper(vars(builtins), "eval") is eval
+
+    target = "contextlib.ContextDecorator.__call__"
+    cfg = {
+        "_target_": target,
+        "_args_": [context_manager, dict.get],
+        "_convert_": "all",
+    }
+    with raises(
+        InstantiationException,
+        match=r"Target 'contextlib\.ContextDecorator\.__call__'.*cannot be authorized",
+    ):
+        _instantiate2.instantiate(cfg, _target_whitelist_=target)
 
 
 @mark.parametrize(
@@ -4086,14 +4634,15 @@ def test_discovery_target_applies_legacy_blocklist_to_selected_path() -> None:
         "hydra.utils.get_object",
     ],
 )
-def test_discovery_target_cannot_be_partial_with_target_whitelist(target: str) -> None:
-    cfg = {"_target_": target, "_partial_": True}
+def test_partial_discovery_target_rechecks_runtime_path(target: str) -> None:
+    cfg = {"_target_": target, "_partial_": True, "path": "builtins.int"}
+    deferred = _instantiate2.instantiate(
+        cfg, _target_whitelist_=[target, "builtins.int"]
+    )
 
-    with raises(
-        InstantiationException,
-        match=r"cannot use '_partial_: true'",
-    ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+    assert deferred() is int
+    with raises(InstantiationException, match="cannot be authorized"):
+        deferred(path="builtins.eval")
 
 
 def test_partial_discovery_target_applies_legacy_blocklist() -> None:
@@ -4103,14 +4652,14 @@ def test_partial_discovery_target_applies_legacy_blocklist() -> None:
         "path": "logging.os.system",
     }
 
-    with (
-        warns(UserWarning, match="_target_whitelist_"),
-        raises(
-            InstantiationException,
-            match=r"Target 'os\.system'.*blocklisted",
-        ),
+    with warns(UserWarning, match="_target_whitelist_"):
+        deferred = _instantiate2.instantiate(cfg)
+
+    with raises(
+        InstantiationException,
+        match=r"Target 'os\.system'.*blocklisted",
     ):
-        _instantiate2.instantiate(cfg)
+        deferred()
 
 
 def test_unsafe_allow_all_permits_partial_discovery_target() -> None:

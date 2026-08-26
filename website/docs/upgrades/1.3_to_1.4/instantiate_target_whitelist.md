@@ -115,13 +115,12 @@ lr: 0.01
 ```
 
 Direct `functools.partial` targets remain deprecated and will become an error in
-Hydra 1.5. They cannot use `_partial_: true` with a real target whitelist
-because construction—and therefore validation of the effective callable—would
-be deferred. The explicit `UNSAFE_ALLOW_ALL_TARGETS` escape hatch permits that
-deferred behavior outside the target whitelist's security guarantee.
-Equivalent constructor spellings cannot construct partial subclasses while
-safety checks are active because subclass overrides can hide their invocation
-behavior.
+Hydra 1.5. If they also use `_partial_: true`, Hydra checks the completed
+partial's effective callable and any callable result when the deferred factory
+is invoked. The explicit `UNSAFE_ALLOW_ALL_TARGETS` escape hatch disables those
+checks. Equivalent constructor spellings cannot construct partial subclasses
+while safety checks are active because subclass overrides can hide their
+invocation behavior.
 
 ## Replace generic operator dispatch
 
@@ -134,11 +133,30 @@ item operation instead of naming it as `_target_`, which can extend a narrow
 whitelist entry into generic selection or dispatch authority. Set `_target_` to
 the intended callable, or call it from trusted Python code, instead.
 
-## Authorize config-selected callable results
+## Authorize callable results
 
-When `hydra.utils.get_class`, `get_method`, `get_static_method`, or
-`get_object` is itself an instantiate target, its `path` value selects another
-object. Authorize both the helper and the selected path from trusted code:
+Hydra applies the active target policy to a callable returned by any target. A
+whitelist entry for a factory does not authorize a class or function returned
+by that factory. Include both targets in the whitelist:
+
+```python
+model_type = instantiate(
+    {
+        "_target_": "my_app.get_model_class",
+        "name": "resnet",
+    },
+    _target_whitelist_=[
+        "my_app.get_model_class",
+        "my_app.models.ResNet",
+    ],
+)
+```
+
+This also applies to Hydra's discovery helpers. When
+`hydra.utils.get_class`, `get_method`, `get_static_method`, or `get_object` is
+itself an instantiate target, its `path` value selects another object.
+
+Authorize both the helper and the selected path from trusted code:
 
 ```python
 obj = instantiate(
@@ -165,13 +183,12 @@ Access or mutate the intended attribute from trusted Python code instead. The
 equivalent `object.__getattribute__` and `type.__getattribute__` dispatch targets
 cannot be authorized either.
 
-Discovery helpers cannot use `_partial_: true` with a real target whitelist.
-The partial could receive its selected path after instantiate's authorization
-has finished. Resolve the value immediately, or expose a narrow trusted Python
-wrapper for the intended operation. The explicit `UNSAFE_ALLOW_ALL_TARGETS`
+Discovery helpers may use `_partial_: true` with a real target whitelist. Hydra
+checks the effective path whenever the deferred factory is invoked, including a
+path supplied or replaced at runtime. The explicit `UNSAFE_ALLOW_ALL_TARGETS`
 escape hatch keeps discovery and attribute access unrestricted. On the legacy
-no-whitelist path, immediately selected callables are still checked against the
-blocklist and ordinary non-callable attribute values remain unchanged.
+no-whitelist path, selected callables are still checked against the blocklist
+and ordinary non-callable attribute values remain unchanged.
 
 Do not configure `hydra.utils.instantiate`, `hydra.utils.call`, or the internal
 `instantiate` function as `_target_`. Hydra refuses to authorize these aliases
