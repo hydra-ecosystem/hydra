@@ -27,7 +27,14 @@ def partial_equal(obj1: Any, obj2: Any) -> bool:
 
     obj1, obj2 = _convert_type(obj1), _convert_type(obj2)
 
-    if type(obj1) != type(obj2):
+    if isinstance(obj1, partial) and isinstance(obj2, partial):
+        return all(
+            [
+                partial_equal(getattr(obj1, attr), getattr(obj2, attr))
+                for attr in ["func", "args", "keywords"]
+            ]
+        )
+    if type(obj1) is not type(obj2):
         return False
     if isinstance(obj1, dict):
         if len(obj1) != len(obj2):
@@ -40,14 +47,14 @@ def partial_equal(obj1: Any, obj2: Any) -> bool:
         if len(obj1) != len(obj2):
             return False
         return all([partial_equal(obj1[i], obj2[i]) for i in range(len(obj1))])
-    if not (isinstance(obj1, partial) and isinstance(obj2, partial)):
-        return False
-    return all(
-        [
-            partial_equal(getattr(obj1, attr), getattr(obj2, attr))
-            for attr in ["func", "args", "keywords"]
-        ]
-    )
+    return False
+
+
+def make_attributed_partial() -> partial:
+    result = partial(pow, exp=2)
+    result.__name__ = "square"
+    result.metadata = {"source": "application"}
+    return result
 
 
 class ArgsClass:
