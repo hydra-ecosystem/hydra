@@ -69,6 +69,7 @@ CALLBACK_DISPATCH_TARGETS = {
     "concurrent.futures.process.ProcessPoolExecutor.map",
     "concurrent.futures.process.ProcessPoolExecutor.submit",
     "concurrent.futures.thread.ThreadPoolExecutor.submit",
+    "functools.partial.__call__",
     "functools.reduce",
     "itertools.accumulate",
     "itertools.groupby",
@@ -86,6 +87,7 @@ CALLBACK_DISPATCH_TARGETS = {
 }
 
 _CALLABLE_DESCRIPTOR_BINDING_TARGETS: Dict[type, str] = {
+    property: "builtins.property.__get__",
     types.ClassMethodDescriptorType: "types.ClassMethodDescriptorType.__get__",
     types.FunctionType: "types.FunctionType.__get__",
     types.MethodDescriptorType: "types.MethodDescriptorType.__get__",
@@ -484,6 +486,17 @@ def _authorize_target_invocation(
     allow_incomplete_partial: bool = False,
 ) -> None:
     target_name = _get_resolved_target_name_for_check(target)
+    if target_name == "builtins.iter" and len(args) == 2:
+        msg = dedent(
+            """\
+            Target 'builtins.iter' cannot use its two-argument callback form from
+            config because callback execution is deferred beyond instantiate's
+            target authorization. Use one-argument iter(iterable), or perform the
+            callback iteration in trusted Python code. This restriction cannot be
+            bypassed with HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE."""
+        )
+        raise InstantiationException(_with_full_key(msg, full_key))
+
     if target_name in _NON_CALLABLE_MOCK_TARGETS:
         unsafe_parameters = sorted(
             set(kwargs).difference(_NON_CALLABLE_MOCK_SAFE_PARAMETERS)
