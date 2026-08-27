@@ -1,6 +1,6 @@
 {
-  "generated_on": "2026-08-26",
-  "generated_at": "2026-08-26T07:22:53Z",
+  "generated_on": "2026-08-27",
+  "generated_at": "2026-08-27T05:07:26Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 101,
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 6
+        "count": 7
       },
       {
         "status": "blocked",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 95
+        "count": 94
       },
       {
         "status": "done",
@@ -192,6 +192,27 @@
       "updated": "2026-08-11",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3375"
+    },
+    {
+      "number": 3405,
+      "title": "Reject optional and override on the same Defaults List entry",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "community PR",
+      "status_emoji": "🤝",
+      "prs": [
+        {
+          "number": 3414,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3414"
+        }
+      ],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "bug",
+        "defaults list"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
     },
     {
       "number": 385,
@@ -1632,22 +1653,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3404"
     },
     {
-      "number": 3405,
-      "title": "Reject optional and override on the same Defaults List entry",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-23",
-      "updated": "2026-08-23",
-      "labels": [
-        "bug",
-        "defaults list"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
-    },
-    {
       "number": 3406,
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
       "category": "Documentation",
@@ -1979,6 +1984,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-27T05:07:26Z",
+      "kind": "pr",
+      "issue": 3405,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3405",
+      "title": "Reject optional and override on the same Defaults List entry",
+      "detail": "linked #3414"
+    },
+    {
+      "ts": "2026-08-27T05:07:26Z",
+      "kind": "status",
+      "issue": 3405,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3405",
+      "title": "Reject optional and override on the same Defaults List entry",
+      "detail": "not started → community PR",
+      "pr": {
+        "number": 3414,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3414"
+      }
+    },
     {
       "ts": "2026-08-26T07:22:53Z",
       "kind": "closed",
@@ -3554,25 +3579,6 @@
       "issue": 3318,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3318",
       "title": "Dangling Defaults List override can override a command-line append"
-    },
-    {
-      "ts": "2026-07-26T20:12:46Z",
-      "kind": "closed",
-      "issue": 1081,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1081",
-      "title": "[Feature Request] Configen adds url to original module documentation"
-    },
-    {
-      "ts": "2026-07-26T20:12:46Z",
-      "kind": "status",
-      "issue": 2121,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2121",
-      "title": "[Bug] Recursion overflow from `--help` if `group=''`",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3320,
-        "url": "https://github.com/facebookresearch/hydra/pull/3320"
-      }
     }
   ]
 }

@@ -20,7 +20,7 @@
     "3402": "2026-08-23",
     "3411": "2026-08-26"
   },
-  "generated_at": "2026-08-26T07:22:53Z",
+  "generated_at": "2026-08-27T05:07:26Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -1120,9 +1120,11 @@
         "bug",
         "defaults list"
       ],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3414"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "community PR",
       "title": "Reject optional and override on the same Defaults List entry",
       "updated_at": "2026-08-23T21:27:11Z"
     },
