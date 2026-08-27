@@ -190,4 +190,8 @@ If you use Hydra in your research please use the following BibTeX entry:
   year =         {2019},
   url =          {https://github.com/hydra-ecosystem/hydra}
 }
-```
+```$ python my_app.py db.user=root db.pass=1234
+db:
+
+  user:butterfly331258
+  pass:
