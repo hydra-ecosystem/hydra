@@ -1881,7 +1881,6 @@ def test_resolved_target_aliases_are_blocklisted(
     "target",
     [
         "builtins.filter",
-        "builtins.iter",
         "itertools.dropwhile",
         "itertools.filterfalse",
         "itertools.takewhile",
@@ -1889,6 +1888,66 @@ def test_resolved_target_aliases_are_blocklisted(
 )
 def test_non_result_lazy_callback_targets_are_not_blocklisted(target: str) -> None:
     assert not _instantiate2._is_blocklisted_target(target)
+
+
+def test_one_argument_iter_target_is_allowed() -> None:
+    result = _instantiate2.instantiate(
+        {"_target_": "builtins.iter", "_args_": [[1, 2]]}
+    )
+
+    assert list(result) == [1, 2]
+
+
+def test_two_argument_iter_callback_cannot_be_allowlisted(monkeypatch: Any) -> None:
+    calls: List[str] = []
+
+    def callback() -> int:
+        calls.append("called")
+        return 1
+
+    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "builtins.iter")
+    cfg = {"_target_": "builtins.iter", "_args_": [callback, 2]}
+    with raises(InstantiationException, match="two-argument callback form"):
+        _instantiate2.instantiate(cfg)
+
+    assert calls == []
+
+
+def test_partial_call_target_cannot_be_allowlisted(monkeypatch: Any) -> None:
+    calls: List[str] = []
+
+    def callback() -> None:
+        calls.append("called")
+
+    target = "functools.partial.__call__"
+    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", target)
+    cfg = {"_target_": target, "_args_": [partial(callback)]}
+    with raises(InstantiationException, match="cannot be authorized"):
+        _instantiate2.instantiate(cfg)
+
+    assert calls == []
+
+
+def test_property_get_target_cannot_be_allowlisted(monkeypatch: Any) -> None:
+    calls: List[str] = []
+
+    class Receiver:
+        pass
+
+    def getter(_: Receiver) -> int:
+        calls.append("called")
+        return 42
+
+    target = "builtins.property.__get__"
+    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", target)
+    cfg = {
+        "_target_": target,
+        "_args_": [property(getter), Receiver(), Receiver],
+    }
+    with raises(InstantiationException, match="cannot be authorized"):
+        _instantiate2.instantiate(cfg)
+
+    assert calls == []
 
 
 def test_discovery_target_applies_blocklist_to_selected_path() -> None:
