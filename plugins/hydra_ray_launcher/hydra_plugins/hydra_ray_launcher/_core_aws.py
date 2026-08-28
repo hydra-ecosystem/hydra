@@ -76,7 +76,11 @@ def launch(
     )
     ray_cluster["setup_commands"] = setup_commands
 
-    configure_log(launcher.config.hydra.hydra_logging, launcher.config.hydra.verbose)
+    configure_log(
+        launcher.config.hydra.hydra_logging,
+        launcher.config.hydra.verbose,
+        target_whitelist=launcher.hydra_context.target_whitelist,
+    )
     logging_config = cast(
         Dict[str, Any],
         OmegaConf.to_container(launcher.logging, resolve=True, enum_to_str=True),
