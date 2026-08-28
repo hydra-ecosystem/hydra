@@ -9,6 +9,10 @@ from typing import Any, Callable, List, Optional
 from omegaconf import DictConfig, open_dict, read_write
 
 from . import version
+from ._internal.target_policy import TargetWhitelist
+from ._internal.target_policy import (
+    target_whitelist as target_whitelist_context,
+)
 from ._internal.utils import _run_hydra, get_args_parser
 from .core.hydra_config import HydraConfig
 from .core.utils import _flush_loggers, configure_log
@@ -42,6 +46,7 @@ def main(
     config_path: Optional[str] = None,
     config_name: Optional[str] = None,
     version_base: Optional[str] = version._UNSPECIFIED_,
+    target_whitelist: TargetWhitelist = None,
 ) -> Callable[[TaskFunction], Any]:
     """
     :param config_path: The config path, a directory where Hydra will search for
@@ -51,6 +56,8 @@ def main(
                         a python package to add to the searchpath.
                         If config_path is None no directory is added to the Config search path.
     :param config_name: The name of the config (usually the file name without the .yaml extension)
+    :param target_whitelist: Trusted Python targets allowed for Hydra operations,
+                            including instantiate() and logging configuration.
     """
 
     version.setbase(version_base)
@@ -58,25 +65,26 @@ def main(
     def main_decorator(task_function: TaskFunction) -> Callable[[], None]:
         @functools.wraps(task_function)
         def decorated_main(cfg_passthrough: Optional[DictConfig] = None) -> Any:
-            if cfg_passthrough is not None:
-                return task_function(cfg_passthrough)
-            else:
-                args_parser = get_args_parser()
-                args = args_parser.parse_intermixed_args()
-                if args.experimental_rerun is not None:
-                    cfg = _get_rerun_conf(args.experimental_rerun, args.overrides)
-                    task_function(cfg)
-                    _flush_loggers()
+            with target_whitelist_context(target_whitelist):
+                if cfg_passthrough is not None:
+                    return task_function(cfg_passthrough)
                 else:
-                    # no return value from run_hydra() as it may sometime actually run the task_function
-                    # multiple times (--multirun)
-                    _run_hydra(
-                        args=args,
-                        args_parser=args_parser,
-                        task_function=task_function,
-                        config_path=config_path,
-                        config_name=config_name,
-                    )
+                    args_parser = get_args_parser()
+                    args = args_parser.parse_intermixed_args()
+                    if args.experimental_rerun is not None:
+                        cfg = _get_rerun_conf(args.experimental_rerun, args.overrides)
+                        task_function(cfg)
+                        _flush_loggers()
+                    else:
+                        # no return value from run_hydra() as it may sometime actually run the task_function
+                        # multiple times (--multirun)
+                        _run_hydra(
+                            args=args,
+                            args_parser=args_parser,
+                            task_function=task_function,
+                            config_path=config_path,
+                            config_name=config_name,
+                        )
 
         return decorated_main
 

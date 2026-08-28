@@ -38,6 +38,49 @@ root:
 disable_existing_loggers: false
 ```
 
+<details>
+<summary>Security considerations</summary>
+
+Python logging configuration can import and call the values of handler
+`class` keys and formatter, filter, and handler `()` keys. Configure a target
+whitelist in trusted Python code whenever logging configuration may come from
+an untrusted source:
+
+```python
+import hydra
+
+@hydra.main(
+    version_base=None,
+    config_path="conf",
+    config_name="config",
+    target_whitelist=["my_app.logging.CustomHandler"],
+)
+def my_app(cfg):
+    ...
+```
+
+Hydra automatically permits the exact targets used by its built-in logging
+configurations. Add any application-defined handler, formatter, filter, queue,
+or listener targets to the whitelist. The whitelist must come from trusted
+Python code; do not derive it from composed configuration.
+
+Hydra does not support replacing Python's global
+`logging.config.dictConfigClass`. A custom configurator would bypass Hydra's
+target authorization. Express custom logging components in the logging
+configuration and authorize their targets instead.
+
+See [Target whitelist](/docs/upgrades/1.3_to_1.4/instantiate_target_whitelist)
+for the shared whitelist rules and migration guidance for both logging and
+`instantiate()`.
+
+Resolving additional logging targets without a target whitelist retains the
+legacy blocklist behavior in Hydra 1.4, but is deprecated and will become an
+error in Hydra 1.5. Use `UNSAFE_ALLOW_ALL_TARGETS` only when all composed
+logging configuration is trusted and unrestricted target resolution is
+intentional.
+
+</details>
+
 This is what the default logging looks like:
 ```
 $ python my_app.py hydra/job_logging=default
@@ -49,4 +92,3 @@ And this is what the custom logging looks like:
 $ python my_app.py 
 [INFO] - Info level message
 ```
-
