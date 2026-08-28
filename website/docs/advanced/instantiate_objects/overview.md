@@ -81,11 +81,11 @@ instantiation is not supported for these sequence inputs.
         reset: bool = False,
     ):
         """
-        Create a target whitelist object for hydra.utils.instantiate().
+        Create a target whitelist object for config-selected Python targets.
 
         The returned object can be used as a context manager to apply a whitelist
-        to instantiate() calls in the current context, or passed to instantiate()
-        as _target_whitelist_.
+        to Hydra operations in the current context, including logging
+        configuration, or passed to instantiate() as _target_whitelist_.
 
         :param target_whitelist: A target string, list of target strings, or
                                  UNSAFE_ALLOW_ALL_TARGETS. A trailing .*
@@ -101,9 +101,10 @@ The config passed to these functions must have a key called `_target_`, with the
 For convenience, `None` config results in a `None` object.
 
 Create a whitelist object with `target_whitelist()`. Use it as a context manager
-to apply a whitelist to every `instantiate()` call in a block. This is useful
-when another function or framework calls `instantiate()` internally, or when
-calling `instantiate()` multiple times with the same whitelist:
+to apply a whitelist to every Hydra target resolution in a block, including
+`instantiate()` and logging configuration. This is useful when another function
+or framework calls `instantiate()` internally, or when calling `instantiate()`
+multiple times with the same whitelist:
 
 ```python
 from hydra.utils import instantiate, target_whitelist

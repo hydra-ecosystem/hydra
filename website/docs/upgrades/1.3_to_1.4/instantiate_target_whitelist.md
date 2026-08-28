@@ -1,18 +1,68 @@
 ---
 id: instantiate_target_whitelist
-title: Instantiate target whitelist
+title: Target whitelist
 ---
 
-Running `hydra.utils.instantiate()` on config nodes from untrusted sources can
-result in arbitrary code execution. This is a security risk because configs are
-sometimes bundled with packages, models, checkpoints, or other downloaded
-artifacts.
+Config-selected Python targets can result in arbitrary code execution. Hydra
+uses them in `hydra.utils.instantiate()` and Python logging configuration. This
+is a security risk because configs are sometimes bundled with packages, models,
+checkpoints, or other downloaded artifacts.
 
-To address this, Hydra 1.4 deprecates resolving `_target_` values unless
-trusted Python code at the callsite also provides `_target_whitelist_`.
+To address this, Hydra 1.4 deprecates resolving targets without a whitelist
+provided by trusted Python code.
 
 For the full API reference, see
 [Instantiating objects with Hydra](/docs/advanced/instantiate_objects/overview).
+
+## Configure the application whitelist
+
+Use `target_whitelist` on `@hydra.main()` to protect both logging setup and
+`instantiate()` calls made during the application invocation:
+
+```python
+import hydra
+
+@hydra.main(
+    version_base=None,
+    config_path="conf",
+    config_name="config",
+    target_whitelist=["my_app.*"],
+)
+def my_app(cfg):
+    ...
+```
+
+Hydra adds the exact targets used by its provided logging configurations for
+logging setup only. Add application-defined handlers,
+formatters, filters, queues, and listeners to the application whitelist.
+
+## Configure logging targets
+
+Python's `dictConfig` can resolve Python targets from handler `class` keys and
+formatter, filter, and handler `()` keys. Add each application-defined target
+to `target_whitelist` on `@hydra.main()`:
+
+```python
+import hydra
+
+@hydra.main(
+    version_base=None,
+    config_path="conf",
+    config_name="config",
+    target_whitelist=["my_app.logging.CustomHandler"],
+)
+def my_app(cfg):
+    ...
+```
+
+If Hydra rejects a custom logging target, the error identifies the target and
+points back to this page. Keep the whitelist in trusted Python code; do not
+derive it from composed logging configuration.
+
+Hydra does not support replacing Python's global
+`logging.config.dictConfigClass`. A custom configurator would bypass Hydra's
+target authorization. Express custom logging components in the logging
+configuration and authorize their targets instead.
 
 ## Update direct calls
 
@@ -27,9 +77,9 @@ model = instantiate(cfg.model, _target_whitelist_="my_app.models.*")
 
 ## Update wrapped calls
 
-If another function calls `instantiate()` internally, put the whitelist around
-that call. This is also useful when calling `instantiate()` multiple times with
-the same whitelist.
+If another function calls `instantiate()` or configures Hydra logging
+internally, put the whitelist around that call. This is also useful when
+calling `instantiate()` multiple times with the same whitelist.
 
 ```python
 from hydra.utils import target_whitelist

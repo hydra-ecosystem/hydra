@@ -1,3 +1,5 @@
 ``instantiate()`` blocks unsafe targets and refuses to whitelist
 config-controlled execution surfaces, including aliases, callable wrappers,
 deferred dispatch, and unauthorized callable results.
+Hydra logging configuration now applies the same target policy to dynamically
+resolved handlers, formatters, filters, queues, listeners, and external values.
