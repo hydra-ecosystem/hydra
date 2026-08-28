@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-28",
-  "generated_at": "2026-08-28T12:09:46Z",
+  "generated_at": "2026-08-28T13:51:10Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 101,
+    "open_total": 102,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 8.9
+        "percentage": 8.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 73,
-        "percentage": 72.3
+        "count": 74,
+        "percentage": 72.5
       },
       {
         "category": "Documentation",
@@ -27,19 +27,19 @@
         "category": "Question",
         "emoji": "❓",
         "count": 5,
-        "percentage": 5.0
+        "percentage": 4.9
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 4.0
+        "percentage": 3.9
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 4,
-        "percentage": 4.0
+        "percentage": 3.9
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 94
+        "count": 95
       },
       {
         "status": "done",
@@ -1694,6 +1694,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3410"
     },
     {
+      "number": 3419,
+      "title": "[Feature Request] AlbumentationsX example for nested instantiation and multirun reproducibility",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-28",
+      "updated": "2026-08-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1984,6 +1997,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-28T13:51:10Z",
+      "kind": "new",
+      "issue": 3419,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3419",
+      "title": "[Feature Request] AlbumentationsX example for nested instantiation and multirun reproducibility"
+    },
     {
       "ts": "2026-08-27T05:07:26Z",
       "kind": "pr",
@@ -3572,13 +3592,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2121",
       "title": "[Bug] Recursion overflow from `--help` if `group=''`",
       "detail": "linked #3320"
-    },
-    {
-      "ts": "2026-07-26T20:12:46Z",
-      "kind": "closed",
-      "issue": 3318,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3318",
-      "title": "Dangling Defaults List override can override a command-line append"
     }
   ]
 }
