@@ -20,7 +20,7 @@
     "3402": "2026-08-23",
     "3411": "2026-08-26"
   },
-  "generated_at": "2026-08-28T13:51:10Z",
+  "generated_at": "2026-08-28T20:02:38Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -1167,8 +1167,8 @@
       "pr_numbers": [],
       "state": "OPEN",
       "status": "not started",
-      "title": "[Feature Request] AlbumentationsX example for nested instantiation and multirun reproducibility",
-      "updated_at": "2026-08-28T13:49:50Z"
+      "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun",
+      "updated_at": "2026-08-28T14:11:22Z"
     },
     "385": {
       "category": "Enhancement",
