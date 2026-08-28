@@ -14,7 +14,7 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Hydra" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.af05b0d6.css">
-<script src="/assets/js/runtime~main.4f383722.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.750f0cc5.js" defer="defer"></script>
 <script src="/assets/js/main.212c89d7.js" defer="defer"></script>
 </head>
 <body>
@@ -182,18 +182,18 @@ a normal target whitelist. Use a narrow trusted wrapper instead. The explicit
 <code>_target_: functools.partial</code>. Direct <code>functools.partial</code> targets and equivalent
 constructor spellings such as <code>functools.partial.__new__</code> are deprecated. When
 used with <code>_target_whitelist_</code>, both the partial constructor and its effective
-callable must be authorized. Direct partial targets cannot themselves use
-<code>_partial_: true</code> with a real target whitelist because validation would be
-deferred. Equivalent constructor spellings also cannot construct partial
-subclasses while safety checks are active because subclass overrides can hide
-their invocation behavior.</p><p>If a config targets <code>hydra.utils.get_class</code>, <code>get_method</code>,
+callable must be authorized. If a direct partial target also uses
+<code>_partial_: true</code>, Hydra rechecks its completed callable and any callable result
+when the deferred factory is invoked. Equivalent constructor spellings cannot
+construct partial subclasses while safety checks are active because subclass
+overrides can hide their invocation behavior.</p><p>If a config targets <code>hydra.utils.get_class</code>, <code>get_method</code>,
 <code>get_static_method</code>, or <code>get_object</code>, whitelist both the discovery helper and
 the dotpath in its <code>path</code> argument. Hydra applies the same target policy to the
 selected path and to the canonical identity of a callable result. Discovery
-helpers cannot use <code>_partial_: true</code> with a real target whitelist because the
-path could be supplied after authorization has finished. Hydra&#x27;s <code>instantiate</code>
-and <code>call</code> functions cannot themselves be authorized as config targets; invoke
-them from trusted Python code.</p><p>Hydra does not authorize <code>builtins.getattr</code>, <code>hasattr</code>, <code>setattr</code>, or <code>delattr</code>
+helpers may use <code>_partial_: true</code>; Hydra checks the effective path on every
+invocation, including a path supplied or replaced at runtime. Hydra&#x27;s
+<code>instantiate</code> and <code>call</code> functions cannot themselves be authorized as config
+targets; invoke them from trusted Python code.</p><p>Hydra does not authorize <code>builtins.getattr</code>, <code>hasattr</code>, <code>setattr</code>, or <code>delattr</code>
 through a real target whitelist. Attribute operations can execute property or
 custom descriptor code before Hydra can inspect the operation. Access or mutate
 the intended attribute from trusted Python code instead. The equivalent
