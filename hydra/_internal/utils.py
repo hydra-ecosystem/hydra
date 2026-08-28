@@ -242,7 +242,10 @@ def run_and_report(func: Any) -> Any:
                         frame = tb.tb_frame
                         tb = tb.tb_next
                         search_max = search_max - 1
-                        if inspect.getframeinfo(frame).function == "run_job":
+                        if inspect.getframeinfo(frame).function in {
+                            "run_job",
+                            "_run_job",
+                        }:
                             break
 
                     if search_max == 0 or tb is None:
