@@ -35,6 +35,7 @@ def simple_stdout_log_config(level: int = logging.INFO) -> None:
 def configure_log(
     log_config: DictConfig,
     verbose_config: Union[bool, str, Sequence[str]] = False,
+    target_whitelist: Any = None,
 ) -> None:
     assert isinstance(verbose_config, (bool, str)) or OmegaConf.is_list(verbose_config)
     if log_config is not None:
@@ -42,7 +43,10 @@ def configure_log(
             log_config, resolve=True
         )
         if conf["root"] is not None:
-            logging.config.dictConfig(conf)
+            # Imported lazily because instantiate's resolver imports core.utils.
+            from hydra._internal.logging_config import configure_logging
+
+            configure_logging(conf, target_whitelist)
     else:
         # default logging to stdout
         root = logging.getLogger()
@@ -105,6 +109,28 @@ def run_job(
     hydra_context: HydraContext,
     configure_logging: bool = True,
 ) -> "JobReturn":
+    # Imported lazily because target_policy's resolver imports core.utils.
+    from hydra._internal.target_policy import target_whitelist
+
+    with target_whitelist(hydra_context.target_whitelist, reset=True):
+        return _run_job(
+            task_function=task_function,
+            config=config,
+            job_dir_key=job_dir_key,
+            job_subdir_key=job_subdir_key,
+            hydra_context=hydra_context,
+            configure_logging=configure_logging,
+        )
+
+
+def _run_job(
+    task_function: TaskFunction,
+    config: DictConfig,
+    job_dir_key: str,
+    job_subdir_key: Optional[str],
+    hydra_context: HydraContext,
+    configure_logging: bool = True,
+) -> "JobReturn":
     callbacks = hydra_context.callbacks
 
     old_cwd = os.getcwd()
@@ -159,7 +185,11 @@ def run_job(
             ret.working_dir = os.getcwd()
 
         if configure_logging:
-            configure_log(config.hydra.job_logging, config.hydra.verbose)
+            configure_log(
+                config.hydra.job_logging,
+                config.hydra.verbose,
+                target_whitelist=hydra_context.target_whitelist,
+            )
 
         if config.hydra.output_subdir is not None:
             hydra_output = Path(config.hydra.runtime.output_dir) / Path(

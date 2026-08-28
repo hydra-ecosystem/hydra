@@ -30,6 +30,7 @@ from omegaconf import (
 from omegaconf.errors import ValidationError
 from pytest import fixture, mark, param, raises, warns
 
+from hydra._internal import target_policy
 from hydra._internal.instantiate import _instantiate2
 from hydra._internal.instantiate._instantiate2 import _resolve_target
 from hydra.errors import InstantiationException
@@ -3214,8 +3215,8 @@ def test_target_whitelist_in_config_is_rejected(instantiate_func: Any) -> None:
 def test_target_whitelist_can_explicitly_allow_blocklisted_targets(
     instantiate_func: Any,
 ) -> None:
-    assert _instantiate2._is_blocklisted_target("_sitebuiltins.Quitter")
-    assert not _instantiate2._is_non_whitelistable_target("_sitebuiltins.Quitter")
+    assert target_policy._is_blocklisted_target("_sitebuiltins.Quitter")
+    assert not target_policy._is_non_whitelistable_target("_sitebuiltins.Quitter")
     cfg = {
         "_target_": "_sitebuiltins.Quitter",
         "_args_": ["probe", None],
@@ -3225,10 +3226,10 @@ def test_target_whitelist_can_explicitly_allow_blocklisted_targets(
     assert type(result).__qualname__ == "Quitter"
 
 
-@mark.parametrize("target", sorted(_instantiate2.UNCONTROLLED_EXECUTION_TARGETS))
+@mark.parametrize("target", sorted(target_policy.UNCONTROLLED_EXECUTION_TARGETS))
 def test_uncontrolled_execution_targets_cannot_be_whitelisted(target: str) -> None:
-    assert _instantiate2._is_blocklisted_target(target)
-    assert _instantiate2._is_non_whitelistable_target(target)
+    assert target_policy._is_blocklisted_target(target)
+    assert target_policy._is_non_whitelistable_target(target)
     cfg = {"_target_": target}
 
     with raises(InstantiationException, match="cannot be authorized"):
@@ -3250,8 +3251,8 @@ def test_uncontrolled_execution_targets_cannot_be_whitelisted(target: str) -> No
     ],
 )
 def test_uncontrolled_execution_families_cannot_be_whitelisted(target: str) -> None:
-    assert _instantiate2._is_blocklisted_target(target)
-    assert _instantiate2._is_non_whitelistable_target(target)
+    assert target_policy._is_blocklisted_target(target)
+    assert target_policy._is_non_whitelistable_target(target)
     with raises(InstantiationException, match="cannot be authorized"):
         _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
 
@@ -3276,13 +3277,13 @@ def test_ineffective_sys_modules_entries_are_not_in_policy() -> None:
         "sys.modules.psutil",
         "sys.modules.tkinter",
     ):
-        assert target not in _instantiate2.DEFAULT_BLOCKLISTED_MODULES
-        assert target not in _instantiate2.UNCONTROLLED_EXECUTION_TARGETS
+        assert target not in target_policy.DEFAULT_BLOCKLISTED_MODULES
+        assert target not in target_policy.UNCONTROLLED_EXECUTION_TARGETS
 
 
 def test_blocklist_policy_sections_are_disjoint() -> None:
-    assert _instantiate2.DEFAULT_BLOCKLISTED_MODULES.isdisjoint(
-        _instantiate2.UNCONTROLLED_EXECUTION_TARGETS
+    assert target_policy.DEFAULT_BLOCKLISTED_MODULES.isdisjoint(
+        target_policy.UNCONTROLLED_EXECUTION_TARGETS
     )
 
 
@@ -3296,7 +3297,7 @@ def test_blocklist_policy_sections_are_disjoint() -> None:
     ],
 )
 def test_non_result_lazy_callback_targets_are_not_blocklisted(target: str) -> None:
-    assert not _instantiate2._is_blocklisted_target(target)
+    assert not target_policy._is_blocklisted_target(target)
 
 
 def test_one_argument_iter_target_is_allowed() -> None:
@@ -5711,19 +5712,19 @@ def test_exact_blocklist_takes_precedence_over_prefix_exception(
     monkeypatch: Any,
 ) -> None:
     monkeypatch.setattr(
-        _instantiate2,
+        target_policy,
         "DEFAULT_BLOCKLISTED_MODULES",
-        {*_instantiate2.DEFAULT_BLOCKLISTED_MODULES, "trace.CoverageResults"},
+        {*target_policy.DEFAULT_BLOCKLISTED_MODULES, "trace.CoverageResults"},
     )
     monkeypatch.setattr(
-        _instantiate2,
+        target_policy,
         "UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS",
         {
-            *_instantiate2.UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
+            *target_policy.UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
             "trace.CoverageResults",
         },
     )
-    assert _instantiate2._is_blocklisted_target("trace.CoverageResults")
+    assert target_policy._is_blocklisted_target("trace.CoverageResults")
 
 
 @mark.parametrize(
