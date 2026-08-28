@@ -38,6 +38,24 @@ root:
 disable_existing_loggers: false
 ```
 
+<details>
+<summary>Security considerations</summary>
+
+Python logging configuration can import and call the values of handler
+`class` keys and formatter, filter, and handler `()` keys. Hydra applies the
+same target blocklist used by `instantiate()` to these values, including
+dynamically resolved queues, listeners, and external values.
+
+Hydra does not support replacing Python's global
+`logging.config.dictConfigClass`. A custom configurator would bypass Hydra's
+target authorization. Express custom logging components in the logging
+configuration instead.
+
+The blocklist is defense in depth, not a complete security boundary. Do not
+compose logging configuration from an untrusted source.
+
+</details>
+
 This is what the default logging looks like:
 ```
 $ python my_app.py hydra/job_logging=default

@@ -19,4 +19,8 @@ max-line-length = 119
 copyright-check = True
 select = E,F,W,C
 copyright-regexp=Copyright \(c\) Facebook, Inc. and its affiliates. All Rights Reserved
+per-file-ignores =
+    hydra/_internal/logging_config.py:C801
+    hydra/_internal/target_policy.py:C801
+    tests/test_logging_config.py:C801
 ignore=W503,E203
