@@ -24,7 +24,17 @@ def launch(
     assert launcher.hydra_context is not None
     assert launcher.task_function is not None
 
-    configure_log(launcher.config.hydra.hydra_logging, launcher.config.hydra.verbose)
+    target_whitelist = getattr(launcher.hydra_context, "target_whitelist", None)
+    if target_whitelist is None:
+        configure_log(
+            launcher.config.hydra.hydra_logging, launcher.config.hydra.verbose
+        )
+    else:
+        configure_log(
+            launcher.config.hydra.hydra_logging,
+            launcher.config.hydra.verbose,
+            target_whitelist=target_whitelist,
+        )
     sweep_dir = Path(str(launcher.config.hydra.sweep.dir))
     sweep_dir.mkdir(parents=True, exist_ok=True)
     log.info(

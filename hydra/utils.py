@@ -9,6 +9,12 @@ from typing import Any, Callable
 import hydra._internal.instantiate._instantiate2
 import hydra.types
 from hydra._internal.deprecation_warning import deprecation_warning
+from hydra._internal.target_policy import (
+    UNSAFE_ALLOW_ALL_TARGETS as UNSAFE_ALLOW_ALL_TARGETS,
+)
+from hydra._internal.target_policy import (
+    target_whitelist as target_whitelist,
+)
 from hydra._internal.utils import _locate
 from hydra.core.hydra_config import HydraConfig
 
@@ -17,10 +23,6 @@ log = logging.getLogger(__name__)
 # Instantiation related symbols
 instantiate = hydra._internal.instantiate._instantiate2.instantiate
 call = instantiate
-UNSAFE_ALLOW_ALL_TARGETS = (
-    hydra._internal.instantiate._instantiate2.UNSAFE_ALLOW_ALL_TARGETS
-)
-target_whitelist = hydra._internal.instantiate._instantiate2.target_whitelist
 ConvertMode = hydra.types.ConvertMode
 
 
