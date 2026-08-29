@@ -1,3 +1,14 @@
+1.3.6 (2026-08-29)
+==================
+
+### Bug Fixes
+
+- Harden instantiate authorization against unsafe aliases and callable results.
+  ([#3410](https://github.com/facebookresearch/hydra/issues/3410))
+- Apply Hydra's target blocklist to Python logging configuration.
+  ([#3418](https://github.com/facebookresearch/hydra/issues/3418))
+
+
 1.3.5 (2026-08-06)
 ==================
 
