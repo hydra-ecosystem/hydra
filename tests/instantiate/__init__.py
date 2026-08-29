@@ -7,7 +7,7 @@ from typing import Any, Dict, List, NoReturn, Optional, Tuple
 
 from omegaconf import MISSING, DictConfig, ListConfig
 
-from hydra.utils import UNSAFE_ALLOW_ALL_TARGETS, instantiate
+from hydra.utils import UNSAFE_DISABLE_EXECUTION_CHECKS, instantiate
 from tests.instantiate.module_shadowed_by_function import a_function
 
 module_shadowed_by_function = a_function
@@ -432,7 +432,7 @@ class TargetWithInstantiateInInit:
             self.user = user
         else:
             self.user = instantiate(
-                user_config, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+                user_config, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
             )
 
     def __eq__(self, other: Any) -> bool:

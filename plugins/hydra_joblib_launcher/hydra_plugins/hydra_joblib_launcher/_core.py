@@ -156,7 +156,9 @@ def launch(
     configure_log(
         launcher.config.hydra.hydra_logging,
         launcher.config.hydra.verbose,
-        target_whitelist=getattr(launcher.hydra_context, "target_whitelist", None),
+        execution_whitelist=getattr(
+            launcher.hydra_context, "execution_whitelist", None
+        ),
     )
     sweep_dir = Path(str(launcher.config.hydra.sweep.dir))
     sweep_dir.mkdir(parents=True, exist_ok=True)

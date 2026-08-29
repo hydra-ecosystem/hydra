@@ -106,6 +106,16 @@ module.exports = {
             'advanced/overriding_packages',
             {
                 type: 'category',
+                label: 'Execution whitelist',
+                items: [
+                    'advanced/execution_whitelist',
+                    'advanced/execution_whitelist/scopes',
+                    'advanced/execution_whitelist/target_rules',
+                    'advanced/execution_whitelist/restricted_targets',
+                ]
+            },
+            {
+                type: 'category',
                 label: 'Instantiating Objects',
                 items: [
                     'advanced/instantiate_objects/overview',
@@ -153,7 +163,7 @@ module.exports = {
                     'upgrades/1.3_to_1.4/breaking_changes',
                     'upgrades/1.3_to_1.4/hydra_job_override_dirname',
                     'upgrades/1.3_to_1.4/instantiate_resolution',
-                    'upgrades/1.3_to_1.4/instantiate_target_whitelist',
+                    'upgrades/1.3_to_1.4/execution_whitelist',
                     'upgrades/1.3_to_1.4/nevergrad_sweeper',
                     'upgrades/1.3_to_1.4/slash_in_default',
                 ],

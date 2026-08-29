@@ -36,7 +36,7 @@ from hydra._internal.instantiate._instantiate2 import _resolve_target
 from hydra.errors import InstantiationException
 from hydra.test_utils.test_utils import assert_multiline_regex_search
 from hydra.types import ConvertMode
-from hydra.utils import UNSAFE_ALLOW_ALL_TARGETS, target_whitelist
+from hydra.utils import UNSAFE_DISABLE_EXECUTION_CHECKS, execution_whitelist
 from tests.instantiate import (
     AClass,
     Adam,
@@ -152,7 +152,7 @@ class ItemOperationProbe:
 )
 def instantiate_func(request: Any) -> Any:
     def wrapper(config: Any, *args: Any, **kwargs: Any) -> Any:
-        kwargs.setdefault("_target_whitelist_", UNSAFE_ALLOW_ALL_TARGETS)
+        kwargs.setdefault("_execution_whitelist_", UNSAFE_DISABLE_EXECUTION_CHECKS)
         return request.param(config, *args, **kwargs)
 
     return wrapper
@@ -641,7 +641,7 @@ def test_callsite_override_restores_internal_resolver_after_clear() -> None:
             "derived": "${base}",
         },
         base=20,
-        _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS,
+        _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
     )
 
     assert result == {"base": 20, "derived": 20}
@@ -2823,11 +2823,11 @@ def test_cannot_locate_target(instantiate_func: Any) -> None:
         "subprocess.run",
     ],
 )
-def test_blocklisted_target_fails(target: str) -> None:
+def test_blacklisted_target_fails(target: str) -> None:
     cfg = OmegaConf.create({"foo": {"_target_": target}})
     with raises(
         InstantiationException,
-        match=rf"Target '{re.escape(target)}'.*blocklisted",
+        match=rf"Target '{re.escape(target)}'.*blacklisted",
     ) as exc_info:
         _instantiate2.instantiate(cfg)
     err = exc_info.value
@@ -2852,10 +2852,10 @@ def test_blocklisted_target_fails(target: str) -> None:
         "_frozen_importlib_external._LoaderBasics.exec_module",
     ],
 )
-def test_importlib_loader_execution_targets_are_blocklisted(target: str) -> None:
+def test_importlib_loader_execution_targets_are_blacklisted(target: str) -> None:
     with (
         warnings.catch_warnings(),
-        raises(InstantiationException, match="blocklisted"),
+        raises(InstantiationException, match="blacklisted"),
     ):
         warnings.simplefilter("ignore")
         _instantiate2.instantiate({"_target_": target})
@@ -2888,7 +2888,7 @@ def test_importlib_source_loader_is_blocked_before_execution(
 
     with (
         warnings.catch_warnings(),
-        raises(InstantiationException, match="blocklisted"),
+        raises(InstantiationException, match="blacklisted"),
     ):
         warnings.simplefilter("ignore")
         _instantiate2.instantiate(cfg)
@@ -2896,7 +2896,7 @@ def test_importlib_source_loader_is_blocked_before_execution(
     assert not marker.exists()
 
 
-def test_target_whitelist_warns_in_legacy_mode() -> None:
+def test_execution_whitelist_warns_in_legacy_mode() -> None:
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10, "b": 20, "c": 30}
     with warns(UserWarning, match=r"This\s+warning will become an error in Hydra 1\.5"):
         assert _instantiate2.instantiate(cfg) == AClass(a=10, b=20, c=30)
@@ -2916,18 +2916,18 @@ def test_direct_functools_partial_target_warns_in_legacy_mode() -> None:
     )
 
 
-def test_direct_functools_partial_target_warns_with_unsafe_allow_all() -> None:
+def test_direct_partial_warns_with_unsafe_disable_execution_checks() -> None:
     cfg = {"_target_": "functools.partial", "_args_": [pow], "exp": 2}
 
     with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
         factory = _instantiate2.instantiate(
-            cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+            cfg, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
         )
 
     assert factory(3) == 9
 
 
-def test_target_whitelist_warning_points_to_user_callsite() -> None:
+def test_execution_whitelist_warning_points_to_user_callsite() -> None:
     def call_legacy_instantiate(config: Any) -> Any:
         nonlocal expected_lineno
         frame = inspect.currentframe()
@@ -2944,41 +2944,41 @@ def test_target_whitelist_warning_points_to_user_callsite() -> None:
             "c": 30,
         }
     }
-    with warns(UserWarning, match="_target_whitelist_") as records:
+    with warns(UserWarning, match="_execution_whitelist_") as records:
         assert call_legacy_instantiate(cfg) == {"nested": AClass(a=10, b=20, c=30)}
 
     assert os.path.samefile(records[0].filename, __file__)
     assert records[0].lineno == expected_lineno
 
 
-def test_target_whitelist_applies_to_callable_targets() -> None:
+def test_execution_whitelist_applies_to_callable_targets() -> None:
     cfg = {"_target_": AClass, "a": 10, "b": 20, "c": 30}
-    with warns(UserWarning, match="_target_whitelist_"):
+    with warns(UserWarning, match="_execution_whitelist_"):
         assert _instantiate2.instantiate(cfg) == AClass(a=10, b=20, c=30)
 
     assert _instantiate2.instantiate(
-        cfg, _target_whitelist_="tests.instantiate.AClass"
+        cfg, _execution_whitelist_="tests.instantiate.AClass"
     ) == AClass(a=10, b=20, c=30)
 
     cfg = OmegaConf.create(
         {"_target_": module_function, "x": 10},
         flags={"allow_objects": True},
     )
-    with warns(UserWarning, match="_target_whitelist_"):
+    with warns(UserWarning, match="_execution_whitelist_"):
         assert _instantiate2.instantiate(cfg) == 10
 
     with raises(
         InstantiationException,
         match=(
             "Target 'tests.instantiate.module_function' is not in the "
-            "instantiate target whitelist"
+            "Hydra execution whitelist"
         ),
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=[])
+        _instantiate2.instantiate(cfg, _execution_whitelist_=[])
 
     assert (
         _instantiate2.instantiate(
-            cfg, _target_whitelist_="tests.instantiate.module_function"
+            cfg, _execution_whitelist_="tests.instantiate.module_function"
         )
         == 10
     )
@@ -2989,7 +2989,7 @@ def test_target_whitelist_applies_to_callable_targets() -> None:
     )
     with raises(
         InstantiationException,
-        match="Target 'builtins.eval' is blocklisted",
+        match="Target 'builtins.eval' is blacklisted",
     ):
         _instantiate2.instantiate(cfg)
 
@@ -3000,7 +3000,7 @@ def test_target_whitelist_applies_to_callable_targets() -> None:
     )
     assert (
         _instantiate2.instantiate(
-            cfg, _target_whitelist_="tests.instantiate.CallableClass"
+            cfg, _execution_whitelist_="tests.instantiate.CallableClass"
         )
         == "callable class"
     )
@@ -3008,20 +3008,20 @@ def test_target_whitelist_applies_to_callable_targets() -> None:
     cfg = {"_target_": target}
     assert (
         _instantiate2.instantiate(
-            cfg, _target_whitelist_="tests.instantiate.CallableClass"
+            cfg, _execution_whitelist_="tests.instantiate.CallableClass"
         )
         == "callable class"
     )
 
 
-def test_target_whitelist_preserves_bound_classmethod_identity() -> None:
+def test_execution_whitelist_preserves_bound_classmethod_identity() -> None:
     cfg = OmegaConf.create(
         {"_target_": ASubclass.class_method, "y": 10},
         flags={"allow_objects": True},
     )
 
     result = _instantiate2.instantiate(
-        cfg, _target_whitelist_="tests.instantiate.ASubclass.class_method"
+        cfg, _execution_whitelist_="tests.instantiate.ASubclass.class_method"
     )
 
     assert isinstance(result, ASubclass)
@@ -3064,28 +3064,28 @@ def test_callable_target_does_not_alias_literal_target_string(
 
 
 @mark.parametrize(
-    "target_whitelist",
+    "execution_whitelist",
     [
         "tests.instantiate.*",
         ["tests.instantiate.AClass"],
     ],
 )
-def test_target_whitelist_allows_expected_targets(
-    instantiate_func: Any, target_whitelist: Any
+def test_execution_whitelist_allows_expected_targets(
+    instantiate_func: Any, execution_whitelist: Any
 ) -> None:
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10, "b": 20, "c": 30}
-    assert instantiate_func(cfg, _target_whitelist_=target_whitelist) == AClass(
+    assert instantiate_func(cfg, _execution_whitelist_=execution_whitelist) == AClass(
         a=10, b=20, c=30
     )
 
 
-def test_target_whitelist_context_allows_expected_targets() -> None:
+def test_execution_whitelist_context_allows_expected_targets() -> None:
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10, "b": 20, "c": 30}
-    with target_whitelist("tests.instantiate.*"):
+    with execution_whitelist("tests.instantiate.*"):
         assert _instantiate2.instantiate(cfg) == AClass(a=10, b=20, c=30)
 
 
-def test_target_whitelist_context_stacks_additively() -> None:
+def test_execution_whitelist_context_stacks_additively() -> None:
     class_cfg = {
         "_target_": "tests.instantiate.AClass",
         "a": 10,
@@ -3094,35 +3094,35 @@ def test_target_whitelist_context_stacks_additively() -> None:
     }
     function_cfg = {"_target_": "tests.instantiate.module_function", "x": 10}
 
-    with target_whitelist("tests.instantiate.AClass"):
+    with execution_whitelist("tests.instantiate.AClass"):
         assert _instantiate2.instantiate(class_cfg) == AClass(a=10, b=20, c=30)
-        with target_whitelist("tests.instantiate.module_function"):
+        with execution_whitelist("tests.instantiate.module_function"):
             assert _instantiate2.instantiate(class_cfg) == AClass(a=10, b=20, c=30)
             assert _instantiate2.instantiate(function_cfg) == 10
 
         with raises(
             InstantiationException,
-            match="Target 'tests.instantiate.module_function' is not in the instantiate target whitelist",
+            match="Target 'tests.instantiate.module_function' is not in the Hydra execution whitelist",
         ):
             _instantiate2.instantiate(function_cfg)
 
 
-def test_target_whitelist_context_reset_replaces_outer_context() -> None:
+def test_execution_whitelist_context_reset_replaces_outer_context() -> None:
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10, "b": 20, "c": 30}
 
-    with target_whitelist("tests.instantiate.*"):
-        with target_whitelist([], reset=True):
+    with execution_whitelist("tests.instantiate.*"):
+        with execution_whitelist([], reset=True):
             with raises(
                 InstantiationException,
-                match="Target 'tests.instantiate.AClass' is not in the instantiate target whitelist",
+                match="Target 'tests.instantiate.AClass' is not in the Hydra execution whitelist",
             ):
                 _instantiate2.instantiate(cfg)
 
         assert _instantiate2.instantiate(cfg) == AClass(a=10, b=20, c=30)
 
 
-def test_target_whitelist_policy_isolates_overlapping_async_contexts() -> None:
-    policy = target_whitelist("tests.instantiate.AClass")
+def test_execution_whitelist_policy_isolates_overlapping_async_contexts() -> None:
+    policy = execution_whitelist("tests.instantiate.AClass")
     first_entered = asyncio.Event()
     second_entered = asyncio.Event()
     first_exited = asyncio.Event()
@@ -3147,93 +3147,95 @@ def test_target_whitelist_policy_isolates_overlapping_async_contexts() -> None:
     asyncio.run(run())
 
 
-def test_target_whitelist_policy_can_be_passed_to_instantiate(
+def test_execution_whitelist_policy_can_be_passed_to_instantiate(
     instantiate_func: Any,
 ) -> None:
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10, "b": 20, "c": 30}
-    policy = target_whitelist("tests.instantiate.*", reset=True)
-    assert instantiate_func(cfg, _target_whitelist_=policy) == AClass(a=10, b=20, c=30)
+    policy = execution_whitelist("tests.instantiate.*", reset=True)
+    assert instantiate_func(cfg, _execution_whitelist_=policy) == AClass(
+        a=10, b=20, c=30
+    )
 
 
-def test_target_whitelist_policy_reset_replaces_context_for_instantiate() -> None:
+def test_execution_whitelist_policy_reset_replaces_context_for_instantiate() -> None:
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10, "b": 20, "c": 30}
 
-    with target_whitelist("tests.instantiate.*"):
+    with execution_whitelist("tests.instantiate.*"):
         with raises(
             InstantiationException,
-            match="Target 'tests.instantiate.AClass' is not in the instantiate target whitelist",
+            match="Target 'tests.instantiate.AClass' is not in the Hydra execution whitelist",
         ):
             _instantiate2.instantiate(
-                cfg, _target_whitelist_=target_whitelist([], reset=True)
+                cfg, _execution_whitelist_=execution_whitelist([], reset=True)
             )
 
 
 @mark.parametrize(
-    "target_whitelist",
+    "execution_whitelist",
     [
         [],
         "tests.other.*",
         ["tests.instantiate.BClass"],
     ],
 )
-def test_target_whitelist_blocks_unlisted_targets(
-    instantiate_func: Any, target_whitelist: Any
+def test_execution_whitelist_blocks_unlisted_targets(
+    instantiate_func: Any, execution_whitelist: Any
 ) -> None:
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10}
     with raises(
         InstantiationException,
-        match="Target 'tests.instantiate.AClass' is not in the instantiate target whitelist",
+        match="Target 'tests.instantiate.AClass' is not in the Hydra execution whitelist",
     ):
-        instantiate_func(cfg, _target_whitelist_=target_whitelist)
+        instantiate_func(cfg, _execution_whitelist_=execution_whitelist)
 
 
-@mark.parametrize("target_whitelist", ["*", "*.*", "tests.*.AClass"])
-def test_target_whitelist_rejects_broad_wildcards(
-    instantiate_func: Any, target_whitelist: str
+@mark.parametrize("execution_whitelist", ["*", "*.*", "tests.*.AClass"])
+def test_execution_whitelist_rejects_broad_wildcards(
+    instantiate_func: Any, execution_whitelist: str
 ) -> None:
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10}
     with raises(
         InstantiationException,
-        match="Invalid _target_whitelist_ entry",
+        match="Invalid _execution_whitelist_ entry",
     ):
-        instantiate_func(cfg, _target_whitelist_=target_whitelist)
+        instantiate_func(cfg, _execution_whitelist_=execution_whitelist)
 
 
-def test_target_whitelist_in_config_is_rejected(instantiate_func: Any) -> None:
+def test_execution_whitelist_in_config_is_rejected(instantiate_func: Any) -> None:
     cfg = {
         "_target_": "tests.instantiate.AClass",
-        "_target_whitelist_": "tests.instantiate.*",
+        "_execution_whitelist_": "tests.instantiate.*",
         "a": 10,
     }
     with raises(
         InstantiationException,
-        match="_target_whitelist_ must be passed to instantiate\\(\\)",
+        match="_execution_whitelist_ must be passed to instantiate\\(\\)",
     ):
         instantiate_func(cfg)
 
 
-def test_target_whitelist_can_explicitly_allow_blocklisted_targets(
+def test_execution_whitelist_can_explicitly_allow_blacklisted_targets(
     instantiate_func: Any,
 ) -> None:
-    assert target_policy._is_blocklisted_target("_sitebuiltins.Quitter")
+    assert target_policy._is_blacklisted_target("_sitebuiltins.Quitter")
     assert not target_policy._is_non_whitelistable_target("_sitebuiltins.Quitter")
     cfg = {
         "_target_": "_sitebuiltins.Quitter",
         "_args_": ["probe", None],
     }
-    result = instantiate_func(cfg, _target_whitelist_="_sitebuiltins.Quitter")
+    result = instantiate_func(cfg, _execution_whitelist_="_sitebuiltins.Quitter")
     assert type(result).__module__ == "_sitebuiltins"
     assert type(result).__qualname__ == "Quitter"
 
 
 @mark.parametrize("target", sorted(target_policy.UNCONTROLLED_EXECUTION_TARGETS))
 def test_uncontrolled_execution_targets_cannot_be_whitelisted(target: str) -> None:
-    assert target_policy._is_blocklisted_target(target)
+    assert target_policy._is_blacklisted_target(target)
     assert target_policy._is_non_whitelistable_target(target)
     cfg = {"_target_": target}
 
     with raises(InstantiationException, match="cannot be authorized"):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=target)
 
 
 @mark.parametrize(
@@ -3251,19 +3253,19 @@ def test_uncontrolled_execution_targets_cannot_be_whitelisted(target: str) -> No
     ],
 )
 def test_uncontrolled_execution_families_cannot_be_whitelisted(target: str) -> None:
-    assert target_policy._is_blocklisted_target(target)
+    assert target_policy._is_blacklisted_target(target)
     assert target_policy._is_non_whitelistable_target(target)
     with raises(InstantiationException, match="cannot be authorized"):
-        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+        _instantiate2.instantiate({"_target_": target}, _execution_whitelist_=target)
 
 
-def test_getcwd_is_not_blocklisted() -> None:
-    with warns(UserWarning, match="with no\n_target_whitelist_"):
+def test_getcwd_is_not_blacklisted() -> None:
+    with warns(UserWarning, match="with no\n_execution_whitelist_"):
         assert _instantiate2.instantiate({"_target_": "os.getcwd"}) == os.getcwd()
 
     assert (
         _instantiate2.instantiate(
-            {"_target_": "os.getcwd"}, _target_whitelist_="os.getcwd"
+            {"_target_": "os.getcwd"}, _execution_whitelist_="os.getcwd"
         )
         == os.getcwd()
     )
@@ -3277,12 +3279,12 @@ def test_ineffective_sys_modules_entries_are_not_in_policy() -> None:
         "sys.modules.psutil",
         "sys.modules.tkinter",
     ):
-        assert target not in target_policy.DEFAULT_BLOCKLISTED_MODULES
+        assert target not in target_policy.DEFAULT_BLACKLISTED_MODULES
         assert target not in target_policy.UNCONTROLLED_EXECUTION_TARGETS
 
 
-def test_blocklist_policy_sections_are_disjoint() -> None:
-    assert target_policy.DEFAULT_BLOCKLISTED_MODULES.isdisjoint(
+def test_blacklist_policy_sections_are_disjoint() -> None:
+    assert target_policy.DEFAULT_BLACKLISTED_MODULES.isdisjoint(
         target_policy.UNCONTROLLED_EXECUTION_TARGETS
     )
 
@@ -3296,14 +3298,14 @@ def test_blocklist_policy_sections_are_disjoint() -> None:
         "itertools.takewhile",
     ],
 )
-def test_non_result_lazy_callback_targets_are_not_blocklisted(target: str) -> None:
-    assert not target_policy._is_blocklisted_target(target)
+def test_non_result_lazy_callback_targets_are_not_blacklisted(target: str) -> None:
+    assert not target_policy._is_blacklisted_target(target)
 
 
 def test_one_argument_iter_target_is_allowed() -> None:
     result = _instantiate2.instantiate(
         {"_target_": "builtins.iter", "_args_": [[1, 2]]},
-        _target_whitelist_="builtins.iter",
+        _execution_whitelist_="builtins.iter",
     )
 
     assert list(result) == [1, 2]
@@ -3318,7 +3320,7 @@ def test_two_argument_iter_callback_is_blocked_in_legacy_mode() -> None:
 
     cfg = {"_target_": "builtins.iter", "_args_": [callback, 2]}
     with (
-        warns(UserWarning, match="_target_whitelist_"),
+        warns(UserWarning, match="_execution_whitelist_"),
         raises(InstantiationException, match="two-argument callback form"),
     ):
         _instantiate2.instantiate(cfg)
@@ -3335,7 +3337,7 @@ def test_two_argument_iter_callback_cannot_be_whitelisted() -> None:
 
     cfg = {"_target_": "builtins.iter", "_args_": [callback, 2]}
     with raises(InstantiationException, match="two-argument callback form"):
-        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.iter")
+        _instantiate2.instantiate(cfg, _execution_whitelist_="builtins.iter")
 
     assert calls == []
 
@@ -3354,7 +3356,9 @@ def test_partial_call_target_cannot_be_whitelisted() -> None:
         InstantiationException,
         match=r"Target 'functools\.partial\.__call__'.*cannot be authorized",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="functools.partial.__call__")
+        _instantiate2.instantiate(
+            cfg, _execution_whitelist_="functools.partial.__call__"
+        )
 
     assert calls == []
 
@@ -3377,7 +3381,9 @@ def test_property_get_target_cannot_be_whitelisted() -> None:
         InstantiationException,
         match=r"Target 'builtins\.property\.__get__'.*cannot be authorized",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.property.__get__")
+        _instantiate2.instantiate(
+            cfg, _execution_whitelist_="builtins.property.__get__"
+        )
 
     assert calls == []
 
@@ -3449,7 +3455,7 @@ def test_callable_dispatch_aliases_are_non_whitelistable(
         InstantiationException,
         match=rf"Target '{re.escape(canonical_target)}'.*cannot be authorized",
     ):
-        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+        _instantiate2.instantiate({"_target_": target}, _execution_whitelist_=target)
 
 
 @mark.parametrize(
@@ -3473,8 +3479,8 @@ def test_callable_dispatch_aliases_are_non_whitelistable(
         "_operator.setitem",
     ],
 )
-def test_operator_dispatch_targets_are_blocklisted(target: str) -> None:
-    with raises(InstantiationException, match="blocklisted"):
+def test_operator_dispatch_targets_are_blacklisted(target: str) -> None:
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate({"_target_": target})
 
 
@@ -3499,16 +3505,16 @@ def test_operator_dispatch_targets_are_blocklisted(target: str) -> None:
         "_operator.setitem",
     ],
 )
-def test_target_whitelist_cannot_authorize_operator_dispatch(target: str) -> None:
+def test_execution_whitelist_cannot_authorize_operator_dispatch(target: str) -> None:
     with raises(
         InstantiationException,
         match=r"generic selection or dispatch using\s+config data",
     ):
-        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+        _instantiate2.instantiate({"_target_": target}, _execution_whitelist_=target)
 
 
 @mark.parametrize(
-    ("target", "target_whitelist"),
+    ("target", "execution_whitelist"),
     [
         (
             "operator.methodcaller.__new__",
@@ -3525,19 +3531,19 @@ def test_target_whitelist_cannot_authorize_operator_dispatch(target: str) -> Non
         ),
     ],
 )
-def test_target_whitelist_cannot_authorize_methodcaller_constructor(
-    target: str, target_whitelist: str
+def test_execution_whitelist_cannot_authorize_methodcaller_constructor(
+    target: str, execution_whitelist: str
 ) -> None:
     with raises(
         InstantiationException,
         match=r"Target 'operator\.methodcaller'.*cannot be authorized",
     ):
         _instantiate2.instantiate(
-            {"_target_": target}, _target_whitelist_=target_whitelist
+            {"_target_": target}, _execution_whitelist_=execution_whitelist
         )
 
 
-def test_target_whitelist_rejects_methodcaller_constructor_callable() -> None:
+def test_execution_whitelist_rejects_methodcaller_constructor_callable() -> None:
     with raises(
         InstantiationException,
         match=r"Target 'operator\.methodcaller'.*cannot be authorized",
@@ -3545,20 +3551,20 @@ def test_target_whitelist_rejects_methodcaller_constructor_callable() -> None:
         _resolve_target(
             operator.methodcaller.__new__,
             full_key="",
-            target_whitelist=("operator.methodcaller",),
+            execution_whitelist=("operator.methodcaller",),
         )
 
 
-def test_methodcaller_constructor_alias_is_blocklisted() -> None:
+def test_methodcaller_constructor_alias_is_blacklisted() -> None:
     with raises(
         InstantiationException,
-        match=r"Target 'operator\.methodcaller'.*resolved from.*blocklisted",
+        match=r"Target 'operator\.methodcaller'.*resolved from.*blacklisted",
     ):
         _instantiate2.instantiate({"_target_": "operator.methodcaller.__new__"})
 
 
 @mark.parametrize(
-    ("target", "target_whitelist"),
+    ("target", "execution_whitelist"),
     [
         ("operator.attrgetter.__new__", "operator.attrgetter.__new__"),
         ("operator.attrgetter.__new__", "operator.*"),
@@ -3572,19 +3578,19 @@ def test_methodcaller_constructor_alias_is_blocklisted() -> None:
         ),
     ],
 )
-def test_target_whitelist_cannot_authorize_attrgetter_constructor(
-    target: str, target_whitelist: str
+def test_execution_whitelist_cannot_authorize_attrgetter_constructor(
+    target: str, execution_whitelist: str
 ) -> None:
     with raises(
         InstantiationException,
         match=r"Target 'operator\.attrgetter'.*cannot be authorized",
     ):
         _instantiate2.instantiate(
-            {"_target_": target}, _target_whitelist_=target_whitelist
+            {"_target_": target}, _execution_whitelist_=execution_whitelist
         )
 
 
-def test_target_whitelist_rejects_attrgetter_constructor_callable() -> None:
+def test_execution_whitelist_rejects_attrgetter_constructor_callable() -> None:
     with raises(
         InstantiationException,
         match=r"Target 'operator\.attrgetter'.*cannot be authorized",
@@ -3592,14 +3598,14 @@ def test_target_whitelist_rejects_attrgetter_constructor_callable() -> None:
         _resolve_target(
             operator.attrgetter.__new__,
             full_key="",
-            target_whitelist=("operator.attrgetter",),
+            execution_whitelist=("operator.attrgetter",),
         )
 
 
-def test_attrgetter_constructor_alias_is_blocklisted() -> None:
+def test_attrgetter_constructor_alias_is_blacklisted() -> None:
     with raises(
         InstantiationException,
-        match=r"Target 'operator\.attrgetter'.*resolved from.*blocklisted",
+        match=r"Target 'operator\.attrgetter'.*resolved from.*blacklisted",
     ):
         _instantiate2.instantiate({"_target_": "operator.attrgetter.__new__"})
 
@@ -3611,20 +3617,20 @@ def test_attrgetter_constructor_alias_is_blocklisted() -> None:
         "tests.instantiate.test_instantiate.operator_itemgetter.__new__",
     ],
 )
-def test_target_whitelist_cannot_authorize_itemgetter_constructor(
+def test_execution_whitelist_cannot_authorize_itemgetter_constructor(
     target: str,
 ) -> None:
     with raises(
         InstantiationException,
         match=r"Target 'operator\.itemgetter'.*cannot be authorized",
     ):
-        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+        _instantiate2.instantiate({"_target_": target}, _execution_whitelist_=target)
 
 
-def test_itemgetter_constructor_alias_is_blocklisted() -> None:
+def test_itemgetter_constructor_alias_is_blacklisted() -> None:
     with raises(
         InstantiationException,
-        match=r"Target 'operator\.itemgetter'.*resolved from.*blocklisted",
+        match=r"Target 'operator\.itemgetter'.*resolved from.*blacklisted",
     ):
         _instantiate2.instantiate({"_target_": "operator.itemgetter.__new__"})
 
@@ -3664,15 +3670,15 @@ def test_itemgetter_constructor_alias_is_blocklisted() -> None:
         ),
     ],
 )
-def test_target_whitelist_cannot_authorize_operator_dispatch_descriptors(
+def test_execution_whitelist_cannot_authorize_operator_dispatch_descriptors(
     target: str, descriptor: Any, canonical_target: str
 ) -> None:
     match = rf"Target '{canonical_target}'.*cannot be authorized"
     with raises(InstantiationException, match=match):
-        _instantiate2.instantiate({"_target_": target}, _target_whitelist_=target)
+        _instantiate2.instantiate({"_target_": target}, _execution_whitelist_=target)
 
     with raises(InstantiationException, match=match):
-        _resolve_target(descriptor, full_key="", target_whitelist=(target,))
+        _resolve_target(descriptor, full_key="", execution_whitelist=(target,))
 
 
 @mark.parametrize(
@@ -3683,28 +3689,28 @@ def test_target_whitelist_cannot_authorize_operator_dispatch_descriptors(
         ("operator.methodcaller.__call__", "operator.methodcaller"),
     ],
 )
-def test_operator_dispatch_descriptors_are_blocklisted(
+def test_operator_dispatch_descriptors_are_blacklisted(
     target: str, canonical_target: str
 ) -> None:
     with raises(
         InstantiationException,
-        match=rf"Target '{canonical_target}'.*resolved from.*blocklisted",
+        match=rf"Target '{canonical_target}'.*resolved from.*blacklisted",
     ):
         _instantiate2.instantiate({"_target_": target})
 
 
-def test_legacy_operator_error_does_not_recommend_target_whitelist() -> None:
+def test_legacy_operator_error_does_not_recommend_execution_whitelist() -> None:
     with raises(InstantiationException) as exc_info:
         _instantiate2.instantiate({"_target_": "operator.methodcaller"})
 
     message = str(exc_info.value)
-    assert "_target_whitelist_" not in message
-    assert "UNSAFE_ALLOW_ALL_TARGETS" in message
+    assert "_execution_whitelist_" not in message
+    assert "UNSAFE_DISABLE_EXECUTION_CHECKS" in message
     assert "Set '_target_' to the intended callable instead" in message
 
 
 @mark.parametrize(
-    ("target", "receiver", "marker_owner", "target_whitelist"),
+    ("target", "receiver", "marker_owner", "execution_whitelist"),
     [
         (
             "builtins.object.__getattribute__",
@@ -3752,11 +3758,11 @@ def test_legacy_operator_error_does_not_recommend_target_whitelist() -> None:
         ),
     ],
 )
-def test_target_whitelist_rejects_getattribute_before_descriptor_access(
+def test_execution_whitelist_rejects_getattribute_before_descriptor_access(
     target: str,
     receiver: Dict[str, Any],
     marker_owner: Any,
-    target_whitelist: List[str],
+    execution_whitelist: List[str],
 ) -> None:
     marker_owner.descriptor_accessed = False
     cfg = {"_target_": target, "_args_": [receiver, "payload"]}
@@ -3765,12 +3771,12 @@ def test_target_whitelist_rejects_getattribute_before_descriptor_access(
         InstantiationException,
         match=r"Target 'builtins\.(?:object|type)\.__getattribute__'.*cannot be authorized",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target_whitelist)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=execution_whitelist)
 
     assert not marker_owner.descriptor_accessed
 
 
-def test_target_whitelist_rejects_getattr_before_descriptor_access() -> None:
+def test_execution_whitelist_rejects_getattr_before_descriptor_access() -> None:
     GetattrDescriptorProbe.descriptor_accessed = False
     probe_target = "tests.instantiate.test_instantiate.GetattrDescriptorProbe"
     cfg = {
@@ -3787,7 +3793,7 @@ def test_target_whitelist_rejects_getattr_before_descriptor_access() -> None:
     ):
         _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=[
+            _execution_whitelist_=[
                 "builtins.getattr",
                 probe_target,
             ],
@@ -3822,7 +3828,7 @@ def test_target_whitelist_rejects_getattr_before_descriptor_access() -> None:
         ),
     ],
 )
-def test_target_whitelist_rejects_attribute_dispatch_before_descriptor_access(
+def test_execution_whitelist_rejects_attribute_dispatch_before_descriptor_access(
     target: str, canonical_target: str, args: List[Any], marker: str
 ) -> None:
     probe_target = "tests.instantiate.test_instantiate.GetattrDescriptorProbe"
@@ -3838,7 +3844,7 @@ def test_target_whitelist_rejects_attribute_dispatch_before_descriptor_access(
     ):
         _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=[target, probe_target],
+            _execution_whitelist_=[target, probe_target],
         )
 
     assert not getattr(GetattrDescriptorProbe, marker)
@@ -3857,7 +3863,7 @@ def test_target_whitelist_rejects_attribute_dispatch_before_descriptor_access(
         ("_operator.contains", ["payload"], "membership_checked"),
     ],
 )
-def test_target_whitelist_rejects_item_dispatch_before_receiver_access(
+def test_execution_whitelist_rejects_item_dispatch_before_receiver_access(
     target: str, args: List[Any], marker: str
 ) -> None:
     probe_target = "tests.instantiate.test_instantiate.ItemOperationProbe"
@@ -3873,7 +3879,7 @@ def test_target_whitelist_rejects_item_dispatch_before_receiver_access(
     ):
         _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=[target, probe_target],
+            _execution_whitelist_=[target, probe_target],
         )
 
     assert not getattr(ItemOperationProbe, marker)
@@ -3888,11 +3894,11 @@ def test_getattr_allows_non_callable_result_in_legacy_mode() -> None:
         ],
     }
 
-    with warns(UserWarning, match="_target_whitelist_"):
+    with warns(UserWarning, match="_execution_whitelist_"):
         assert _instantiate2.instantiate(cfg) == 10
 
 
-def test_getattr_callable_result_applies_legacy_blocklist() -> None:
+def test_getattr_callable_result_applies_legacy_blacklist() -> None:
     cfg = {
         "_target_": "builtins.getattr",
         "_args_": [
@@ -3902,10 +3908,10 @@ def test_getattr_callable_result_applies_legacy_blocklist() -> None:
     }
 
     with (
-        warns(UserWarning, match="_target_whitelist_"),
+        warns(UserWarning, match="_execution_whitelist_"),
         raises(
             InstantiationException,
-            match=r"Target 'timeit\.Timer\.timeit'.*blocklisted",
+            match=r"Target 'timeit\.Timer\.timeit'.*blacklisted",
         ),
     ):
         _instantiate2.instantiate(cfg)
@@ -3918,16 +3924,16 @@ def test_getattr_unwraps_partial_callable_result() -> None:
     }
 
     with (
-        warns(UserWarning, match="_target_whitelist_"),
+        warns(UserWarning, match="_execution_whitelist_"),
         raises(
             InstantiationException,
-            match=r"Target 'builtins\.eval'.*blocklisted",
+            match=r"Target 'builtins\.eval'.*blacklisted",
         ),
     ):
         _instantiate2.instantiate(cfg)
 
 
-def test_target_whitelist_cannot_authorize_getattr_callable_result() -> None:
+def test_execution_whitelist_cannot_authorize_getattr_callable_result() -> None:
     cfg = {
         "_target_": "builtins.getattr",
         "_args_": [
@@ -3941,7 +3947,7 @@ def test_target_whitelist_cannot_authorize_getattr_callable_result() -> None:
     ):
         _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=[
+            _execution_whitelist_=[
                 "builtins.getattr",
                 "timeit.Timer",
                 "timeit.Timer.timeit",
@@ -3975,7 +3981,7 @@ def test_getattr_map_dispatch_chain_is_rejected() -> None:
     ):
         _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=[
+            _execution_whitelist_=[
                 "builtins.getattr",
                 "builtins.list",
                 "builtins.map",
@@ -3984,27 +3990,27 @@ def test_getattr_map_dispatch_chain_is_rejected() -> None:
         )
 
 
-def test_getattr_cannot_be_partial_with_target_whitelist() -> None:
+def test_getattr_cannot_be_partial_with_execution_whitelist() -> None:
     cfg = {"_target_": "builtins.getattr", "_partial_": True}
 
     with raises(
         InstantiationException,
         match=r"Target 'builtins\.getattr'.*cannot be authorized",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.getattr")
+        _instantiate2.instantiate(cfg, _execution_whitelist_="builtins.getattr")
 
 
-def test_unsafe_allow_all_permits_partial_getattr() -> None:
+def test_unsafe_disable_execution_checks_permits_partial_getattr() -> None:
     cfg = {"_target_": "builtins.getattr", "_partial_": True}
 
     factory = _instantiate2.instantiate(
-        cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+        cfg, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
     )
     assert factory(str, "upper") is str.upper
 
 
 @mark.parametrize(
-    ("target", "target_whitelist"),
+    ("target", "execution_whitelist"),
     [
         ("functools.partial", "functools.partial"),
         ("functools.partial", "functools.*"),
@@ -4014,35 +4020,35 @@ def test_unsafe_allow_all_permits_partial_getattr() -> None:
         ),
     ],
 )
-def test_target_whitelist_authorizes_functools_partial_and_effective_callable(
-    target: str, target_whitelist: str
+def test_execution_whitelist_authorizes_functools_partial_and_effective_callable(
+    target: str, execution_whitelist: str
 ) -> None:
     cfg = {"_target_": target, "_args_": [pow], "exp": 2}
 
     with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
         factory = _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=[target_whitelist, "builtins.pow"],
+            _execution_whitelist_=[execution_whitelist, "builtins.pow"],
         )
 
     assert factory(3) == 9
 
 
-def test_target_whitelist_checks_functools_partial_effective_callable() -> None:
+def test_execution_whitelist_checks_functools_partial_effective_callable() -> None:
     cfg = {"_target_": "functools.partial", "_args_": [pow], "exp": 2}
 
     with (
         warns(UserWarning, match=r"Using '_target_: functools\.partial'"),
         raises(
             InstantiationException,
-            match=r"Target 'builtins\.pow'.*not in the instantiate target whitelist",
+            match=r"Target 'builtins\.pow'.*not in the Hydra execution whitelist",
         ),
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="functools.partial")
+        _instantiate2.instantiate(cfg, _execution_whitelist_="functools.partial")
 
 
 @mark.parametrize(
-    ("target", "target_whitelist"),
+    ("target", "execution_whitelist"),
     [
         ("functools.partial.__new__", "functools.partial.__new__"),
         ("functools.partial.__new__", "functools.*"),
@@ -4052,25 +4058,25 @@ def test_target_whitelist_checks_functools_partial_effective_callable() -> None:
         ),
     ],
 )
-def test_target_whitelist_authorizes_functools_partial_constructor(
-    target: str, target_whitelist: str
+def test_execution_whitelist_authorizes_functools_partial_constructor(
+    target: str, execution_whitelist: str
 ) -> None:
     cfg = {"_target_": target, "_args_": [partial, pow], "exp": 2}
 
     with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
         factory = _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=[target_whitelist, "builtins.pow"],
+            _execution_whitelist_=[execution_whitelist, "builtins.pow"],
         )
 
     assert factory(3) == 9
 
 
 @mark.parametrize(
-    "target_whitelist", [None, ["functools.partial.__new__", "builtins.len"]]
+    "execution_whitelist", [None, ["functools.partial.__new__", "builtins.len"]]
 )
 def test_functools_partial_constructor_rejects_subclass_with_spoofed_func(
-    target_whitelist: Any,
+    execution_whitelist: Any,
 ) -> None:
     spoofed_partial = type(
         "SpoofedPartial",
@@ -4086,10 +4092,10 @@ def test_functools_partial_constructor_rejects_subclass_with_spoofed_func(
         warns(UserWarning),
         raises(InstantiationException, match="cannot return partial subclasses"),
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target_whitelist)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=execution_whitelist)
 
 
-def test_unsafe_allow_all_permits_functools_partial_subclass() -> None:
+def test_unsafe_disable_execution_checks_permits_partial_subclass() -> None:
     spoofed_partial = type(
         "SpoofedPartial",
         (partial,),
@@ -4102,31 +4108,31 @@ def test_unsafe_allow_all_permits_functools_partial_subclass() -> None:
 
     with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
         factory = _instantiate2.instantiate(
-            cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+            cfg, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
         )
 
     assert factory("1 + 2") == 3
 
 
-def test_direct_functools_partial_applies_legacy_blocklist_to_callable() -> None:
+def test_direct_functools_partial_applies_legacy_blacklist_to_callable() -> None:
     cfg = {"_target_": "functools.partial", "_args_": [eval]}
 
     with (
         warns(UserWarning),
         raises(
             InstantiationException,
-            match=r"Target 'builtins\.eval'.*blocklisted",
+            match=r"Target 'builtins\.eval'.*blacklisted",
         ),
     ):
         _instantiate2.instantiate(cfg)
 
 
-def test_unsafe_allow_all_permits_blocklisted_functools_partial_callable() -> None:
+def test_unsafe_disable_checks_permit_blacklisted_partial_callable() -> None:
     cfg = {"_target_": "functools.partial", "_args_": [eval]}
 
     with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
         factory = _instantiate2.instantiate(
-            cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+            cfg, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
         )
 
     assert factory("1 + 2") == 3
@@ -4138,7 +4144,7 @@ def test_direct_functools_partial_can_be_deferred_with_runtime_authorization() -
     with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
         deferred = _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=["functools.partial", "builtins.pow"],
+            _execution_whitelist_=["functools.partial", "builtins.pow"],
         )
 
     factory = deferred(pow, exp=2)
@@ -4153,7 +4159,7 @@ def test_native_partial_remains_whitelistable() -> None:
     }
 
     factory = _instantiate2.instantiate(
-        cfg, _target_whitelist_="tests.instantiate.module_function"
+        cfg, _execution_whitelist_="tests.instantiate.module_function"
     )
 
     assert factory() == 10
@@ -4170,7 +4176,7 @@ def test_callable_result_from_any_target_requires_authorization() -> None:
         InstantiationException,
         match=r"Target 'builtins\.eval'.*cannot be authorized",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.dict.get")
+        _instantiate2.instantiate(cfg, _execution_whitelist_="builtins.dict.get")
 
 
 def test_callable_result_from_any_target_allows_authorized_callable() -> None:
@@ -4182,7 +4188,7 @@ def test_callable_result_from_any_target_allows_authorized_callable() -> None:
 
     assert (
         _instantiate2.instantiate(
-            cfg, _target_whitelist_=["builtins.dict.get", "builtins.pow"]
+            cfg, _execution_whitelist_=["builtins.dict.get", "builtins.pow"]
         )
         is pow
     )
@@ -4197,9 +4203,9 @@ def test_callable_result_producer_whitelist_does_not_authorize_result() -> None:
 
     with raises(
         InstantiationException,
-        match=r"Target 'os\.remove'.*not in the instantiate target whitelist",
+        match=r"Target 'os\.remove'.*not in the Hydra execution whitelist",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="builtins.dict.get")
+        _instantiate2.instantiate(cfg, _execution_whitelist_="builtins.dict.get")
 
 
 def test_native_partial_authorizes_callable_result_when_invoked() -> None:
@@ -4210,7 +4216,7 @@ def test_native_partial_authorizes_callable_result_when_invoked() -> None:
             "_args_": [{"pow": pow, "eval": eval}],
             "_convert_": "all",
         },
-        _target_whitelist_=["builtins.dict.get", "builtins.pow"],
+        _execution_whitelist_=["builtins.dict.get", "builtins.pow"],
     )
 
     assert isinstance(deferred, partial)
@@ -4225,7 +4231,7 @@ def test_native_partial_authorizes_callable_result_when_invoked() -> None:
 def test_native_partial_with_runtime_authorization_is_pickleable() -> None:
     deferred = _instantiate2.instantiate(
         {"_target_": "builtins.pow", "_partial_": True, "exp": 2},
-        _target_whitelist_="builtins.pow",
+        _execution_whitelist_="builtins.pow",
     )
     restored = pickle.loads(pickle.dumps(deferred))  # nosec B301
 
@@ -4237,7 +4243,7 @@ def test_native_partial_with_runtime_authorization_is_pickleable() -> None:
 def test_native_partial_preserves_unsafe_policy_when_pickled() -> None:
     deferred = _instantiate2.instantiate(
         {"_target_": "builtins.dict.get", "_partial_": True},
-        _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS,
+        _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
     )
     restored = pickle.loads(pickle.dumps(deferred))  # nosec B301
 
@@ -4253,7 +4259,7 @@ def test_direct_functools_partial_authorizes_result_when_invoked() -> None:
     with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
         factory = _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=[
+            _execution_whitelist_=[
                 "functools.partial",
                 "builtins.dict.get",
                 "builtins.pow",
@@ -4278,7 +4284,7 @@ def test_native_partial_mediates_partial_result_when_invoked() -> None:
     with warns(UserWarning, match=r"Using '_target_: functools\.partial'"):
         outer = _instantiate2.instantiate(
             cfg,
-            _target_whitelist_=[
+            _execution_whitelist_=[
                 "functools.partial",
                 "builtins.dict.get",
                 "builtins.pow",
@@ -4298,7 +4304,7 @@ def test_native_partial_mediates_partial_result_when_invoked() -> None:
 def test_mediated_partial_result_preserves_attributes() -> None:
     factory = _instantiate2.instantiate(
         {"_target_": make_attributed_partial},
-        _target_whitelist_=[
+        _execution_whitelist_=[
             "tests.instantiate.make_attributed_partial",
             "builtins.pow",
         ],
@@ -4316,7 +4322,7 @@ def test_partial_discovery_target_reauthorizes_runtime_override() -> None:
             "_partial_": True,
             "path": "builtins.pow",
         },
-        _target_whitelist_=["hydra.utils.get_object", "builtins.pow"],
+        _execution_whitelist_=["hydra.utils.get_object", "builtins.pow"],
     )
 
     assert deferred() is pow
@@ -4331,7 +4337,7 @@ def test_type_introspection_is_allowed() -> None:
     assert (
         _instantiate2.instantiate(
             {"_target_": "builtins.type", "_args_": [10]},
-            _target_whitelist_=["builtins.type", "builtins.int"],
+            _execution_whitelist_=["builtins.type", "builtins.int"],
         )
         is int
     )
@@ -4349,13 +4355,13 @@ def test_dynamic_type_construction_is_not_allowed(target: str) -> None:
         InstantiationException,
         match="cannot be used for dynamic class construction",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=target)
 
 
 def test_partial_type_reauthorizes_runtime_arguments() -> None:
     deferred = _instantiate2.instantiate(
         {"_target_": "builtins.type", "_partial_": True},
-        _target_whitelist_=["builtins.type", "builtins.int"],
+        _execution_whitelist_=["builtins.type", "builtins.int"],
     )
 
     assert deferred(10) is int
@@ -4380,7 +4386,7 @@ def test_resolved_partial_target_cannot_bypass_dynamic_type_guard() -> None:
     ):
         _instantiate2.instantiate(
             {"_target_": target},
-            _target_whitelist_="builtins.type",
+            _execution_whitelist_="builtins.type",
         )
 
     assert initialized_subclasses == []
@@ -4394,7 +4400,7 @@ def test_resolved_partial_target_cannot_bypass_mock_parameter_guard() -> None:
     ):
         _instantiate2.instantiate(
             {"_target_": target},
-            _target_whitelist_="unittest.mock.NonCallableMock",
+            _execution_whitelist_="unittest.mock.NonCallableMock",
         )
 
 
@@ -4417,7 +4423,7 @@ def test_resolved_partial_target_substitutes_placeholder_before_guard() -> None:
     ):
         _instantiate2.instantiate(
             {"_target_": target, "_args_": ["Selector"]},
-            _target_whitelist_="builtins.type",
+            _execution_whitelist_="builtins.type",
         )
 
     assert initialized_subclasses == []
@@ -4434,7 +4440,7 @@ def test_resolved_partial_target_preserves_unfilled_placeholder_error() -> None:
     with raises(InstantiationException, match="Error in call to target"):
         _instantiate2.instantiate(
             {"_target_": target},
-            _target_whitelist_="builtins.pow",
+            _execution_whitelist_="builtins.pow",
         )
 
 
@@ -4445,7 +4451,7 @@ def test_metaclass_constructor_method_is_not_allowed() -> None:
     ):
         _instantiate2.instantiate(
             {"_target_": "abc.ABCMeta.__new__"},
-            _target_whitelist_="abc.ABCMeta.__new__",
+            _execution_whitelist_="abc.ABCMeta.__new__",
         )
 
 
@@ -4455,7 +4461,7 @@ def test_metaclass_constructor_method_is_not_allowed() -> None:
 )
 def test_non_callable_mock_is_allowed(target: str) -> None:
     mock = _instantiate2.instantiate(
-        {"_target_": target, "name": "inert"}, _target_whitelist_=target
+        {"_target_": target, "name": "inert"}, _execution_whitelist_=target
     )
     assert not callable(mock)
     assert mock._extract_mock_name() == "inert"
@@ -4464,7 +4470,7 @@ def test_non_callable_mock_is_allowed(target: str) -> None:
 def test_non_callable_mock_allows_one_positional_spec() -> None:
     target = "unittest.mock.NonCallableMock"
     mock = _instantiate2.instantiate(
-        {"_target_": target, "_args_": [[]]}, _target_whitelist_=target
+        {"_target_": target, "_args_": [[]]}, _execution_whitelist_=target
     )
     assert not callable(mock)
 
@@ -4486,7 +4492,7 @@ def test_non_callable_mock_cannot_configure_callable_children(
         InstantiationException,
         match="cannot configure callable attributes",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=target)
 
 
 def test_non_callable_mock_rejects_positional_wraps() -> None:
@@ -4496,13 +4502,13 @@ def test_non_callable_mock_rejects_positional_wraps() -> None:
         InstantiationException,
         match="cannot configure callable attributes",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=target)
 
 
 def test_partial_non_callable_mock_reauthorizes_runtime_configuration() -> None:
     target = "unittest.mock.NonCallableMock"
     deferred = _instantiate2.instantiate(
-        {"_target_": target, "_partial_": True}, _target_whitelist_=target
+        {"_target_": target, "_partial_": True}, _execution_whitelist_=target
     )
 
     assert not callable(deferred(name="inert"))
@@ -4533,11 +4539,11 @@ def test_context_decorator_cannot_hide_deferred_callable_selection() -> None:
         InstantiationException,
         match=r"Target 'contextlib\.ContextDecorator\.__call__'.*cannot be authorized",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=target)
 
 
 @mark.parametrize(
-    ("target", "target_whitelist"),
+    ("target", "execution_whitelist"),
     [
         ("hydra.utils.instantiate", "hydra.utils.instantiate"),
         ("hydra.utils.call", "hydra.utils.*"),
@@ -4547,8 +4553,8 @@ def test_context_decorator_cannot_hide_deferred_callable_selection() -> None:
         ),
     ],
 )
-def test_target_whitelist_cannot_authorize_instantiate_reentry(
-    target: str, target_whitelist: str
+def test_execution_whitelist_cannot_authorize_instantiate_reentry(
+    target: str, execution_whitelist: str
 ) -> None:
     cfg = {"_target_": target, "_recursive_": False, "config": {}}
 
@@ -4556,7 +4562,7 @@ def test_target_whitelist_cannot_authorize_instantiate_reentry(
         InstantiationException,
         match=r"reentrant instantiate calls do not safely inherit",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target_whitelist)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=execution_whitelist)
 
 
 @mark.parametrize(
@@ -4592,11 +4598,13 @@ def test_discovery_targets_require_selected_path_authorization(
 
     with raises(
         InstantiationException,
-        match=rf"Target '{re.escape(path)}' is not in the instantiate target whitelist",
+        match=rf"Target '{re.escape(path)}' is not in the Hydra execution whitelist",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_=target)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=target)
 
-    assert _instantiate2.instantiate(cfg, _target_whitelist_=[target, path]) is expected
+    assert (
+        _instantiate2.instantiate(cfg, _execution_whitelist_=[target, path]) is expected
+    )
 
 
 def test_internal_locate_requires_selected_path_authorization() -> None:
@@ -4607,19 +4615,19 @@ def test_internal_locate_requires_selected_path_authorization() -> None:
 
     with raises(
         InstantiationException,
-        match="Target 'tests.instantiate.module_function' is not in the instantiate target whitelist",
+        match="Target 'tests.instantiate.module_function' is not in the Hydra execution whitelist",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="hydra.*")
+        _instantiate2.instantiate(cfg, _execution_whitelist_="hydra.*")
 
 
-def test_discovery_target_applies_legacy_blocklist_to_selected_path() -> None:
+def test_discovery_target_applies_legacy_blacklist_to_selected_path() -> None:
     cfg = {"_target_": "hydra.utils.get_method", "path": "builtins.eval"}
 
     with (
-        warns(UserWarning, match="_target_whitelist_"),
+        warns(UserWarning, match="_execution_whitelist_"),
         raises(
             InstantiationException,
-            match="Target 'builtins.eval' is blocklisted",
+            match="Target 'builtins.eval' is blacklisted",
         ),
     ):
         _instantiate2.instantiate(cfg)
@@ -4638,7 +4646,7 @@ def test_discovery_target_applies_legacy_blocklist_to_selected_path() -> None:
 def test_partial_discovery_target_rechecks_runtime_path(target: str) -> None:
     cfg = {"_target_": target, "_partial_": True, "path": "builtins.int"}
     deferred = _instantiate2.instantiate(
-        cfg, _target_whitelist_=[target, "builtins.int"]
+        cfg, _execution_whitelist_=[target, "builtins.int"]
     )
 
     assert deferred() is int
@@ -4646,36 +4654,41 @@ def test_partial_discovery_target_rechecks_runtime_path(target: str) -> None:
         deferred(path="builtins.eval")
 
 
-def test_partial_discovery_target_applies_legacy_blocklist() -> None:
+def test_partial_discovery_target_applies_legacy_blacklist() -> None:
     cfg = {
         "_target_": "hydra.utils.get_method",
         "_partial_": True,
         "path": "logging.os.system",
     }
 
-    with warns(UserWarning, match="_target_whitelist_"):
+    with warns(UserWarning, match="_execution_whitelist_"):
         deferred = _instantiate2.instantiate(cfg)
 
     with raises(
         InstantiationException,
-        match=r"Target 'os\.system'.*blocklisted",
+        match=r"Target 'os\.system'.*blacklisted",
     ):
         deferred()
 
 
-def test_unsafe_allow_all_permits_partial_discovery_target() -> None:
+def test_unsafe_disable_checks_permit_partial_discovery_target() -> None:
     cfg = {"_target_": "hydra.utils.get_method", "_partial_": True}
 
     factory = _instantiate2.instantiate(
-        cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS
+        cfg, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
     )
 
     assert factory("builtins.str") is str
 
 
-def test_target_whitelist_unsafe_allows_all_targets(instantiate_func: Any) -> None:
+def test_unsafe_disable_execution_checks_allows_all_targets(
+    instantiate_func: Any,
+) -> None:
     cfg = {"_target_": "builtins.eval", "_args_": ["1+2"]}
-    assert instantiate_func(cfg, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS) == 3
+    assert (
+        instantiate_func(cfg, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS)
+        == 3
+    )
 
 
 @mark.parametrize(
@@ -5353,16 +5366,16 @@ def test_dict_as_none(instantiate_func: Any) -> None:
         "builtins.eval.__call__",
     ],
 )
-def test_blocklist_blocks_module_attribute_aliases(alias: str) -> None:
-    # The alias is not literally in the blocklist, but resolves to a blocklisted
+def test_blacklist_blocks_module_attribute_aliases(alias: str) -> None:
+    # The alias is not literally in the blacklist, but resolves to a blacklisted
     # callable. Authorization must be on the resolved identity, not the string.
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _resolve_target(alias, "")
 
 
 @mark.parametrize("target", [os.system.__call__, eval.__call__])
-def test_blocklist_blocks_callable_object_aliases(target: Callable[..., Any]) -> None:
-    with raises(InstantiationException, match="blocklisted"):
+def test_blacklist_blocks_callable_object_aliases(target: Callable[..., Any]) -> None:
+    with raises(InstantiationException, match="blacklisted"):
         _resolve_target(target, "")
 
 
@@ -5375,7 +5388,7 @@ def test_whitelist_blocks_module_attribute_aliases() -> None:
         InstantiationException,
         match="cannot be authorized by the",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="logging.*")
+        _instantiate2.instantiate(cfg, _execution_whitelist_="logging.*")
 
 
 def test_whitelist_allows_genuine_target_under_prefix() -> None:
@@ -5383,7 +5396,7 @@ def test_whitelist_allows_genuine_target_under_prefix() -> None:
     # prefix keeps working.
     cfg = {"_target_": "tests.instantiate.AClass", "a": 10, "b": 20, "c": 30}
     assert _instantiate2.instantiate(
-        cfg, _target_whitelist_="tests.instantiate.*"
+        cfg, _execution_whitelist_="tests.instantiate.*"
     ) == AClass(a=10, b=20, c=30)
 
 
@@ -5401,7 +5414,7 @@ def test_whitelist_allows_os_callable_objects(target: Callable[..., Any]) -> Non
     ("target", "message"),
     [
         ("posix.system", "cannot be authorized by the"),
-        ("ntpath.join", "not in the instantiate target whitelist"),
+        ("ntpath.join", "not in the Hydra execution whitelist"),
     ],
 )
 def test_whitelist_does_not_alias_literal_target_strings(
@@ -5419,7 +5432,7 @@ def test_whitelist_allows_exact_reexported_target() -> None:
     import json
 
     cfg = OmegaConf.create({"_target_": "json.JSONDecoder"})
-    obj = _instantiate2.instantiate(cfg, _target_whitelist_="json.JSONDecoder")
+    obj = _instantiate2.instantiate(cfg, _execution_whitelist_="json.JSONDecoder")
     assert isinstance(obj, json.JSONDecoder)
 
 
@@ -5432,7 +5445,7 @@ def test_whitelist_wildcard_still_blocks_alias_after_exact_reexport_rule() -> No
         InstantiationException,
         match="cannot be authorized by the",
     ):
-        _instantiate2.instantiate(cfg, _target_whitelist_="logging.*")
+        _instantiate2.instantiate(cfg, _execution_whitelist_="logging.*")
 
 
 @mark.parametrize(
@@ -5454,17 +5467,17 @@ def test_whitelist_wildcard_still_blocks_alias_after_exact_reexport_rule() -> No
         "cloudpickle.loads",
     ],
 )
-def test_deserialization_sinks_are_blocklisted(target: str) -> None:
+def test_deserialization_sinks_are_blacklisted(target: str) -> None:
     # Direct-instantiate unpickle sinks are refused on the legacy path. This
-    # removes the trivial inline RCE vector; the target whitelist remains the
+    # removes the trivial inline RCE vector; the execution whitelist remains the
     # boundary, and users who genuinely need to deserialize wrap it in their own
     # callable.
     cfg = OmegaConf.create({"foo": {"_target_": target}})
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)
 
 
-def test_pickle_base64_chain_is_blocklisted() -> None:
+def test_pickle_base64_chain_is_blacklisted() -> None:
     # The reporter's inline vector: pickle.loads(base64.b64decode("...")). The
     # outer pickle.loads target is refused before the chain runs.
     cfg = OmegaConf.create(
@@ -5473,7 +5486,7 @@ def test_pickle_base64_chain_is_blocklisted() -> None:
             "_args_": [{"_target_": "base64.b64decode", "_args_": ["gA=="]}],
         }
     )
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)
 
 
@@ -5518,12 +5531,12 @@ def test_pickle_base64_chain_is_blocklisted() -> None:
         "optparse.Values.read_file",
     ],
 )
-def test_exec_wrapper_targets_are_blocklisted(target: str) -> None:
+def test_exec_wrapper_targets_are_blacklisted(target: str) -> None:
     # Standard-library functions that exec/eval a user-supplied string. They have
     # no legitimate instantiate() use, so they are blocked directly (this is what
     # closed the reporter's timeit.timeit vector). The whitelist stays the boundary.
     cfg = OmegaConf.create({"foo": {"_target_": target}})
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)
 
 
@@ -5585,8 +5598,8 @@ def test_exec_wrapper_targets_are_blocklisted(target: str) -> None:
         },
     ],
 )
-def test_exec_wrapper_chains_are_blocklisted(cfg: Any) -> None:
-    with raises(InstantiationException, match="blocklisted"):
+def test_exec_wrapper_chains_are_blacklisted(cfg: Any) -> None:
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)
 
 
@@ -5602,9 +5615,9 @@ def test_exec_wrapper_chains_are_blocklisted(cfg: Any) -> None:
         "profile.runctx",
     ],
 )
-def test_blocklist_covers_alternate_sink_spellings(target: str) -> None:
+def test_blacklist_covers_alternate_sink_spellings(target: str) -> None:
     cfg = OmegaConf.create({"foo": {"_target_": target}})
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)
 
 
@@ -5620,13 +5633,13 @@ def test_blocklist_covers_alternate_sink_spellings(target: str) -> None:
         "logging.config.DictConfigurator.configure_filter",
     ],
 )
-def test_logging_config_family_is_blocklisted(target: str) -> None:
+def test_logging_config_family_is_blacklisted(target: str) -> None:
     # The whole logging.config namespace resolves/calls config-named factories
     # (arbitrary code) on the legacy path. Covered by one prefix rather than
     # enumerating configurator methods. Permanent control is the whitelist
     # (GHSA-c3wx); this is the stopgap for 1.3 and the 1.4 legacy path.
     cfg = OmegaConf.create({"foo": {"_target_": target}})
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)
 
 
@@ -5642,11 +5655,11 @@ def test_logging_config_family_is_blocklisted(target: str) -> None:
         "doctest.debug_script",
     ],
 )
-def test_doctest_family_is_blocklisted(target: str) -> None:
+def test_doctest_family_is_blacklisted(target: str) -> None:
     # doctest executes example code from docstrings/files; the whole family is
     # covered by one prefix (no legitimate instantiate() use).
     cfg = OmegaConf.create({"foo": {"_target_": target}})
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)
 
 
@@ -5661,11 +5674,11 @@ def test_doctest_family_is_blocklisted(target: str) -> None:
         "trace.Trace.run",
     ],
 )
-def test_shelve_and_trace_families_are_blocklisted(target: str) -> None:
+def test_shelve_and_trace_families_are_blacklisted(target: str) -> None:
     # shelve shelf classes unpickle on access; trace delegates to CoverageResults
     # which unpickles. Whole families covered by prefixes rather than one entry.
     cfg = OmegaConf.create({"foo": {"_target_": target}})
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)
 
 
@@ -5673,10 +5686,10 @@ def test_shelve_and_trace_families_are_blocklisted(target: str) -> None:
     "target",
     ["pydoc.importfile", "pydoc.safeimport", "pydoc.render_doc"],
 )
-def test_pydoc_family_is_blocklisted(target: str) -> None:
+def test_pydoc_family_is_blacklisted(target: str) -> None:
     # pydoc imports/executes modules and files; covered by a prefix.
     cfg = OmegaConf.create({"foo": {"_target_": target}})
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)
 
 
@@ -5699,22 +5712,22 @@ def test_pydoc_family_is_blocklisted(target: str) -> None:
         {"_target_": "trace.Trace"},
     ],
 )
-def test_blocklist_prefix_exceptions_are_allowed(cfg: Dict[str, Any]) -> None:
-    with warns(UserWarning, match="with no\n_target_whitelist_"):
+def test_blacklist_prefix_exceptions_are_allowed(cfg: Dict[str, Any]) -> None:
+    with warns(UserWarning, match="with no\n_execution_whitelist_"):
         result = _instantiate2.instantiate(cfg)
     assert result is not None
 
     target = cfg["_target_"]
-    assert _instantiate2.instantiate(cfg, _target_whitelist_=target) is not None
+    assert _instantiate2.instantiate(cfg, _execution_whitelist_=target) is not None
 
 
-def test_exact_blocklist_takes_precedence_over_prefix_exception(
+def test_exact_blacklist_takes_precedence_over_prefix_exception(
     monkeypatch: Any,
 ) -> None:
     monkeypatch.setattr(
         target_policy,
-        "DEFAULT_BLOCKLISTED_MODULES",
-        {*target_policy.DEFAULT_BLOCKLISTED_MODULES, "trace.CoverageResults"},
+        "DEFAULT_BLACKLISTED_MODULES",
+        {*target_policy.DEFAULT_BLACKLISTED_MODULES, "trace.CoverageResults"},
     )
     monkeypatch.setattr(
         target_policy,
@@ -5724,7 +5737,7 @@ def test_exact_blocklist_takes_precedence_over_prefix_exception(
             "trace.CoverageResults",
         },
     )
-    assert target_policy._is_blocklisted_target("trace.CoverageResults")
+    assert target_policy._is_blacklisted_target("trace.CoverageResults")
 
 
 @mark.parametrize(
@@ -5741,8 +5754,8 @@ def test_exact_blocklist_takes_precedence_over_prefix_exception(
         "bdb.Bdb.runctx",
     ],
 )
-def test_debugger_families_are_blocklisted(target: str) -> None:
+def test_debugger_families_are_blacklisted(target: str) -> None:
     # pdb/bdb evaluate/execute user strings; whole families covered by prefix.
     cfg = OmegaConf.create({"foo": {"_target_": target}})
-    with raises(InstantiationException, match="blocklisted"):
+    with raises(InstantiationException, match="blacklisted"):
         _instantiate2.instantiate(cfg)

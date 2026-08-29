@@ -6,9 +6,9 @@ title: Instantiate resolution and call-site overrides
 Hydra 1.4 changes when `hydra.utils.instantiate()` resolves configuration
 values and how call-site arguments interact with the input configuration.
 
-The examples on this page pass `_target_whitelist_` because trusted call-site
+The examples on this page pass `_execution_whitelist_` because trusted call-site
 code is responsible for authorizing configured targets in Hydra 1.4. See the
-[target whitelist migration guide](/docs/upgrades/1.3_to_1.4/instantiate_target_whitelist)
+[execution whitelist migration guide](/docs/upgrades/1.3_to_1.4/execution_whitelist)
 for the associated security and migration context.
 
 ## Benefits
@@ -83,7 +83,7 @@ cfg = {
     "tags": {"env": "prod", "team": "ml"},
 }
 
-result = instantiate(cfg, tags={"env": "dev"}, _target_whitelist_="builtins.dict")
+result = instantiate(cfg, tags={"env": "dev"}, _execution_whitelist_="builtins.dict")
 assert result["tags"] == {"env": "dev"}
 ```
 
@@ -100,7 +100,7 @@ cfg = {
 result = instantiate(
     cfg,
     optimizer={"lr": 0.3},
-    _target_whitelist_="builtins.dict",
+    _execution_whitelist_="builtins.dict",
 )
 assert result["optimizer"] == {"lr": 0.3, "momentum": 0.5}
 ```
@@ -137,14 +137,14 @@ cfg = {"_target_": "builtins.dict"}
 runtime_result = instantiate(
     cfg,
     child=child,
-    _target_whitelist_="builtins.dict",
+    _execution_whitelist_="builtins.dict",
 )
 assert runtime_result["child"] is child
 
 config_result = instantiate(
     cfg,
     child=OmegaConf.structured(child),
-    _target_whitelist_="builtins.dict",
+    _execution_whitelist_="builtins.dict",
 )
 assert config_result["child"] == {"value": 10}
 ```
@@ -164,7 +164,7 @@ cfg = OmegaConf.create(
     }
 )
 
-result = instantiate(cfg, b=99, _target_whitelist_="builtins.dict")
+result = instantiate(cfg, b=99, _execution_whitelist_="builtins.dict")
 assert result == {"b": 99, "c": 99}
 ```
 
@@ -196,7 +196,7 @@ independent = OmegaConf.create(cfg.payload)
 result = instantiate(
     cfg,
     payload=independent,
-    _target_whitelist_="builtins.dict",
+    _execution_whitelist_="builtins.dict",
 )
 assert result["payload"] is independent
 ```

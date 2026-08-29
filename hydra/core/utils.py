@@ -35,7 +35,7 @@ def simple_stdout_log_config(level: int = logging.INFO) -> None:
 def configure_log(
     log_config: DictConfig,
     verbose_config: Union[bool, str, Sequence[str]] = False,
-    target_whitelist: Any = None,
+    execution_whitelist: Any = None,
 ) -> None:
     assert isinstance(verbose_config, (bool, str)) or OmegaConf.is_list(verbose_config)
     if log_config is not None:
@@ -46,7 +46,7 @@ def configure_log(
             # Imported lazily because instantiate's resolver imports core.utils.
             from hydra._internal.logging_config import configure_logging
 
-            configure_logging(conf, target_whitelist)
+            configure_logging(conf, execution_whitelist)
     else:
         # default logging to stdout
         root = logging.getLogger()
@@ -110,9 +110,9 @@ def run_job(
     configure_logging: bool = True,
 ) -> "JobReturn":
     # Imported lazily because target_policy's resolver imports core.utils.
-    from hydra._internal.target_policy import target_whitelist
+    from hydra._internal.target_policy import execution_whitelist
 
-    with target_whitelist(hydra_context.target_whitelist, reset=True):
+    with execution_whitelist(hydra_context.execution_whitelist, reset=True):
         return _run_job(
             task_function=task_function,
             config=config,
@@ -188,7 +188,7 @@ def _run_job(
             configure_log(
                 config.hydra.job_logging,
                 config.hydra.verbose,
-                target_whitelist=hydra_context.target_whitelist,
+                execution_whitelist=hydra_context.execution_whitelist,
             )
 
         if config.hydra.output_subdir is not None:

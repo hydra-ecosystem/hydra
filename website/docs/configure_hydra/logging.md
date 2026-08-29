@@ -41,10 +41,10 @@ disable_existing_loggers: false
 <details>
 <summary>Security considerations</summary>
 
-Python logging configuration can import and call the values of handler
-`class` keys and formatter, filter, and handler `()` keys. Configure a target
-whitelist in trusted Python code whenever logging configuration may come from
-an untrusted source:
+When Hydra configures Python logging, the configuration can import and call the
+values of handler `class` keys and formatter, filter, and handler `()` keys.
+Configure an execution whitelist in trusted Python code whenever Hydra's
+logging configuration may come from an untrusted source:
 
 ```python
 import hydra
@@ -53,7 +53,7 @@ import hydra
     version_base=None,
     config_path="conf",
     config_name="config",
-    target_whitelist=["my_app.logging.CustomHandler"],
+    execution_whitelist=("my_app.logging.CustomHandler",),
 )
 def my_app(cfg):
     ...
@@ -69,13 +69,12 @@ Hydra does not support replacing Python's global
 target authorization. Express custom logging components in the logging
 configuration and authorize their targets instead.
 
-See [Target whitelist](/docs/upgrades/1.3_to_1.4/instantiate_target_whitelist)
-for the shared whitelist rules and migration guidance for both logging and
-`instantiate()`.
+See [Execution whitelist](/docs/advanced/execution_whitelist) for the
+shared rules for logging and `instantiate()`.
 
-Resolving additional logging targets without a target whitelist retains the
-legacy blocklist behavior in Hydra 1.4, but is deprecated and will become an
-error in Hydra 1.5. Use `UNSAFE_ALLOW_ALL_TARGETS` only when all composed
+Resolving additional logging targets without an execution whitelist retains the
+legacy blacklist behavior in Hydra 1.4, but is deprecated and will become an
+error in Hydra 1.5. Use `UNSAFE_DISABLE_EXECUTION_CHECKS` only when all composed
 logging configuration is trusted and unrestricted target resolution is
 intentional.
 

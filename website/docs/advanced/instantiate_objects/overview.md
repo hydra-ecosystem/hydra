@@ -51,11 +51,11 @@ instantiation is not supported for these sequence inputs.
                                       containers too.
                        _partial_: If True, return functools.partial wrapped method or object
                                   False by default. Configure per target.
-        :param _target_whitelist_: A target string, list of target strings,
-                                   object returned by target_whitelist(), or
-                                   UNSAFE_ALLOW_ALL_TARGETS. Passing None
+        :param _execution_whitelist_: A target string, list of target strings,
+                                   object returned by execution_whitelist(), or
+                                   UNSAFE_DISABLE_EXECUTION_CHECKS. Passing None
                                    preserves legacy behavior unless a
-                                   target_whitelist() context is active.
+                                   execution_whitelist() context is active.
         :param args: Optional positional parameters pass-through
         :param kwargs: Optional named parameters to override
                        parameters in the config object. Parameters not present
@@ -73,24 +73,24 @@ instantiation is not supported for these sequence inputs.
 </details><br/>
 
 <details>
-    <summary>Target whitelist API (Expand for details)</summary>
+    <summary>Execution whitelist API (Expand for details)</summary>
 
     ```python
-    def target_whitelist(
-        target_whitelist: str | Sequence[str] | UNSAFE_ALLOW_ALL_TARGETS | None,
+    def execution_whitelist(
+        execution_whitelist: str | Sequence[str] | UNSAFE_DISABLE_EXECUTION_CHECKS | None,
         reset: bool = False,
     ):
         """
-        Create a target whitelist object for config-selected Python targets.
+        Create an execution whitelist for config-selected Python targets.
 
-        The returned object can be used as a context manager to apply a whitelist
-        to Hydra operations in the current context, including logging
-        configuration, or passed to instantiate() as _target_whitelist_.
+        The returned object can be used as a context manager for instantiate()
+        calls and Python logging configured by Hydra in the current context, or
+        passed to instantiate() as _execution_whitelist_.
 
-        :param target_whitelist: A target string, list of target strings, or
-                                 UNSAFE_ALLOW_ALL_TARGETS. A trailing .*
+        :param execution_whitelist: A target string, list of target strings, or
+                                 UNSAFE_DISABLE_EXECUTION_CHECKS. A trailing .*
                                  allows targets under a package prefix.
-        :param reset: If True, ignore any outer target_whitelist() context.
+        :param reset: If True, ignore any outer execution_whitelist() context.
                       If False, add these targets to the current context.
         """
     ```
@@ -100,16 +100,16 @@ instantiation is not supported for these sequence inputs.
 The config passed to these functions must have a key called `_target_`, with the value of a fully qualified class name, class method, static method or callable.
 For convenience, `None` config results in a `None` object.
 
-Create a whitelist object with `target_whitelist()`. Use it as a context manager
-to apply a whitelist to every Hydra target resolution in a block, including
-`instantiate()` and logging configuration. This is useful when another function
-or framework calls `instantiate()` internally, or when calling `instantiate()`
-multiple times with the same whitelist:
+Create an execution whitelist with `execution_whitelist()`. Use it as a context
+manager to apply a whitelist to every Hydra target resolution in a block,
+including `instantiate()` and logging configuration. This is useful when another
+function or framework calls `instantiate()` internally, or when calling
+`instantiate()` multiple times with the same whitelist:
 
 ```python
-from hydra.utils import instantiate, target_whitelist
+from hydra.utils import instantiate, execution_whitelist
 
-with target_whitelist("my_app.*"):
+with execution_whitelist("my_app.*"):
     framework_function(cfg)
 ```
 
@@ -118,16 +118,16 @@ Or pass it directly to one `instantiate()` call:
 ```python
 model = instantiate(
     cfg.model,
-    _target_whitelist_=target_whitelist("my_app.models.*"),
+    _execution_whitelist_=execution_whitelist("my_app.models.*"),
 )
 ```
 
-Nested `target_whitelist()` scopes stack by default: an inner scope adds its
+Nested `execution_whitelist()` scopes stack by default: an inner scope adds its
 targets to the outer scope.
 
 ```python
-with target_whitelist("my_app.models.*"):
-    with target_whitelist("my_app.optimizers.*"):
+with execution_whitelist("my_app.models.*"):
+    with execution_whitelist("my_app.optimizers.*"):
         train(cfg)
 ```
 
@@ -135,25 +135,28 @@ Use `reset=True` when the inner scope should replace the outer scope instead of
 adding to it:
 
 ```python
-with target_whitelist("my_app.*"):
-    with target_whitelist("my_app.models.*", reset=True):
+with execution_whitelist("my_app.*"):
+    with execution_whitelist("my_app.models.*", reset=True):
         instantiate(cfg.model)
 ```
 
-For simple direct calls, `_target_whitelist_` also accepts a string or list of
+For simple direct calls, `_execution_whitelist_` also accepts a string or list of
 strings.
 
 The wildcard `*` by itself is not allowed as a whitelist entry. To explicitly
-preserve legacy all-target behavior, use `UNSAFE_ALLOW_ALL_TARGETS`:
+preserve legacy all-target behavior, use `UNSAFE_DISABLE_EXECUTION_CHECKS`:
 
 ```python
-from hydra.utils import UNSAFE_ALLOW_ALL_TARGETS, instantiate
+from hydra.utils import UNSAFE_DISABLE_EXECUTION_CHECKS, instantiate
 
 component = instantiate(
     cfg.component,
-    _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS,
+    _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
 )
 ```
+
+See [Execution whitelist](/docs/advanced/execution_whitelist) for the
+shared security model, logging integration, and advanced target rules.
 
 **Named arguments** : Config fields (except reserved fields like `_target_`) are passed as named arguments to the target.
 Named arguments in the config can be overridden by passing named argument with the same name in the `instantiate()` call-site.
@@ -255,7 +258,7 @@ optimizer:
 <div className="col col--6">
 
 ```python title="Instantiation"
-with target_whitelist("my_app.*"):
+with execution_whitelist("my_app.*"):
     opt = instantiate(cfg.optimizer)
 print(opt)
 # Optimizer(algo=SGD,lr=0.01)
@@ -267,7 +270,7 @@ print(opt)
 You can override parameters at the call-site:
 
 ```python
-with target_whitelist("my_app.*"):
+with execution_whitelist("my_app.*"):
     opt = instantiate(
         cfg.optimizer,
         lr=0.2,
@@ -311,7 +314,7 @@ trainer:
 
 Hydra will instantiate nested objects recursively by default.
 ```python
-with target_whitelist("my_app.*"):
+with execution_whitelist("my_app.*"):
     trainer = instantiate(cfg.trainer)
     print(trainer)
     # Trainer(
@@ -321,7 +324,7 @@ with target_whitelist("my_app.*"):
 ```
 You can override parameters for nested objects:
 ```python
-with target_whitelist("my_app.*"):
+with execution_whitelist("my_app.*"):
     trainer = instantiate(
         cfg.trainer,
         optimizer={"lr": 0.3},
@@ -336,7 +339,7 @@ print(trainer)
 
 Similarly, positional arguments of nested objects can be overridden:
 ```python
-with target_whitelist("my_app.*"):
+with execution_whitelist("my_app.*"):
     obj = instantiate(
         cfg.object,
         # pass 1 and 2 as positional arguments
@@ -355,7 +358,7 @@ In that case the Trainer object will receive an OmegaConf DictConfig for nested 
 trainer = instantiate(
     cfg.trainer,
     _recursive_=False,
-    _target_whitelist_="my_app.Trainer",
+    _execution_whitelist_="my_app.Trainer",
 )
 print(trainer)
 ```
@@ -423,22 +426,22 @@ cfg = OmegaConf.create(
     }
 )
 
-obj_none = instantiate(cfg, _convert_="none", _target_whitelist_="__main__.*")
+obj_none = instantiate(cfg, _convert_="none", _execution_whitelist_="__main__.*")
 assert isinstance(obj_none, MyTarget)
 assert isinstance(obj_none.foo, DictConfig)
 assert isinstance(obj_none.bar, DictConfig)
 
-obj_partial = instantiate(cfg, _convert_="partial", _target_whitelist_="__main__.*")
+obj_partial = instantiate(cfg, _convert_="partial", _execution_whitelist_="__main__.*")
 assert isinstance(obj_partial, MyTarget)
 assert isinstance(obj_partial.foo, DictConfig)
 assert isinstance(obj_partial.bar, dict)
 
-obj_object = instantiate(cfg, _convert_="object", _target_whitelist_="__main__.*")
+obj_object = instantiate(cfg, _convert_="object", _execution_whitelist_="__main__.*")
 assert isinstance(obj_object, MyTarget)
 assert isinstance(obj_object.foo, Foo)
 assert isinstance(obj_object.bar, dict)
 
-obj_all = instantiate(cfg, _convert_="all", _target_whitelist_="__main__.*")
+obj_all = instantiate(cfg, _convert_="all", _execution_whitelist_="__main__.*")
 assert isinstance(obj_all, MyTarget)
 assert isinstance(obj_all.foo, dict)
 assert isinstance(obj_all.bar, dict)
@@ -450,16 +453,16 @@ instances of `MyTarget` that are equivalent to the above:
 
 ```python
 cfg_none = OmegaConf.create({..., "_convert_": "none"})
-obj_none = instantiate(cfg_none, _target_whitelist_="__main__.*")
+obj_none = instantiate(cfg_none, _execution_whitelist_="__main__.*")
 
 cfg_partial = OmegaConf.create({..., "_convert_": "partial"})
-obj_partial = instantiate(cfg_partial, _target_whitelist_="__main__.*")
+obj_partial = instantiate(cfg_partial, _execution_whitelist_="__main__.*")
 
 cfg_object = OmegaConf.create({..., "_convert_": "object"})
-obj_object = instantiate(cfg_object, _target_whitelist_="__main__.*")
+obj_object = instantiate(cfg_object, _execution_whitelist_="__main__.*")
 
 cfg_all = OmegaConf.create({..., "_convert_": "all"})
-obj_all = instantiate(cfg_all, _target_whitelist_="__main__.*")
+obj_all = instantiate(cfg_all, _execution_whitelist_="__main__.*")
 ```
 
 ### Partial Instantiation
@@ -511,7 +514,7 @@ model:
 <div className="col col--7">
 
 ```python title="Instantiation"
-with target_whitelist("my_app.*"):
+with execution_whitelist("my_app.*"):
     model = instantiate(cfg.model)
 print(model)
 # "Model(Optimizer=Optimizer(algo=SGD,lr=0.01),lr=0.01)
@@ -526,7 +529,7 @@ using `_partial_=True` may provide a significant speedup as compared with regula
 factory = instantiate(
     config,
     _partial_=True,
-    _target_whitelist_="my_app.*",
+    _execution_whitelist_="my_app.*",
 )
 obj = factory()
 ```
@@ -548,7 +551,7 @@ bar_conf = {
 bar_factory = instantiate(
     bar_conf,
     _partial_=True,
-    _target_whitelist_="__main__.*",
+    _execution_whitelist_="__main__.*",
 )
 bar1 = bar_factory()
 bar2 = bar_factory()
@@ -562,47 +565,18 @@ in which case a new `Foo` instance would be created with each call to `instantia
 <details>
 <summary>Security considerations</summary>
 
-Hydra distinguishes between two denied-target classes. Generally problematic
-targets are blocked in legacy mode but trusted Python code can authorize them
-with `_target_whitelist_`. Targets that let config data control executable
-behavior, unsafe loading, imports, or generic dispatch cannot be authorized by
-a normal target whitelist. Use a narrow trusted wrapper instead. The explicit
-`UNSAFE_ALLOW_ALL_TARGETS` escape hatch disables both protections.
+Configured `_target_` values select Python code to execute. Supply an execution
+whitelist from trusted Python code whenever configuration is not fully trusted.
+Hydra also checks callable results and some argument-selected operations; some
+generic dispatch and uncontrolled-execution surfaces cannot be whitelisted.
 
-Use the native `_partial_: true` option instead of configuring
-`_target_: functools.partial`. Direct `functools.partial` targets and equivalent
-constructor spellings such as `functools.partial.__new__` are deprecated. When
-used with `_target_whitelist_`, both the partial constructor and its effective
-callable must be authorized. If a direct partial target also uses
-`_partial_: true`, Hydra rechecks its completed callable and any callable result
-when the deferred factory is invoked. Equivalent constructor spellings cannot
-construct partial subclasses while safety checks are active because subclass
-overrides can hide their invocation behavior.
+Use Hydra's native `_partial_: true` support instead of targeting
+`functools.partial` directly. Call `instantiate()` from trusted Python code
+rather than configuring Hydra's own instantiate aliases as `_target_`.
 
-If a config targets `hydra.utils.get_class`, `get_method`,
-`get_static_method`, or `get_object`, whitelist both the discovery helper and
-the dotpath in its `path` argument. Hydra applies the same target policy to the
-selected path and to the canonical identity of a callable result. Discovery
-helpers may use `_partial_: true`; Hydra checks the effective path on every
-invocation, including a path supplied or replaced at runtime. Hydra's
-`instantiate` and `call` functions cannot themselves be authorized as config
-targets; invoke them from trusted Python code.
-
-Hydra does not authorize `builtins.getattr`, `hasattr`, `setattr`, or `delattr`
-through a real target whitelist. Attribute operations can execute property or
-custom descriptor code before Hydra can inspect the operation. Access or mutate
-the intended attribute from trusted Python code instead. The equivalent
-`object.__getattribute__` and `type.__getattribute__` dispatch targets cannot be
-authorized either. These targets remain available on the legacy no-whitelist
-path; `getattr` returns non-callable values normally and checks callable results
-against the blocklist. The explicit `UNSAFE_ALLOW_ALL_TARGETS` escape hatch
-preserves unrestricted legacy behavior.
-
-Hydra also refuses to authorize generic `operator` dispatch and selection
-targets, including `call`, `attrgetter`, `methodcaller`, `getitem`, `itemgetter`,
-`setitem`, `delitem`, and `contains`, or their canonical `_operator` spellings.
-Set `_target_` to the intended callable instead. These generic operator targets
-are also blocklisted on the legacy no-whitelist path.
+See [Execution whitelist](/docs/advanced/execution_whitelist) for the
+complete policy, including discovery helpers, logging, non-whitelistable
+targets, legacy behavior, and the explicit unsafe opt-out.
 
 </details>
 
@@ -618,7 +592,7 @@ from hydra.utils import instantiate
 instantiate(
     {"_target_": "builtins.len"},
     [1,2,3],
-    _target_whitelist_="builtins.len",
+    _execution_whitelist_="builtins.len",
 )  # this works, returns the number 3
 ```
 

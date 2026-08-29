@@ -26,7 +26,7 @@ class OptunaSweeper(Sweeper):
 
         sampler = instantiate(
             sampler,
-            _target_whitelist_=(
+            _execution_whitelist_=(
                 "hydra_plugins.hydra_optuna_sweeper.*",
                 "optuna.samplers.*",
             ),

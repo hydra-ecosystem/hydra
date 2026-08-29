@@ -12,20 +12,20 @@ from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union, cast
 from hydra._internal.utils import _locate
 from hydra.errors import InstantiationException
 
-# This blocklist is a best-effort, defense-in-depth stopgap that refuses the
-# most obvious dangerous _target_ values on the legacy (no _target_whitelist_)
+# This blacklist is a best-effort, defense-in-depth stopgap that refuses the
+# most obvious dangerous _target_ values on the legacy (no _execution_whitelist_)
 # path. It is NOT a security boundary and is intentionally not exhaustive.
 #
 # Known limitation - indirect dispatch: user-defined targets can invoke a
 # blocked method without ever naming it as a _target_. The method name is data,
 # not a target, so name-based blocking cannot see it. Hydra blocks the generic
 # standard-library dispatch primitives identified here, but cannot exhaustively
-# identify equivalent application wrappers. A target whitelist supplied from
+# identify equivalent application wrappers. An execution whitelist supplied from
 # trusted Python code is the real security boundary.
 # Generally problematic targets are refused on the legacy path, but trusted
-# Python code may authorize them with a target whitelist. Keep this set
+# Python code may authorize them with an execution whitelist. Keep this set
 # for operations whose effect is fully named and bounded by the target itself.
-DEFAULT_BLOCKLISTED_MODULES = {
+DEFAULT_BLACKLISTED_MODULES = {
     "_sitebuiltins.Quitter",
     "builtins.exit",
     "builtins.quit",
@@ -128,8 +128,8 @@ _NON_CALLABLE_MOCK_TARGETS = {
 _NON_CALLABLE_MOCK_SAFE_PARAMETERS = {"name", "spec", "spec_set"}
 
 # These targets allow config data to select or supply executable behavior.
-# They are refused both on the legacy path and by a real target whitelist.
-# UNSAFE_ALLOW_ALL_TARGETS remains the explicit opt-out from all checks.
+# They are refused both on the legacy path and by a real execution whitelist.
+# UNSAFE_DISABLE_EXECUTION_CHECKS remains the explicit opt-out from all checks.
 UNCONTROLLED_EXECUTION_TARGETS = (
     {
         "_sitebuiltins._Helper",
@@ -265,7 +265,7 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIXES = (
     # BaseConfigurator/DictConfigurator method resolve and call config-named
     # factories (arbitrary code) on the legacy/no-whitelist path. Block the
     # family with one prefix instead of enumerating methods. Stopgap only; the
-    # permanent control for logging config is the target whitelist (GHSA-c3wx).
+    # permanent control for logging config is the execution whitelist (GHSA-c3wx).
     # Hydra's own logging calls logging.config.dictConfig directly (not via
     # instantiate), so this does not affect it.
     "logging.config.",
@@ -331,22 +331,24 @@ DISCOVERY_TARGETS = {
 }
 
 
-class _UnsafeAllowAllTargets:
+class _UnsafeDisableExecutionChecks:
     def __repr__(self) -> str:
-        return "UNSAFE_ALLOW_ALL_TARGETS"
+        return "UNSAFE_DISABLE_EXECUTION_CHECKS"
 
     def __reduce__(self) -> Any:
-        return (_get_unsafe_allow_all_targets, ())
+        return (_get_unsafe_disable_execution_checks, ())
 
 
-def _get_unsafe_allow_all_targets() -> "_UnsafeAllowAllTargets":
-    return UNSAFE_ALLOW_ALL_TARGETS
+def _get_unsafe_disable_execution_checks() -> "_UnsafeDisableExecutionChecks":
+    return UNSAFE_DISABLE_EXECUTION_CHECKS
 
 
-UNSAFE_ALLOW_ALL_TARGETS = _UnsafeAllowAllTargets()
-NormalizedTargetWhitelist = Union[Tuple[str, ...], _UnsafeAllowAllTargets, None]
-_TARGET_WHITELIST_CONTEXT: ContextVar[NormalizedTargetWhitelist] = ContextVar(
-    "hydra_target_whitelist", default=None
+UNSAFE_DISABLE_EXECUTION_CHECKS = _UnsafeDisableExecutionChecks()
+NormalizedExecutionWhitelist = Union[
+    Tuple[str, ...], _UnsafeDisableExecutionChecks, None
+]
+_EXECUTION_WHITELIST_CONTEXT: ContextVar[NormalizedExecutionWhitelist] = ContextVar(
+    "hydra_execution_whitelist", default=None
 )
 
 
@@ -363,10 +365,10 @@ def _get_os_alias_target(target: str) -> str:
     return target
 
 
-def _is_blocklisted_target(target: str) -> bool:
+def _is_blacklisted_target(target: str) -> bool:
     canonical_target = _get_os_alias_target(target)
     if (
-        canonical_target in DEFAULT_BLOCKLISTED_MODULES
+        canonical_target in DEFAULT_BLACKLISTED_MODULES
         or canonical_target in UNCONTROLLED_EXECUTION_TARGETS
     ):
         return True
@@ -396,58 +398,64 @@ def _is_uncontrolled_execution_target(target: str) -> bool:
     return canonical_target.startswith(UNCONTROLLED_EXECUTION_TARGET_PREFIXES)
 
 
-def _validate_target_whitelist_pattern(pattern: Any) -> str:
+def _validate_execution_whitelist_pattern(pattern: Any) -> str:
     if not isinstance(pattern, str):
         raise InstantiationException(
-            f"Invalid _target_whitelist_ entry '{pattern}': expected a string"
+            f"Invalid _execution_whitelist_ entry '{pattern}': expected a string"
         )
     if pattern == "":
-        raise InstantiationException("Invalid _target_whitelist_ entry: empty string")
+        raise InstantiationException(
+            "Invalid _execution_whitelist_ entry: empty string"
+        )
     if "*" not in pattern:
         return pattern
     if pattern == "*" or not pattern.endswith(".*") or pattern.count("*") > 1:
         raise InstantiationException(
             dedent(f"""\
-                Invalid _target_whitelist_ entry '{pattern}'. Only trailing '.*'
+                Invalid _execution_whitelist_ entry '{pattern}'. Only trailing '.*'
                 package wildcards are supported. The wildcard '*' is not allowed
-                as a target whitelist pattern. To preserve legacy all-target
-                behavior, pass UNSAFE_ALLOW_ALL_TARGETS explicitly.""")
+                as an execution whitelist pattern. To preserve legacy all-target
+                behavior, pass UNSAFE_DISABLE_EXECUTION_CHECKS explicitly.""")
         )
     prefix = pattern[:-2]
     if prefix == "" or prefix.endswith("."):
         raise InstantiationException(
-            f"Invalid _target_whitelist_ entry '{pattern}': missing package prefix"
+            f"Invalid _execution_whitelist_ entry '{pattern}': missing package prefix"
         )
     return pattern
 
 
-def _normalize_target_whitelist(
-    target_whitelist: Any,
-) -> NormalizedTargetWhitelist:
-    if target_whitelist is None:
+def _normalize_execution_whitelist(
+    execution_whitelist: Any,
+) -> NormalizedExecutionWhitelist:
+    if execution_whitelist is None:
         return None
-    if target_whitelist is UNSAFE_ALLOW_ALL_TARGETS:
-        return UNSAFE_ALLOW_ALL_TARGETS
-    if isinstance(target_whitelist, _TargetWhitelistPolicy):
-        return target_whitelist.whitelist
-    if isinstance(target_whitelist, str):
-        return (_validate_target_whitelist_pattern(target_whitelist),)
+    if execution_whitelist is UNSAFE_DISABLE_EXECUTION_CHECKS:
+        return UNSAFE_DISABLE_EXECUTION_CHECKS
+    if isinstance(execution_whitelist, _ExecutionWhitelistPolicy):
+        return execution_whitelist.whitelist
+    if isinstance(execution_whitelist, str):
+        return (_validate_execution_whitelist_pattern(execution_whitelist),)
     try:
         return tuple(
-            _validate_target_whitelist_pattern(pattern) for pattern in target_whitelist
+            _validate_execution_whitelist_pattern(pattern)
+            for pattern in execution_whitelist
         )
     except TypeError as e:
         raise InstantiationException(
-            "Invalid _target_whitelist_: expected a string, a sequence of strings, "
-            "or UNSAFE_ALLOW_ALL_TARGETS"
+            "Invalid _execution_whitelist_: expected a string, a sequence of strings, "
+            "or UNSAFE_DISABLE_EXECUTION_CHECKS"
         ) from e
 
 
-def _combine_target_whitelists(
-    base: NormalizedTargetWhitelist, extra: NormalizedTargetWhitelist
-) -> NormalizedTargetWhitelist:
-    if base is UNSAFE_ALLOW_ALL_TARGETS or extra is UNSAFE_ALLOW_ALL_TARGETS:
-        return UNSAFE_ALLOW_ALL_TARGETS
+def _combine_execution_whitelists(
+    base: NormalizedExecutionWhitelist, extra: NormalizedExecutionWhitelist
+) -> NormalizedExecutionWhitelist:
+    if (
+        base is UNSAFE_DISABLE_EXECUTION_CHECKS
+        or extra is UNSAFE_DISABLE_EXECUTION_CHECKS
+    ):
+        return UNSAFE_DISABLE_EXECUTION_CHECKS
     if base is None:
         return extra
     if extra is None:
@@ -457,80 +465,83 @@ def _combine_target_whitelists(
     )
 
 
-class _TargetWhitelistPolicy:
+class _ExecutionWhitelistPolicy:
     def __init__(
-        self, whitelist: NormalizedTargetWhitelist, reset: bool = False
+        self, whitelist: NormalizedExecutionWhitelist, reset: bool = False
     ) -> None:
         self.whitelist = whitelist
         self.reset = reset
         self._tokens: ContextVar[Tuple[Any, ...]] = ContextVar(
-            "hydra_target_whitelist_tokens", default=()
+            "hydra_execution_whitelist_tokens", default=()
         )
 
     def resolve(
-        self, inherited: NormalizedTargetWhitelist
-    ) -> NormalizedTargetWhitelist:
+        self, inherited: NormalizedExecutionWhitelist
+    ) -> NormalizedExecutionWhitelist:
         if self.reset:
             return self.whitelist
-        return _combine_target_whitelists(inherited, self.whitelist)
+        return _combine_execution_whitelists(inherited, self.whitelist)
 
-    def __enter__(self) -> "_TargetWhitelistPolicy":
-        token = _TARGET_WHITELIST_CONTEXT.set(
-            self.resolve(_TARGET_WHITELIST_CONTEXT.get())
+    def __enter__(self) -> "_ExecutionWhitelistPolicy":
+        token = _EXECUTION_WHITELIST_CONTEXT.set(
+            self.resolve(_EXECUTION_WHITELIST_CONTEXT.get())
         )
         self._tokens.set((*self._tokens.get(), token))
         return self
 
     def __exit__(self, *args: Any) -> None:
         tokens = self._tokens.get()
-        _TARGET_WHITELIST_CONTEXT.reset(tokens[-1])
+        _EXECUTION_WHITELIST_CONTEXT.reset(tokens[-1])
         self._tokens.set(tokens[:-1])
 
 
-TargetWhitelist = Union[
-    str, Sequence[str], _UnsafeAllowAllTargets, _TargetWhitelistPolicy, None
+ExecutionWhitelist = Union[
+    str, Sequence[str], _UnsafeDisableExecutionChecks, _ExecutionWhitelistPolicy, None
 ]
 
 
-def target_whitelist(target_whitelist: TargetWhitelist, reset: bool = False) -> Any:
+def execution_whitelist(
+    execution_whitelist: ExecutionWhitelist, reset: bool = False
+) -> Any:
     """
-    Create a target whitelist object for config-selected Python targets.
+    Create an execution whitelist object for config-selected Python targets.
 
-    The returned object can be used as a context manager to apply a whitelist to
-    Hydra operations in the current context, or passed to instantiate() as
-    _target_whitelist_. This includes targets selected by Hydra logging
-    configuration.
+    The returned object can be used as a context manager for instantiate() calls
+    and Python logging configured by Hydra in the current context, or passed to
+    instantiate() as _execution_whitelist_.
 
-    :param target_whitelist: A target string, list of target strings, or
-        UNSAFE_ALLOW_ALL_TARGETS. A trailing .* allows targets under a package
+    :param execution_whitelist: A target string, list of target strings, or
+        UNSAFE_DISABLE_EXECUTION_CHECKS. A trailing .* allows targets under a package
         prefix.
-    :param reset: If True, ignore any outer target_whitelist() context.
+    :param reset: If True, ignore any outer execution_whitelist() context.
         If False, add these targets to the current context.
     """
-    return _TargetWhitelistPolicy(
-        whitelist=_normalize_target_whitelist(target_whitelist),
+    return _ExecutionWhitelistPolicy(
+        whitelist=_normalize_execution_whitelist(execution_whitelist),
         reset=reset,
     )
 
 
-def _resolve_target_whitelist(
-    target_whitelist: TargetWhitelist,
-) -> NormalizedTargetWhitelist:
-    inherited = _TARGET_WHITELIST_CONTEXT.get()
-    if isinstance(target_whitelist, _TargetWhitelistPolicy):
-        return target_whitelist.resolve(inherited)
-    return _combine_target_whitelists(
-        inherited, _normalize_target_whitelist(target_whitelist)
+def _resolve_execution_whitelist(
+    execution_whitelist: ExecutionWhitelist,
+) -> NormalizedExecutionWhitelist:
+    inherited = _EXECUTION_WHITELIST_CONTEXT.get()
+    if isinstance(execution_whitelist, _ExecutionWhitelistPolicy):
+        return execution_whitelist.resolve(inherited)
+    return _combine_execution_whitelists(
+        inherited, _normalize_execution_whitelist(execution_whitelist)
     )
 
 
-def _get_active_target_whitelist() -> NormalizedTargetWhitelist:
-    """Return the normalized target whitelist active in this context."""
-    return _TARGET_WHITELIST_CONTEXT.get()
+def _get_active_execution_whitelist() -> NormalizedExecutionWhitelist:
+    """Return the normalized execution whitelist active in this context."""
+    return _EXECUTION_WHITELIST_CONTEXT.get()
 
 
-def _is_target_whitelisted(target: str, target_whitelist: Tuple[str, ...]) -> bool:
-    for pattern in target_whitelist:
+def _is_execution_whitelisted(
+    target: str, execution_whitelist: Tuple[str, ...]
+) -> bool:
+    for pattern in execution_whitelist:
         if pattern.endswith(".*"):
             prefix = pattern[:-2]
             if target.startswith(f"{prefix}."):
@@ -645,18 +656,16 @@ def _resolved_from_note(target_name: str, resolved_from: str) -> str:
     return "" if resolved_from == target_name else f" (resolved from '{resolved_from}')"
 
 
-_TARGET_WHITELIST_DOC_URL = (
-    "https://hydra.cc/docs/upgrades/1.3_to_1.4/instantiate_target_whitelist/"
-)
+_EXECUTION_WHITELIST_DOC_URL = "https://hydra.cc/docs/advanced/execution_whitelist/"
 
 
 def _logging_target_help(full_key: str) -> str:
     if full_key != "hydra.logging":
         return ""
-    return f"\nSee {_TARGET_WHITELIST_DOC_URL}"
+    return f"\nSee {_EXECUTION_WHITELIST_DOC_URL}"
 
 
-def _blocklisted_target_message(
+def _blacklisted_target_message(
     target_name: str, resolved_from: str, full_key: str
 ) -> str:
     resolved_note = _resolved_from_note(target_name, resolved_from)
@@ -680,26 +689,26 @@ def _blocklisted_target_message(
     }:
         message = dedent(
             f"""\
-            Target '{target_name}'{resolved_note} is blocklisted because it performs
+            Target '{target_name}'{resolved_note} is blacklisted because it performs
             generic selection or dispatch using config data.
             Set '_target_' to the intended callable instead. Pass
-            UNSAFE_ALLOW_ALL_TARGETS only to explicitly disable target safety checks."""
+            UNSAFE_DISABLE_EXECUTION_CHECKS only to explicitly disable target safety checks."""
         )
     elif _is_uncontrolled_execution_target(target_name):
         message = dedent(
             f"""\
-            Target '{target_name}'{resolved_note} is blocklisted because it allows
+            Target '{target_name}'{resolved_note} is blacklisted because it allows
             config data to control executable behavior or belongs to an
-            execution-capable target family. It cannot be authorized with a target
-            whitelist. Pass UNSAFE_ALLOW_ALL_TARGETS only to explicitly disable
+            execution-capable target family. It cannot be authorized with an execution
+            whitelist. Pass UNSAFE_DISABLE_EXECUTION_CHECKS only to explicitly disable
             target safety checks."""
         )
     else:
         message = dedent(
             f"""\
-            Target '{target_name}'{resolved_note} is blocklisted and cannot be instantiated from config
+            Target '{target_name}'{resolved_note} is blacklisted and cannot be instantiated from config
             to prevent security vulnerabilities.
-            Pass _target_whitelist_ from trusted code to allow expected targets."""
+            Pass _execution_whitelist_ from trusted code to allow expected targets."""
         )
     return message + _logging_target_help(full_key)
 
@@ -711,16 +720,16 @@ def _not_whitelisted_message(
     if full_key == "hydra.logging":
         return dedent(
             f"""\
-            Logging target '{target_name}'{resolved_note} is not in the Hydra target whitelist.
-            Add it to target_whitelist= on @hydra.main(), or use
-            hydra.utils.target_whitelist() around logging setup from trusted Python
+            Logging target '{target_name}'{resolved_note} is not in the Hydra execution whitelist.
+            Add it to execution_whitelist= on @hydra.main(), or use
+            hydra.utils.execution_whitelist() around logging setup from trusted Python
             code.
-            See {_TARGET_WHITELIST_DOC_URL}"""
+            See {_EXECUTION_WHITELIST_DOC_URL}"""
         )
     return dedent(
         f"""\
-        Target '{target_name}'{resolved_note} is not in the instantiate target whitelist.
-        Pass _target_whitelist_ from trusted code to allow expected targets."""
+        Target '{target_name}'{resolved_note} is not in the Hydra execution whitelist.
+        Pass _execution_whitelist_ from trusted code to allow expected targets."""
     )
 
 
@@ -738,16 +747,16 @@ def _non_whitelistable_target_message(
     }:
         message = dedent(
             f"""\
-            Target '{target_name}'{resolved_note} cannot be authorized by the instantiate
-            target whitelist because attribute operations can execute descriptor code before
+            Target '{target_name}'{resolved_note} cannot be authorized by the Hydra
+            execution whitelist because attribute operations can execute descriptor code before
             the operation can be authorized. Access or mutate the attribute from trusted
             Python code instead."""
         )
     elif target_name == "hydra._internal.instantiate._instantiate2.instantiate":
         message = dedent(
             f"""\
-            Target '{target_name}'{resolved_note} cannot be authorized by the instantiate
-            target whitelist because reentrant instantiate calls do not safely inherit
+            Target '{target_name}'{resolved_note} cannot be authorized by the Hydra
+            execution whitelist because reentrant instantiate calls do not safely inherit
             the effective whitelist. Call instantiate() from trusted Python code instead."""
         )
     elif target_name in {
@@ -770,8 +779,8 @@ def _non_whitelistable_target_message(
     }:
         message = dedent(
             f"""\
-            Target '{target_name}'{resolved_note} cannot be authorized by the instantiate
-            target whitelist because it performs generic selection or dispatch using
+            Target '{target_name}'{resolved_note} cannot be authorized by the Hydra
+            execution whitelist because it performs generic selection or dispatch using
             config data.
             Set '_target_' to the intended callable instead."""
         )
@@ -779,15 +788,15 @@ def _non_whitelistable_target_message(
         message = dedent(
             f"""\
             Target '{target_name}'{resolved_note} cannot be authorized by the
-            instantiate target whitelist because it allows config data to control
+            Hydra execution whitelist because it allows config data to control
             executable behavior or belongs to an execution-capable target family.
             Call a narrow trusted wrapper from config instead."""
         )
     else:
         message = dedent(
             f"""\
-            Target '{target_name}'{resolved_note} cannot be authorized by the instantiate
-            target whitelist because it delegates the effective operation to config data.
+            Target '{target_name}'{resolved_note} cannot be authorized by the Hydra
+            execution whitelist because it delegates the effective operation to config data.
             Set '_target_' to the intended callable instead."""
         )
     return message + _logging_target_help(full_key)
@@ -797,11 +806,11 @@ def _reject_non_whitelistable_target(
     target_name: str,
     resolved_from: str,
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
 ) -> None:
     if (
-        target_whitelist is not None
-        and target_whitelist is not UNSAFE_ALLOW_ALL_TARGETS
+        execution_whitelist is not None
+        and execution_whitelist is not UNSAFE_DISABLE_EXECUTION_CHECKS
         and _is_non_whitelistable_target(target_name)
     ):
         raise InstantiationException(
@@ -812,15 +821,16 @@ def _reject_non_whitelistable_target(
         )
 
 
-def _is_exactly_whitelisted(target: str, target_whitelist: Tuple[str, ...]) -> bool:
+def _is_exactly_whitelisted(target: str, execution_whitelist: Tuple[str, ...]) -> bool:
     """True if target matches a non-wildcard (exact) whitelist entry."""
     return any(
-        not pattern.endswith(".*") and target == pattern for pattern in target_whitelist
+        not pattern.endswith(".*") and target == pattern
+        for pattern in execution_whitelist
     )
 
 
 def _requires_resolved_authorization(
-    target_name: str, target_whitelist: NormalizedTargetWhitelist
+    target_name: str, execution_whitelist: NormalizedExecutionWhitelist
 ) -> bool:
     """Whether the resolved identity must be re-authorized after _locate().
 
@@ -828,14 +838,14 @@ def _requires_resolved_authorization(
     not punish a deliberate exact whitelist entry for a re-exported target
     (e.g. 'json.JSONDecoder' whose canonical name is 'json.decoder.JSONDecoder').
     An exact whitelist match on the config string is authoritative; only a
-    wildcard match still needs the recheck. The blocklist path always rechecks.
+    wildcard match still needs the recheck. The blacklist path always rechecks.
     """
-    if target_whitelist is UNSAFE_ALLOW_ALL_TARGETS:
+    if execution_whitelist is UNSAFE_DISABLE_EXECUTION_CHECKS:
         return False
-    if target_whitelist is None:
+    if execution_whitelist is None:
         return True
     return not _is_exactly_whitelisted(
-        target_name, cast(Tuple[str, ...], target_whitelist)
+        target_name, cast(Tuple[str, ...], execution_whitelist)
     )
 
 
@@ -843,31 +853,31 @@ def _authorize_target_name(
     target_name: str,
     resolved_from: str,
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
 ) -> None:
     """Authorize a single target name against the active policy.
 
     Called on the literal pre-resolution string and on resolved callable
     identities. Checking the resolved identity is what closes module-attribute
-    aliasing bypasses (e.g. ``logging.os.system`` resolving to the blocklisted
+    aliasing bypasses (e.g. ``logging.os.system`` resolving to the blacklisted
     ``os.system``), since a dotted string can name a callable that lives in a
     different module than the string's prefix suggests.
     """
-    if target_whitelist is UNSAFE_ALLOW_ALL_TARGETS:
+    if execution_whitelist is UNSAFE_DISABLE_EXECUTION_CHECKS:
         return
     _reject_non_whitelistable_target(
-        target_name, resolved_from, full_key, target_whitelist
+        target_name, resolved_from, full_key, execution_whitelist
     )
-    if target_whitelist is None:
-        if _is_blocklisted_target(target_name):
+    if execution_whitelist is None:
+        if _is_blacklisted_target(target_name):
             raise InstantiationException(
                 _with_full_key(
-                    _blocklisted_target_message(target_name, resolved_from, full_key),
+                    _blacklisted_target_message(target_name, resolved_from, full_key),
                     full_key,
                 )
             )
-    elif not _is_target_whitelisted(
-        target_name, cast(Tuple[str, ...], target_whitelist)
+    elif not _is_execution_whitelisted(
+        target_name, cast(Tuple[str, ...], execution_whitelist)
     ):
         raise InstantiationException(
             _with_full_key(
@@ -882,7 +892,7 @@ def _authorize_discovery_path(
     args: Tuple[Any, ...],
     kwargs: Dict[str, Any],
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
 ) -> Optional[str]:
     """Authorize the dotpath consumed by a Hydra discovery helper."""
     target_name = _get_resolved_target_name_for_check(target)
@@ -892,7 +902,7 @@ def _authorize_discovery_path(
     path = args[0] if args else kwargs.get("path")
     if not isinstance(path, str):
         return None
-    _authorize_target_name(path, path, full_key, target_whitelist)
+    _authorize_target_name(path, path, full_key, execution_whitelist)
     return path
 
 
@@ -900,27 +910,29 @@ def _authorize_discovery_result(
     path: str,
     result: Callable[..., Any],
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
 ) -> None:
     """Recheck a discovered callable by its canonical security identity."""
-    _authorize_resolved_target_identity(result, path, full_key, target_whitelist)
+    _authorize_resolved_target_identity(result, path, full_key, execution_whitelist)
 
 
 def _authorize_resolved_target_identity(
     target: Callable[..., Any],
     resolved_from: str,
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
 ) -> str:
     """Authorize the canonical identity of a callable resolved from a dotpath."""
     resolved_name = _get_os_alias_target(_get_resolved_target_name_for_check(target))
     _reject_non_whitelistable_target(
-        resolved_name, resolved_from, full_key, target_whitelist
+        resolved_name, resolved_from, full_key, execution_whitelist
     )
     if resolved_name != resolved_from and _requires_resolved_authorization(
-        resolved_from, target_whitelist
+        resolved_from, execution_whitelist
     ):
-        _authorize_target_name(resolved_name, resolved_from, full_key, target_whitelist)
+        _authorize_target_name(
+            resolved_name, resolved_from, full_key, execution_whitelist
+        )
     return resolved_name
 
 
@@ -928,11 +940,11 @@ def _authorize_callable_result(
     result: Callable[..., Any],
     resolved_from: str,
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
 ) -> None:
     """Authorize a callable selected as another target's runtime result."""
     resolved_name = _get_os_alias_target(_get_resolved_target_name_for_check(result))
-    _authorize_target_name(resolved_name, resolved_from, full_key, target_whitelist)
+    _authorize_target_name(resolved_name, resolved_from, full_key, execution_whitelist)
 
 
 def _get_effective_target_invocation(
@@ -967,12 +979,12 @@ def _authorize_target_invocation(
     args: Tuple[Any, ...],
     kwargs: Dict[str, Any],
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
     *,
     allow_incomplete_partial: bool = False,
 ) -> None:
     """Reject argument-sensitive construction surfaces before invoking them."""
-    if target_whitelist is UNSAFE_ALLOW_ALL_TARGETS:
+    if execution_whitelist is UNSAFE_DISABLE_EXECUTION_CHECKS:
         return
 
     target_name = _get_resolved_target_name_for_check(target)
@@ -982,7 +994,7 @@ def _authorize_target_invocation(
             Target 'builtins.iter' cannot use its two-argument callback form from
             config because callback execution is deferred beyond instantiate's
             target authorization. Use one-argument iter(iterable), or perform the
-            callback iteration in trusted Python code. Pass UNSAFE_ALLOW_ALL_TARGETS
+            callback iteration in trusted Python code. Pass UNSAFE_DISABLE_EXECUTION_CHECKS
             only to explicitly disable target safety checks."""
         )
         raise InstantiationException(_with_full_key(msg, full_key))
@@ -1001,7 +1013,7 @@ def _authorize_target_invocation(
                 Target '{target_name}' cannot configure callable attributes,
                 children, or wrappers from config (unsafe parameters: {joined}).
                 Only one positional spec and the name, spec, and spec_set keyword
-                parameters are allowed. Pass UNSAFE_ALLOW_ALL_TARGETS only to
+                parameters are allowed. Pass UNSAFE_DISABLE_EXECUTION_CHECKS only to
                 explicitly disable target safety checks."""
             )
             raise InstantiationException(_with_full_key(msg, full_key))
@@ -1020,7 +1032,7 @@ def _authorize_target_invocation(
                     f"""\
                     Target '{target_name}' cannot be used for dynamic class construction
                     from config. Metaclass constructor methods cannot be authorized with
-                    a target whitelist. Pass UNSAFE_ALLOW_ALL_TARGETS only to explicitly
+                    an execution whitelist. Pass UNSAFE_DISABLE_EXECUTION_CHECKS only to explicitly
                     disable target safety checks."""
                 )
                 raise InstantiationException(_with_full_key(msg, full_key))
@@ -1035,7 +1047,7 @@ def _authorize_target_invocation(
         f"""\
         Target '{target_name}' cannot be used for dynamic class construction from
         config. Only one-argument type(obj) introspection is allowed. Pass
-        UNSAFE_ALLOW_ALL_TARGETS only to explicitly disable target safety checks."""
+        UNSAFE_DISABLE_EXECUTION_CHECKS only to explicitly disable target safety checks."""
     )
     raise InstantiationException(_with_full_key(msg, full_key))
 
@@ -1045,7 +1057,7 @@ class _DeferredTarget(functools.partial):  # type: ignore[type-arg]
 
     _hydra_resolved_from: str
     _hydra_full_key: str
-    _hydra_target_whitelist: NormalizedTargetWhitelist
+    _hydra_execution_whitelist: NormalizedExecutionWhitelist
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         effective_target, effective_args, effective_kwargs = (
@@ -1056,21 +1068,21 @@ class _DeferredTarget(functools.partial):  # type: ignore[type-arg]
             effective_args,
             effective_kwargs,
             self._hydra_full_key,
-            self._hydra_target_whitelist,
+            self._hydra_execution_whitelist,
         )
         discovery_path = _authorize_discovery_path(
             effective_target,
             effective_args,
             effective_kwargs,
             self._hydra_full_key,
-            self._hydra_target_whitelist,
+            self._hydra_execution_whitelist,
         )
         result = super().__call__(*args, **kwargs)
         return _mediate_target_result(
             result,
             discovery_path or self._hydra_resolved_from,
             self._hydra_full_key,
-            self._hydra_target_whitelist,
+            self._hydra_execution_whitelist,
             discovery_path=discovery_path,
         )
 
@@ -1079,12 +1091,12 @@ def _mediate_target_result(
     result: Any,
     resolved_from: str,
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
     *,
     discovery_path: Optional[str] = None,
 ) -> Any:
     """Authorize callable results and keep deferred partial results mediated."""
-    if target_whitelist is UNSAFE_ALLOW_ALL_TARGETS:
+    if execution_whitelist is UNSAFE_DISABLE_EXECUTION_CHECKS:
         return result
 
     if isinstance(result, functools.partial) and type(result) is not _DeferredTarget:
@@ -1104,16 +1116,16 @@ def _mediate_target_result(
         deferred.__dict__.update(result.__dict__)
         deferred._hydra_resolved_from = resolved_from
         deferred._hydra_full_key = full_key
-        deferred._hydra_target_whitelist = target_whitelist
+        deferred._hydra_execution_whitelist = execution_whitelist
         result = deferred
 
     if callable(result):
         if discovery_path is not None:
             _authorize_discovery_result(
-                discovery_path, result, full_key, target_whitelist
+                discovery_path, result, full_key, execution_whitelist
             )
         else:
             _authorize_callable_result(
-                result, resolved_from, full_key, target_whitelist
+                result, resolved_from, full_key, execution_whitelist
             )
     return result

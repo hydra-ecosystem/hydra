@@ -5,12 +5,12 @@ from typing import Any
 from pytest import mark, param, raises
 
 from hydra.errors import InstantiationException
-from hydra.utils import UNSAFE_ALLOW_ALL_TARGETS, instantiate
+from hydra.utils import UNSAFE_DISABLE_EXECUTION_CHECKS, instantiate
 from tests.instantiate import ArgsClass
 
 
 def unsafe_instantiate(config: Any, *args: Any, **kwargs: Any) -> Any:
-    kwargs.setdefault("_target_whitelist_", UNSAFE_ALLOW_ALL_TARGETS)
+    kwargs.setdefault("_execution_whitelist_", UNSAFE_DISABLE_EXECUTION_CHECKS)
     return instantiate(config, *args, **kwargs)
 
 

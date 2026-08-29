@@ -8,7 +8,7 @@ from omegaconf import DictConfig, OmegaConf
 import hydra
 from hydra.core.utils import JobReturn
 from hydra.experimental.callback import Callback
-from hydra.utils import target_whitelist
+from hydra.utils import execution_whitelist
 
 log = logging.getLogger(__name__)
 
@@ -45,5 +45,5 @@ def my_app(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    with target_whitelist("my_app.*"):
+    with execution_whitelist("my_app.*"):
         my_app()

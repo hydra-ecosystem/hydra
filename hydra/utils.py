@@ -10,10 +10,10 @@ import hydra._internal.instantiate._instantiate2
 import hydra.types
 from hydra._internal.deprecation_warning import deprecation_warning
 from hydra._internal.target_policy import (
-    UNSAFE_ALLOW_ALL_TARGETS as UNSAFE_ALLOW_ALL_TARGETS,
+    UNSAFE_DISABLE_EXECUTION_CHECKS as UNSAFE_DISABLE_EXECUTION_CHECKS,
 )
 from hydra._internal.target_policy import (
-    target_whitelist as target_whitelist,
+    execution_whitelist as execution_whitelist,
 )
 from hydra._internal.utils import _locate
 from hydra.core.hydra_config import HydraConfig

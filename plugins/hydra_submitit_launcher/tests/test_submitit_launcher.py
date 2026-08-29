@@ -76,7 +76,7 @@ def test_slurm_python_parameter(tmp_path: Path, python: Optional[str]) -> None:
     config.hydra.launcher.python = python
     launcher = instantiate(
         config.hydra.launcher,
-        _target_whitelist_=(
+        _execution_whitelist_=(
             "hydra_plugins.hydra_submitit_launcher.submitit_launcher.SlurmLauncher"
         ),
     )
@@ -114,7 +114,7 @@ def test_slurm_tasks_per_node_is_optional_with_compatible_default(
     config.hydra.launcher.tasks_per_node = tasks_per_node
     launcher = instantiate(
         config.hydra.launcher,
-        _target_whitelist_=(
+        _execution_whitelist_=(
             "hydra_plugins.hydra_submitit_launcher.submitit_launcher.SlurmLauncher"
         ),
     )

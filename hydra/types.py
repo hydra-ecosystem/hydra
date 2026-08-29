@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class HydraContext:
     config_loader: "ConfigLoader"
     callbacks: "Callbacks"
-    target_whitelist: Any = None
+    execution_whitelist: Any = None
 
 
 class RunMode(Enum):
