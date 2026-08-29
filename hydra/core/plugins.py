@@ -112,7 +112,7 @@ class Plugins(metaclass=Singleton):
             plugin = instantiate(
                 config=config,
                 _target_=clazz,
-                _target_whitelist_=classname,
+                _execution_whitelist_=classname,
                 _recursive_=False,
             )
             assert isinstance(plugin, Plugin)

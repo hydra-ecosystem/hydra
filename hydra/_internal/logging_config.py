@@ -11,22 +11,23 @@ from typing import Any, Callable, Dict, Tuple, cast
 
 from hydra._internal.deprecation_warning import deprecation_warning
 from hydra._internal.target_policy import (
-    UNSAFE_ALLOW_ALL_TARGETS,
-    NormalizedTargetWhitelist,
-    TargetWhitelist,
+    UNSAFE_DISABLE_EXECUTION_CHECKS,
+    ExecutionWhitelist,
+    NormalizedExecutionWhitelist,
     _authorize_discovery_path,
     _authorize_resolved_target_identity,
     _authorize_target_invocation,
     _authorize_target_name,
-    _combine_target_whitelists,
+    _combine_execution_whitelists,
     _get_os_alias_target,
     _get_resolved_target_name_for_check,
     _mediate_target_result,
-    _resolve_target_whitelist,
+    _resolve_execution_whitelist,
 )
+from hydra.errors import InstantiationException
 
 # Hydra's built-in logging configurations must continue to work when an
-# application enables a restrictive target whitelist. Keep this list exact so
+# application enables a restrictive execution whitelist. Keep this list exact so
 # it does not broaden instantiate() authorization or trust a package namespace.
 _BUILTIN_LOGGING_TARGETS: Tuple[str, ...] = (
     "colorlog.ColoredFormatter",
@@ -37,16 +38,16 @@ _BUILTIN_LOGGING_TARGETS: Tuple[str, ...] = (
 )
 
 
-def _resolve_logging_target_whitelist(
-    target_whitelist: TargetWhitelist,
-) -> NormalizedTargetWhitelist:
-    resolved = _resolve_target_whitelist(target_whitelist)
-    if resolved is None or resolved is UNSAFE_ALLOW_ALL_TARGETS:
+def _resolve_logging_execution_whitelist(
+    execution_whitelist: ExecutionWhitelist,
+) -> NormalizedExecutionWhitelist:
+    resolved = _resolve_execution_whitelist(execution_whitelist)
+    if resolved is None or resolved is UNSAFE_DISABLE_EXECUTION_CHECKS:
         return resolved
-    return _combine_target_whitelists(resolved, _BUILTIN_LOGGING_TARGETS)
+    return _combine_execution_whitelists(resolved, _BUILTIN_LOGGING_TARGETS)
 
 
-def _warn_legacy_logging_target_whitelist() -> None:
+def _warn_legacy_logging_execution_whitelist() -> None:
     stacklevel = 1
     frame = inspect.currentframe()
     hydra_package = Path(__file__).resolve().parents[1]
@@ -62,13 +63,13 @@ def _warn_legacy_logging_target_whitelist() -> None:
     deprecation_warning(
         dedent(
             """\
-            Hydra configured Python logging without a target whitelist. This
+            Hydra configured Python logging without an execution whitelist. This
             preserves legacy behavior but is deprecated because logging
             configuration can select and execute arbitrary Python callables.
-            This warning will become an error in Hydra 1.5. Pass target_whitelist=
-            to @hydra.main(), use hydra.utils.target_whitelist(), or pass
-            UNSAFE_ALLOW_ALL_TARGETS to explicitly keep legacy behavior.
-            See https://hydra.cc/docs/upgrades/1.3_to_1.4/instantiate_target_whitelist/"""
+            This warning will become an error in Hydra 1.5. Pass execution_whitelist=
+            to @hydra.main(), use hydra.utils.execution_whitelist(), or pass
+            UNSAFE_DISABLE_EXECUTION_CHECKS to explicitly keep legacy behavior.
+            See https://hydra.cc/docs/advanced/execution_whitelist/"""
         ),
         stacklevel=stacklevel,
     )
@@ -80,10 +81,10 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
     def __init__(
         self,
         config: Dict[str, Any],
-        target_whitelist: NormalizedTargetWhitelist,
+        execution_whitelist: NormalizedExecutionWhitelist,
     ) -> None:
         super().__init__(config)
-        self._target_whitelist = target_whitelist
+        self._execution_whitelist = execution_whitelist
         self._resolved_targets: Dict[str, Any] = {}
         self._resolved_target_sources: Dict[int, str] = {}
 
@@ -95,7 +96,7 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
                 target,
                 resolved_from,
                 "hydra.logging",
-                self._target_whitelist,
+                self._execution_whitelist,
             )
         else:
             target_name = _get_os_alias_target(
@@ -105,14 +106,14 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
                 target_name,
                 target_name,
                 "hydra.logging",
-                self._target_whitelist,
+                self._execution_whitelist,
             )
         if (
-            self._target_whitelist is None
+            self._execution_whitelist is None
             and target_name not in _BUILTIN_LOGGING_TARGETS
             and resolved_from not in _BUILTIN_LOGGING_TARGETS
         ):
-            _warn_legacy_logging_target_whitelist()
+            _warn_legacy_logging_execution_whitelist()
         return target_name
 
     def _invoke_authorized_callable(
@@ -127,36 +128,36 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
             args,
             kwargs,
             "hydra.logging",
-            self._target_whitelist,
+            self._execution_whitelist,
         )
         discovery_path = _authorize_discovery_path(
             target,
             args,
             kwargs,
             "hydra.logging",
-            self._target_whitelist,
+            self._execution_whitelist,
         )
         result = target(*args, **kwargs)
         return _mediate_target_result(
             result,
             discovery_path or resolved_from,
             "hydra.logging",
-            self._target_whitelist,
+            self._execution_whitelist,
             discovery_path=discovery_path,
         )
 
     def resolve(self, s: str) -> Any:
         if s in self._resolved_targets:
             return self._resolved_targets[s]
-        _authorize_target_name(s, s, "hydra.logging", self._target_whitelist)
+        _authorize_target_name(s, s, "hydra.logging", self._execution_whitelist)
         result = super().resolve(s)
         self._authorize_callable(result, s)
         if (
             not callable(result)
-            and self._target_whitelist is None
+            and self._execution_whitelist is None
             and s not in _BUILTIN_LOGGING_TARGETS
         ):
-            _warn_legacy_logging_target_whitelist()
+            _warn_legacy_logging_execution_whitelist()
         self._resolved_targets[s] = result
         self._resolved_target_sources[id(result)] = s
         return result
@@ -247,14 +248,14 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
                 (),
                 kwargs,
                 "hydra.logging",
-                self._target_whitelist,
+                self._execution_whitelist,
             )
             discovery_path = _authorize_discovery_path(
                 handler_class,
                 (),
                 kwargs,
                 "hydra.logging",
-                self._target_whitelist,
+                self._execution_whitelist,
             )
             resolved_from = discovery_path or resolved_from
         for key in ("queue", "listener"):
@@ -292,7 +293,7 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
                 result,
                 resolved_from,
                 "hydra.logging",
-                self._target_whitelist,
+                self._execution_whitelist,
             )
 
         formatter = deferred_config.get("formatter")
@@ -316,7 +317,7 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
 
 
 def configure_logging(
-    config: Dict[str, Any], target_whitelist: TargetWhitelist = None
+    config: Dict[str, Any], execution_whitelist: ExecutionWhitelist = None
 ) -> None:
     if logging.config.dictConfigClass is not logging.config.DictConfigurator:
         raise ValueError(
@@ -325,12 +326,20 @@ def configure_logging(
                 Hydra does not support a custom logging.config.dictConfigClass
                 because it can bypass Hydra target authorization. Express custom
                 handlers, formatters, filters, queues, and listeners in the logging
-                configuration and authorize them with target_whitelist instead.
-                See https://hydra.cc/docs/upgrades/1.3_to_1.4/instantiate_target_whitelist/"""
+                configuration and authorize them with execution_whitelist instead.
+                See https://hydra.cc/docs/advanced/execution_whitelist/"""
             )
         )
-    effective_whitelist = _resolve_logging_target_whitelist(target_whitelist)
-    HydraDictConfigurator(
-        config,
-        cast(NormalizedTargetWhitelist, effective_whitelist),
-    ).configure()
+    effective_whitelist = _resolve_logging_execution_whitelist(execution_whitelist)
+    try:
+        HydraDictConfigurator(
+            config,
+            cast(NormalizedExecutionWhitelist, effective_whitelist),
+        ).configure()
+    except ValueError as e:
+        cause = e.__cause__
+        while cause is not None and not isinstance(cause, InstantiationException):
+            cause = cause.__cause__
+        if isinstance(cause, InstantiationException):
+            raise ValueError(f"{e}\n{cause}") from e
+        raise

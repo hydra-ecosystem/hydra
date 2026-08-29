@@ -59,7 +59,7 @@ class BasicLauncher(Launcher):
         configure_log(
             self.config.hydra.hydra_logging,
             self.config.hydra.verbose,
-            target_whitelist=self.hydra_context.target_whitelist,
+            execution_whitelist=self.hydra_context.execution_whitelist,
         )
         sweep_dir = self.config.hydra.sweep.dir
         Path(str(sweep_dir)).mkdir(parents=True, exist_ok=True)
@@ -86,6 +86,6 @@ class BasicLauncher(Launcher):
             configure_log(
                 self.config.hydra.hydra_logging,
                 self.config.hydra.verbose,
-                target_whitelist=self.hydra_context.target_whitelist,
+                execution_whitelist=self.hydra_context.execution_whitelist,
             )
         return runs

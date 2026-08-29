@@ -301,7 +301,7 @@ def test_motpe_sampler_removed() -> None:
     ):
         instantiate(
             OmegaConf.structured(MOTPESamplerConfig),
-            _target_whitelist_="hydra_plugins.hydra_optuna_sweeper.config.raise_motpe_removed",
+            _execution_whitelist_="hydra_plugins.hydra_optuna_sweeper.config.raise_motpe_removed",
         )
 
 

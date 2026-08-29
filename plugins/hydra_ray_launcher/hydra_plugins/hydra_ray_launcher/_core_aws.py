@@ -76,8 +76,8 @@ def launch(
     )
     ray_cluster["setup_commands"] = setup_commands
 
-    target_whitelist = getattr(launcher.hydra_context, "target_whitelist", None)
-    if target_whitelist is None:
+    execution_whitelist = getattr(launcher.hydra_context, "execution_whitelist", None)
+    if execution_whitelist is None:
         configure_log(
             launcher.config.hydra.hydra_logging, launcher.config.hydra.verbose
         )
@@ -85,7 +85,7 @@ def launch(
         configure_log(
             launcher.config.hydra.hydra_logging,
             launcher.config.hydra.verbose,
-            target_whitelist=target_whitelist,
+            execution_whitelist=execution_whitelist,
         )
     logging_config = cast(
         Dict[str, Any],

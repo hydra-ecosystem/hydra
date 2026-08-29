@@ -17,12 +17,12 @@ from pytest import MonkeyPatch, fixture, importorskip, mark, raises, warns
 from hydra import main
 from hydra._internal.logging_config import HydraDictConfigurator
 from hydra._internal.target_policy import (
-    UNSAFE_ALLOW_ALL_TARGETS,
-    _get_active_target_whitelist,
+    UNSAFE_DISABLE_EXECUTION_CHECKS,
+    _get_active_execution_whitelist,
 )
 from hydra.core.utils import configure_log
 from hydra.errors import InstantiationException
-from hydra.utils import target_whitelist
+from hydra.utils import execution_whitelist
 
 
 class CustomHandler(logging.Handler):
@@ -146,7 +146,7 @@ def _root_cause(error: BaseException) -> BaseException:
     return error
 
 
-def test_logging_blocklist_rejects_custom_factory_rce() -> None:
+def test_logging_blacklist_rejects_custom_factory_rce() -> None:
     config = _logging_config({"()": "subprocess.Popen", "args": ["must-not-execute"]})
 
     with raises(ValueError, match="Unable to configure handler") as exc_info:
@@ -154,10 +154,10 @@ def test_logging_blocklist_rejects_custom_factory_rce() -> None:
 
     cause = _root_cause(exc_info.value)
     assert isinstance(cause, InstantiationException)
-    assert "Target 'subprocess.Popen' is blocklisted" in str(cause)
+    assert "Target 'subprocess.Popen' is blacklisted" in str(cause)
 
 
-def test_logging_blocklist_rejects_handler_class_rce() -> None:
+def test_logging_blacklist_rejects_handler_class_rce() -> None:
     config = _logging_config(
         {"class": "subprocess.Popen", "args": ["must-not-execute"]}
     )
@@ -167,42 +167,46 @@ def test_logging_blocklist_rejects_handler_class_rce() -> None:
 
     cause = _root_cause(exc_info.value)
     assert isinstance(cause, InstantiationException)
-    assert "Target 'subprocess.Popen' is blocklisted" in str(cause)
+    assert "Target 'subprocess.Popen' is blacklisted" in str(cause)
 
 
 def test_logging_whitelist_rejects_unlisted_factory() -> None:
     config = _logging_config({"()": "tests.test_logging_config.CustomHandler"})
 
-    with target_whitelist([]):
+    with execution_whitelist([]):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
+    assert "Logging target 'tests.test_logging_config.CustomHandler'" in str(
+        exc_info.value
+    )
+    assert "is not in the Hydra execution whitelist" in str(exc_info.value)
     cause = _root_cause(exc_info.value)
     assert isinstance(cause, InstantiationException)
     message = str(cause)
     assert "Logging target 'tests.test_logging_config.CustomHandler'" in message
-    assert "is not in the Hydra target whitelist" in message
-    assert "target_whitelist= on @hydra.main()" in message
-    assert "hydra.utils.target_whitelist()" in message
-    assert "instantiate_target_whitelist/" in message
+    assert "is not in the Hydra execution whitelist" in message
+    assert "execution_whitelist= on @hydra.main()" in message
+    assert "hydra.utils.execution_whitelist()" in message
+    assert "advanced/execution_whitelist/" in message
 
 
 def test_logging_whitelist_allows_custom_factory() -> None:
     config = _logging_config({"()": "tests.test_logging_config.CustomHandler"})
 
-    with target_whitelist("tests.test_logging_config.CustomHandler"):
+    with execution_whitelist("tests.test_logging_config.CustomHandler"):
         configure_log(config)
 
     assert isinstance(logging.getLogger().handlers[0], CustomHandler)
 
 
-def test_logging_handler_class_result_uses_target_whitelist() -> None:
+def test_logging_handler_class_result_uses_execution_whitelist() -> None:
     CallableHandler.configured = False
     config = _logging_config(
         {"class": "tests.test_logging_config.SubstitutingHandler", "level": "INFO"}
     )
 
-    with target_whitelist("tests.test_logging_config.SubstitutingHandler"):
+    with execution_whitelist("tests.test_logging_config.SubstitutingHandler"):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
@@ -217,7 +221,7 @@ def test_logging_factory_invocation_uses_argument_checks() -> None:
         {"()": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
     )
 
-    with target_whitelist("unittest.mock.NonCallableMock"):
+    with execution_whitelist("unittest.mock.NonCallableMock"):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
@@ -231,7 +235,7 @@ def test_logging_handler_class_invocation_uses_argument_checks() -> None:
         {"class": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
     )
 
-    with target_whitelist("unittest.mock.NonCallableMock"):
+    with execution_whitelist("unittest.mock.NonCallableMock"):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
@@ -262,7 +266,7 @@ def test_logging_handler_class_is_resolved_once() -> None:
     sys.modules[module_name] = module
     try:
         config = _logging_config({"class": f"{module_name}.Handler"})
-        with target_whitelist(f"{module_name}.Handler"):
+        with execution_whitelist(f"{module_name}.Handler"):
             configure_log(config)
     finally:
         del sys.modules[module_name]
@@ -276,7 +280,7 @@ def test_logging_whitelist_allows_builtin_defaults() -> None:
         {"class": "logging.StreamHandler", "stream": "ext://sys.stdout"}
     )
 
-    with target_whitelist([]):
+    with execution_whitelist([]):
         configure_log(config)
 
     assert isinstance(logging.getLogger().handlers[0], logging.StreamHandler)
@@ -296,14 +300,14 @@ def test_logging_whitelist_allows_colorlog_plugin() -> None:
         }
     )
 
-    with target_whitelist([]):
+    with execution_whitelist([]):
         configure_log(config)
 
     formatter = logging.getLogger().handlers[0].formatter
     assert isinstance(formatter, colorlog.ColoredFormatter)
 
 
-def test_logging_formatter_class_uses_target_whitelist() -> None:
+def test_logging_formatter_class_uses_execution_whitelist() -> None:
     config = OmegaConf.create(
         {
             "version": 1,
@@ -318,7 +322,7 @@ def test_logging_formatter_class_uses_target_whitelist() -> None:
         }
     )
 
-    with target_whitelist([]):
+    with execution_whitelist([]):
         with raises(ValueError, match="Unable to configure formatter") as exc_info:
             configure_log(config)
 
@@ -362,7 +366,7 @@ def test_logging_formatter_class_is_resolved_once() -> None:
             }
         )
 
-        with target_whitelist(f"{module_name}.Formatter"):
+        with execution_whitelist(f"{module_name}.Formatter"):
             configure_log(config)
     finally:
         del sys.modules[module_name]
@@ -371,7 +375,7 @@ def test_logging_formatter_class_is_resolved_once() -> None:
     assert not payload_executed
 
 
-def test_logging_filter_factory_uses_target_whitelist() -> None:
+def test_logging_filter_factory_uses_execution_whitelist() -> None:
     config = OmegaConf.create(
         {
             "version": 1,
@@ -384,7 +388,7 @@ def test_logging_filter_factory_uses_target_whitelist() -> None:
         }
     )
 
-    with target_whitelist("tests.test_logging_config.CustomFilter"):
+    with execution_whitelist("tests.test_logging_config.CustomFilter"):
         configure_log(config)
 
     assert isinstance(logging.getLogger().handlers[0].filters[0], CustomFilter)
@@ -394,7 +398,7 @@ def test_logging_filter_factory_uses_target_whitelist() -> None:
     sys.version_info < (3, 12),
     reason="dictConfig queue listener factories require Python 3.12 or newer",
 )
-def test_logging_discovery_factory_result_uses_target_whitelist() -> None:
+def test_logging_discovery_factory_result_uses_execution_whitelist() -> None:
     UnlistedQueueListener.invoked = False
     config = OmegaConf.create(
         {
@@ -414,7 +418,9 @@ def test_logging_discovery_factory_result_uses_target_whitelist() -> None:
         }
     )
 
-    with target_whitelist(["logging.handlers.QueueHandler", "hydra.utils.get_object"]):
+    with execution_whitelist(
+        ["logging.handlers.QueueHandler", "hydra.utils.get_object"]
+    ):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
@@ -428,7 +434,7 @@ def test_logging_discovery_factory_result_uses_target_whitelist() -> None:
     sys.version_info < (3, 12),
     reason="dictConfig queue factories require Python 3.12 or newer",
 )
-def test_logging_queue_factory_result_uses_target_whitelist() -> None:
+def test_logging_queue_factory_result_uses_execution_whitelist() -> None:
     config = _logging_config(
         {
             "class": "logging.handlers.QueueHandler",
@@ -436,7 +442,7 @@ def test_logging_queue_factory_result_uses_target_whitelist() -> None:
         }
     )
 
-    with target_whitelist(
+    with execution_whitelist(
         [
             "logging.handlers.QueueHandler",
             "tests.test_logging_config.callable_queue_factory",
@@ -467,7 +473,7 @@ def test_logging_queue_factory_result_uses_target_whitelist() -> None:
         ),
     ],
 )
-def test_logging_queue_listener_result_uses_target_whitelist(
+def test_logging_queue_listener_result_uses_execution_whitelist(
     listener_factory: Any,
     listener_target: str,
 ) -> None:
@@ -487,7 +493,7 @@ def test_logging_queue_listener_result_uses_target_whitelist(
         flags={"allow_objects": True},
     )
 
-    with target_whitelist(
+    with execution_whitelist(
         [
             "logging.handlers.QueueHandler",
             listener_target,
@@ -501,7 +507,7 @@ def test_logging_queue_listener_result_uses_target_whitelist(
     assert "CallableQueueListener" in str(cause)
 
 
-def test_logging_ext_value_uses_target_whitelist() -> None:
+def test_logging_ext_value_uses_execution_whitelist() -> None:
     configurator = HydraDictConfigurator({}, ())
 
     with raises(InstantiationException, match="Logging target 'os.environ'.*not in"):
@@ -511,18 +517,20 @@ def test_logging_ext_value_uses_target_whitelist() -> None:
 def test_logging_resolved_alias_cannot_hide_non_whitelistable_target() -> None:
     config = _logging_config({"()": "logging.os.system", "command": "must-not-execute"})
 
-    with target_whitelist("logging.*"):
+    with execution_whitelist("logging.*"):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
+    assert "Target 'os.system'" in str(exc_info.value)
+    assert "cannot be authorized" in str(exc_info.value)
     cause = _root_cause(exc_info.value)
     assert isinstance(cause, InstantiationException)
     assert "Target 'os.system'" in str(cause)
     assert "cannot be authorized" in str(cause)
 
 
-def test_logging_unsafe_allow_all_is_explicit_escape_hatch() -> None:
-    configurator = HydraDictConfigurator({}, UNSAFE_ALLOW_ALL_TARGETS)
+def test_logging_unsafe_disable_execution_checks_is_explicit_escape_hatch() -> None:
+    configurator = HydraDictConfigurator({}, UNSAFE_DISABLE_EXECUTION_CHECKS)
 
     assert configurator.resolve("subprocess.Popen").__name__ == "Popen"
 
@@ -530,7 +538,7 @@ def test_logging_unsafe_allow_all_is_explicit_escape_hatch() -> None:
 def test_logging_without_whitelist_warns() -> None:
     config = _logging_config({"class": "tests.test_logging_config.CustomHandler"})
 
-    with warns(UserWarning, match="logging without a target whitelist") as records:
+    with warns(UserWarning, match="logging without an execution whitelist") as records:
         configure_log(config)
 
     assert Path(records[0].filename) == Path(__file__)
@@ -541,7 +549,7 @@ def test_non_callable_logging_target_without_whitelist_warns() -> None:
         {"class": "logging.StreamHandler", "stream": "ext://os.environ"}
     )
 
-    with warns(UserWarning, match="logging without a target whitelist") as records:
+    with warns(UserWarning, match="logging without an execution whitelist") as records:
         configure_log(config)
 
     assert Path(records[0].filename) == Path(__file__)
@@ -570,13 +578,13 @@ def test_custom_dict_config_class_is_rejected(monkeypatch: MonkeyPatch) -> None:
     assert not CustomDictConfigurator.called
 
 
-def test_hydra_main_target_whitelist_applies_to_full_invocation() -> None:
-    @main(target_whitelist="tests.test_logging_config.CustomHandler")
+def test_hydra_main_execution_whitelist_applies_to_full_invocation() -> None:
+    @main(execution_whitelist="tests.test_logging_config.CustomHandler")
     def app(config: DictConfig) -> Any:
         configure_log(
             _logging_config({"()": "tests.test_logging_config.CustomHandler"})
         )
-        return _get_active_target_whitelist()
+        return _get_active_execution_whitelist()
 
     assert app(OmegaConf.create()) == ("tests.test_logging_config.CustomHandler",)
-    assert _get_active_target_whitelist() is None
+    assert _get_active_execution_whitelist() is None

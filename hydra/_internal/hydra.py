@@ -17,7 +17,7 @@ from omegaconf import (
 )
 from omegaconf.errors import InterpolationToMissingValueError
 
-from hydra._internal.target_policy import _get_active_target_whitelist
+from hydra._internal.target_policy import _get_active_execution_whitelist
 from hydra._internal.utils import get_column_widths, run_and_report
 from hydra.core.config_loader import ConfigLoader
 from hydra.core.config_search_path import ConfigSearchPath
@@ -165,7 +165,7 @@ class Hydra:
                 hydra_context=HydraContext(
                     config_loader=self.config_loader,
                     callbacks=callbacks,
-                    target_whitelist=_get_active_target_whitelist(),
+                    execution_whitelist=_get_active_execution_whitelist(),
                 ),
                 task_function=task_function,
                 config=cfg,
@@ -216,7 +216,7 @@ class Hydra:
             hydra_context=HydraContext(
                 config_loader=self.config_loader,
                 callbacks=callbacks,
-                target_whitelist=_get_active_target_whitelist(),
+                execution_whitelist=_get_active_execution_whitelist(),
             ),
             task_function=task_function,
         )

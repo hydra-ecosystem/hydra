@@ -13,8 +13,8 @@ from omegaconf.errors import InterpolationResolutionError
 
 from hydra._internal.deprecation_warning import deprecation_warning
 from hydra._internal.target_policy import (
-    NormalizedTargetWhitelist,
-    TargetWhitelist,
+    ExecutionWhitelist,
+    NormalizedExecutionWhitelist,
     _authorize_discovery_path,
     _authorize_resolved_target_identity,
     _authorize_target_invocation,
@@ -24,7 +24,7 @@ from hydra._internal.target_policy import (
     _get_os_alias_target,
     _get_resolved_target_name_for_check,
     _mediate_target_result,
-    _resolve_target_whitelist,
+    _resolve_execution_whitelist,
     _with_full_key,
 )
 from hydra._internal.utils import _locate
@@ -49,7 +49,7 @@ class _Keys(str, Enum):
     RECURSIVE = "_recursive_"
     ARGS = "_args_"
     PARTIAL = "_partial_"
-    TARGET_WHITELIST = "_target_whitelist_"
+    EXECUTION_WHITELIST = "_execution_whitelist_"
 
 
 def _is_target(x: Any) -> bool:
@@ -60,7 +60,7 @@ def _is_target(x: Any) -> bool:
     return False
 
 
-def _warn_legacy_target_whitelist(target: str) -> None:
+def _warn_legacy_execution_whitelist(target: str) -> None:
     stacklevel = 1
     frame = inspect.currentframe()
     while frame is not None:
@@ -72,12 +72,12 @@ def _warn_legacy_target_whitelist(target: str) -> None:
         dedent(
             f"""\
             hydra.utils.instantiate() resolved _target_='{target}' with no
-            _target_whitelist_. This preserves legacy behavior but is deprecated
+            _execution_whitelist_. This preserves legacy behavior but is deprecated
             because config-controlled targets can execute arbitrary code. This
-            warning will become an error in Hydra 1.5. Pass a callsite target
-            whitelist, or pass UNSAFE_ALLOW_ALL_TARGETS to explicitly keep legacy
-            behavior.
-            See https://hydra.cc/docs/upgrades/1.3_to_1.4/instantiate_target_whitelist/"""
+            warning will become an error in Hydra 1.5. Pass an execution whitelist
+            from trusted call-site code, or pass UNSAFE_DISABLE_EXECUTION_CHECKS to
+            explicitly keep legacy behavior.
+            See https://hydra.cc/docs/advanced/execution_whitelist/"""
         ),
         stacklevel=stacklevel,
     )
@@ -123,7 +123,7 @@ def _call_target(
     args: Tuple[Any, ...],
     kwargs: Dict[str, Any],
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
 ) -> Any:
     """Call target (type) with args and kwargs."""
     try:
@@ -144,7 +144,7 @@ def _call_target(
         effective_args,
         effective_kwargs,
         full_key,
-        target_whitelist,
+        execution_whitelist,
         allow_incomplete_partial=_partial_,
     )
     discovery_path = _authorize_discovery_path(
@@ -152,14 +152,14 @@ def _call_target(
         effective_args,
         effective_kwargs,
         full_key,
-        target_whitelist,
+        execution_whitelist,
     )
     try:
         if _partial_:
             deferred = _DeferredTarget(_target_, *args, **kwargs)
             deferred._hydra_resolved_from = discovery_path or resolved_target_name
             deferred._hydra_full_key = full_key
-            deferred._hydra_target_whitelist = target_whitelist
+            deferred._hydra_execution_whitelist = execution_whitelist
             return deferred
         result = _target_(*args, **kwargs)
     except Exception as e:
@@ -176,7 +176,7 @@ def _call_target(
         result,
         discovery_path or resolved_target_name,
         full_key,
-        target_whitelist,
+        execution_whitelist,
         discovery_path=discovery_path,
     )
 
@@ -249,7 +249,7 @@ def _validate_callsite_override(value: Any, path: Tuple[Any, ...]) -> None:
 def _resolve_target(
     target: Union[str, type, Callable[..., Any]],
     full_key: str,
-    target_whitelist: NormalizedTargetWhitelist = None,
+    execution_whitelist: NormalizedExecutionWhitelist = None,
 ) -> Union[type, Callable[..., Any]]:
     """Resolve target string, type or callable into type or callable."""
     if isinstance(target, str) or callable(target):
@@ -261,7 +261,7 @@ def _resolve_target(
 
         # Stage 1: authorize a string literally before import, or authorize an
         # already-resolved callable by its canonical identity.
-        _authorize_target_name(target_name, target_name, full_key, target_whitelist)
+        _authorize_target_name(target_name, target_name, full_key, execution_whitelist)
 
         resolved_name = target_name
         if isinstance(target, str):
@@ -277,13 +277,13 @@ def _resolve_target(
             # Skipped for an exact whitelist entry, which authoritatively allows a
             # re-exported target whose canonical module differs from the string.
             resolved_name = _authorize_resolved_target_identity(
-                target, target_name, full_key, target_whitelist
+                target, target_name, full_key, execution_whitelist
             )
 
         if resolved_name == "functools.partial":
             _warn_direct_functools_partial_target()
-        if target_whitelist is None:
-            _warn_legacy_target_whitelist(target_name)
+        if execution_whitelist is None:
+            _warn_legacy_execution_whitelist(target_name)
     if not callable(target):
         msg = f"Expected a callable target, got '{target}' of type '{type(target).__name__}'"
         raise InstantiationException(_with_full_key(msg, full_key))
@@ -293,7 +293,7 @@ def _resolve_target(
 def instantiate(
     config: Any,
     *args: Any,
-    _target_whitelist_: TargetWhitelist = None,
+    _execution_whitelist_: ExecutionWhitelist = None,
     **kwargs: Any,
 ) -> Any:
     """
@@ -302,7 +302,7 @@ def instantiate(
                    _target_ : target class or callable name (str)
                               IMPORTANT: This may pose a security risk since the config
                               can be used to execute arbitrary code. Make sure to use this only
-                              with trusted configs or configure the target whitelist.
+                              with trusted configs or configure the execution whitelist.
                    And may contain:
                    _args_: List-like of positional arguments to pass to the target
                    _recursive_: Construct nested objects as well (bool).
@@ -324,10 +324,10 @@ def instantiate(
                                   containers too.
                    _partial_: If True, return functools.partial wrapped method or object
                               False by default. Configure per target.
-    :param _target_whitelist_: A target string, list of target strings,
-                    target_whitelist() policy, or UNSAFE_ALLOW_ALL_TARGETS. A trailing
+    :param _execution_whitelist_: A target string, list of target strings,
+                    execution_whitelist() policy, or UNSAFE_DISABLE_EXECUTION_CHECKS. A trailing
                     .* allows targets under a package prefix. Passing None preserves
-                    legacy behavior unless a target_whitelist() context is active.
+                    legacy behavior unless a execution_whitelist() context is active.
     :param args: Optional positional parameters pass-through
     :param kwargs: Optional named parameters to override
                    parameters in the config object. Parameters not present
@@ -347,7 +347,7 @@ def instantiate(
     if config is None:
         return None
 
-    target_whitelist = _resolve_target_whitelist(_target_whitelist_)
+    execution_whitelist = _resolve_execution_whitelist(_execution_whitelist_)
 
     for index, value in enumerate(args):
         _validate_callsite_override(value, (_Keys.ARGS, index))
@@ -380,7 +380,7 @@ def instantiate(
             *args,
             overrides=kwargs,
             is_root=True,
-            target_whitelist=target_whitelist,
+            execution_whitelist=execution_whitelist,
         )
     elif OmegaConf.is_sequence(config):
         _recursive_ = kwargs.pop(_Keys.RECURSIVE, True)
@@ -400,7 +400,7 @@ def instantiate(
             recursive=_recursive_,
             convert=_convert_,
             partial=_partial_,
-            target_whitelist=target_whitelist,
+            execution_whitelist=execution_whitelist,
         )
     else:
         raise InstantiationException(
@@ -529,7 +529,7 @@ def _instantiate_override(
     *,
     convert: Union[str, ConvertMode],
     recursive: bool,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
 ) -> Any:
     if is_structured_config(value):
         return value
@@ -548,7 +548,7 @@ def _instantiate_override(
             overrides=dict_override,
             convert=convert,
             recursive=recursive,
-            target_whitelist=target_whitelist,
+            execution_whitelist=execution_whitelist,
         )
 
     if isinstance(value, (list, tuple)):
@@ -557,7 +557,7 @@ def _instantiate_override(
                 item,
                 convert=convert,
                 recursive=recursive,
-                target_whitelist=target_whitelist,
+                execution_whitelist=execution_whitelist,
             )
             for item in value
         ]
@@ -570,7 +570,7 @@ def _instantiate_override(
             value,
             convert=convert,
             recursive=recursive,
-            target_whitelist=target_whitelist,
+            execution_whitelist=execution_whitelist,
         )
     return value
 
@@ -787,7 +787,7 @@ def _instantiate_effective_value(
     is_target_parameter: bool,
     convert: Union[str, ConvertMode],
     recursive: bool,
-    target_whitelist: NormalizedTargetWhitelist,
+    execution_whitelist: NormalizedExecutionWhitelist,
 ) -> Any:
     if overrides is not None and key in overrides:
         override = overrides[key]
@@ -805,14 +805,14 @@ def _instantiate_effective_value(
                         value,
                         convert=convert,
                         recursive=recursive,
-                        target_whitelist=target_whitelist,
+                        execution_whitelist=execution_whitelist,
                     )
                 return value
         return _instantiate_override(
             override,
             convert=convert,
             recursive=recursive,
-            target_whitelist=target_whitelist,
+            execution_whitelist=execution_whitelist,
         )
 
     value = node[key]
@@ -821,7 +821,7 @@ def _instantiate_effective_value(
             value,
             convert=convert,
             recursive=recursive,
-            target_whitelist=target_whitelist,
+            execution_whitelist=execution_whitelist,
         )
     return value
 
@@ -834,7 +834,7 @@ def instantiate_node(
     recursive: bool = True,
     partial: bool = False,
     is_root: bool = False,
-    target_whitelist: NormalizedTargetWhitelist = None,
+    execution_whitelist: NormalizedExecutionWhitelist = None,
 ) -> Any:
     # Return None if config is None
     if node is None or (
@@ -885,7 +885,7 @@ def instantiate_node(
                 item,
                 convert=convert,
                 recursive=recursive,
-                target_whitelist=target_whitelist,
+                execution_whitelist=execution_whitelist,
             )
             for item in node._iter_ex(resolve=True)
         ]
@@ -895,9 +895,9 @@ def instantiate_node(
         )
 
     elif OmegaConf.is_dict(node):
-        if _Keys.TARGET_WHITELIST in node:
+        if _Keys.EXECUTION_WHITELIST in node:
             msg = (
-                "_target_whitelist_ must be passed to instantiate() from trusted "
+                "_execution_whitelist_ must be passed to instantiate() from trusted "
                 "code, not configured inside the config being instantiated."
             )
             raise InstantiationException(_with_full_key(msg, full_key))
@@ -909,7 +909,7 @@ def instantiate_node(
                 if overrides is not None and _Keys.TARGET in overrides
                 else node.get(_Keys.TARGET)
             )
-            _target_ = _resolve_target(target, full_key, target_whitelist)
+            _target_ = _resolve_target(target, full_key, execution_whitelist)
             kwargs = {}
             is_partial = partial
             for key in _iter_effective_keys(node, overrides):
@@ -923,12 +923,12 @@ def instantiate_node(
                         is_target_parameter=True,
                         convert=convert,
                         recursive=recursive,
-                        target_whitelist=target_whitelist,
+                        execution_whitelist=execution_whitelist,
                     )
                     kwargs[key] = _convert_node(value, convert)
 
             return _call_target(
-                _target_, partial, args, kwargs, full_key, target_whitelist
+                _target_, partial, args, kwargs, full_key, execution_whitelist
             )
         else:
             object_type = node._metadata.object_type
@@ -955,7 +955,7 @@ def instantiate_node(
                         is_target_parameter=False,
                         convert=convert,
                         recursive=recursive,
-                        target_whitelist=target_whitelist,
+                        execution_whitelist=execution_whitelist,
                     )
                 return dict_items
             else:
@@ -972,7 +972,7 @@ def instantiate_node(
                             is_target_parameter=False,
                             convert=convert,
                             recursive=recursive,
-                            target_whitelist=target_whitelist,
+                            execution_whitelist=execution_whitelist,
                         )
                     )
                 cfg._set_parent(node)

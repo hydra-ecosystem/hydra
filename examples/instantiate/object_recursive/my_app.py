@@ -4,7 +4,7 @@ from typing import List
 from omegaconf import DictConfig
 
 import hydra
-from hydra.utils import instantiate, target_whitelist
+from hydra.utils import execution_whitelist, instantiate
 
 
 class Driver:
@@ -30,7 +30,7 @@ class Car:
 
 @hydra.main(config_path=".", config_name="config")
 def my_app(cfg: DictConfig) -> None:
-    with target_whitelist("my_app.*"):
+    with execution_whitelist("my_app.*"):
         car: Car = instantiate(cfg.car)
     car.drive()
 

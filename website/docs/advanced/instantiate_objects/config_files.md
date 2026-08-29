@@ -85,6 +85,6 @@ With this, you can instantiate the object from the configuration with a single l
 ```python
 @hydra.main(config_path="conf", config_name="config")
 def my_app(cfg):
-    connection = hydra.utils.instantiate(cfg.db, _target_whitelist_="my_app.*")
+    connection = hydra.utils.instantiate(cfg.db, _execution_whitelist_="my_app.*")
     connection.connect()
 ```

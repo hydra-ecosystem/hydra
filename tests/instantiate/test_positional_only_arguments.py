@@ -3,13 +3,15 @@ from typing import Any
 
 from pytest import mark, param
 
-from hydra.utils import UNSAFE_ALLOW_ALL_TARGETS, instantiate
+from hydra.utils import UNSAFE_DISABLE_EXECUTION_CHECKS, instantiate
 
 from .positional_only import PosOnlyArgsClass
 
 
 def unsafe_instantiate(config: Any, *args: Any) -> Any:
-    return instantiate(config, *args, _target_whitelist_=UNSAFE_ALLOW_ALL_TARGETS)
+    return instantiate(
+        config, *args, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
+    )
 
 
 @mark.parametrize(

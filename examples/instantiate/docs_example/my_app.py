@@ -3,7 +3,7 @@
 from omegaconf import DictConfig
 
 import hydra
-from hydra.utils import instantiate, target_whitelist
+from hydra.utils import execution_whitelist, instantiate
 
 
 class Optimizer:
@@ -41,7 +41,7 @@ class Trainer:
 
 @hydra.main(config_path=".", config_name="config")
 def my_app(cfg: DictConfig) -> None:
-    with target_whitelist("my_app.*"):
+    with execution_whitelist("my_app.*"):
         optimizer = instantiate(cfg.trainer.optimizer)
         print(optimizer)
         # Optimizer(algo=SGD,lr=0.01)
