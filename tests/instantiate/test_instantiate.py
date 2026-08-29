@@ -17,6 +17,7 @@ from pytest import fixture, mark, param, raises, warns
 
 import hydra
 from hydra import version
+from hydra._internal import target_policy
 from hydra._internal.instantiate import _instantiate2
 from hydra._internal.instantiate._instantiate2 import _resolve_target
 from hydra.errors import Hydra14MigrationWarning, InstantiationException
@@ -1610,7 +1611,7 @@ def test_allowlist_works_for_canonical_os_alias(monkeypatch: Any) -> None:
     assert _resolve_target("posix.kill", "") is os.kill
 
 
-@mark.parametrize("target", sorted(_instantiate2.UNCONTROLLED_EXECUTION_TARGETS))
+@mark.parametrize("target", sorted(target_policy.UNCONTROLLED_EXECUTION_TARGETS))
 def test_uncontrolled_execution_target_ignores_allowlist_override(
     target: str, monkeypatch: Any
 ) -> None:
@@ -1655,12 +1656,12 @@ def test_uncontrolled_execution_family_ignores_allowlist_override(
 def test_uncontrolled_execution_prefix_exceptions_are_not_blocklisted(
     target: str,
 ) -> None:
-    assert not _instantiate2._is_blocklisted_target(target)
+    assert not target_policy._is_blocklisted_target(target)
 
 
 def test_blocklist_policy_sections_are_disjoint() -> None:
-    assert _instantiate2.DEFAULT_BLOCKLISTED_MODULES.isdisjoint(
-        _instantiate2.UNCONTROLLED_EXECUTION_TARGETS
+    assert target_policy.DEFAULT_BLOCKLISTED_MODULES.isdisjoint(
+        target_policy.UNCONTROLLED_EXECUTION_TARGETS
     )
 
 
@@ -1676,8 +1677,8 @@ def test_ineffective_sys_modules_entries_are_not_in_policy() -> None:
         "sys.modules.psutil",
         "sys.modules.tkinter",
     ):
-        assert target not in _instantiate2.DEFAULT_BLOCKLISTED_MODULES
-        assert target not in _instantiate2.UNCONTROLLED_EXECUTION_TARGETS
+        assert target not in target_policy.DEFAULT_BLOCKLISTED_MODULES
+        assert target not in target_policy.UNCONTROLLED_EXECUTION_TARGETS
 
 
 @mark.parametrize(
@@ -1887,7 +1888,7 @@ def test_resolved_target_aliases_are_blocklisted(
     ],
 )
 def test_non_result_lazy_callback_targets_are_not_blocklisted(target: str) -> None:
-    assert not _instantiate2._is_blocklisted_target(target)
+    assert not target_policy._is_blocklisted_target(target)
 
 
 def test_one_argument_iter_target_is_allowed() -> None:

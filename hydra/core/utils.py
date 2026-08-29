@@ -43,7 +43,10 @@ def configure_log(
             log_config, resolve=True
         )
         if conf["root"] is not None:
-            logging.config.dictConfig(conf)
+            # Imported lazily because target policy resolution imports core.utils.
+            from hydra._internal.logging_config import configure_logging
+
+            configure_logging(conf)
     else:
         # default logging to stdout
         root = logging.getLogger()
