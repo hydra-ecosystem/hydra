@@ -9,7 +9,7 @@ from contextvars import ContextVar
 from textwrap import dedent
 from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union, cast
 
-from hydra._internal.utils import _locate
+from hydra._internal._locate import _locate
 from hydra.errors import InstantiationException
 
 # This blacklist is a best-effort, defense-in-depth stopgap that refuses the
