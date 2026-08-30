@@ -14,8 +14,8 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Hydra" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.af05b0d6.css">
-<script src="/assets/js/runtime~main.f21beabe.js" defer="defer"></script>
-<script src="/assets/js/main.fd9b0d36.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.505ca1dd.js" defer="defer"></script>
+<script src="/assets/js/main.fe41c2fc.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -123,12 +123,12 @@ version:</p>
 <div class="language-shell codeBlockContainer_FIHn theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_trs3"><pre tabindex="0" class="prism-code language-shell codeBlock_prNR thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_jA8Y"><div class="token-line" style="color:#bfc7d5"><span class="token plain">python tools/release/release.py \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  action=validate_versions \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  set=hydra-full-release \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  version=1.4.0</span><br></div></code></pre></div></div>
 <h2 class="anchor anchorTargetStickyNavbar_PR2Y" id="pypi">PyPI<a href="#pypi" class="hash-link" aria-label="Direct link to PyPI" title="Direct link to PyPI" translate="no">​</a></h2>
 <p>Use the PyPI workflow for real dev, release-candidate, and stable releases.</p>
-<p>Every run pins one commit for every job. Leave the workflow&#x27;s <code>commit</code> input
-empty to pin the dispatched branch tip, or set it to a full 40-character commit
-SHA to publish that exact commit, for example when the branch has already moved
-past the release you are publishing. The release tool always sends the exact
-commit it publishes, which on the recovery path is the version bump it just
-created, so this input matters only for a manual dispatch.</p>
+<p>Every run pins one commit for every job. By default, the release tool pins its
+final current commit, including a version-bump commit it creates as part of a
+recovery, so later pushes cannot change what the workflow builds. Set
+<code>commit=&lt;full-commit-sha&gt;</code> to release an existing commit after the branch has
+already moved past it. The workflow also exposes the same commit input for
+manual dispatches.</p>
 <p>For dev releases, use the release tool&#x27;s dev-release action. By default this is
 a dry run: it shows the selected packages and versions, checks PyPI for the
 target version, builds artifacts in a temporary release workspace, runs
@@ -137,8 +137,9 @@ exact publish workflow dispatch that would run:</p>
 <div class="language-shell codeBlockContainer_FIHn theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_trs3"><pre tabindex="0" class="prism-code language-shell codeBlock_prNR thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_jA8Y"><div class="token-line" style="color:#bfc7d5"><span class="token plain">python tools/release/release.py \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  action=dev_release \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  set=hydra-full-release \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  version=1.4.0.dev3</span><br></div></code></pre></div></div>
 <p>To dry-run a single plugin dev release, narrow the selected package set:</p>
 <div class="language-shell codeBlockContainer_FIHn theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_trs3"><pre tabindex="0" class="prism-code language-shell codeBlock_prNR thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_jA8Y"><div class="token-line" style="color:#bfc7d5"><span class="token plain">python tools/release/release.py \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  action=dev_release \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  set=hydra-plugins \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  only=hydra_optuna_sweeper \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  version=1.4.0.dev3</span><br></div></code></pre></div></div>
-<p>To publish the dev release, rerun with <code>publish=true</code>. This requires a clean
-working tree whose current commit matches <code>remote/&lt;workflow_ref&gt;</code> and dispatches
+<p>To publish the dev release, rerun with <code>publish=true</code>. This first confirms that
+the selected commit exists on the configured GitHub remote, without requiring
+it to be the branch tip, and requires a clean working tree. It dispatches
 <code>Publish to PyPI</code> with the selected package set, expected version, and the exact
 commit being published. In the normal release flow, the selected packages are
 already at this version because they were bumped immediately after the previous
@@ -147,11 +148,22 @@ release:</p>
 <p>The command can set, commit, and push the target version when the selected
 packages do not already match it. Treat that as a recovery path, not the normal
 release cadence.</p>
+<p>If the branch was advanced to the next development version before the previous
+one was published, dry-run the existing release commit directly:</p>
+<div class="language-shell codeBlockContainer_FIHn theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_trs3"><pre tabindex="0" class="prism-code language-shell codeBlock_prNR thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_jA8Y"><div class="token-line" style="color:#bfc7d5"><span class="token plain">python tools/release/release.py \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  action=dev_release \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  set=hydra-full-release \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  version=1.4.0.dev3 \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  commit=&lt;full-commit-sha&gt;</span><br></div></code></pre></div></div>
+<p>This archives the exact commit, requires every selected package to already have
+the target version, and builds from that tree without changing the current
+checkout. The commit must exist locally and on GitHub. After the dry run passes,
+repeat the same command with <code>publish=true</code>. Explicit commit mode never sets
+versions, creates a commit, or pushes the current branch.</p>
 <p>Wait for the publish workflow run to finish before advancing anything. The run
-pauses for <code>pypi-publish</code> environment approval, so a bump pushed while it waits
-lands on the branch before the build job starts. Once the run succeeds,
-immediately advance the selected packages to the next development version,
-commit, and push the change before resuming development:</p>
+builds and verifies artifacts, then pauses for <code>pypi-publish</code> environment
+approval immediately before upload. Approve within seven days, before the
+transient artifacts expire. Every job uses the pinned commit, so later pushes
+cannot change the artifacts awaiting approval. A successful upload deletes the
+transient artifacts. Once the run succeeds, immediately advance the selected
+packages to the next development version, commit, and push the change before
+resuming development:</p>
 <div class="language-shell codeBlockContainer_FIHn theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_trs3"><pre tabindex="0" class="prism-code language-shell codeBlock_prNR thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_jA8Y"><div class="token-line" style="color:#bfc7d5"><span class="token plain">python tools/release/release.py \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  action=set_version \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  set=hydra-full-release \</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  version=1.4.0.dev4</span><br></div></code></pre></div></div>
 <p>Do not leave the development branch reporting a version that has already been
 published.</p>
