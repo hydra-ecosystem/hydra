@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-30",
-  "generated_at": "2026-08-30T14:55:45Z",
+  "generated_at": "2026-08-30T17:11:05Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 102,
+    "open_total": 101,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 8.8
+        "percentage": 8.9
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 74,
-        "percentage": 72.5
+        "count": 73,
+        "percentage": 72.3
       },
       {
         "category": "Documentation",
@@ -27,19 +27,19 @@
         "category": "Question",
         "emoji": "❓",
         "count": 5,
-        "percentage": 4.9
+        "percentage": 5.0
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 3.9
+        "percentage": 4.0
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 4,
-        "percentage": 3.9
+        "percentage": 4.0
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 95
+        "count": 94
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 19
+        "count": 20
       }
     ]
   },
@@ -756,22 +756,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2824"
-    },
-    {
-      "number": 2846,
-      "title": "[Feature Request] Conditionally disable the creation of output folders via callback",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-02-03",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2846"
     },
     {
       "number": 2848,
@@ -1994,9 +1978,32 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
+    },
+    {
+      "number": 2846,
+      "title": "[Feature Request] Conditionally disable the creation of output folders via callback",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-02-03",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2846"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-30T17:11:05Z",
+      "kind": "closed",
+      "issue": 2846,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2846",
+      "title": "[Feature Request] Conditionally disable the creation of output folders via callback"
+    },
     {
       "ts": "2026-08-28T13:51:10Z",
       "kind": "new",
@@ -3584,14 +3591,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/934",
       "title": "[Bug] tab completion slow with slow imports",
       "detail": "removed \"triage\""
-    },
-    {
-      "ts": "2026-07-26T20:12:46Z",
-      "kind": "pr",
-      "issue": 2121,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2121",
-      "title": "[Bug] Recursion overflow from `--help` if `group=''`",
-      "detail": "linked #3320"
     }
   ]
 }
