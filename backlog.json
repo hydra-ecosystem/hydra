@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T07:20:59Z",
+  "generated_at": "2026-08-31T08:17:15Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 100,
@@ -766,10 +766,10 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2024-02-21",
-      "updated": "2026-07-15",
+      "updated": "2026-08-31",
       "labels": [
         "enhancement",
-        "triage"
+        "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2851"
     },
@@ -1997,6 +1997,14 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T08:17:15Z",
+      "kind": "label",
+      "issue": 2851,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2851",
+      "title": "[Feature Request] Concatenating parameter sweeps",
+      "detail": "added \"sweep\"; removed \"triage\""
+    },
     {
       "ts": "2026-08-31T06:50:50Z",
       "kind": "closed",
@@ -3583,13 +3591,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1085",
       "title": "[Feature Request] shell completion for Enum type",
       "detail": "removed \"triage\""
-    },
-    {
-      "ts": "2026-07-27T06:18:00Z",
-      "kind": "closed",
-      "issue": 2121,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2121",
-      "title": "[Bug] Recursion overflow from `--help` if `group=''`"
     }
   ]
 }

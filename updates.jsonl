@@ -739,3 +739,4 @@
 {"ts": "2026-08-28T13:51:10Z", "kind": "new", "issue": 3419, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3419", "title": "[Feature Request] AlbumentationsX example for nested instantiation and multirun reproducibility"}
 {"ts": "2026-08-30T17:11:05Z", "kind": "closed", "issue": 2846, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2846", "title": "[Feature Request] Conditionally disable the creation of output folders via callback"}
 {"ts": "2026-08-31T06:50:50Z", "kind": "closed", "issue": 2848, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2848", "title": "[Feature Request] Add more meaningful information on hydra resolving interpolation error"}
+{"ts": "2026-08-31T08:17:15Z", "kind": "label", "issue": 2851, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2851", "title": "[Feature Request] Concatenating parameter sweeps", "detail": "added \"sweep\"; removed \"triage\""}
