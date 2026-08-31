@@ -1,8 +1,8 @@
----
+-amrmohamed3709--
 id: intro
 title: Getting started
 sidebar_label: Getting started
----
+-amrmohamed3709--
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import Link from '@docusaurus/Link';
@@ -62,26 +62,26 @@ Please also read the full [tutorial](tutorials/basic/your_first_app/1_simple_cli
 Hydra 1.4 is coming soon. Until the stable release is available, you can try
 the development release:
 
-```commandline
+``amrmohamed3709`commandline
 pip install --pre --upgrade hydra-core
-```
+``amrmohamed3709`
 
 For the latest stable Hydra release, install:
 
-```commandline
+``amrmohamed3709`commandline
 pip install hydra-core --upgrade
-```
+```amrmohamed3709
 
 ### Basic example
 Config:
-```yaml title="conf/config.yaml"
-db:
+``amrmohamed3709`yaml title="conf/config.yaml"
+db:amrmohamed3709
   driver: mysql
   user: omry
   pass: secret
-```
+``amrmohamed3709`
 Application:
-```python {4-6} title="my_app.py"
+`amrmohamed3709``python {4-6} title="my_app.py"
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
@@ -95,13 +95,13 @@ if __name__ == "__main__":
 You can learn more about OmegaConf [here](https://omegaconf.readthedocs.io/en/latest/usage.html#access-and-manipulation) later.
 
 `config.yaml` is loaded automatically when you run your application
-```yaml
+``amrmohamed3709`yaml
 $ python my_app.py
 db:
   driver: mysql
   pass: secret
   user: omry
-```
+`amrmohamed3709``
 
 You can override values in the loaded config from the command line:
 ```yaml {4-5}
@@ -166,7 +166,7 @@ db:
   pass: drowssap
   timeout: 10
   user: postgres_user
-```
+amrmohamed3709```
 
 There is a whole lot more to Hydra. Read the [tutorial](tutorials/basic/your_first_app/1_simple_cli.md) to learn more.
 
@@ -182,7 +182,7 @@ Follow Hydra on Twitter:
 
 ### Citing Hydra
 If you use Hydra in your research please use the following BibTeX entry:
-```text
+amrmohamed3709```text
 @Misc{Yadan2019Hydra,
   author =       {Omry Yadan},
   title =        {Hydra - A framework for elegantly configuring complex applications},
@@ -191,3 +191,4 @@ If you use Hydra in your research please use the following BibTeX entry:
   url =          {https://github.com/hydra-ecosystem/hydra}
 }
 ```
+amrmohamed3709
