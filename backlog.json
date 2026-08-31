@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T12:45:04Z",
+  "generated_at": "2026-08-31T12:59:52Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 96,
+    "open_total": 95,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.4
+        "percentage": 9.5
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 71,
-        "percentage": 74.0
+        "percentage": 74.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.2
+        "percentage": 6.3
       },
       {
         "category": "Question",
         "emoji": "❓",
-        "count": 3,
-        "percentage": 3.1
+        "count": 2,
+        "percentage": 2.1
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 3.1
+        "percentage": 3.2
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 89
+        "count": 88
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 26
+        "count": 27
       }
     ]
   },
@@ -809,21 +809,6 @@
         "ray-launcher"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2927"
-    },
-    {
-      "number": 2938,
-      "title": "How to override the default model in main.yaml in code when testing different models",
-      "category": "Question",
-      "category_emoji": "❓",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-08-20",
-      "updated": "2026-07-15",
-      "labels": [
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2938"
     },
     {
       "number": 2942,
@@ -1873,6 +1858,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2892"
     },
     {
+      "number": 2898,
+      "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-04-30",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2898"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -2001,23 +2002,29 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
     },
     {
-      "number": 2898,
-      "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages",
-      "category": "Enhancement",
-      "category_emoji": "✨",
+      "number": 2938,
+      "title": "How to override the default model in main.yaml in code when testing different models",
+      "category": "Question",
+      "category_emoji": "❓",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2024-04-30",
+      "created": "2024-08-20",
       "updated": "2026-07-15",
       "labels": [
-        "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2898"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2938"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T12:59:52Z",
+      "kind": "closed",
+      "issue": 2938,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2938",
+      "title": "How to override the default model in main.yaml in code when testing different models"
+    },
     {
       "ts": "2026-08-31T12:45:04Z",
       "kind": "closed",
@@ -3601,14 +3608,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/468",
       "title": "Specify the schema for returning the result of optimization.",
       "detail": "added \"enhancement\", \"sweep\"; removed \"triage\""
-    },
-    {
-      "ts": "2026-07-27T08:33:27Z",
-      "kind": "label",
-      "issue": 633,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/633",
-      "title": "Allow adding help messages to command line arguments",
-      "detail": "added \"blocked\"; removed \"triage\", \"wishlist\""
     }
   ]
 }
