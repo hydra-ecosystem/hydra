@@ -22,9 +22,10 @@
     "3397": "2026-08-15",
     "3398": "2026-08-15",
     "3402": "2026-08-23",
+    "3410": "2026-08-31",
     "3411": "2026-08-26"
   },
-  "generated_at": "2026-08-31T11:34:03Z",
+  "generated_at": "2026-08-31T11:43:52Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -1106,16 +1107,6 @@
       "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates",
       "updated_at": "2026-08-24T10:56:10Z"
     },
-    "3410": {
-      "category": "Build",
-      "created_at": "2026-08-24T17:00:47Z",
-      "labels": [],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9",
-      "updated_at": "2026-08-24T20:01:54Z"
-    },
     "3419": {
       "category": "Enhancement",
       "created_at": "2026-08-28T13:49:50Z",
@@ -1556,6 +1547,16 @@
       "status": "done",
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior",
       "updated_at": "2026-08-23T21:26:53Z"
+    },
+    "3410": {
+      "category": "Build",
+      "created_at": "2026-08-24T17:00:47Z",
+      "labels": [],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9",
+      "updated_at": "2026-08-24T20:01:54Z"
     },
     "3411": {
       "category": "Enhancement",

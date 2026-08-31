@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T11:34:03Z",
+  "generated_at": "2026-08-31T11:43:52Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 98,
+    "open_total": 97,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.2
+        "percentage": 9.3
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 71,
-        "percentage": 72.4
+        "percentage": 73.2
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.1
+        "percentage": 6.2
       },
       {
         "category": "Question",
@@ -38,8 +38,8 @@
       {
         "category": "Build",
         "emoji": "🏗️",
-        "count": 4,
-        "percentage": 4.1
+        "count": 3,
+        "percentage": 3.1
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 91
+        "count": 90
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 23
+        "count": 24
       }
     ]
   },
@@ -1621,19 +1621,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3408"
     },
     {
-      "number": 3410,
-      "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9",
-      "category": "Build",
-      "category_emoji": "🏗️",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-24",
-      "updated": "2026-08-24",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3410"
-    },
-    {
       "number": 3419,
       "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun",
       "category": "Enhancement",
@@ -1869,6 +1856,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2864"
     },
     {
+      "number": 2887,
+      "title": "[Feature Request] Support relative paths in defaults keys.",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-04-08",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2887"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1984,23 +1987,27 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
     },
     {
-      "number": 2887,
-      "title": "[Feature Request] Support relative paths in defaults keys.",
-      "category": "Enhancement",
-      "category_emoji": "✨",
+      "number": 3410,
+      "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9",
+      "category": "Build",
+      "category_emoji": "🏗️",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2024-04-08",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2887"
+      "created": "2026-08-24",
+      "updated": "2026-08-24",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3410"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T11:43:52Z",
+      "kind": "closed",
+      "issue": 3410,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3410",
+      "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9"
+    },
     {
       "ts": "2026-08-31T11:34:03Z",
       "kind": "closed",
@@ -3587,14 +3594,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/993",
       "title": "Create a working directory abstraction",
       "detail": "added \"blocked\""
-    },
-    {
-      "ts": "2026-07-27T08:07:57Z",
-      "kind": "label",
-      "issue": 733,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/733",
-      "title": "[Feature Request] Support for s3fs",
-      "detail": "removed \"triage\""
     }
   ]
 }
