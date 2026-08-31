@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T08:17:15Z",
+  "generated_at": "2026-08-31T08:51:47Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 100,
+    "open_total": 99,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.0
+        "percentage": 9.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 72,
-        "percentage": 72.0
+        "count": 71,
+        "percentage": 71.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.0
+        "percentage": 6.1
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 5,
-        "percentage": 5.0
+        "percentage": 5.1
       },
       {
         "category": "Refactor",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 93
+        "count": 92
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 21
+        "count": 22
       }
     ]
   },
@@ -772,22 +772,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2851"
-    },
-    {
-      "number": 2864,
-      "title": "[Feature Request] Generalize PickleJobInfoCallback to support YAML and/or JSON serialization ",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-03-03",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2864"
     },
     {
       "number": 2874,
@@ -1994,9 +1978,32 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
+    },
+    {
+      "number": 2864,
+      "title": "[Feature Request] Generalize PickleJobInfoCallback to support YAML and/or JSON serialization ",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-03-03",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2864"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T08:51:47Z",
+      "kind": "closed",
+      "issue": 2864,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2864",
+      "title": "[Feature Request] Generalize PickleJobInfoCallback to support YAML and/or JSON serialization "
+    },
     {
       "ts": "2026-08-31T08:17:15Z",
       "kind": "label",
@@ -3583,14 +3590,6 @@
       "issue": 3321,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3321",
       "title": "Evaluate replacing ANTLR in the override parser"
-    },
-    {
-      "ts": "2026-07-27T06:24:00Z",
-      "kind": "label",
-      "issue": 1085,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1085",
-      "title": "[Feature Request] shell completion for Enum type",
-      "detail": "removed \"triage\""
     }
   ]
 }
