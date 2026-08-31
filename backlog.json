@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T06:50:50Z",
+  "generated_at": "2026-08-31T07:20:59Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 100,
@@ -1865,6 +1865,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2846"
     },
     {
+      "number": 2848,
+      "title": "[Feature Request] Add more meaningful information on hydra resolving interpolation error",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-02-15",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2848"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1978,22 +1994,6 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
-    },
-    {
-      "number": 2848,
-      "title": "[Feature Request] Add more meaningful information on hydra resolving interpolation error",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2024-02-15",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2848"
     }
   ],
   "updates": [
