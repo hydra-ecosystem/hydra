@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T10:56:12Z",
+  "generated_at": "2026-08-31T11:02:23Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 99,
@@ -14,8 +14,8 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 71,
-        "percentage": 71.7
+        "count": 72,
+        "percentage": 72.7
       },
       {
         "category": "Documentation",
@@ -26,8 +26,8 @@
       {
         "category": "Question",
         "emoji": "❓",
-        "count": 5,
-        "percentage": 5.1
+        "count": 4,
+        "percentage": 4.0
       },
       {
         "category": "Refactor",
@@ -776,14 +776,20 @@
     {
       "number": 2874,
       "title": "[Help requested] Dynamic hydra launcher configuration",
-      "category": "Question",
-      "category_emoji": "❓",
+      "category": "Enhancement",
+      "category_emoji": "✨",
       "status": "not started",
       "status_emoji": "⬜",
       "prs": [],
       "created": "2024-03-21",
       "updated": "2026-08-31",
-      "labels": [],
+      "labels": [
+        "enhancement",
+        "wishlist",
+        "ray-launcher",
+        "sweep",
+        "launchers"
+      ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2874"
     },
     {
@@ -1995,6 +2001,14 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T11:02:23Z",
+      "kind": "label",
+      "issue": 2874,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2874",
+      "title": "[Help requested] Dynamic hydra launcher configuration",
+      "detail": "added \"enhancement\", \"launchers\", \"ray-launcher\", \"sweep\", \"wishlist\""
+    },
     {
       "ts": "2026-08-31T10:56:12Z",
       "kind": "label",
@@ -3581,14 +3595,6 @@
       "issue": 841,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/841",
       "title": "Add docker example for Ray launcher."
-    },
-    {
-      "ts": "2026-07-27T07:39:34Z",
-      "kind": "label",
-      "issue": 845,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/845",
-      "title": "Add a standalone page describing @hydra.main() in details.",
-      "detail": "removed \"good first issue\", \"triage\""
     }
   ]
 }
