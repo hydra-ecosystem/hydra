@@ -42,20 +42,30 @@ def _initialize_hydra(create_hydra: Callable[[], Any]) -> Any:
 
 
 class _ScopedInitializer:
-    def __init__(self, create_hydra: Callable[[], Any]) -> None:
+    def __init__(
+        self, create_hydra: Callable[[], Any], version_base: Optional[str]
+    ) -> None:
         self._create_hydra = create_hydra
+        self._version_base = version_base
         self._gh_backup: Any = None
+        self._version_base_backup: Optional[str] = None
 
     def __enter__(self, *args: Any, **kwargs: Any) -> None:
         self._gh_backup = Singleton._instances.pop(GlobalHydra, None)
+        self._version_base_backup = version.getbase()
         try:
+            version.setbase(self._version_base)
             self._create_hydra()
         except BaseException:
             restore_gh_from_backup(self._gh_backup)
+            assert self._version_base_backup is not None
+            version.VersionBase.instance().setbase(self._version_base_backup)
             raise
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         restore_gh_from_backup(self._gh_backup)
+        assert self._version_base_backup is not None
+        version.VersionBase.instance().setbase(self._version_base_backup)
 
 
 class initialize:
@@ -110,8 +120,6 @@ class initialize:
         caller_stack_depth: int = 1,
         version_base: Optional[str] = version._UNSPECIFIED_,
     ) -> _ScopedInitializer:
-        version.setbase(version_base)
-
         if config_path is not None and os.path.isabs(config_path):
             raise HydraException("config_path in initialize() must be relative")
         calling_file, calling_module = detect_calling_file_or_module_from_stack_frame(
@@ -128,7 +136,8 @@ class initialize:
                 calling_module=calling_module,
                 config_path=config_path,
                 job_name=job_name,
-            )
+            ),
+            version_base,
         )
 
     def __enter__(self, *args: Any, **kwargs: Any) -> None: ...
@@ -172,15 +181,14 @@ class initialize_config_module:
         job_name: str = "app",
         version_base: Optional[str] = version._UNSPECIFIED_,
     ) -> _ScopedInitializer:
-        version.setbase(version_base)
-
         return _ScopedInitializer(
             lambda: Hydra.create_main_hydra_file_or_module(
                 calling_file=None,
                 calling_module=f"{config_module}.{job_name}",
                 config_path=None,
                 job_name=job_name,
-            )
+            ),
+            version_base,
         )
 
     def __enter__(self, *args: Any, **kwargs: Any) -> None: ...
@@ -228,15 +236,16 @@ class initialize_config_dir:
         job_name: str = "app",
         version_base: Optional[str] = version._UNSPECIFIED_,
     ) -> _ScopedInitializer:
-        version.setbase(version_base)
-
         if not os.path.isabs(config_dir):
             raise HydraException(
                 "initialize_config_dir() requires an absolute config_dir as input"
             )
         csp = create_config_search_path(search_path_dir=config_dir)
         return _ScopedInitializer(
-            lambda: Hydra.create_main_hydra2(task_name=job_name, config_search_path=csp)
+            lambda: Hydra.create_main_hydra2(
+                task_name=job_name, config_search_path=csp
+            ),
+            version_base,
         )
 
     def __enter__(self, *args: Any, **kwargs: Any) -> None: ...

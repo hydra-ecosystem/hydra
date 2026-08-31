@@ -435,6 +435,39 @@ def test_scoped_initializers_restore_existing_hydra(
         assert GlobalHydra.instance() is persistent_hydra
 
 
+def test_scoped_initializers_restore_version_base(
+    hydra_restore_singletons: Any,
+) -> None:
+    initial_version_base = version.getbase()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", Hydra15MigrationWarning)
+        outer = initialize_config_module.scoped(
+            config_module="hydra.test_utils.configs",
+            job_name="outer",
+            version_base="1.3",
+        )
+        inner = initialize_config_module.scoped(
+            config_module="hydra.test_utils.configs",
+            job_name="inner",
+            version_base="1.4",
+        )
+
+        assert version.getbase() == initial_version_base
+        with outer:
+            assert version.getbase() == "1.3"
+            assert compose(return_hydra_config=True).hydra.runtime.version_base == "1.3"
+            with inner:
+                assert version.getbase() == "1.4"
+                assert (
+                    compose(return_hydra_config=True).hydra.runtime.version_base
+                    == "1.4"
+                )
+            assert version.getbase() == "1.3"
+            assert compose(return_hydra_config=True).hydra.runtime.version_base == "1.3"
+
+        assert version.getbase() == initial_version_base
+
+
 def test_nested_initialize_config_dir_contexts(
     hydra_restore_singletons: Any, tmp_path: Path
 ) -> None:
@@ -482,18 +515,24 @@ def test_scoped_initializer_restores_hydra_after_initialization_error(
         config_module="hydra.test_utils.configs", job_name="persistent"
     )
     persistent_hydra = GlobalHydra.instance()
+    persistent_version_base = version.getbase()
 
     def fail_initialization(*args: Any, **kwargs: Any) -> None:
         raise RuntimeError("initialization failed")
 
     monkeypatch.setattr(Hydra, "create_main_hydra_file_or_module", fail_initialization)
-    with raises(RuntimeError, match="initialization failed"):
-        with initialize_config_module.scoped(
-            config_module="hydra.test_utils.configs", job_name="scoped"
-        ):
-            pass
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", Hydra15MigrationWarning)
+        with raises(RuntimeError, match="initialization failed"):
+            with initialize_config_module.scoped(
+                config_module="hydra.test_utils.configs",
+                job_name="scoped",
+                version_base="1.3",
+            ):
+                pass
 
     assert GlobalHydra.instance() is persistent_hydra
+    assert version.getbase() == persistent_version_base
 
 
 def test_method_initializers_reject_reinitialization(
