@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T08:51:47Z",
+  "generated_at": "2026-08-31T09:06:56Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 99,
@@ -14,8 +14,8 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 71,
-        "percentage": 71.7
+        "count": 72,
+        "percentage": 72.7
       },
       {
         "category": "Documentation",
@@ -26,8 +26,8 @@
       {
         "category": "Question",
         "emoji": "❓",
-        "count": 5,
-        "percentage": 5.1
+        "count": 4,
+        "percentage": 4.0
       },
       {
         "category": "Refactor",
@@ -776,15 +776,18 @@
     {
       "number": 2874,
       "title": "[Help requested] Dynamic hydra launcher configuration",
-      "category": "Question",
-      "category_emoji": "❓",
+      "category": "Enhancement",
+      "category_emoji": "✨",
       "status": "not started",
       "status_emoji": "⬜",
       "prs": [],
       "created": "2024-03-21",
-      "updated": "2026-07-15",
+      "updated": "2026-08-31",
       "labels": [
-        "triage"
+        "enhancement",
+        "help wanted",
+        "plugin",
+        "ray-launcher"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2874"
     },
@@ -1865,6 +1868,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2848"
     },
     {
+      "number": 2864,
+      "title": "[Feature Request] Generalize PickleJobInfoCallback to support YAML and/or JSON serialization ",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-03-03",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2864"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1978,25 +1997,17 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
-    },
-    {
-      "number": 2864,
-      "title": "[Feature Request] Generalize PickleJobInfoCallback to support YAML and/or JSON serialization ",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2024-03-03",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2864"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T09:06:56Z",
+      "kind": "label",
+      "issue": 2874,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2874",
+      "title": "[Help requested] Dynamic hydra launcher configuration",
+      "detail": "added \"enhancement\", \"help wanted\", \"plugin\", \"ray-launcher\"; removed \"triage\""
+    },
     {
       "ts": "2026-08-31T08:51:47Z",
       "kind": "closed",
@@ -3583,13 +3594,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/902",
       "title": "[Feature Request] Replace lexer token names by their symbols in ANTLR error messages",
       "detail": "removed \"triage\""
-    },
-    {
-      "ts": "2026-07-27T07:11:19Z",
-      "kind": "new",
-      "issue": 3321,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3321",
-      "title": "Evaluate replacing ANTLR in the override parser"
     }
   ]
 }

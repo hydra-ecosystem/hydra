@@ -23,7 +23,7 @@
     "3402": "2026-08-23",
     "3411": "2026-08-26"
   },
-  "generated_at": "2026-08-31T08:51:47Z",
+  "generated_at": "2026-08-31T09:06:56Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -370,16 +370,19 @@
       "updated_at": "2026-08-31T08:20:16Z"
     },
     "2874": {
-      "category": "Question",
+      "category": "Enhancement",
       "created_at": "2024-03-21T03:42:35Z",
       "labels": [
-        "triage"
+        "enhancement",
+        "help wanted",
+        "plugin",
+        "ray-launcher"
       ],
       "pr_numbers": [],
       "state": "OPEN",
       "status": "not started",
       "title": "[Help requested] Dynamic hydra launcher configuration",
-      "updated_at": "2026-07-15T13:16:14Z"
+      "updated_at": "2026-08-31T09:05:35Z"
     },
     "2887": {
       "category": "Enhancement",
