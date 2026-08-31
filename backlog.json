@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T11:43:52Z",
+  "generated_at": "2026-08-31T12:05:45Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 97,
@@ -14,8 +14,8 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 71,
-        "percentage": 73.2
+        "count": 72,
+        "percentage": 74.2
       },
       {
         "category": "Documentation",
@@ -26,8 +26,8 @@
       {
         "category": "Question",
         "emoji": "❓",
-        "count": 4,
-        "percentage": 4.1
+        "count": 3,
+        "percentage": 3.1
       },
       {
         "category": "Refactor",
@@ -66,7 +66,7 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 24
+        "count": 25
       }
     ]
   },
@@ -791,21 +791,6 @@
         "launchers"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2874"
-    },
-    {
-      "number": 2892,
-      "title": "[Help requested] Optuna Sweeper Multiple GPU Parallelism",
-      "category": "Question",
-      "category_emoji": "❓",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-04-17",
-      "updated": "2026-07-15",
-      "labels": [
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2892"
     },
     {
       "number": 2898,
@@ -1634,6 +1619,23 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
     },
     {
+      "number": 3425,
+      "title": "Expose Optuna GridSampler seed in the structured config",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-31",
+      "updated": "2026-08-31",
+      "labels": [
+        "enhancement",
+        "plugin",
+        "optuna"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3425"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1969,6 +1971,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
     },
     {
+      "number": 3410,
+      "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9",
+      "category": "Build",
+      "category_emoji": "🏗️",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-24",
+      "updated": "2026-08-24",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3410"
+    },
+    {
       "number": 3411,
       "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
       "category": "Enhancement",
@@ -1987,20 +2002,36 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
     },
     {
-      "number": 3410,
-      "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9",
-      "category": "Build",
-      "category_emoji": "🏗️",
+      "number": 2892,
+      "title": "[Help requested] Optuna Sweeper Multiple GPU Parallelism",
+      "category": "Question",
+      "category_emoji": "❓",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2026-08-24",
-      "updated": "2026-08-24",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3410"
+      "created": "2024-04-17",
+      "updated": "2026-07-15",
+      "labels": [
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2892"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T12:05:45Z",
+      "kind": "closed",
+      "issue": 2892,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2892",
+      "title": "[Help requested] Optuna Sweeper Multiple GPU Parallelism"
+    },
+    {
+      "ts": "2026-08-31T12:05:45Z",
+      "kind": "new",
+      "issue": 3425,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425",
+      "title": "Expose Optuna GridSampler seed in the structured config"
+    },
     {
       "ts": "2026-08-31T11:43:52Z",
       "kind": "closed",
@@ -3579,21 +3610,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/700",
       "title": "[Feature Request] Purging older output/working directories ",
       "detail": "removed \"triage\""
-    },
-    {
-      "ts": "2026-07-27T08:17:22Z",
-      "kind": "closed",
-      "issue": 714,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/714",
-      "title": "Make sure Hydra logging config override all loggers from 3rd party libs"
-    },
-    {
-      "ts": "2026-07-27T08:07:57Z",
-      "kind": "label",
-      "issue": 993,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/993",
-      "title": "Create a working directory abstraction",
-      "detail": "added \"blocked\""
     }
   ]
 }
