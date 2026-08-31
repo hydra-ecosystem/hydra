@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T14:35:07Z",
+  "generated_at": "2026-08-31T15:09:56Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 96,
+    "open_total": 97,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 9,
-        "percentage": 9.4
+        "count": 10,
+        "percentage": 10.3
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 72,
-        "percentage": 75.0
+        "percentage": 74.2
       },
       {
         "category": "Documentation",
@@ -33,7 +33,7 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 4.2
+        "percentage": 4.1
       },
       {
         "category": "Build",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 89
+        "count": 90
       },
       {
         "status": "done",
@@ -1620,6 +1620,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
     },
     {
+      "number": 3427,
+      "title": "HydraConfig is unavailable during multirun controller initialization",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-31",
+      "updated": "2026-08-31",
+      "labels": [
+        "bug",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -2033,6 +2049,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T15:09:56Z",
+      "kind": "new",
+      "issue": 3427,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3427",
+      "title": "HydraConfig is unavailable during multirun controller initialization"
+    },
     {
       "ts": "2026-08-31T14:35:07Z",
       "kind": "new",
@@ -3615,13 +3638,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1885",
       "title": "follow up with shell testing for #1842",
       "detail": "removed \"priority_low\", \"triage\""
-    },
-    {
-      "ts": "2026-07-27T10:07:57Z",
-      "kind": "closed",
-      "issue": 1873,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1873",
-      "title": "[Feature Request] `exclude_keys` in `override_dirname` should have regex/wildcard/glob(*) option"
     }
   ]
 }
