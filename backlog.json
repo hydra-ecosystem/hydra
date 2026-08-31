@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T12:59:52Z",
+  "generated_at": "2026-08-31T14:35:07Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 95,
+    "open_total": 96,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.5
+        "percentage": 9.4
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 71,
-        "percentage": 74.7
+        "count": 72,
+        "percentage": 75.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.3
+        "percentage": 6.2
       },
       {
         "category": "Question",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 3.2
+        "percentage": 3.1
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 88
+        "count": 89
       },
       {
         "status": "done",
@@ -1605,6 +1605,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3425"
     },
     {
+      "number": 3426,
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-31",
+      "updated": "2026-08-31",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1874,6 +1889,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2898"
     },
     {
+      "number": 2938,
+      "title": "How to override the default model in main.yaml in code when testing different models",
+      "category": "Question",
+      "category_emoji": "❓",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-08-20",
+      "updated": "2026-07-15",
+      "labels": [
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2938"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -2000,24 +2030,16 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
-    },
-    {
-      "number": 2938,
-      "title": "How to override the default model in main.yaml in code when testing different models",
-      "category": "Question",
-      "category_emoji": "❓",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2024-08-20",
-      "updated": "2026-07-15",
-      "labels": [
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2938"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T14:35:07Z",
+      "kind": "new",
+      "issue": 3426,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper"
+    },
     {
       "ts": "2026-08-31T12:59:52Z",
       "kind": "closed",
@@ -3600,14 +3622,6 @@
       "issue": 1873,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1873",
       "title": "[Feature Request] `exclude_keys` in `override_dirname` should have regex/wildcard/glob(*) option"
-    },
-    {
-      "ts": "2026-07-27T09:45:53Z",
-      "kind": "label",
-      "issue": 468,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/468",
-      "title": "Specify the schema for returning the result of optimization.",
-      "detail": "added \"enhancement\", \"sweep\"; removed \"triage\""
     }
   ]
 }

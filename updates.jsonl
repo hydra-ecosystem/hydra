@@ -750,3 +750,4 @@
 {"ts": "2026-08-31T12:05:45Z", "kind": "closed", "issue": 2892, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2892", "title": "[Help requested] Optuna Sweeper Multiple GPU Parallelism"}
 {"ts": "2026-08-31T12:45:04Z", "kind": "closed", "issue": 2898, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2898", "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages"}
 {"ts": "2026-08-31T12:59:52Z", "kind": "closed", "issue": 2938, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2938", "title": "How to override the default model in main.yaml in code when testing different models"}
+{"ts": "2026-08-31T14:35:07Z", "kind": "new", "issue": 3426, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426", "title": "Support `NSGAIIISampler` on Optuna Sweeper"}
