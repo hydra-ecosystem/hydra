@@ -1,27 +1,27 @@
 {
-  "generated_on": "2026-08-30",
-  "generated_at": "2026-08-30T17:11:05Z",
+  "generated_on": "2026-08-31",
+  "generated_at": "2026-08-31T06:50:50Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 101,
+    "open_total": 100,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 8.9
+        "percentage": 9.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 73,
-        "percentage": 72.3
+        "count": 72,
+        "percentage": 72.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 5.9
+        "percentage": 6.0
       },
       {
         "category": "Question",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 94
+        "count": 93
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 20
+        "count": 21
       }
     ]
   },
@@ -756,22 +756,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2824"
-    },
-    {
-      "number": 2848,
-      "title": "[Feature Request] Add more meaningful information on hydra resolving interpolation error",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-02-15",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2848"
     },
     {
       "number": 2851,
@@ -1865,6 +1849,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2810"
     },
     {
+      "number": 2846,
+      "title": "[Feature Request] Conditionally disable the creation of output folders via callback",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-02-03",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2846"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -1980,23 +1980,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
     },
     {
-      "number": 2846,
-      "title": "[Feature Request] Conditionally disable the creation of output folders via callback",
+      "number": 2848,
+      "title": "[Feature Request] Add more meaningful information on hydra resolving interpolation error",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2024-02-03",
+      "created": "2024-02-15",
       "updated": "2026-07-15",
       "labels": [
         "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2846"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2848"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T06:50:50Z",
+      "kind": "closed",
+      "issue": 2848,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2848",
+      "title": "[Feature Request] Add more meaningful information on hydra resolving interpolation error"
+    },
     {
       "ts": "2026-08-30T17:11:05Z",
       "kind": "closed",
@@ -3583,14 +3590,6 @@
       "issue": 2121,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2121",
       "title": "[Bug] Recursion overflow from `--help` if `group=''`"
-    },
-    {
-      "ts": "2026-07-27T06:18:00Z",
-      "kind": "label",
-      "issue": 934,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/934",
-      "title": "[Bug] tab completion slow with slow imports",
-      "detail": "removed \"triage\""
     }
   ]
 }
