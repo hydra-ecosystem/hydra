@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T09:06:56Z",
+  "generated_at": "2026-08-31T10:56:12Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 99,
@@ -14,8 +14,8 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 72,
-        "percentage": 72.7
+        "count": 71,
+        "percentage": 71.7
       },
       {
         "category": "Documentation",
@@ -26,8 +26,8 @@
       {
         "category": "Question",
         "emoji": "❓",
-        "count": 4,
-        "percentage": 4.0
+        "count": 5,
+        "percentage": 5.1
       },
       {
         "category": "Refactor",
@@ -776,19 +776,14 @@
     {
       "number": 2874,
       "title": "[Help requested] Dynamic hydra launcher configuration",
-      "category": "Enhancement",
-      "category_emoji": "✨",
+      "category": "Question",
+      "category_emoji": "❓",
       "status": "not started",
       "status_emoji": "⬜",
       "prs": [],
       "created": "2024-03-21",
       "updated": "2026-08-31",
-      "labels": [
-        "enhancement",
-        "help wanted",
-        "plugin",
-        "ray-launcher"
-      ],
+      "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2874"
     },
     {
@@ -1570,7 +1565,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2026-08-23",
-      "updated": "2026-08-23",
+      "updated": "2026-08-31",
       "labels": [
         "maintenance",
         "callbacks"
@@ -2000,6 +1995,14 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T10:56:12Z",
+      "kind": "label",
+      "issue": 2874,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2874",
+      "title": "[Help requested] Dynamic hydra launcher configuration",
+      "detail": "removed \"enhancement\", \"help wanted\", \"plugin\", \"ray-launcher\""
+    },
     {
       "ts": "2026-08-31T09:06:56Z",
       "kind": "label",
@@ -3586,14 +3589,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/845",
       "title": "Add a standalone page describing @hydra.main() in details.",
       "detail": "removed \"good first issue\", \"triage\""
-    },
-    {
-      "ts": "2026-07-27T07:13:25Z",
-      "kind": "label",
-      "issue": 902,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/902",
-      "title": "[Feature Request] Replace lexer token names by their symbols in ANTLR error messages",
-      "detail": "removed \"triage\""
     }
   ]
 }

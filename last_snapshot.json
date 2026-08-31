@@ -23,7 +23,7 @@
     "3402": "2026-08-23",
     "3411": "2026-08-26"
   },
-  "generated_at": "2026-08-31T09:06:56Z",
+  "generated_at": "2026-08-31T10:56:12Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -370,19 +370,14 @@
       "updated_at": "2026-08-31T08:20:16Z"
     },
     "2874": {
-      "category": "Enhancement",
+      "category": "Question",
       "created_at": "2024-03-21T03:42:35Z",
-      "labels": [
-        "enhancement",
-        "help wanted",
-        "plugin",
-        "ray-launcher"
-      ],
+      "labels": [],
       "pr_numbers": [],
       "state": "OPEN",
       "status": "not started",
       "title": "[Help requested] Dynamic hydra launcher configuration",
-      "updated_at": "2026-08-31T09:05:35Z"
+      "updated_at": "2026-08-31T10:54:53Z"
     },
     "2887": {
       "category": "Enhancement",
@@ -1054,7 +1049,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5",
-      "updated_at": "2026-08-23T17:43:36Z"
+      "updated_at": "2026-08-31T10:49:22Z"
     },
     "3403": {
       "category": "Enhancement",
