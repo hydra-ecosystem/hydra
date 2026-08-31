@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T11:02:23Z",
+  "generated_at": "2026-08-31T11:34:03Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 99,
+    "open_total": 98,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.1
+        "percentage": 9.2
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 72,
-        "percentage": 72.7
+        "count": 71,
+        "percentage": 72.4
       },
       {
         "category": "Documentation",
@@ -27,19 +27,19 @@
         "category": "Question",
         "emoji": "❓",
         "count": 4,
-        "percentage": 4.0
+        "percentage": 4.1
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 4.0
+        "percentage": 4.1
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 4,
-        "percentage": 4.0
+        "percentage": 4.1
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 92
+        "count": 91
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 22
+        "count": 23
       }
     ]
   },
@@ -791,22 +791,6 @@
         "launchers"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2874"
-    },
-    {
-      "number": 2887,
-      "title": "[Feature Request] Support relative paths in defaults keys.",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-04-08",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2887"
     },
     {
       "number": 2892,
@@ -1998,9 +1982,32 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
+    },
+    {
+      "number": 2887,
+      "title": "[Feature Request] Support relative paths in defaults keys.",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-04-08",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2887"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T11:34:03Z",
+      "kind": "closed",
+      "issue": 2887,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2887",
+      "title": "[Feature Request] Support relative paths in defaults keys."
+    },
     {
       "ts": "2026-08-31T11:02:23Z",
       "kind": "label",
@@ -3588,13 +3595,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/733",
       "title": "[Feature Request] Support for s3fs",
       "detail": "removed \"triage\""
-    },
-    {
-      "ts": "2026-07-27T07:51:01Z",
-      "kind": "closed",
-      "issue": 841,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/841",
-      "title": "Add docker example for Ray launcher."
     }
   ]
 }
