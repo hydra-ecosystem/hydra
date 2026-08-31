@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T12:05:45Z",
+  "generated_at": "2026-08-31T12:45:04Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 97,
+    "open_total": 96,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.3
+        "percentage": 9.4
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 72,
-        "percentage": 74.2
+        "count": 71,
+        "percentage": 74.0
       },
       {
         "category": "Documentation",
@@ -33,7 +33,7 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 4.1
+        "percentage": 4.2
       },
       {
         "category": "Build",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 90
+        "count": 89
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 25
+        "count": 26
       }
     ]
   },
@@ -791,22 +791,6 @@
         "launchers"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2874"
-    },
-    {
-      "number": 2898,
-      "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-04-30",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2898"
     },
     {
       "number": 2927,
@@ -1620,7 +1604,7 @@
     },
     {
       "number": 3425,
-      "title": "Expose Optuna GridSampler seed in the structured config",
+      "title": "Align Optuna sampler structured configs with Optuna 4.9",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "not started",
@@ -1874,6 +1858,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2887"
     },
     {
+      "number": 2892,
+      "title": "[Help requested] Optuna Sweeper Multiple GPU Parallelism",
+      "category": "Question",
+      "category_emoji": "❓",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-04-17",
+      "updated": "2026-07-15",
+      "labels": [
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2892"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -2002,22 +2001,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
     },
     {
-      "number": 2892,
-      "title": "[Help requested] Optuna Sweeper Multiple GPU Parallelism",
-      "category": "Question",
-      "category_emoji": "❓",
+      "number": 2898,
+      "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages",
+      "category": "Enhancement",
+      "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2024-04-17",
+      "created": "2024-04-30",
       "updated": "2026-07-15",
       "labels": [
+        "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2892"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2898"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-08-31T12:45:04Z",
+      "kind": "closed",
+      "issue": 2898,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2898",
+      "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages"
+    },
     {
       "ts": "2026-08-31T12:05:45Z",
       "kind": "closed",
@@ -3602,14 +3609,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/633",
       "title": "Allow adding help messages to command line arguments",
       "detail": "added \"blocked\"; removed \"triage\", \"wishlist\""
-    },
-    {
-      "ts": "2026-07-27T08:27:44Z",
-      "kind": "label",
-      "issue": 700,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/700",
-      "title": "[Feature Request] Purging older output/working directories ",
-      "detail": "removed \"triage\""
     }
   ]
 }

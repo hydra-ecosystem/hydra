@@ -16,6 +16,7 @@
     "2864": "2026-08-31",
     "2887": "2026-08-31",
     "2892": "2026-08-31",
+    "2898": "2026-08-31",
     "3385": "2026-08-12",
     "3386": "2026-08-12",
     "3395": "2026-08-15",
@@ -26,7 +27,7 @@
     "3410": "2026-08-31",
     "3411": "2026-08-26"
   },
-  "generated_at": "2026-08-31T12:05:45Z",
+  "generated_at": "2026-08-31T12:45:04Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -387,19 +388,6 @@
       "status": "not started",
       "title": "[Help requested] Dynamic hydra launcher configuration",
       "updated_at": "2026-08-31T11:01:09Z"
-    },
-    "2898": {
-      "category": "Enhancement",
-      "created_at": "2024-04-30T15:35:59Z",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages",
-      "updated_at": "2026-07-15T13:16:12Z"
     },
     "2927": {
       "category": "Bug",
@@ -1117,8 +1105,8 @@
       "pr_numbers": [],
       "state": "OPEN",
       "status": "not started",
-      "title": "Expose Optuna GridSampler seed in the structured config",
-      "updated_at": "2026-08-31T12:03:25Z"
+      "title": "Align Optuna sampler structured configs with Optuna 4.9",
+      "updated_at": "2026-08-31T12:42:29Z"
     },
     "385": {
       "category": "Enhancement",
@@ -1485,6 +1473,19 @@
       "state": "CLOSED",
       "status": "done",
       "title": "[Help requested] Optuna Sweeper Multiple GPU Parallelism",
+      "updated_at": "2026-07-15T13:16:12Z"
+    },
+    "2898": {
+      "category": "Enhancement",
+      "created_at": "2024-04-30T15:35:59Z",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages",
       "updated_at": "2026-07-15T13:16:12Z"
     },
     "3385": {
