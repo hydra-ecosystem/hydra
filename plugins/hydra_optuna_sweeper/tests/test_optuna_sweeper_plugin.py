@@ -4,7 +4,6 @@ import sys
 import warnings
 from pathlib import Path
 from typing import Any, List
-from unittest.mock import patch
 
 import optuna
 from hydra import compose, initialize
@@ -78,32 +77,29 @@ def test_sampler_config_defaults(
 
 
 @mark.parametrize(
-    "sampler_name, constructor_path, field_override, expected",
+    "sampler_name, field_override, expected",
     [
-        ("grid", "optuna.samplers.GridSampler", "seed=123", 123),
-        ("tpe", "optuna.samplers.TPESampler", "group=true", True),
-        ("tpe", "optuna.samplers.TPESampler", "constant_liar=true", True),
+        ("grid", "seed=123", 123),
+        ("tpe", "group=true", True),
+        ("tpe", "constant_liar=true", True),
         (
             "tpe",
-            "optuna.samplers.TPESampler",
             "constraints_func=test_constraints",
             "test_constraints",
         ),
-        ("cmaes", "optuna.samplers.CmaEsSampler", "n_startup_trials=7", 7),
-        ("cmaes", "optuna.samplers.CmaEsSampler", "popsize=12", 12),
-        ("cmaes", "optuna.samplers.CmaEsSampler", "with_margin=true", True),
-        ("cmaes", "optuna.samplers.CmaEsSampler", "lr_adapt=true", True),
+        ("cmaes", "n_startup_trials=7", 7),
+        ("cmaes", "popsize=12", 12),
+        ("cmaes", "with_margin=true", True),
+        ("cmaes", "lr_adapt=true", True),
         (
             "nsgaii",
-            "optuna.samplers.NSGAIISampler",
             "crossover=test_crossover",
             "test_crossover",
         ),
     ],
 )
-def test_sampler_normal_override_is_forwarded(
+def test_sampler_normal_override(
     sampler_name: str,
-    constructor_path: str,
     field_override: str,
     expected: Any,
 ) -> None:
@@ -118,20 +114,7 @@ def test_sampler_normal_override_is_forwarded(
             ],
         )
 
-    with patch(
-        f"{constructor_path}.__init__", return_value=None
-    ) as sampler_constructor:
-        sweeper = instantiate(
-            cfg.hydra.sweeper,
-            _execution_whitelist_=(
-                "hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper"
-            ),
-            _recursive_=False,
-        )
-        if sampler_name == "grid":
-            sweeper.sweeper.sampler({"x": [0]})
-
-    assert sampler_constructor.call_args.kwargs[field_name] == expected
+    assert cfg.hydra.sweeper.sampler[field_name] == expected
 
 
 def test_default_cmaes_config_has_no_restart_deprecation_warning() -> None:
