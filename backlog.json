@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-01",
-  "generated_at": "2026-09-01T02:39:36Z",
+  "generated_at": "2026-09-01T07:15:35Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 96,
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 7
+        "count": 8
       },
       {
         "status": "blocked",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 89
+        "count": 88
       },
       {
         "status": "done",
@@ -213,6 +213,28 @@
         "defaults list"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
+    },
+    {
+      "number": 3425,
+      "title": "Align Optuna sampler structured configs with Optuna 4.9",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "community PR",
+      "status_emoji": "🤝",
+      "prs": [
+        {
+          "number": 3431,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3431"
+        }
+      ],
+      "created": "2026-08-31",
+      "updated": "2026-09-01",
+      "labels": [
+        "enhancement",
+        "plugin",
+        "optuna"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3425"
     },
     {
       "number": 385,
@@ -1572,23 +1594,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
     },
     {
-      "number": 3425,
-      "title": "Align Optuna sampler structured configs with Optuna 4.9",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-31",
-      "updated": "2026-09-01",
-      "labels": [
-        "enhancement",
-        "plugin",
-        "optuna"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3425"
-    },
-    {
       "number": 3426,
       "title": "Support `NSGAIIISampler` on Optuna Sweeper",
       "category": "Enhancement",
@@ -1597,7 +1602,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2026-08-31",
-      "updated": "2026-08-31",
+      "updated": "2026-09-01",
       "labels": [
         "enhancement"
       ],
@@ -2049,6 +2054,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-01T07:15:35Z",
+      "kind": "pr",
+      "issue": 3425,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425",
+      "title": "Align Optuna sampler structured configs with Optuna 4.9",
+      "detail": "linked #3431"
+    },
+    {
+      "ts": "2026-09-01T07:15:35Z",
+      "kind": "status",
+      "issue": 3425,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425",
+      "title": "Align Optuna sampler structured configs with Optuna 4.9",
+      "detail": "not started → community PR",
+      "pr": {
+        "number": 3431,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3431"
+      }
+    },
     {
       "ts": "2026-08-31T15:28:38Z",
       "kind": "closed",
@@ -3623,20 +3648,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2227",
       "title": "[Feature Request] Easier **replacement** of subconfigs",
       "detail": "added \"blocked\"; removed \"triage\""
-    },
-    {
-      "ts": "2026-07-27T10:36:14Z",
-      "kind": "closed",
-      "issue": 1896,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1896",
-      "title": "[Feature Request] Override dictionary syntax"
-    },
-    {
-      "ts": "2026-07-27T10:28:03Z",
-      "kind": "closed",
-      "issue": 1888,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1888",
-      "title": "interpolation fail in compose API"
     }
   ]
 }
