@@ -1,10 +1,13 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import os
 import sys
+import warnings
 from pathlib import Path
 from typing import Any, List
+from unittest.mock import patch
 
 import optuna
+from hydra import compose, initialize
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.plugins import Plugins
 from hydra.errors import InstantiationException
@@ -26,7 +29,13 @@ from optuna.distributions import (
 from pytest import mark, raises
 
 from hydra_plugins.hydra_optuna_sweeper import _impl
-from hydra_plugins.hydra_optuna_sweeper.config import MOTPESamplerConfig
+from hydra_plugins.hydra_optuna_sweeper.config import (
+    CmaEsSamplerConfig,
+    GridSamplerConfig,
+    MOTPESamplerConfig,
+    NSGAIISamplerConfig,
+    TPESamplerConfig,
+)
 from hydra_plugins.hydra_optuna_sweeper.optuna_sweeper import OptunaSweeper
 
 chdir_plugin_root()
@@ -45,6 +54,100 @@ def test_discovery() -> None:
     assert OptunaSweeper.__name__ in [
         x.__name__ for x in Plugins.instance().discover(Sweeper)
     ]
+
+
+@mark.parametrize(
+    "config_type, field_name, expected",
+    [
+        (GridSamplerConfig, "seed", None),
+        (TPESamplerConfig, "group", False),
+        (TPESamplerConfig, "constant_liar", False),
+        (TPESamplerConfig, "constraints_func", None),
+        (CmaEsSamplerConfig, "n_startup_trials", 1),
+        (CmaEsSamplerConfig, "popsize", None),
+        (CmaEsSamplerConfig, "with_margin", False),
+        (CmaEsSamplerConfig, "lr_adapt", False),
+        (CmaEsSamplerConfig, "inc_popsize", -1),
+        (NSGAIISamplerConfig, "crossover", None),
+    ],
+)
+def test_sampler_config_defaults(
+    config_type: Any, field_name: str, expected: Any
+) -> None:
+    assert getattr(config_type(), field_name) == expected
+
+
+@mark.parametrize(
+    "sampler_name, constructor_path, field_override, expected",
+    [
+        ("grid", "optuna.samplers.GridSampler", "seed=123", 123),
+        ("tpe", "optuna.samplers.TPESampler", "group=true", True),
+        ("tpe", "optuna.samplers.TPESampler", "constant_liar=true", True),
+        (
+            "tpe",
+            "optuna.samplers.TPESampler",
+            "constraints_func=test_constraints",
+            "test_constraints",
+        ),
+        ("cmaes", "optuna.samplers.CmaEsSampler", "n_startup_trials=7", 7),
+        ("cmaes", "optuna.samplers.CmaEsSampler", "popsize=12", 12),
+        ("cmaes", "optuna.samplers.CmaEsSampler", "with_margin=true", True),
+        ("cmaes", "optuna.samplers.CmaEsSampler", "lr_adapt=true", True),
+        (
+            "nsgaii",
+            "optuna.samplers.NSGAIISampler",
+            "crossover=test_crossover",
+            "test_crossover",
+        ),
+    ],
+)
+def test_sampler_normal_override_is_forwarded(
+    sampler_name: str,
+    constructor_path: str,
+    field_override: str,
+    expected: Any,
+) -> None:
+    field_name = field_override.split("=", maxsplit=1)[0]
+    with initialize(config_path="conf"):
+        cfg = compose(
+            config_name="test_grid",
+            return_hydra_config=True,
+            overrides=[
+                f"hydra/sweeper/sampler={sampler_name}",
+                f"hydra.sweeper.sampler.{field_override}",
+            ],
+        )
+
+    with patch(
+        f"{constructor_path}.__init__", return_value=None
+    ) as sampler_constructor:
+        sweeper = instantiate(
+            cfg.hydra.sweeper,
+            _execution_whitelist_=(
+                "hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper"
+            ),
+            _recursive_=False,
+        )
+        if sampler_name == "grid":
+            sweeper.sweeper.sampler({"x": [0]})
+
+    assert sampler_constructor.call_args.kwargs[field_name] == expected
+
+
+def test_default_cmaes_config_has_no_restart_deprecation_warning() -> None:
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        instantiate(
+            OmegaConf.structured(CmaEsSamplerConfig),
+            _execution_whitelist_="optuna.samplers.*",
+        )
+
+    messages = [str(warning.message).lower() for warning in caught]
+    assert not any(
+        "inc_popsize" in message
+        or ("restart_strategy" in message and "deprecat" in message)
+        for message in messages
+    )
 
 
 def check_distribution(expected: BaseDistribution, actual: BaseDistribution) -> None:
@@ -186,6 +289,7 @@ def test_example_with_grid_sampler(
         "hydra.sweeper.n_jobs=1",
         f"hydra.sweeper.storage={storage}",
         f"hydra.sweeper.study_name={study_name}",
+        "hydra.sweeper.sampler.seed=123",
     ]
     run_optuna_script(cmd)
     returns = OmegaConf.load(f"{tmpdir}/optimization_results.yaml")
