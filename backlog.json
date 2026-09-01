@@ -1,6 +1,6 @@
 {
-  "generated_on": "2026-08-31",
-  "generated_at": "2026-08-31T15:28:38Z",
+  "generated_on": "2026-09-01",
+  "generated_at": "2026-09-01T02:27:59Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 96,
@@ -1580,7 +1580,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2026-08-31",
-      "updated": "2026-08-31",
+      "updated": "2026-09-01",
       "labels": [
         "enhancement",
         "plugin",
@@ -1904,6 +1904,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2938"
     },
     {
+      "number": 2942,
+      "title": "[Feature Request] I'd like to be able to do multirun over files matching a glob (ideally a glob that depends on other, non-sweeped params in the config file)",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-09-01",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2942"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -2030,22 +2046,6 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
-    },
-    {
-      "number": 2942,
-      "title": "[Feature Request] I'd like to be able to do multirun over files matching a glob (ideally a glob that depends on other, non-sweeped params in the config file)",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2024-09-01",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2942"
     }
   ],
   "updates": [

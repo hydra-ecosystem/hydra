@@ -29,7 +29,7 @@
     "3410": "2026-08-31",
     "3411": "2026-08-26"
   },
-  "generated_at": "2026-08-31T15:28:38Z",
+  "generated_at": "2026-09-01T02:27:59Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -1083,7 +1083,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "Align Optuna sampler structured configs with Optuna 4.9",
-      "updated_at": "2026-08-31T14:39:54Z"
+      "updated_at": "2026-09-01T01:17:46Z"
     },
     "3426": {
       "category": "Enhancement",
