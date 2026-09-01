@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-01",
-  "generated_at": "2026-09-01T07:15:35Z",
+  "generated_at": "2026-09-01T11:31:06Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 96,
+    "open_total": 95,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 10,
-        "percentage": 10.4
+        "percentage": 10.5
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 71,
-        "percentage": 74.0
+        "count": 70,
+        "percentage": 73.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.2
+        "percentage": 6.3
       },
       {
         "category": "Question",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 3.1
+        "percentage": 3.2
       }
     ],
     "by_status": [
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 8
+        "count": 9
       },
       {
         "status": "blocked",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 88
+        "count": 86
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 28
+        "count": 29
       }
     ]
   },
@@ -235,6 +235,26 @@
         "optuna"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3425"
+    },
+    {
+      "number": 3426,
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "community PR",
+      "status_emoji": "🤝",
+      "prs": [
+        {
+          "number": 3432,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3432"
+        }
+      ],
+      "created": "2026-08-31",
+      "updated": "2026-09-01",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
     },
     {
       "number": 385,
@@ -831,22 +851,6 @@
         "ray-launcher"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2927"
-    },
-    {
-      "number": 2943,
-      "title": "[Feature Request] It'd be nice to have a custom resolver for accessing data files for a given python package.",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-09-01",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2943"
     },
     {
       "number": 2944,
@@ -1594,21 +1598,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
     },
     {
-      "number": 3426,
-      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-31",
-      "updated": "2026-09-01",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
-    },
-    {
       "number": 3427,
       "title": "HydraConfig is unavailable during multirun controller initialization",
       "category": "Bug",
@@ -2051,9 +2040,52 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
+    },
+    {
+      "number": 2943,
+      "title": "[Feature Request] It'd be nice to have a custom resolver for accessing data files for a given python package.",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-09-01",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2943"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-01T11:31:06Z",
+      "kind": "pr",
+      "issue": 3426,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "detail": "linked #3432"
+    },
+    {
+      "ts": "2026-09-01T11:31:06Z",
+      "kind": "closed",
+      "issue": 2943,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2943",
+      "title": "[Feature Request] It'd be nice to have a custom resolver for accessing data files for a given python package."
+    },
+    {
+      "ts": "2026-09-01T11:31:06Z",
+      "kind": "status",
+      "issue": 3426,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "detail": "not started → community PR",
+      "pr": {
+        "number": 3432,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3432"
+      }
+    },
     {
       "ts": "2026-09-01T07:15:35Z",
       "kind": "pr",
@@ -3620,34 +3652,6 @@
       "issue": 1901,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1901",
       "title": "[Feature Request] Derive structured configuration from class constructor "
-    },
-    {
-      "ts": "2026-07-27T12:08:05Z",
-      "kind": "pr",
-      "issue": 1899,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1899",
-      "title": "[Bug] Defaults list interpolation in an inner config failing to find keys from outer config",
-      "detail": "linked #3322"
-    },
-    {
-      "ts": "2026-07-27T12:08:05Z",
-      "kind": "status",
-      "issue": 1899,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1899",
-      "title": "[Bug] Defaults list interpolation in an inner config failing to find keys from outer config",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3322,
-        "url": "https://github.com/facebookresearch/hydra/pull/3322"
-      }
-    },
-    {
-      "ts": "2026-07-27T10:45:00Z",
-      "kind": "label",
-      "issue": 2227,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2227",
-      "title": "[Feature Request] Easier **replacement** of subconfigs",
-      "detail": "added \"blocked\"; removed \"triage\""
     }
   ]
 }

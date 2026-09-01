@@ -19,6 +19,7 @@
     "2898": "2026-08-31",
     "2938": "2026-08-31",
     "2942": "2026-08-31",
+    "2943": "2026-09-01",
     "3385": "2026-08-12",
     "3386": "2026-08-12",
     "3395": "2026-08-15",
@@ -29,7 +30,7 @@
     "3410": "2026-08-31",
     "3411": "2026-08-26"
   },
-  "generated_at": "2026-09-01T07:15:35Z",
+  "generated_at": "2026-09-01T11:31:06Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -405,19 +406,6 @@
       "status": "not started",
       "title": "Ray Launcher:  Additional properties are not allowed",
       "updated_at": "2026-06-26T13:10:08Z"
-    },
-    "2943": {
-      "category": "Enhancement",
-      "created_at": "2024-09-01T17:36:44Z",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "[Feature Request] It'd be nice to have a custom resolver for accessing data files for a given python package.",
-      "updated_at": "2026-07-15T13:16:11Z"
     },
     "2944": {
       "category": "Enhancement",
@@ -1093,9 +1081,11 @@
       "labels": [
         "enhancement"
       ],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3432"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "community PR",
       "title": "Support `NSGAIIISampler` on Optuna Sweeper",
       "updated_at": "2026-09-01T06:09:00Z"
     },
@@ -1515,6 +1505,19 @@
       "state": "CLOSED",
       "status": "done",
       "title": "[Feature Request] I'd like to be able to do multirun over files matching a glob (ideally a glob that depends on other, non-sweeped params in the config file)",
+      "updated_at": "2026-07-15T13:16:11Z"
+    },
+    "2943": {
+      "category": "Enhancement",
+      "created_at": "2024-09-01T17:36:44Z",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "[Feature Request] It'd be nice to have a custom resolver for accessing data files for a given python package.",
       "updated_at": "2026-07-15T13:16:11Z"
     },
     "3385": {
