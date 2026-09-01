@@ -34,6 +34,7 @@ class GridSamplerConfig(SamplerConfig):
     _target_: str = "optuna.samplers.GridSampler"
     # search_space will be populated at run time based on hydra.sweeper.params
     _partial_: bool = True
+    seed: Optional[int] = None
 
 
 @dataclass
@@ -52,7 +53,10 @@ class TPESamplerConfig(SamplerConfig):
     n_startup_trials: int = 10
     n_ei_candidates: int = 24
     multivariate: bool = False
+    group: bool = False
     warn_independent_sampling: Optional[bool] = None
+    constant_liar: bool = False
+    constraints_func: Optional[Any] = None
 
 
 @dataclass
@@ -76,12 +80,16 @@ class CmaEsSamplerConfig(SamplerConfig):
 
     x0: Optional[Dict[str, Any]] = None
     sigma0: Optional[float] = None
+    n_startup_trials: int = 1
     independent_sampler: Optional[Any] = None
     warn_independent_sampling: bool = True
     consider_pruned_trials: bool = False
     restart_strategy: Optional[Any] = None
-    inc_popsize: int = 2
+    popsize: Optional[int] = None
+    inc_popsize: int = -1
     use_separable_cma: bool = False
+    with_margin: bool = False
+    lr_adapt: bool = False
     source_trials: Optional[Any] = None
 
 
@@ -96,6 +104,7 @@ class NSGAIISamplerConfig(SamplerConfig):
 
     population_size: int = 50
     mutation_prob: Optional[float] = None
+    crossover: Optional[Any] = None
     crossover_prob: float = 0.9
     swapping_prob: float = 0.5
     constraints_func: Optional[Any] = None
