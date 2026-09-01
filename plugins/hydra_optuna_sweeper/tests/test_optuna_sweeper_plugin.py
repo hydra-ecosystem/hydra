@@ -35,10 +35,17 @@ SQLALCHEMY_UTC_WARNING_FILTER = (
     r"-W ignore:datetime.datetime.utcfromtimestamp() is deprecated:"
     r"DeprecationWarning:sqlalchemy.sql.sqltypes"
 )
+OPTUNA_EXPERIMENTAL_WARNING_FILTER = "-W default:NSGAIIISampler is experimental"
 
 
 def run_optuna_script(cmd: List[str]) -> None:
-    run_python_script([SQLALCHEMY_UTC_WARNING_FILTER, *cmd])
+    run_python_script(
+        [
+            SQLALCHEMY_UTC_WARNING_FILTER,
+            OPTUNA_EXPERIMENTAL_WARNING_FILTER,
+            *cmd,
+        ]
+    )
 
 
 def test_discovery() -> None:
@@ -203,8 +210,13 @@ def test_example_with_grid_sampler(
     assert bz in ["foo", "bar"]
 
 
+@mark.parametrize("sampler", ("random", "nsgaiii"))
 @mark.parametrize("with_commandline", (True, False))
-def test_optuna_multi_objective_example(with_commandline: bool, tmpdir: Path) -> None:
+def test_optuna_multi_objective_example(
+    sampler: str,
+    with_commandline: bool,
+    tmpdir: Path,
+) -> None:
     cmd = [
         "example/multi-objective.py",
         "--multirun",
@@ -212,7 +224,7 @@ def test_optuna_multi_objective_example(with_commandline: bool, tmpdir: Path) ->
         "hydra.job.chdir=True",
         "hydra.sweeper.n_trials=20",
         "hydra.sweeper.n_jobs=1",
-        "hydra/sweeper/sampler=random",
+        f"hydra/sweeper/sampler={sampler}",
         "hydra.sweeper.sampler.seed=123",
     ]
     if with_commandline:
