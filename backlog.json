@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-02",
-  "generated_at": "2026-09-02T07:16:38Z",
+  "generated_at": "2026-09-02T10:14:46Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 95,
+    "open_total": 94,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 10,
-        "percentage": 10.5
+        "percentage": 10.6
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 70,
-        "percentage": 73.7
+        "count": 69,
+        "percentage": 73.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.3
+        "percentage": 6.4
       },
       {
         "category": "Question",
@@ -33,7 +33,7 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 4,
-        "percentage": 4.2
+        "percentage": 4.3
       },
       {
         "category": "Build",
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 9
+        "count": 8
       },
       {
         "status": "blocked",
@@ -66,7 +66,7 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 29
+        "count": 30
       }
     ]
   },
@@ -213,28 +213,6 @@
         "defaults list"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
-    },
-    {
-      "number": 3425,
-      "title": "Align Optuna sampler structured configs with Optuna 4.9",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3431,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3431"
-        }
-      ],
-      "created": "2026-08-31",
-      "updated": "2026-09-01",
-      "labels": [
-        "enhancement",
-        "plugin",
-        "optuna"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3425"
     },
     {
       "number": 3426,
@@ -2056,9 +2034,38 @@
       "updated": "2026-08-24",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
+    },
+    {
+      "number": 3425,
+      "title": "Align Optuna sampler structured configs with Optuna 4.9",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3431,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3431"
+        }
+      ],
+      "created": "2026-08-31",
+      "updated": "2026-09-01",
+      "labels": [
+        "enhancement",
+        "optuna",
+        "plugin"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3425"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-02T10:14:46Z",
+      "kind": "closed",
+      "issue": 3425,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425",
+      "title": "Align Optuna sampler structured configs with Optuna 4.9"
+    },
     {
       "ts": "2026-09-01T11:31:06Z",
       "kind": "pr",
@@ -3645,13 +3652,6 @@
       "issue": 1899,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1899",
       "title": "[Bug] Defaults list interpolation in an inner config failing to find keys from outer config"
-    },
-    {
-      "ts": "2026-07-27T12:33:50Z",
-      "kind": "closed",
-      "issue": 1901,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1901",
-      "title": "[Feature Request] Derive structured configuration from class constructor "
     }
   ]
 }
