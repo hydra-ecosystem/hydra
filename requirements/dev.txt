@@ -1,7 +1,7 @@
 -r requirements.txt
 attrs
 bandit
-ruff==0.15.22
+ruff==0.16.4
 build
 coverage
 pyrefly==1.1.1
