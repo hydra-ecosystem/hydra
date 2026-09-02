@@ -30,7 +30,7 @@
     "3410": "2026-08-31",
     "3411": "2026-08-26"
   },
-  "generated_at": "2026-09-01T11:31:06Z",
+  "generated_at": "2026-09-02T07:16:38Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -113,7 +113,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "[Feature Request] Append to a list from command line",
-      "updated_at": "2026-07-25T03:19:41Z"
+      "updated_at": "2026-09-02T04:51:27Z"
     },
     "1602": {
       "category": "Bug",
@@ -294,7 +294,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs",
-      "updated_at": "2026-06-29T19:15:23Z"
+      "updated_at": "2026-09-02T02:27:16Z"
     },
     "2758": {
       "category": "Documentation",
@@ -1087,7 +1087,7 @@
       "state": "OPEN",
       "status": "community PR",
       "title": "Support `NSGAIIISampler` on Optuna Sweeper",
-      "updated_at": "2026-09-01T06:09:00Z"
+      "updated_at": "2026-09-01T17:03:39Z"
     },
     "3427": {
       "category": "Bug",
