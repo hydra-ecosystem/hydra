@@ -31,7 +31,6 @@ from pytest import mark, raises
 
 from hydra_plugins.hydra_optuna_sweeper import _impl
 from hydra_plugins.hydra_optuna_sweeper.config import (
-    MOTPESamplerConfig,
     CmaEsSamplerConfig,
     GridSamplerConfig,
     MOTPESamplerConfig,
