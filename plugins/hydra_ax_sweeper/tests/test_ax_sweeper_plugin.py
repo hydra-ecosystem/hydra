@@ -22,10 +22,10 @@ WARNING_FILTERS = [
     # 2026-05-15: linear_operator 0.6.1 imports torch.jit.script via
     # Ax -> Botorch -> GPyTorch on Python 3.14 with Torch 2.12.
     # Remove when the current Ax stack no longer emits it under -Werror.
-    "ignore:`torch.jit.script` is deprecated:DeprecationWarning",
+    "ignore:`torch.jit.script` is deprecated:FutureWarning",
     # 2026-05-15: same linear_operator import path as above, but Torch emits this
     # alternate wording in some import paths. Remove with the filter above.
-    "ignore:`torch.jit.script` is not supported:DeprecationWarning",
+    "ignore:`torch.jit.script` is not supported:FutureWarning",
     # 2026-05-15: Ax 1.2.4 uses asyncio.iscoroutinefunction in retry helpers.
     # Remove when Ax no longer emits it on Python 3.14 under -Werror.
     "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",
