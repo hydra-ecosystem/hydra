@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-09-02",
-  "generated_at": "2026-09-02T19:50:41Z",
+  "generated_at": "2026-09-02T22:16:57Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 94,
+    "open_total": 93,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 10,
-        "percentage": 10.6
+        "percentage": 10.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 69,
-        "percentage": 73.4
+        "count": 68,
+        "percentage": 73.1
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.4
+        "percentage": 6.5
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 2,
-        "percentage": 2.1
+        "percentage": 2.2
       },
       {
         "category": "Refactor",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 87
+        "count": 86
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 30
+        "count": 31
       }
     ]
   },
@@ -1556,21 +1556,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
     },
     {
-      "number": 3426,
-      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-31",
-      "updated": "2026-09-01",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
-    },
-    {
       "number": 3427,
       "title": "HydraConfig is unavailable during multirun controller initialization",
       "category": "Bug",
@@ -2051,9 +2036,31 @@
         "plugin"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3425"
+    },
+    {
+      "number": 3426,
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-31",
+      "updated": "2026-09-01",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-02T22:16:57Z",
+      "kind": "closed",
+      "issue": 3426,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper"
+    },
     {
       "ts": "2026-09-02T18:50:10Z",
       "kind": "pr",
@@ -3641,14 +3648,6 @@
       "issue": 1918,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1918",
       "title": "sweep parameters in a paired manner"
-    },
-    {
-      "ts": "2026-07-27T13:36:20Z",
-      "kind": "label",
-      "issue": 1258,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1258",
-      "title": "[Feature Request] Tuple Sweeper OR Top-level dictionary overrides",
-      "detail": "added \"sweep\"; removed \"triage\", \"wishlist\""
     }
   ]
 }

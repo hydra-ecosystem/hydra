@@ -761,3 +761,4 @@
 {"ts": "2026-09-02T10:14:46Z", "kind": "closed", "issue": 3425, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425", "title": "Align Optuna sampler structured configs with Optuna 4.9"}
 {"ts": "2026-09-02T18:50:10Z", "kind": "status", "issue": 3426, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426", "title": "Support `NSGAIIISampler` on Optuna Sweeper", "detail": "community PR → not started"}
 {"ts": "2026-09-02T18:50:10Z", "kind": "pr", "issue": 3426, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426", "title": "Support `NSGAIIISampler` on Optuna Sweeper", "detail": "unlinked #3432"}
+{"ts": "2026-09-02T22:16:57Z", "kind": "closed", "issue": 3426, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426", "title": "Support `NSGAIIISampler` on Optuna Sweeper"}

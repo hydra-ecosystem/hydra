@@ -29,9 +29,10 @@
     "3402": "2026-08-23",
     "3410": "2026-08-31",
     "3411": "2026-08-26",
-    "3425": "2026-09-02"
+    "3425": "2026-09-02",
+    "3426": "2026-09-02"
   },
-  "generated_at": "2026-09-02T19:50:41Z",
+  "generated_at": "2026-09-02T22:16:57Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -1060,18 +1061,6 @@
       "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun",
       "updated_at": "2026-08-28T14:11:22Z"
     },
-    "3426": {
-      "category": "Enhancement",
-      "created_at": "2026-08-31T14:33:43Z",
-      "labels": [
-        "enhancement"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
-      "updated_at": "2026-09-01T17:03:39Z"
-    },
     "3427": {
       "category": "Bug",
       "created_at": "2026-08-31T15:08:33Z",
@@ -1616,6 +1605,18 @@
       "status": "done",
       "title": "Align Optuna sampler structured configs with Optuna 4.9",
       "updated_at": "2026-09-01T01:17:46Z"
+    },
+    "3426": {
+      "category": "Enhancement",
+      "created_at": "2026-08-31T14:33:43Z",
+      "labels": [
+        "enhancement"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "updated_at": "2026-09-01T17:03:39Z"
     }
   },
   "repo": "hydra-ecosystem/hydra"
