@@ -107,7 +107,7 @@ class NSGAIIISamplerConfig(SamplerConfig):
     https://optuna.readthedocs.io/en/v4.9.0/reference/samplers/generated/optuna.samplers.NSGAIIISampler.html
     """
 
-    _target_: str = "optuna.samplers.NSGAIIISampler"
+    _target_: str = "hydra_plugins.hydra_optuna_sweeper._impl.create_nsgaiii_sampler"
     seed: Optional[int] = None
 
     population_size: int = 50
