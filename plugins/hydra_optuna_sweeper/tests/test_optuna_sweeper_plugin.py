@@ -34,8 +34,8 @@ from hydra_plugins.hydra_optuna_sweeper.config import (
     CmaEsSamplerConfig,
     GridSamplerConfig,
     MOTPESamplerConfig,
+    NSGAIIISamplerConfig,
     NSGAIISamplerConfig,
-    NSGAIIISamplerConfig
     TPESamplerConfig,
 )
 from hydra_plugins.hydra_optuna_sweeper.optuna_sweeper import OptunaSweeper
