@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-02",
-  "generated_at": "2026-09-02T18:50:10Z",
+  "generated_at": "2026-09-02T19:50:41Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 94,
@@ -1556,6 +1556,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
     },
     {
+      "number": 3426,
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-31",
+      "updated": "2026-09-01",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
+    },
+    {
       "number": 3427,
       "title": "HydraConfig is unavailable during multirun controller initialization",
       "category": "Bug",
@@ -1570,21 +1585,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
-    },
-    {
-      "number": 3426,
-      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-31",
-      "updated": "2026-09-01",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
     },
     {
       "number": 2762,
