@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-02",
-  "generated_at": "2026-09-02T13:39:40Z",
+  "generated_at": "2026-09-02T18:50:10Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 94,
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 8
+        "count": 7
       },
       {
         "status": "blocked",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 86
+        "count": 87
       },
       {
         "status": "done",
@@ -213,26 +213,6 @@
         "defaults list"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
-    },
-    {
-      "number": 3426,
-      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3432,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3432"
-        }
-      ],
-      "created": "2026-08-31",
-      "updated": "2026-09-01",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
     },
     {
       "number": 385,
@@ -1592,6 +1572,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
     },
     {
+      "number": 3426,
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-31",
+      "updated": "2026-09-01",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -2059,6 +2054,22 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-02T18:50:10Z",
+      "kind": "pr",
+      "issue": 3426,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "detail": "unlinked #3432"
+    },
+    {
+      "ts": "2026-09-02T18:50:10Z",
+      "kind": "status",
+      "issue": 3426,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
+      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
+      "detail": "community PR → not started"
+    },
     {
       "ts": "2026-09-02T10:14:46Z",
       "kind": "closed",
@@ -3638,20 +3649,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1258",
       "title": "[Feature Request] Tuple Sweeper OR Top-level dictionary overrides",
       "detail": "added \"sweep\"; removed \"triage\", \"wishlist\""
-    },
-    {
-      "ts": "2026-07-27T13:29:36Z",
-      "kind": "closed",
-      "issue": 1913,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1913",
-      "title": "[Feature Request] Mixing `_global_` / `_here_` / `_package_`"
-    },
-    {
-      "ts": "2026-07-27T13:24:48Z",
-      "kind": "closed",
-      "issue": 1899,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1899",
-      "title": "[Bug] Defaults list interpolation in an inner config failing to find keys from outer config"
     }
   ]
 }
