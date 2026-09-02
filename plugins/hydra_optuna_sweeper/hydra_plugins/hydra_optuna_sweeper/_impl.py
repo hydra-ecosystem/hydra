@@ -13,7 +13,7 @@ from typing import (
     Tuple,
 )
 
-import numpy as np
+import numpy
 import optuna
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.override_parser.types import (
@@ -47,7 +47,7 @@ def create_nsgaiii_sampler(
     **kwargs: Any,
 ) -> optuna.samplers.NSGAIIISampler:
     if (points := reference_points) is not None:
-        kwargs["reference_points"] = np.asarray(points, dtype=float)
+        kwargs["reference_points"] = numpy.asarray(points, dtype=float)
     return optuna.samplers.NSGAIIISampler(**kwargs)
 
 

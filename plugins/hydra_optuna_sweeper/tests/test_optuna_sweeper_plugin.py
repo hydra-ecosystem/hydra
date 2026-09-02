@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, List
 from unittest.mock import patch
 
-import numpy as np
+import numpy
 import optuna
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.plugins import Plugins
@@ -343,8 +343,8 @@ def test_nsgaiii_sampler_reference_points_converted_to_array() -> None:
         )
 
     actual = nsgaiii_sampler.call_args.kwargs["reference_points"]
-    assert isinstance(actual, np.ndarray)
-    np.testing.assert_array_equal(actual, reference_points)
+    assert isinstance(actual, numpy.ndarray)
+    numpy.testing.assert_array_equal(actual, reference_points)
 
 
 def test_example_with_removed_motpe(
