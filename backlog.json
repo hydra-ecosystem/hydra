@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T16:26:41Z",
+  "generated_at": "2026-09-04T16:32:37Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 89,
+    "open_total": 88,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 9.0
+        "percentage": 9.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 67,
-        "percentage": 75.3
+        "count": 66,
+        "percentage": 75.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.7
+        "percentage": 6.8
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 2,
-        "percentage": 2.2
+        "percentage": 2.3
       },
       {
         "category": "Refactor",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 88
+        "count": 87
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 35
+        "count": 36
       }
     ]
   },
@@ -736,22 +736,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2944"
-    },
-    {
-      "number": 2949,
-      "title": "[Feature Request] Use @hydra.main() decorator for multiple python scripts from one bash script",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-09-10",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2949"
     },
     {
       "number": 2972,
@@ -1483,6 +1467,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
     },
     {
+      "number": 2757,
+      "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-09-26",
+      "updated": "2026-09-02",
+      "labels": [
+        "awaiting_response",
+        "bug"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2757"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -2016,23 +2016,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
     },
     {
-      "number": 2757,
-      "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs",
-      "category": "Bug",
-      "category_emoji": "🐛",
+      "number": 2949,
+      "title": "[Feature Request] Use @hydra.main() decorator for multiple python scripts from one bash script",
+      "category": "Enhancement",
+      "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2023-09-26",
-      "updated": "2026-09-02",
+      "created": "2024-09-10",
+      "updated": "2026-07-15",
       "labels": [
-        "awaiting_response",
-        "bug"
+        "enhancement",
+        "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2757"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2949"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T16:32:37Z",
+      "kind": "closed",
+      "issue": 2949,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2949",
+      "title": "[Feature Request] Use @hydra.main() decorator for multiple python scripts from one bash script"
+    },
     {
       "ts": "2026-09-04T16:26:41Z",
       "kind": "closed",
@@ -3629,13 +3636,6 @@
       "issue": 2252,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2252",
       "title": "[Feature Request] Support having '\"' in dict keys in command line override"
-    },
-    {
-      "ts": "2026-07-28T16:49:18Z",
-      "kind": "closed",
-      "issue": 2226,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2226",
-      "title": "No hydra interpolation is possible in Jupyter"
     }
   ]
 }
