@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T12:46:42Z",
+  "generated_at": "2026-09-04T13:36:55Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 92,
+    "open_total": 91,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.8
+        "percentage": 9.9
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 68,
-        "percentage": 73.9
+        "percentage": 74.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.5
+        "percentage": 6.6
       },
       {
         "category": "Question",
@@ -32,8 +32,8 @@
       {
         "category": "Refactor",
         "emoji": "🔧",
-        "count": 4,
-        "percentage": 4.3
+        "count": 3,
+        "percentage": 3.3
       },
       {
         "category": "Build",
@@ -46,12 +46,12 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 4
+        "count": 1
       },
       {
         "status": "blocked",
@@ -61,102 +61,16 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 87
+        "count": 90
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 32
+        "count": 33
       }
     ]
   },
   "issues": [
-    {
-      "number": 3369,
-      "title": "Remove redundant setup-xcode step from macOS CI",
-      "category": "Refactor",
-      "category_emoji": "🔧",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3434,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3434"
-        }
-      ],
-      "created": "2026-08-11",
-      "updated": "2026-09-04",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3369"
-    },
-    {
-      "number": 802,
-      "title": "Improve Hydra test coverage to 100%",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3377,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3377"
-        }
-      ],
-      "created": "2020-07-21",
-      "updated": "2026-07-21",
-      "labels": [
-        "help wanted",
-        "maintenance",
-        "tests",
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/802"
-    },
-    {
-      "number": 1749,
-      "title": "tests: Use multiline regex search instead of assert_regex_match",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3327,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3327"
-        }
-      ],
-      "created": "2021-08-02",
-      "updated": "2026-07-19",
-      "labels": [
-        "maintenance",
-        "tests",
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1749"
-    },
-    {
-      "number": 2237,
-      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3333,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3333"
-        }
-      ],
-      "created": "2022-05-26",
-      "updated": "2026-07-15",
-      "labels": [
-        "bug",
-        "plugin",
-        "optuna",
-        "sweep"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2237"
-    },
     {
       "number": 3375,
       "title": "Show project homepages in the Hydra Landscape",
@@ -1546,6 +1460,59 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
     },
     {
+      "number": 802,
+      "title": "Improve Hydra test coverage to 100%",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2020-07-21",
+      "updated": "2026-07-21",
+      "labels": [
+        "help wanted",
+        "maintenance",
+        "tests",
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/802"
+    },
+    {
+      "number": 1749,
+      "title": "tests: Use multiline regex search instead of assert_regex_match",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2021-08-02",
+      "updated": "2026-07-19",
+      "labels": [
+        "maintenance",
+        "tests",
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1749"
+    },
+    {
+      "number": 2237,
+      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2022-05-26",
+      "updated": "2026-07-15",
+      "labels": [
+        "bug",
+        "plugin",
+        "optuna",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2237"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -2046,9 +2013,82 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
+    },
+    {
+      "number": 3369,
+      "title": "Remove redundant setup-xcode step from macOS CI",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3434,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3434"
+        }
+      ],
+      "created": "2026-08-11",
+      "updated": "2026-09-04",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3369"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T13:36:55Z",
+      "kind": "pr",
+      "issue": 2237,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2237",
+      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
+      "detail": "unlinked #3333"
+    },
+    {
+      "ts": "2026-09-04T13:36:55Z",
+      "kind": "pr",
+      "issue": 1749,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1749",
+      "title": "tests: Use multiline regex search instead of assert_regex_match",
+      "detail": "unlinked #3327"
+    },
+    {
+      "ts": "2026-09-04T13:36:55Z",
+      "kind": "pr",
+      "issue": 802,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/802",
+      "title": "Improve Hydra test coverage to 100%",
+      "detail": "unlinked #3377"
+    },
+    {
+      "ts": "2026-09-04T13:36:55Z",
+      "kind": "closed",
+      "issue": 3369,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3369",
+      "title": "Remove redundant setup-xcode step from macOS CI"
+    },
+    {
+      "ts": "2026-09-04T13:36:55Z",
+      "kind": "status",
+      "issue": 2237,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2237",
+      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
+      "detail": "community PR → not started"
+    },
+    {
+      "ts": "2026-09-04T13:36:55Z",
+      "kind": "status",
+      "issue": 1749,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1749",
+      "title": "tests: Use multiline regex search instead of assert_regex_match",
+      "detail": "community PR → not started"
+    },
+    {
+      "ts": "2026-09-04T13:36:55Z",
+      "kind": "status",
+      "issue": 802,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/802",
+      "title": "Improve Hydra test coverage to 100%",
+      "detail": "community PR → not started"
+    },
     {
       "ts": "2026-09-04T12:46:42Z",
       "kind": "pr",
@@ -3596,62 +3636,6 @@
       "issue": 3324,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3324",
       "title": "Align bundled plugin dependencies with Hydra release lines"
-    },
-    {
-      "ts": "2026-07-28T12:56:57Z",
-      "kind": "pr",
-      "issue": 2187,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2187",
-      "title": "[Feature Request] implement `MultiprocessingLauncher`",
-      "detail": "linked #3323"
-    },
-    {
-      "ts": "2026-07-28T12:56:57Z",
-      "kind": "status",
-      "issue": 2187,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2187",
-      "title": "[Feature Request] implement `MultiprocessingLauncher`",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3323,
-        "url": "https://github.com/facebookresearch/hydra/pull/3323"
-      }
-    },
-    {
-      "ts": "2026-07-27T17:35:17Z",
-      "kind": "label",
-      "issue": 2170,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2170",
-      "title": "[Bug] `???` defaults cannot display `--help`",
-      "detail": "removed \"triage\""
-    },
-    {
-      "ts": "2026-07-27T17:26:38Z",
-      "kind": "closed",
-      "issue": 2140,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2140",
-      "title": "[Feature Request] hydra.utils.instantiate support for lookup (without calling)"
-    },
-    {
-      "ts": "2026-07-27T17:00:01Z",
-      "kind": "closed",
-      "issue": 2091,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2091",
-      "title": "Replace dictionary (instead of merging) from command line"
-    },
-    {
-      "ts": "2026-07-27T16:43:46Z",
-      "kind": "closed",
-      "issue": 2086,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2086",
-      "title": "[Feature Request] Support Ray launcher on windows. "
-    },
-    {
-      "ts": "2026-07-27T16:37:58Z",
-      "kind": "closed",
-      "issue": 2039,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2039",
-      "title": "[Bug] Cannot override a default config group that has been set up in a Structured Config"
     }
   ]
 }

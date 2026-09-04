@@ -20,6 +20,7 @@
     "2938": "2026-08-31",
     "2942": "2026-08-31",
     "2943": "2026-09-01",
+    "3369": "2026-09-04",
     "3385": "2026-08-12",
     "3386": "2026-08-12",
     "3395": "2026-08-15",
@@ -33,7 +34,7 @@
     "3425": "2026-09-02",
     "3426": "2026-09-02"
   },
-  "generated_at": "2026-09-04T12:46:42Z",
+  "generated_at": "2026-09-04T13:36:55Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -151,11 +152,9 @@
         "priority_low",
         "tests"
       ],
-      "pr_numbers": [
-        "3327"
-      ],
+      "pr_numbers": [],
       "state": "OPEN",
-      "status": "community PR",
+      "status": "not started",
       "title": "tests: Use multiline regex search instead of assert_regex_match",
       "updated_at": "2026-07-19T11:33:00Z"
     },
@@ -242,11 +241,9 @@
         "plugin",
         "sweep"
       ],
-      "pr_numbers": [
-        "3333"
-      ],
+      "pr_numbers": [],
       "state": "OPEN",
-      "status": "community PR",
+      "status": "not started",
       "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
       "updated_at": "2026-07-15T18:04:14Z"
     },
@@ -919,18 +916,6 @@
       "title": "Make Compose API initialization contexts nestable and self-contained",
       "updated_at": "2026-09-03T21:08:51Z"
     },
-    "3369": {
-      "category": "Refactor",
-      "created_at": "2026-08-11T15:37:09Z",
-      "labels": [],
-      "pr_numbers": [
-        "3434"
-      ],
-      "state": "OPEN",
-      "status": "in progress",
-      "title": "Remove redundant setup-xcode step from macOS CI",
-      "updated_at": "2026-09-04T12:40:41Z"
-    },
     "3371": {
       "category": "Enhancement",
       "created_at": "2026-08-11T21:50:09Z",
@@ -1147,11 +1132,9 @@
         "priority_low",
         "tests"
       ],
-      "pr_numbers": [
-        "3377"
-      ],
+      "pr_numbers": [],
       "state": "OPEN",
-      "status": "community PR",
+      "status": "not started",
       "title": "Improve Hydra test coverage to 100%",
       "updated_at": "2026-07-21T06:37:13Z"
     },
@@ -1475,6 +1458,18 @@
       "status": "done",
       "title": "[Feature Request] It'd be nice to have a custom resolver for accessing data files for a given python package.",
       "updated_at": "2026-07-15T13:16:11Z"
+    },
+    "3369": {
+      "category": "Refactor",
+      "created_at": "2026-08-11T15:37:09Z",
+      "labels": [],
+      "pr_numbers": [
+        "3434"
+      ],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Remove redundant setup-xcode step from macOS CI",
+      "updated_at": "2026-09-04T12:40:41Z"
     },
     "3385": {
       "category": "Enhancement",
