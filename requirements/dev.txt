@@ -4,7 +4,7 @@ bandit
 ruff==0.16.4
 build
 coverage
-pyrefly==1.1.1
+pyrefly==1.2.0
 nox
 packaging
 pre-commit

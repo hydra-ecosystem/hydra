@@ -4,7 +4,9 @@ import sys
 import warnings
 from pathlib import Path
 from typing import Any, List
+from unittest.mock import patch
 
+import numpy
 import optuna
 from hydra import compose, initialize
 from hydra.core.override_parser.overrides_parser import OverridesParser
@@ -32,6 +34,7 @@ from hydra_plugins.hydra_optuna_sweeper.config import (
     CmaEsSamplerConfig,
     GridSamplerConfig,
     MOTPESamplerConfig,
+    NSGAIIISamplerConfig,
     NSGAIISamplerConfig,
     TPESamplerConfig,
 )
@@ -43,10 +46,17 @@ SQLALCHEMY_UTC_WARNING_FILTER = (
     r"-W ignore:datetime.datetime.utcfromtimestamp() is deprecated:"
     r"DeprecationWarning:sqlalchemy.sql.sqltypes"
 )
+OPTUNA_EXPERIMENTAL_WARNING_FILTER = "-W default:NSGAIIISampler is experimental"
 
 
 def run_optuna_script(cmd: List[str]) -> None:
-    run_python_script([SQLALCHEMY_UTC_WARNING_FILTER, *cmd])
+    run_python_script(
+        [
+            SQLALCHEMY_UTC_WARNING_FILTER,
+            OPTUNA_EXPERIMENTAL_WARNING_FILTER,
+            *cmd,
+        ]
+    )
 
 
 def test_discovery() -> None:
@@ -290,8 +300,13 @@ def test_example_with_grid_sampler(
     assert bz in ["foo", "bar"]
 
 
+@mark.parametrize("sampler", ("random", "nsgaiii"))
 @mark.parametrize("with_commandline", (True, False))
-def test_optuna_multi_objective_example(with_commandline: bool, tmpdir: Path) -> None:
+def test_optuna_multi_objective_example(
+    sampler: str,
+    with_commandline: bool,
+    tmpdir: Path,
+) -> None:
     cmd = [
         "example/multi-objective.py",
         "--multirun",
@@ -299,7 +314,7 @@ def test_optuna_multi_objective_example(with_commandline: bool, tmpdir: Path) ->
         "hydra.job.chdir=True",
         "hydra.sweeper.n_trials=20",
         "hydra.sweeper.n_jobs=1",
-        "hydra/sweeper/sampler=random",
+        f"hydra/sweeper/sampler={sampler}",
         "hydra.sweeper.sampler.seed=123",
     ]
     if with_commandline:
@@ -390,6 +405,31 @@ def test_motpe_sampler_removed() -> None:
             OmegaConf.structured(MOTPESamplerConfig),
             _execution_whitelist_="hydra_plugins.hydra_optuna_sweeper.config.raise_motpe_removed",
         )
+
+
+@mark.filterwarnings("default:NSGAIIISampler is experimental")
+def test_nsgaiii_sampler_reference_points_converted_to_array() -> None:
+    reference_points = [[0.0, 1.0], [1.0, 0.0]]
+    config = OmegaConf.structured(
+        NSGAIIISamplerConfig(reference_points=reference_points)
+    )
+
+    nsgaiii_sampler_constructor = optuna.samplers.NSGAIIISampler
+    with patch(
+        "optuna.samplers.NSGAIIISampler",
+        side_effect=nsgaiii_sampler_constructor,
+    ) as nsgaiii_sampler:
+        instantiate(
+            config,
+            _execution_whitelist_=(
+                "hydra_plugins.hydra_optuna_sweeper._impl.create_nsgaiii_sampler",
+                "optuna.samplers.*",
+            ),
+        )
+
+    actual = nsgaiii_sampler.call_args.kwargs["reference_points"]
+    assert isinstance(actual, numpy.ndarray)
+    numpy.testing.assert_array_equal(actual, reference_points)
 
 
 def test_example_with_removed_motpe(

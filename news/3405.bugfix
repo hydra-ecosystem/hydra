@@ -1,0 +1,1 @@
+Reject Defaults List entries that combine `optional` and `override`.

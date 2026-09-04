@@ -111,6 +111,25 @@ class NSGAIISamplerConfig(SamplerConfig):
 
 
 @dataclass
+class NSGAIIISamplerConfig(SamplerConfig):
+    """
+    https://optuna.readthedocs.io/en/v4.9.0/reference/samplers/generated/optuna.samplers.NSGAIIISampler.html
+    """
+
+    _target_: str = "hydra_plugins.hydra_optuna_sweeper._impl.create_nsgaiii_sampler"
+    seed: Optional[int] = None
+
+    population_size: int = 50
+    mutation_prob: Optional[float] = None
+    crossover: Optional[Any] = None
+    crossover_prob: float = 0.9
+    swapping_prob: float = 0.5
+    constraints_func: Optional[Any] = None
+    reference_points: Optional[List[List[float]]] = None
+    dividing_parameter: int = 3
+
+
+@dataclass
 class MOTPESamplerConfig(SamplerConfig):
     _target_: str = "hydra_plugins.hydra_optuna_sweeper.config.raise_motpe_removed"
 
@@ -223,6 +242,13 @@ ConfigStore.instance().store(
     group="hydra/sweeper/sampler",
     name="nsgaii",
     node=NSGAIISamplerConfig,
+    provider="optuna_sweeper",
+)
+
+ConfigStore.instance().store(
+    group="hydra/sweeper/sampler",
+    name="nsgaiii",
+    node=NSGAIIISamplerConfig,
     provider="optuna_sweeper",
 )
 

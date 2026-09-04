@@ -105,6 +105,21 @@ def test_unknown_keyword_in_defaults_list() -> None:
         repo.load_config(config_path="unknown_keyword")
 
 
+@mark.parametrize(
+    "config_path", ["conflicting_keywords", "conflicting_keywords_reversed"]
+)
+def test_conflicting_keywords_in_defaults_list(config_path: str) -> None:
+    repo = create_repo()
+    with raises(
+        ValueError,
+        match=re.escape(
+            f"In {config_path}: 'optional' and 'override' keywords "
+            "cannot be combined in defaults list"
+        ),
+    ):
+        repo.load_config(config_path=config_path)
+
+
 @mark.parametrize("config_name", ["empty_group", "whitespace_group"])
 def test_missing_group_name_in_defaults_list(config_name: str) -> None:
     repo = create_repo()

@@ -298,6 +298,11 @@ class ConfigRepository(IConfigRepository):
                 keywords.optional = True
             elif keyword == "override":
                 keywords.override = True
+        if keywords.optional and keywords.override:
+            raise ValueError(
+                f"In {config_path}: 'optional' and 'override' keywords "
+                "cannot be combined in defaults list"
+            )
         keywords.group = group
 
 

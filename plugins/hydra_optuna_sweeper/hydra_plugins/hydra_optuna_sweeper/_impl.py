@@ -13,6 +13,7 @@ from typing import (
     Tuple,
 )
 
+import numpy
 import optuna
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.override_parser.types import (
@@ -39,6 +40,15 @@ from optuna.trial import Trial
 from .config import Direction
 
 log = logging.getLogger(__name__)
+
+
+def create_nsgaiii_sampler(
+    reference_points: Optional[List[List[float]]] = None,
+    **kwargs: Any,
+) -> optuna.samplers.NSGAIIISampler:
+    if (points := reference_points) is not None:
+        kwargs["reference_points"] = numpy.asarray(points, dtype=float)
+    return optuna.samplers.NSGAIIISampler(**kwargs)
 
 
 def create_optuna_distribution_from_override(override: Override) -> Any:
