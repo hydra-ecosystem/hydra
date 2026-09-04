@@ -12,9 +12,6 @@ runs:
       path: |-
         ~/miniconda3
         ~/Library/Caches/Homebrew
-  - uses: maxim-lobanov/setup-xcode@v1.6.0
-    with:
-      xcode-version: latest-stable
   - name: Preparing environment - Conda
     run: |-
       if [[ -f ~/miniconda3/LICENSE.txt ]] ; then
