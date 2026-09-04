@@ -775,3 +775,4 @@
 {"ts": "2026-09-04T13:36:55Z", "kind": "pr", "issue": 802, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/802", "title": "Improve Hydra test coverage to 100%", "detail": "unlinked #3377"}
 {"ts": "2026-09-04T13:36:55Z", "kind": "pr", "issue": 1749, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1749", "title": "tests: Use multiline regex search instead of assert_regex_match", "detail": "unlinked #3327"}
 {"ts": "2026-09-04T13:36:55Z", "kind": "pr", "issue": 2237, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2237", "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value", "detail": "unlinked #3333"}
+{"ts": "2026-09-04T15:09:16Z", "kind": "closed", "issue": 3419, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3419", "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun"}

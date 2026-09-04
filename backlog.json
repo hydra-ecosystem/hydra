@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T14:59:44Z",
+  "generated_at": "2026-09-04T15:09:16Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 91,
+    "open_total": 90,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 9.9
+        "percentage": 10.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 68,
-        "percentage": 74.7
+        "count": 67,
+        "percentage": 74.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.6
+        "percentage": 6.7
       },
       {
         "category": "Question",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 90
+        "count": 89
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 33
+        "count": 34
       }
     ]
   },
@@ -1484,19 +1484,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3408"
     },
     {
-      "number": 3419,
-      "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-28",
-      "updated": "2026-08-28",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
-    },
-    {
       "number": 3427,
       "title": "HydraConfig is unavailable during multirun controller initialization",
       "category": "Bug",
@@ -2031,9 +2018,29 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
+    },
+    {
+      "number": 3419,
+      "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-28",
+      "updated": "2026-08-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T15:09:16Z",
+      "kind": "closed",
+      "issue": 3419,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3419",
+      "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun"
+    },
     {
       "ts": "2026-09-04T13:36:55Z",
       "kind": "pr",
@@ -3629,13 +3636,6 @@
       "issue": 2194,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2194",
       "title": "Support for warning handling"
-    },
-    {
-      "ts": "2026-07-28T14:00:39Z",
-      "kind": "new",
-      "issue": 3324,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3324",
-      "title": "Align bundled plugin dependencies with Hydra release lines"
     }
   ]
 }

@@ -31,10 +31,11 @@
     "3405": "2026-09-04",
     "3410": "2026-08-31",
     "3411": "2026-08-26",
+    "3419": "2026-09-04",
     "3425": "2026-09-02",
     "3426": "2026-09-02"
   },
-  "generated_at": "2026-09-04T14:59:44Z",
+  "generated_at": "2026-09-04T15:09:16Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -1020,16 +1021,6 @@
       "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates",
       "updated_at": "2026-08-24T10:56:10Z"
     },
-    "3419": {
-      "category": "Enhancement",
-      "created_at": "2026-08-28T13:49:50Z",
-      "labels": [],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun",
-      "updated_at": "2026-08-28T14:11:22Z"
-    },
     "3427": {
       "category": "Bug",
       "created_at": "2026-08-31T15:08:33Z",
@@ -1583,6 +1574,16 @@
       "status": "done",
       "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
       "updated_at": "2026-08-24T18:13:40Z"
+    },
+    "3419": {
+      "category": "Enhancement",
+      "created_at": "2026-08-28T13:49:50Z",
+      "labels": [],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun",
+      "updated_at": "2026-08-28T14:11:22Z"
     },
     "3425": {
       "category": "Enhancement",
