@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T16:32:37Z",
+  "generated_at": "2026-09-04T16:48:24Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 88,
+    "open_total": 87,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 9.1
+        "percentage": 9.2
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 66,
-        "percentage": 75.0
+        "percentage": 75.9
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.8
+        "percentage": 6.9
       },
       {
         "category": "Question",
         "emoji": "❓",
-        "count": 2,
-        "percentage": 2.3
+        "count": 1,
+        "percentage": 1.1
       },
       {
         "category": "Refactor",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 87
+        "count": 86
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 36
+        "count": 37
       }
     ]
   },
@@ -736,21 +736,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2944"
-    },
-    {
-      "number": 2972,
-      "title": "How to get the application config file path inside application code?",
-      "category": "Question",
-      "category_emoji": "❓",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-10-16",
-      "updated": "2026-07-15",
-      "labels": [
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2972"
     },
     {
       "number": 2977,
@@ -1799,6 +1784,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2943"
     },
     {
+      "number": 2949,
+      "title": "[Feature Request] Use @hydra.main() decorator for multiple python scripts from one bash script",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-09-10",
+      "updated": "2026-07-15",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2949"
+    },
+    {
       "number": 3369,
       "title": "Remove redundant setup-xcode step from macOS CI",
       "category": "Refactor",
@@ -2016,23 +2017,29 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
     },
     {
-      "number": 2949,
-      "title": "[Feature Request] Use @hydra.main() decorator for multiple python scripts from one bash script",
-      "category": "Enhancement",
-      "category_emoji": "✨",
+      "number": 2972,
+      "title": "How to get the application config file path inside application code?",
+      "category": "Question",
+      "category_emoji": "❓",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2024-09-10",
+      "created": "2024-10-16",
       "updated": "2026-07-15",
       "labels": [
-        "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2949"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2972"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T16:48:24Z",
+      "kind": "closed",
+      "issue": 2972,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2972",
+      "title": "How to get the application config file path inside application code?"
+    },
     {
       "ts": "2026-09-04T16:32:37Z",
       "kind": "closed",
@@ -3629,13 +3636,6 @@
       "issue": 2249,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2249",
       "title": "[Question/Feature Request] prevent logging of secrets"
-    },
-    {
-      "ts": "2026-07-28T17:03:01Z",
-      "kind": "closed",
-      "issue": 2252,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2252",
-      "title": "[Feature Request] Support having '\"' in dict keys in command line override"
     }
   ]
 }
