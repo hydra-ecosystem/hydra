@@ -1,45 +1,45 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T16:48:24Z",
+  "generated_at": "2026-09-04T17:29:11Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 87,
+    "open_total": 86,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 8,
-        "percentage": 9.2
+        "percentage": 9.3
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 66,
-        "percentage": 75.9
+        "count": 65,
+        "percentage": 75.6
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.9
+        "percentage": 7.0
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 1.1
+        "percentage": 1.2
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 3,
-        "percentage": 3.4
+        "percentage": 3.5
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 3.4
+        "percentage": 3.5
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 86
+        "count": 85
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 37
+        "count": 38
       }
     ]
   },
@@ -738,22 +738,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2944"
     },
     {
-      "number": 2977,
-      "title": "[Feature Request] Add a generation strategy config to ax-sweeper plugin",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-10-29",
-      "updated": "2026-07-15",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2977"
-    },
-    {
       "number": 2981,
       "title": "[Feature Request] Allow partial instantiation with factories",
       "category": "Enhancement",
@@ -986,7 +970,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2026-05-15",
-      "updated": "2026-05-17",
+      "updated": "2026-09-04",
       "labels": [
         "help wanted",
         "plugin",
@@ -1800,6 +1784,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2949"
     },
     {
+      "number": 2972,
+      "title": "How to get the application config file path inside application code?",
+      "category": "Question",
+      "category_emoji": "❓",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-10-16",
+      "updated": "2026-07-15",
+      "labels": [
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2972"
+    },
+    {
       "number": 3369,
       "title": "Remove redundant setup-xcode step from macOS CI",
       "category": "Refactor",
@@ -2017,22 +2016,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
     },
     {
-      "number": 2972,
-      "title": "How to get the application config file path inside application code?",
-      "category": "Question",
-      "category_emoji": "❓",
+      "number": 2977,
+      "title": "[Feature Request] Add a generation strategy config to ax-sweeper plugin",
+      "category": "Enhancement",
+      "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2024-10-16",
+      "created": "2024-10-29",
       "updated": "2026-07-15",
       "labels": [
+        "enhancement",
         "triage"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2972"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2977"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T17:29:11Z",
+      "kind": "closed",
+      "issue": 2977,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2977",
+      "title": "[Feature Request] Add a generation strategy config to ax-sweeper plugin"
+    },
     {
       "ts": "2026-09-04T16:48:24Z",
       "kind": "closed",
@@ -3629,13 +3636,6 @@
       "issue": 2254,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2254",
       "title": "[Feature Request] Add resolve config under `.hydra/config_resolve.yaml` by default."
-    },
-    {
-      "ts": "2026-07-28T17:16:11Z",
-      "kind": "closed",
-      "issue": 2249,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2249",
-      "title": "[Question/Feature Request] prevent logging of secrets"
     }
   ]
 }

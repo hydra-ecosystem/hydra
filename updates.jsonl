@@ -780,3 +780,4 @@
 {"ts": "2026-09-04T16:26:41Z", "kind": "closed", "issue": 2757, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2757", "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs"}
 {"ts": "2026-09-04T16:32:37Z", "kind": "closed", "issue": 2949, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2949", "title": "[Feature Request] Use @hydra.main() decorator for multiple python scripts from one bash script"}
 {"ts": "2026-09-04T16:48:24Z", "kind": "closed", "issue": 2972, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2972", "title": "How to get the application config file path inside application code?"}
+{"ts": "2026-09-04T17:29:11Z", "kind": "closed", "issue": 2977, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2977", "title": "[Feature Request] Add a generation strategy config to ax-sweeper plugin"}
