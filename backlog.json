@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T13:36:55Z",
+  "generated_at": "2026-09-04T13:49:40Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 91,
@@ -186,6 +186,24 @@
         "exploratory"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/753"
+    },
+    {
+      "number": 802,
+      "title": "Improve Hydra test coverage to 100%",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2020-07-21",
+      "updated": "2026-07-21",
+      "labels": [
+        "help wanted",
+        "maintenance",
+        "tests",
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/802"
     },
     {
       "number": 845,
@@ -398,6 +416,23 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1622"
     },
     {
+      "number": 1749,
+      "title": "tests: Use multiline regex search instead of assert_regex_match",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2021-08-02",
+      "updated": "2026-07-19",
+      "labels": [
+        "maintenance",
+        "tests",
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1749"
+    },
+    {
       "number": 1869,
       "title": "Add more examples to the submitit plugin",
       "category": "Enhancement",
@@ -488,6 +523,24 @@
         "blocked"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2227"
+    },
+    {
+      "number": 2237,
+      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2022-05-26",
+      "updated": "2026-07-15",
+      "labels": [
+        "bug",
+        "plugin",
+        "optuna",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2237"
     },
     {
       "number": 2412,
@@ -1460,59 +1513,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
     },
     {
-      "number": 802,
-      "title": "Improve Hydra test coverage to 100%",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2020-07-21",
-      "updated": "2026-07-21",
-      "labels": [
-        "help wanted",
-        "maintenance",
-        "tests",
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/802"
-    },
-    {
-      "number": 1749,
-      "title": "tests: Use multiline regex search instead of assert_regex_match",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2021-08-02",
-      "updated": "2026-07-19",
-      "labels": [
-        "maintenance",
-        "tests",
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1749"
-    },
-    {
-      "number": 2237,
-      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2022-05-26",
-      "updated": "2026-07-15",
-      "labels": [
-        "bug",
-        "plugin",
-        "optuna",
-        "sweep"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2237"
-    },
-    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -1829,6 +1829,24 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2943"
     },
     {
+      "number": 3369,
+      "title": "Remove redundant setup-xcode step from macOS CI",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3434,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3434"
+        }
+      ],
+      "created": "2026-08-11",
+      "updated": "2026-09-04",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3369"
+    },
+    {
       "number": 3385,
       "title": "Backlog Atlas canary: trusted prompt update",
       "category": "Enhancement",
@@ -2013,24 +2031,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
-    },
-    {
-      "number": 3369,
-      "title": "Remove redundant setup-xcode step from macOS CI",
-      "category": "Refactor",
-      "category_emoji": "🔧",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3434,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3434"
-        }
-      ],
-      "created": "2026-08-11",
-      "updated": "2026-09-04",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3369"
     }
   ],
   "updates": [
