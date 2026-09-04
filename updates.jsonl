@@ -762,3 +762,5 @@
 {"ts": "2026-09-02T18:50:10Z", "kind": "status", "issue": 3426, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426", "title": "Support `NSGAIIISampler` on Optuna Sweeper", "detail": "community PR → not started"}
 {"ts": "2026-09-02T18:50:10Z", "kind": "pr", "issue": 3426, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426", "title": "Support `NSGAIIISampler` on Optuna Sweeper", "detail": "unlinked #3432"}
 {"ts": "2026-09-02T22:16:57Z", "kind": "closed", "issue": 3426, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426", "title": "Support `NSGAIIISampler` on Optuna Sweeper"}
+{"ts": "2026-09-04T07:14:45Z", "kind": "status", "issue": 3364, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364", "title": "Make Compose API initialization contexts nestable and self-contained", "detail": "community PR → not started"}
+{"ts": "2026-09-04T07:14:45Z", "kind": "pr", "issue": 3364, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364", "title": "Make Compose API initialization contexts nestable and self-contained", "detail": "unlinked #3399"}

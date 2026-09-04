@@ -1,6 +1,6 @@
 {
-  "generated_on": "2026-09-03",
-  "generated_at": "2026-09-03T07:15:42Z",
+  "generated_on": "2026-09-04",
+  "generated_at": "2026-09-04T07:14:45Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 93,
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 7
+        "count": 6
       },
       {
         "status": "blocked",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 86
+        "count": 87
       },
       {
         "status": "done",
@@ -138,24 +138,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2237"
-    },
-    {
-      "number": 3364,
-      "title": "Make Compose API initialization contexts nestable and self-contained",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3399,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3399"
-        }
-      ],
-      "created": "2026-08-09",
-      "updated": "2026-08-09",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3364"
     },
     {
       "number": 3369,
@@ -1572,6 +1554,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
     },
     {
+      "number": 3364,
+      "title": "Make Compose API initialization contexts nestable and self-contained",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-09",
+      "updated": "2026-09-03",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3364"
+    },
+    {
       "number": 2762,
       "title": "New Release Version?",
       "category": "Enhancement",
@@ -2054,6 +2049,22 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T07:14:45Z",
+      "kind": "pr",
+      "issue": 3364,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364",
+      "title": "Make Compose API initialization contexts nestable and self-contained",
+      "detail": "unlinked #3399"
+    },
+    {
+      "ts": "2026-09-04T07:14:45Z",
+      "kind": "status",
+      "issue": 3364,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364",
+      "title": "Make Compose API initialization contexts nestable and self-contained",
+      "detail": "community PR → not started"
+    },
     {
       "ts": "2026-09-02T22:16:57Z",
       "kind": "closed",
@@ -3634,20 +3645,6 @@
       "issue": 1982,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1982",
       "title": "[Feature Request] ConfigStore.store to act as decorator"
-    },
-    {
-      "ts": "2026-07-27T14:41:19Z",
-      "kind": "closed",
-      "issue": 1923,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1923",
-      "title": "[Feature Request] Document how configs typing validation works"
-    },
-    {
-      "ts": "2026-07-27T13:36:20Z",
-      "kind": "closed",
-      "issue": 1918,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1918",
-      "title": "sweep parameters in a paired manner"
     }
   ]
 }
