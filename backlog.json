@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T07:14:45Z",
+  "generated_at": "2026-09-04T09:30:35Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 93,
+    "open_total": 92,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 10,
-        "percentage": 10.8
+        "count": 9,
+        "percentage": 9.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 68,
-        "percentage": 73.1
+        "percentage": 73.9
       },
       {
         "category": "Documentation",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 3.2
+        "percentage": 3.3
       }
     ],
     "by_status": [
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 6
+        "count": 5
       },
       {
         "status": "blocked",
@@ -66,7 +66,7 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 31
+        "count": 32
       }
     ]
   },
@@ -174,27 +174,6 @@
       "updated": "2026-08-11",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3375"
-    },
-    {
-      "number": 3405,
-      "title": "Reject optional and override on the same Defaults List entry",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3414,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3414"
-        }
-      ],
-      "created": "2026-08-23",
-      "updated": "2026-08-23",
-      "labels": [
-        "bug",
-        "defaults list"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
     },
     {
       "number": 385,
@@ -1409,6 +1388,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3361"
     },
     {
+      "number": 3364,
+      "title": "Make Compose API initialization contexts nestable and self-contained",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-08-09",
+      "updated": "2026-09-03",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3364"
+    },
+    {
       "number": 3371,
       "title": "Set up CLA, GA4, and privacy policy",
       "category": "Enhancement",
@@ -1552,19 +1544,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
-    },
-    {
-      "number": 3364,
-      "title": "Make Compose API initialization contexts nestable and self-contained",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-09",
-      "updated": "2026-09-03",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3364"
     },
     {
       "number": 2762,
@@ -2046,9 +2025,37 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
+    },
+    {
+      "number": 3405,
+      "title": "Reject optional and override on the same Defaults List entry",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3414,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3414"
+        }
+      ],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "bug",
+        "defaults list"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T09:30:35Z",
+      "kind": "closed",
+      "issue": 3405,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3405",
+      "title": "Reject optional and override on the same Defaults List entry"
+    },
     {
       "ts": "2026-09-04T07:14:45Z",
       "kind": "pr",
@@ -3638,13 +3645,6 @@
       "issue": 1983,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/1983",
       "title": "[Feature Request] Copying a config field between different branches in one config"
-    },
-    {
-      "ts": "2026-07-27T15:02:22Z",
-      "kind": "closed",
-      "issue": 1982,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1982",
-      "title": "[Feature Request] ConfigStore.store to act as decorator"
     }
   ]
 }
