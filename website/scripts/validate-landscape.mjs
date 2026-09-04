@@ -21,6 +21,7 @@ const projectFields = [
   'featureCandidate',
   'reviewedAt',
 ].sort();
+const optionalProjectFields = new Set(['homepage']);
 const kinds = new Set([
   'application',
   'framework',
@@ -44,7 +45,9 @@ assert.ok(landscape.projects.length > 0);
 
 for (const project of landscape.projects) {
   assert.deepEqual(
-    Object.keys(project).sort(),
+    Object.keys(project)
+      .filter((field) => !optionalProjectFields.has(field))
+      .sort(),
     projectFields,
     `${project.repository ?? 'unknown project'} has unexpected fields`,
   );
@@ -57,6 +60,17 @@ for (const project of landscape.projects) {
   assert.ok(project.url.startsWith('https://'));
   assert.ok(!urls.has(project.url), `${project.url} is duplicated`);
   urls.add(project.url);
+  if ('homepage' in project) {
+    assert.ok(
+      project.homepage.startsWith('https://'),
+      `${project.repository} has a non-HTTPS homepage`,
+    );
+    assert.notEqual(
+      project.homepage,
+      project.url,
+      `${project.repository} repeats its repository URL as a homepage`,
+    );
+  }
   assert.ok(project.description.trim());
   assert.ok(kinds.has(project.kind), `${project.repository} has an invalid kind`);
   assert.ok(project.type.trim(), `${project.repository} has no project type`);

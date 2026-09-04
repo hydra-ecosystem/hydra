@@ -51,8 +51,11 @@ the decision ledger.
    ```
 
 5. Record maintainer decisions in `data/decisions.json`. Every included
-   decision must contain its complete public `listing`. Regenerate the public
-   data directly when needed:
+   decision must contain its complete public `listing`. A listing may also
+   carry an optional `homepage`, which must use HTTPS and must differ from
+   `listing.url`; the review queue reports each repository's homepage from
+   GitHub metadata so it can be copied in. Regenerate the public data directly
+   when needed:
 
    ```bash
    .venv/bin/python tools/landscape/build_public_landscape.py

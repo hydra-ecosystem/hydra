@@ -214,6 +214,7 @@ def test_maintenance_summary_exposes_repository_activity() -> None:
             "status": "ok",
             "fetched_at": "2026-07-31T00:00:00Z",
             "url": "https://github.com/example/project",
+            "homepage": "https://example.com",
             "pushed_at": "2026-07-23T09:20:37Z",
             "updated_at": "2026-07-02T00:00:00Z",
             "stars": 100,
@@ -238,6 +239,30 @@ def test_maintenance_summary_exposes_repository_activity() -> None:
     assert result["days_since_release"] == 7
     assert result["stars"] == 100
     assert not result["archived"]
+    assert result["homepage"] == "https://example.com"
+    assert "homepage: https://example.com" in review.maintenance_markdown(result)
+
+
+def test_maintenance_markdown_reports_a_missing_homepage() -> None:
+    result = review.maintenance_summary(
+        {"maintenance": "active", "evidence": []},
+        {
+            "status": "ok",
+            "fetched_at": "2026-07-31T00:00:00Z",
+            "url": "https://github.com/example/project",
+            "homepage": None,
+            "pushed_at": None,
+            "updated_at": None,
+            "stars": None,
+            "archived": False,
+            "fork": False,
+            "parent": None,
+            "default_branch": {},
+            "latest_release": None,
+        },
+    )
+    assert result["homepage"] is None
+    assert "homepage: none" in review.maintenance_markdown(result)
 
 
 def test_adapted_usage_requires_lineage_review() -> None:

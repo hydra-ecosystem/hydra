@@ -40,6 +40,7 @@ LISTING_FIELDS = {
     "type",
     "url",
 }
+OPTIONAL_LISTING_FIELDS = {"homepage"}
 REPOSITORY_RE = re.compile(r"^[\w.-]+/[\w.-]+$")
 TAG_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -103,8 +104,13 @@ def build_project(decision: dict[str, Any]) -> dict[str, Any]:
     listing = decision.get("listing")
     if not isinstance(listing, dict):
         raise ValueError(f"{repo}: included decisions must contain a listing")
-    if set(listing) != LISTING_FIELDS:
-        raise ValueError(f"{repo}: listing fields must be {sorted(LISTING_FIELDS)!r}")
+    unknown = set(listing) - LISTING_FIELDS - OPTIONAL_LISTING_FIELDS
+    missing = LISTING_FIELDS - set(listing)
+    if unknown or missing:
+        raise ValueError(
+            f"{repo}: listing fields must be {sorted(LISTING_FIELDS)!r} "
+            f"with optional {sorted(OPTIONAL_LISTING_FIELDS)!r}"
+        )
 
     kind = require_string(listing.get("kind"), field="listing.kind", repo=repo)
     if kind not in ALLOWED_KINDS:
@@ -126,10 +132,21 @@ def build_project(decision: dict[str, Any]) -> dict[str, Any]:
     if not url.startswith("https://"):
         raise ValueError(f"{repo}: listing.url must use HTTPS")
 
+    homepage = None
+    if "homepage" in listing:
+        homepage = require_string(
+            listing.get("homepage"), field="listing.homepage", repo=repo
+        )
+        if not homepage.startswith("https://"):
+            raise ValueError(f"{repo}: listing.homepage must use HTTPS")
+        if homepage == url:
+            raise ValueError(f"{repo}: listing.homepage must differ from listing.url")
+
     return {
         "repository": repo,
         "name": require_string(listing.get("name"), field="listing.name", repo=repo),
         "url": url,
+        **({"homepage": homepage} if homepage is not None else {}),
         "description": require_string(
             listing.get("description"), field="listing.description", repo=repo
         ),

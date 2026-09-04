@@ -7,6 +7,20 @@ import build_public_landscape as landscape
 import pytest
 
 
+def included_listing(**overrides: object) -> dict[str, object]:
+    listing: dict[str, object] = {
+        "name": "Example",
+        "url": "https://github.com/example/project",
+        "description": "An example Hydra application.",
+        "kind": "application",
+        "type": "Application",
+        "tags": ["robotics", "simulation"],
+        "relationships": ["integrates"],
+    }
+    listing.update(overrides)
+    return listing
+
+
 def included_decision(**overrides: object) -> dict[str, object]:
     decision: dict[str, object] = {
         "repo": "example/project",
@@ -14,15 +28,7 @@ def included_decision(**overrides: object) -> dict[str, object]:
         "group": "good_hydra_usage",
         "feature_candidate": True,
         "decided_at": "2026-08-10",
-        "listing": {
-            "name": "Example",
-            "url": "https://github.com/example/project",
-            "description": "An example Hydra application.",
-            "kind": "application",
-            "type": "Application",
-            "tags": ["robotics", "simulation"],
-            "relationships": ["integrates"],
-        },
+        "listing": included_listing(),
     }
     decision.update(overrides)
     return decision
@@ -42,6 +48,59 @@ def test_build_project_maps_canonical_decision_fields() -> None:
         "featureCandidate": True,
         "reviewedAt": "2026-08-10",
     }
+
+
+def test_build_project_keeps_an_optional_homepage() -> None:
+    project = landscape.build_project(
+        included_decision(listing=included_listing(homepage="https://example.com"))
+    )
+
+    assert project["homepage"] == "https://example.com"
+    assert project["url"] == "https://github.com/example/project"
+
+
+def test_build_project_omits_the_homepage_key_when_absent() -> None:
+    assert "homepage" not in landscape.build_project(included_decision())
+
+
+def test_homepage_must_use_https() -> None:
+    decision = included_decision(
+        listing=included_listing(homepage="http://example.com")
+    )
+
+    with pytest.raises(ValueError, match="listing.homepage must use HTTPS"):
+        landscape.build_project(decision)
+
+
+def test_homepage_must_not_repeat_the_repository_url() -> None:
+    decision = included_decision(
+        listing=included_listing(homepage="https://github.com/example/project")
+    )
+
+    with pytest.raises(ValueError, match="must differ from listing.url"):
+        landscape.build_project(decision)
+
+
+def test_homepage_must_be_a_non_empty_string() -> None:
+    decision = included_decision(listing=included_listing(homepage="   "))
+
+    with pytest.raises(ValueError, match="listing.homepage must be a non-empty string"):
+        landscape.build_project(decision)
+
+
+def test_unknown_listing_fields_are_still_rejected() -> None:
+    decision = included_decision(listing=included_listing(unexpected="value"))
+
+    with pytest.raises(ValueError, match="listing fields must be"):
+        landscape.build_project(decision)
+
+
+def test_missing_required_listing_fields_are_still_rejected() -> None:
+    listing = included_listing()
+    del listing["url"]
+
+    with pytest.raises(ValueError, match="listing fields must be"):
+        landscape.build_project(included_decision(listing=listing))
 
 
 def test_build_payload_omits_excluded_decisions() -> None:
