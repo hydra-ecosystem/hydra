@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T18:33:00Z",
+  "generated_at": "2026-09-04T18:47:46Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 87,
@@ -1446,7 +1446,8 @@
       "created": "2026-09-04",
       "updated": "2026-09-04",
       "labels": [
-        "bug"
+        "bug",
+        "difficult"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
     },
@@ -2048,6 +2049,14 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T18:47:46Z",
+      "kind": "label",
+      "issue": 3436,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3436",
+      "title": "`instantiate()` loses merged ancestor values when copying a context-parented subtree",
+      "detail": "added \"difficult\""
+    },
     {
       "ts": "2026-09-04T18:33:00Z",
       "kind": "new",
@@ -3644,13 +3653,6 @@
       "issue": 2265,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2265",
       "title": "[Feature Request] Better document structured config schema example with attrs"
-    },
-    {
-      "ts": "2026-07-28T17:29:39Z",
-      "kind": "closed",
-      "issue": 2263,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2263",
-      "title": "[Feature Request] Non-strict instantiation"
     }
   ]
 }
