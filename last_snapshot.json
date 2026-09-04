@@ -1,5 +1,6 @@
 {
   "closed_at": {
+    "2757": "2026-09-04",
     "2762": "2026-08-23",
     "2765": "2026-08-23",
     "2767": "2026-08-23",
@@ -35,7 +36,7 @@
     "3425": "2026-09-02",
     "3426": "2026-09-02"
   },
-  "generated_at": "2026-09-04T15:22:40Z",
+  "generated_at": "2026-09-04T16:26:41Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -283,19 +284,6 @@
       "status": "not started",
       "title": "[Not sure if bug/feature] Where does submitit error output go?",
       "updated_at": "2026-06-10T04:04:27Z"
-    },
-    "2757": {
-      "category": "Bug",
-      "created_at": "2023-09-26T11:52:03Z",
-      "labels": [
-        "awaiting_response",
-        "bug"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs",
-      "updated_at": "2026-09-02T02:27:16Z"
     },
     "2758": {
       "category": "Documentation",
@@ -1193,6 +1181,19 @@
     }
   },
   "recent_done": {
+    "2757": {
+      "category": "Bug",
+      "created_at": "2023-09-26T11:52:03Z",
+      "labels": [
+        "awaiting_response",
+        "bug"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs",
+      "updated_at": "2026-09-02T02:27:16Z"
+    },
     "2762": {
       "category": "Enhancement",
       "created_at": "2023-10-06T21:56:43Z",

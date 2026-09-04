@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T15:22:40Z",
+  "generated_at": "2026-09-04T16:26:41Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 90,
+    "open_total": 89,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 9,
-        "percentage": 10.0
+        "count": 8,
+        "percentage": 9.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 67,
-        "percentage": 74.4
+        "percentage": 75.3
       },
       {
         "category": "Documentation",
@@ -33,13 +33,13 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 3,
-        "percentage": 3.3
+        "percentage": 3.4
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 3.3
+        "percentage": 3.4
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 89
+        "count": 88
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 34
+        "count": 35
       }
     ]
   },
@@ -586,22 +586,6 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2664"
-    },
-    {
-      "number": 2757,
-      "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-09-26",
-      "updated": "2026-09-02",
-      "labels": [
-        "bug",
-        "awaiting_response"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2757"
     },
     {
       "number": 2758,
@@ -2030,9 +2014,32 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
+    },
+    {
+      "number": 2757,
+      "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2023-09-26",
+      "updated": "2026-09-02",
+      "labels": [
+        "awaiting_response",
+        "bug"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2757"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T16:26:41Z",
+      "kind": "closed",
+      "issue": 2757,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2757",
+      "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs"
+    },
     {
       "ts": "2026-09-04T15:22:40Z",
       "kind": "label",
@@ -3629,13 +3636,6 @@
       "issue": 2226,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2226",
       "title": "No hydra interpolation is possible in Jupyter"
-    },
-    {
-      "ts": "2026-07-28T16:40:39Z",
-      "kind": "closed",
-      "issue": 2196,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2196",
-      "title": "CI: Testing Hydra against OmegaConf's master branch"
     }
   ]
 }
