@@ -783,3 +783,4 @@
 {"ts": "2026-09-04T17:29:11Z", "kind": "closed", "issue": 2977, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2977", "title": "[Feature Request] Add a generation strategy config to ax-sweeper plugin"}
 {"ts": "2026-09-04T18:33:00Z", "kind": "new", "issue": 3436, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3436", "title": "`instantiate()` loses merged ancestor values when copying a context-parented subtree"}
 {"ts": "2026-09-04T18:47:46Z", "kind": "label", "issue": 3436, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3436", "title": "`instantiate()` loses merged ancestor values when copying a context-parented subtree", "detail": "added \"difficult\""}
+{"ts": "2026-09-04T18:49:26Z", "kind": "closed", "issue": 2981, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2981", "title": "[Feature Request] Allow partial instantiation with factories"}

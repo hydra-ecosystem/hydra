@@ -1,45 +1,45 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T18:47:46Z",
+  "generated_at": "2026-09-04T18:49:26Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 87,
+    "open_total": 86,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 9,
-        "percentage": 10.3
+        "percentage": 10.5
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 65,
-        "percentage": 74.7
+        "count": 64,
+        "percentage": 74.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 6.9
+        "percentage": 7.0
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 1.1
+        "percentage": 1.2
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 3,
-        "percentage": 3.4
+        "percentage": 3.5
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 3.4
+        "percentage": 3.5
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 86
+        "count": 85
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 38
+        "count": 39
       }
     ]
   },
@@ -736,22 +736,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2944"
-    },
-    {
-      "number": 2981,
-      "title": "[Feature Request] Allow partial instantiation with factories",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2024-11-13",
-      "updated": "2026-09-04",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2981"
     },
     {
       "number": 2991,
@@ -2046,9 +2030,32 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
+    },
+    {
+      "number": 2981,
+      "title": "[Feature Request] Allow partial instantiation with factories",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-11-13",
+      "updated": "2026-09-04",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2981"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T18:49:26Z",
+      "kind": "closed",
+      "issue": 2981,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2981",
+      "title": "[Feature Request] Allow partial instantiation with factories"
+    },
     {
       "ts": "2026-09-04T18:47:46Z",
       "kind": "label",
@@ -3646,13 +3653,6 @@
       "issue": 2267,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2267",
       "title": "[Feature Request] allow repeating elements in list"
-    },
-    {
-      "ts": "2026-07-28T18:18:08Z",
-      "kind": "closed",
-      "issue": 2265,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2265",
-      "title": "[Feature Request] Better document structured config schema example with attrs"
     }
   ]
 }
