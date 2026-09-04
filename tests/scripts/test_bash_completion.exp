@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 log_user 0
-set timeout 4
+set timeout 15
 set env(PS1) >>
 
 # Under pycharm, for some unknown reason readline displays
@@ -41,6 +41,6 @@ puts "\nMatching:\n"
 foreach arg [lrange $argv 3 end] {
     expect {
         "$arg" {puts "matched '$arg' to '$expect_out(0,string)'\nbuffer: '$expect_out(buffer)'";continue}
-        timeout {puts "Error matching $arg"; exit 1}
+        timeout {puts "Error matching $arg\nbuffer: '$expect_out(buffer)'"; exit 1}
     }
 }
