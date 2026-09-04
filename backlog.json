@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T15:09:16Z",
+  "generated_at": "2026-09-04T15:22:40Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 90,
@@ -747,10 +747,9 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2024-09-03",
-      "updated": "2026-07-15",
+      "updated": "2026-09-04",
       "labels": [
-        "enhancement",
-        "triage"
+        "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2944"
     },
@@ -1983,6 +1982,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3411"
     },
     {
+      "number": 3419,
+      "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-28",
+      "updated": "2026-08-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
+    },
+    {
       "number": 3425,
       "title": "Align Optuna sampler structured configs with Optuna 4.9",
       "category": "Enhancement",
@@ -2018,22 +2030,17 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
-    },
-    {
-      "number": 3419,
-      "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-08-28",
-      "updated": "2026-08-28",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3419"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-04T15:22:40Z",
+      "kind": "label",
+      "issue": 2944,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2944",
+      "title": "[Feature Request] I would like resolvers to access the decorated main function's docstring and the name of the running script, as well as some other capabilities.",
+      "detail": "removed \"triage\""
+    },
     {
       "ts": "2026-09-04T15:09:16Z",
       "kind": "closed",
@@ -3629,13 +3636,6 @@
       "issue": 2196,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2196",
       "title": "CI: Testing Hydra against OmegaConf's master branch"
-    },
-    {
-      "ts": "2026-07-28T16:30:48Z",
-      "kind": "closed",
-      "issue": 2194,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2194",
-      "title": "Support for warning handling"
     }
   ]
 }
