@@ -5,12 +5,14 @@ import builtins
 import contextlib
 import copy
 import functools
+import gc
 import inspect
 import operator
 import os
 import pickle
 import re
 import warnings
+import weakref
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from textwrap import dedent
@@ -162,6 +164,10 @@ class NestedConfigMutationProbe:
         self.payload = payload
         with read_write(payload):
             payload.child.value = 20
+
+
+def make_config_mutation_partial(payload: DictConfig) -> partial:
+    return partial(ConfigMutationProbe, payload)
 
 
 @fixture(
@@ -1121,6 +1127,277 @@ def test_no_override_config_read_write_unlocks_nested_nodes(
     assert not OmegaConf.is_readonly(cfg.payload.child)
 
 
+def test_no_override_partial_config_is_readonly_when_invoked(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+            "_partial_": True,
+            "_recursive_": False,
+            "payload": {"value": 10},
+        }
+    )
+    OmegaConf.set_readonly(cfg.payload, False)
+
+    factory = instantiate_func(cfg)
+
+    assert not OmegaConf.is_readonly(cfg.payload)
+    result = factory()
+    assert result.readonly
+    assert result.mutation_blocked
+    assert cfg.payload.value == 10
+    assert cfg.payload._get_node_flag("readonly") is False
+
+
+def test_partial_runtime_override_of_source_config_is_readonly(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+            "_partial_": True,
+            "_recursive_": False,
+            "payload": {"value": 10},
+        }
+    )
+
+    factory = instantiate_func(cfg)
+    result = factory(payload=cfg.payload)
+
+    assert result.readonly
+    assert result.mutation_blocked
+    assert cfg.payload.value == 10
+    assert not OmegaConf.is_readonly(cfg.payload)
+
+
+def test_partial_runtime_override_of_independent_config_remains_writable(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+            "_partial_": True,
+            "_recursive_": False,
+            "payload": {"value": 10},
+        }
+    )
+    independent = OmegaConf.create({"value": 30})
+
+    factory = instantiate_func(cfg)
+    result = factory(payload=independent)
+
+    assert not result.readonly
+    assert not result.mutation_blocked
+    assert independent.value == 20
+    assert cfg.payload.value == 10
+
+
+def test_partial_callable_closure_source_config_is_readonly(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "shared": {"value": 10},
+            "factory": {"_target_": None, "_partial_": True},
+        },
+        flags={"allow_objects": True},
+    )
+
+    def target() -> ConfigMutationProbe:
+        return ConfigMutationProbe(cfg.shared)
+
+    cfg.factory._target_ = target
+    factory = instantiate_func(
+        cfg.factory, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
+    )
+    result = factory()
+
+    assert result.readonly
+    assert result.mutation_blocked
+    assert cfg.shared.value == 10
+    assert not OmegaConf.is_readonly(cfg.shared)
+
+
+@mark.parametrize("copier", [copy.copy, copy.deepcopy], ids=["copy", "deepcopy"])
+def test_copied_partial_callable_closure_source_config_is_readonly(
+    instantiate_func: Any, copier: Callable[[Any], Any]
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "shared": {"value": 10},
+            "factory": {"_target_": None, "_partial_": True},
+        },
+        flags={"allow_objects": True},
+    )
+
+    def target() -> ConfigMutationProbe:
+        return ConfigMutationProbe(cfg.shared)
+
+    cfg.factory._target_ = target
+    factory = instantiate_func(
+        cfg.factory, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
+    )
+    copied_factory = copier(factory)
+    result = copied_factory()
+
+    assert result.readonly
+    assert result.mutation_blocked
+    assert cfg.shared.value == 10
+    assert not OmegaConf.is_readonly(cfg.shared)
+
+
+def test_partial_context_ancestor_remains_guarded_after_merged_entry_expires(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "shared": {"value": 10},
+            "factory": {
+                "base": "???",
+                "node": {"_target_": None, "_partial_": True},
+            },
+        },
+        flags={"allow_objects": True},
+    )
+
+    def target() -> ConfigMutationProbe:
+        return ConfigMutationProbe(cfg.shared)
+
+    cfg.factory.node._target_ = target
+    merged = OmegaConf.merge(cfg.factory, {"base": 20})
+    source_ref = weakref.ref(merged.node)
+    factory = instantiate_func(
+        merged.node, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
+    )
+
+    del merged
+    gc.collect()
+    assert source_ref() is None
+    result = factory()
+
+    assert result.readonly
+    assert result.mutation_blocked
+    assert cfg.shared.value == 10
+    assert not OmegaConf.is_readonly(cfg.shared)
+
+
+def test_no_override_nested_partial_config_is_readonly_when_invoked(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.ArgsClass",
+            "factory": {
+                "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+                "_partial_": True,
+                "_recursive_": False,
+                "payload": {"value": 10},
+            },
+        }
+    )
+
+    result = instantiate_func(cfg)
+    probe = result.kwargs["factory"]()
+
+    assert probe.readonly
+    assert probe.mutation_blocked
+    assert cfg.factory.payload.value == 10
+    assert not OmegaConf.is_readonly(cfg.factory.payload)
+
+
+def test_partial_target_bound_config_is_readonly_when_invoked(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "shared": {"value": 10},
+            "factory": {"_target_": None, "_partial_": True},
+        },
+        flags={"allow_objects": True},
+    )
+    cfg.factory._target_ = partial(ConfigMutationProbe, cfg.shared)
+
+    factory = instantiate_func(
+        cfg.factory,
+        _execution_whitelist_="tests.instantiate.test_instantiate.ConfigMutationProbe",
+    )
+    assert factory.func is ConfigMutationProbe
+    assert factory.args == (cfg.shared,)
+    assert not OmegaConf.is_readonly(cfg.shared)
+
+    result = factory()
+
+    assert result.readonly
+    assert result.mutation_blocked
+    assert cfg.shared.value == 10
+    assert not OmegaConf.is_readonly(cfg.shared)
+
+
+def test_no_override_partial_config_read_write_unlocks_nested_nodes(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.NestedConfigMutationProbe",
+            "_partial_": True,
+            "_recursive_": False,
+            "payload": {"child": {"value": 10}},
+        }
+    )
+
+    factory = instantiate_func(cfg)
+    result = factory()
+
+    assert result.payload is cfg.payload
+    assert cfg.payload.child.value == 20
+    assert not OmegaConf.is_readonly(cfg.payload)
+    assert not OmegaConf.is_readonly(cfg.payload.child)
+
+
+def test_no_override_partial_config_readonly_is_restored_after_failure(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+            "_partial_": True,
+            "_recursive_": False,
+            "payload": {"value": 10},
+            "fail": True,
+        }
+    )
+
+    factory = instantiate_func(cfg)
+    with raises(RuntimeError, match="expected failure"):
+        factory()
+
+    assert cfg.payload.value == 10
+    assert not OmegaConf.is_readonly(cfg.payload)
+
+
+def test_returned_partial_preserves_readonly_guard_when_checks_are_disabled(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.make_config_mutation_partial",
+            "_recursive_": False,
+            "payload": {"value": 10},
+        }
+    )
+
+    factory = instantiate_func(
+        cfg, _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS
+    )
+    result = factory()
+
+    assert result.readonly
+    assert result.mutation_blocked
+    assert cfg.payload.value == 10
+    assert not OmegaConf.is_readonly(cfg.payload)
+
+
 def test_no_override_interpolated_config_is_readonly_during_instantiation(
     instantiate_func: Any,
 ) -> None:
@@ -1199,6 +1476,46 @@ def test_private_config_copy_remains_writable(instantiate_func: Any) -> None:
     )
 
     result = instantiate_func(cfg, _convert_="none")
+
+    assert not result.readonly
+    assert not result.mutation_blocked
+    assert result.payload.value == 20
+    assert cfg.payload.value == 10
+
+
+def test_native_partial_config_remains_writable_when_invoked(
+    instantiate_func: Any,
+) -> None:
+    cfg = {
+        "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+        "_partial_": True,
+        "_recursive_": False,
+        "payload": {"value": 10},
+    }
+
+    factory = instantiate_func(cfg)
+    result = factory()
+
+    assert not result.readonly
+    assert not result.mutation_blocked
+    assert result.payload.value == 20
+    assert cfg["payload"]["value"] == 10
+
+
+def test_private_partial_config_copy_remains_writable_when_invoked(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+            "_partial_": True,
+            "_recursive_": False,
+            "payload": {"value": 10},
+        }
+    )
+
+    factory = instantiate_func(cfg, _convert_="none")
+    result = factory()
 
     assert not result.readonly
     assert not result.mutation_blocked
@@ -4502,26 +4819,47 @@ def test_native_partial_authorizes_callable_result_when_invoked() -> None:
         deferred("eval")
 
 
-def test_native_partial_with_runtime_authorization_is_pickleable() -> None:
+@mark.parametrize(
+    "execution_whitelist",
+    ["builtins.pow", UNSAFE_DISABLE_EXECUTION_CHECKS],
+)
+def test_native_partial_cannot_be_pickled_before_invocation(
+    execution_whitelist: Any,
+) -> None:
     deferred = _instantiate2.instantiate(
-        {"_target_": "builtins.pow", "_partial_": True, "exp": 2},
-        _execution_whitelist_="builtins.pow",
+        OmegaConf.create({"_target_": "builtins.pow", "_partial_": True, "exp": 2}),
+        _execution_whitelist_=execution_whitelist,
     )
-    restored = pickle.loads(pickle.dumps(deferred))  # nosec B301
 
-    assert isinstance(restored, partial)
-    assert restored.func is pow
-    assert restored(3) == 9
+    with raises(
+        TypeError,
+        match="Hydra _partial_ factories cannot be pickled before invocation",
+    ):
+        pickle.dumps(deferred)
 
 
-def test_native_partial_preserves_unsafe_policy_when_pickled() -> None:
-    deferred = _instantiate2.instantiate(
-        {"_target_": "builtins.dict.get", "_partial_": True},
-        _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
+def test_attached_partial_does_not_retain_unrelated_ancestors() -> None:
+    cfg = OmegaConf.create(
+        {
+            "unrelated": {"value": 10},
+            "factory": {
+                "_target_": "builtins.pow",
+                "_partial_": True,
+                "base": 3,
+            },
+        },
+        flags={"allow_objects": True},
     )
-    restored = pickle.loads(pickle.dumps(deferred))  # nosec B301
 
-    assert restored({"eval": eval}, "eval") is eval
+    factory = _instantiate2.instantiate(
+        cfg.factory, _execution_whitelist_="builtins.pow"
+    )
+    source_ref = weakref.ref(cfg)
+    del cfg
+    gc.collect()
+
+    assert source_ref() is None
+    assert factory(exp=2) == 9
 
 
 def test_direct_functools_partial_authorizes_result_when_invoked() -> None:

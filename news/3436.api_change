@@ -1,1 +1,2 @@
 Make source configs temporarily read-only during copy-free instantiation.
+Reject pickling Hydra `_partial_` factories before invocation.

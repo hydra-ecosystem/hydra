@@ -1,13 +1,25 @@
 # SPDX-FileCopyrightText: Contributors to Hydra
 # SPDX-License-Identifier: MIT
 
+import copy
 import functools
 import itertools
 import operator
 import types
+from contextlib import nullcontext
 from contextvars import ContextVar
 from textwrap import dedent
-from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Optional,
+    Sequence,
+    SupportsIndex,
+    Tuple,
+    Union,
+    cast,
+)
 
 from hydra._internal._locate import _locate
 from hydra.errors import InstantiationException
@@ -1058,33 +1070,72 @@ class _DeferredTarget(functools.partial):  # type: ignore[type-arg]
     _hydra_resolved_from: str
     _hydra_full_key: str
     _hydra_execution_whitelist: NormalizedExecutionWhitelist
+    _hydra_call_context: Optional[
+        Callable[["_DeferredTarget", Tuple[Any, ...], Dict[str, Any]], Any]
+    ] = None
+
+    def __copy__(self) -> "_DeferredTarget":
+        copied = type(self)(
+            cast(Callable[..., Any], self.func),
+            *self.args,
+            **(self.keywords or {}),
+        )
+        copied.__dict__.update(self.__dict__)
+        return copied
+
+    def __deepcopy__(self, memo: Dict[int, Any]) -> "_DeferredTarget":
+        copied = type(self)(cast(Callable[..., Any], self.func))
+        memo[id(self)] = copied
+        setstate = cast(Callable[[Any], None], getattr(copied, "__setstate__"))
+        setstate(
+            (
+                copy.deepcopy(self.func, memo),
+                copy.deepcopy(self.args, memo),
+                copy.deepcopy(self.keywords, memo),
+                copy.deepcopy(self.__dict__, memo),
+            )
+        )
+        return copied
+
+    def __reduce__(self) -> Union[str, Tuple[Any, ...]]:
+        raise TypeError("Hydra _partial_ factories cannot be pickled before invocation")
+
+    def __reduce_ex__(self, _protocol: SupportsIndex, /) -> Union[str, Tuple[Any, ...]]:
+        return self.__reduce__()
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        effective_target, effective_args, effective_kwargs = (
-            _get_effective_target_invocation(self, args, kwargs)
+        context = (
+            self._hydra_call_context(self, args, kwargs)
+            if self._hydra_call_context is not None
+            else nullcontext()
         )
-        _authorize_target_invocation(
-            effective_target,
-            effective_args,
-            effective_kwargs,
-            self._hydra_full_key,
-            self._hydra_execution_whitelist,
-        )
-        discovery_path = _authorize_discovery_path(
-            effective_target,
-            effective_args,
-            effective_kwargs,
-            self._hydra_full_key,
-            self._hydra_execution_whitelist,
-        )
-        result = super().__call__(*args, **kwargs)
-        return _mediate_target_result(
-            result,
-            discovery_path or self._hydra_resolved_from,
-            self._hydra_full_key,
-            self._hydra_execution_whitelist,
-            discovery_path=discovery_path,
-        )
+        with context:
+            effective_target, effective_args, effective_kwargs = (
+                _get_effective_target_invocation(self, args, kwargs)
+            )
+            _authorize_target_invocation(
+                effective_target,
+                effective_args,
+                effective_kwargs,
+                self._hydra_full_key,
+                self._hydra_execution_whitelist,
+            )
+            discovery_path = _authorize_discovery_path(
+                effective_target,
+                effective_args,
+                effective_kwargs,
+                self._hydra_full_key,
+                self._hydra_execution_whitelist,
+            )
+            result = super().__call__(*args, **kwargs)
+            return _mediate_target_result(
+                result,
+                discovery_path or self._hydra_resolved_from,
+                self._hydra_full_key,
+                self._hydra_execution_whitelist,
+                discovery_path=discovery_path,
+                call_context=self._hydra_call_context,
+            )
 
 
 def _mediate_target_result(
@@ -1094,9 +1145,18 @@ def _mediate_target_result(
     execution_whitelist: NormalizedExecutionWhitelist,
     *,
     discovery_path: Optional[str] = None,
+    call_context: Optional[
+        Callable[[_DeferredTarget, Tuple[Any, ...], Dict[str, Any]], Any]
+    ] = None,
 ) -> Any:
     """Authorize callable results and keep deferred partial results mediated."""
-    if execution_whitelist is UNSAFE_DISABLE_EXECUTION_CHECKS:
+    guard_returned_partial = (
+        call_context is not None and type(result) is functools.partial
+    )
+    if (
+        execution_whitelist is UNSAFE_DISABLE_EXECUTION_CHECKS
+        and not guard_returned_partial
+    ):
         return result
 
     if isinstance(result, functools.partial) and type(result) is not _DeferredTarget:
@@ -1117,6 +1177,7 @@ def _mediate_target_result(
         deferred._hydra_resolved_from = resolved_from
         deferred._hydra_full_key = full_key
         deferred._hydra_execution_whitelist = execution_whitelist
+        deferred._hydra_call_context = call_context
         result = deferred
 
     if callable(result):
