@@ -40,7 +40,7 @@
     "3425": "2026-09-02",
     "3426": "2026-09-02"
   },
-  "generated_at": "2026-09-05T07:12:52Z",
+  "generated_at": "2026-09-05T08:55:42Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -981,9 +981,11 @@
         "bug",
         "difficult"
       ],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3437"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "in progress",
       "title": "`instantiate()` loses merged ancestor values when copying a context-parented subtree",
       "updated_at": "2026-09-04T18:47:46Z"
     },

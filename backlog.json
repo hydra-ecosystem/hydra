@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-05",
-  "generated_at": "2026-09-05T07:12:52Z",
+  "generated_at": "2026-09-05T08:55:42Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 86,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 85
+        "count": 84
       },
       {
         "status": "done",
@@ -71,6 +71,27 @@
     ]
   },
   "issues": [
+    {
+      "number": 3436,
+      "title": "`instantiate()` loses merged ancestor values when copying a context-parented subtree",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3437,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3437"
+        }
+      ],
+      "created": "2026-09-04",
+      "updated": "2026-09-04",
+      "labels": [
+        "bug",
+        "difficult"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
+    },
     {
       "number": 3375,
       "title": "Show project homepages in the Hydra Landscape",
@@ -1420,22 +1441,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
     },
     {
-      "number": 3436,
-      "title": "`instantiate()` loses merged ancestor values when copying a context-parented subtree",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-09-04",
-      "updated": "2026-09-04",
-      "labels": [
-        "bug",
-        "difficult"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
-    },
-    {
       "number": 2757,
       "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs",
       "category": "Bug",
@@ -2049,6 +2054,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-05T08:55:42Z",
+      "kind": "pr",
+      "issue": 3436,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3436",
+      "title": "`instantiate()` loses merged ancestor values when copying a context-parented subtree",
+      "detail": "linked #3437"
+    },
+    {
+      "ts": "2026-09-05T08:55:42Z",
+      "kind": "status",
+      "issue": 3436,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3436",
+      "title": "`instantiate()` loses merged ancestor values when copying a context-parented subtree",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3437,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3437"
+      }
+    },
     {
       "ts": "2026-09-04T18:49:26Z",
       "kind": "closed",
@@ -3634,25 +3659,6 @@
       "issue": 2187,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2187",
       "title": "[Feature Request] implement `MultiprocessingLauncher`"
-    },
-    {
-      "ts": "2026-07-28T19:38:43Z",
-      "kind": "status",
-      "issue": 2268,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2268",
-      "title": "Enable instantiations without resolution",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3325,
-        "url": "https://github.com/facebookresearch/hydra/pull/3325"
-      }
-    },
-    {
-      "ts": "2026-07-28T18:29:09Z",
-      "kind": "closed",
-      "issue": 2267,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2267",
-      "title": "[Feature Request] allow repeating elements in list"
     }
   ]
 }
