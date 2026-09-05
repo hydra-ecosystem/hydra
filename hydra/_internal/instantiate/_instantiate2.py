@@ -3,11 +3,32 @@
 import copy
 import inspect
 import re
+from contextlib import ExitStack, contextmanager
 from enum import Enum
 from textwrap import dedent
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    cast,
+)
 
-from omegaconf import AnyNode, DictConfig, Node, OmegaConf, SCMode
+from omegaconf import (
+    AnyNode,
+    Container,
+    DictConfig,
+    Node,
+    OmegaConf,
+    SCMode,
+    UnionNode,
+    flag_override,
+)
 from omegaconf._utils import is_structured_config
 from omegaconf.errors import InterpolationResolutionError
 
@@ -58,6 +79,59 @@ def _is_target(x: Any) -> bool:
     if OmegaConf.is_dict(x):
         return "_target_" in x
     return False
+
+
+@contextmanager
+def _read_only_config_tree(config: Node) -> Iterator[None]:
+    context_root = config._get_root()
+    nodes = []
+    pending: List[Node] = [context_root]
+    if config is not context_root:
+        # Merged nodes can retain a parent only as interpolation context and may
+        # therefore not be owned by the context root.
+        pending.append(config)
+    seen = set()
+    while pending:
+        node = pending.pop()
+        if id(node) in seen:
+            continue
+        seen.add(id(node))
+
+        if isinstance(node, Container):
+            nodes.append(node)
+            keys: Sequence[Any]
+            if isinstance(node, DictConfig):
+                keys = list(node.keys())
+            else:
+                keys = range(len(cast(Sequence[Any], node)))
+            for key in keys:
+                child = node._get_node(key)
+                if isinstance(child, Node):
+                    pending.append(child)
+        elif isinstance(node, UnionNode):
+            child = node._value()
+            if isinstance(child, Node):
+                pending.append(child)
+
+    root_overrides = ExitStack()
+    descendant_overrides = ExitStack()
+    try:
+        for node in nodes:
+            if node is context_root or node._is_flags_root():
+                root_overrides.enter_context(flag_override(node, "readonly", True))
+            elif node._get_node_flag("readonly") is not True:
+                # Remove local False overrides so the node inherits the guard.
+                # Leaving descendants without local True flags also preserves
+                # read_write(parent)'s normal subtree behavior.
+                descendant_overrides.enter_context(
+                    flag_override(node, "readonly", None)
+                )
+        yield
+    finally:
+        # Restore roots before descendants so context-parented nodes invalidate
+        # their inherited flag cache against the restored root state.
+        root_overrides.close()
+        descendant_overrides.close()
 
 
 def _warn_legacy_execution_whitelist(target: str) -> None:
@@ -375,13 +449,23 @@ def instantiate(
             config = _copy_config_with_override_interpolations(
                 config, resolution_overrides
             )
-        return instantiate_node(
-            config,
-            *args,
-            overrides=kwargs,
-            is_root=True,
-            execution_whitelist=execution_whitelist,
-        )
+            return instantiate_node(
+                config,
+                *args,
+                overrides=kwargs,
+                is_root=True,
+                execution_whitelist=execution_whitelist,
+            )
+        # No private copy was made. Keep the entire instantiation read-only,
+        # including target constructors.
+        with _read_only_config_tree(config):
+            return instantiate_node(
+                config,
+                *args,
+                overrides=kwargs,
+                is_root=True,
+                execution_whitelist=execution_whitelist,
+            )
     elif OmegaConf.is_sequence(config):
         _recursive_ = kwargs.pop(_Keys.RECURSIVE, True)
         _convert_ = kwargs.pop(_Keys.CONVERT, ConvertMode.NONE)
@@ -394,14 +478,15 @@ def instantiate(
                 f"top-level {sequence_type} instantiation"
             )
 
-        return instantiate_node(
-            config,
-            *args,
-            recursive=_recursive_,
-            convert=_convert_,
-            partial=_partial_,
-            execution_whitelist=execution_whitelist,
-        )
+        with _read_only_config_tree(config):
+            return instantiate_node(
+                config,
+                *args,
+                recursive=_recursive_,
+                convert=_convert_,
+                partial=_partial_,
+                execution_whitelist=execution_whitelist,
+            )
     else:
         raise InstantiationException(
             dedent(f"""\
@@ -744,13 +829,24 @@ def _copy_config_with_override_interpolations(
     path = []
     current: Any = config
     while current._get_parent() is not None:
-        path.append(current._key())
-        current = current._get_parent()
+        parent = current._get_parent()
+        key = current._key()
+        path.append((key, current, _get_override_child(parent, key) is current))
+        current = parent
 
     copied_root = copy.deepcopy(current)
     copied_config = copied_root
-    for key in reversed(path):
+    for key, source_config, parent_owns_source in reversed(path):
         copied_config = _get_override_child(copied_config, key)
+        # Merged nodes can retain a parent only as interpolation context.
+        if not parent_owns_source:
+            # This tree is a private copy, so it is safe to mutate even when it
+            # retains read-only flags from the source configuration.
+            merge_source = copy.deepcopy(source_config)
+            # Isolate the private source from flags inherited through its
+            # original parent while preserving that parent for interpolation.
+            merge_source._set_flags_root(True)
+            copied_config._merge_with(merge_source, _allow_readonly_target=True)
 
     if copied_config._is_none():
         ref_type = copied_config._metadata.ref_type
