@@ -27,7 +27,7 @@ from omegaconf import (
     OmegaConf,
     TupleConfig,
 )
-from omegaconf.errors import ValidationError
+from omegaconf.errors import ReadonlyConfigError, ValidationError
 from pytest import fixture, mark, param, raises, warns
 
 from hydra._internal import target_policy
@@ -140,6 +140,20 @@ class ItemOperationProbe:
     def __contains__(self, item: object) -> bool:
         type(self).membership_checked = True
         return False
+
+
+class ConfigMutationProbe:
+    def __init__(self, payload: DictConfig, fail: bool = False) -> None:
+        self.payload = payload
+        self.readonly = OmegaConf.is_readonly(payload)
+        try:
+            payload.value = 20
+        except ReadonlyConfigError:
+            self.mutation_blocked = True
+        else:
+            self.mutation_blocked = False
+        if fail:
+            raise RuntimeError("expected failure")
 
 
 @fixture(
@@ -550,6 +564,85 @@ def test_callsite_override_is_visible_through_absolute_interpolation(
 
     assert result.kwargs == {"base": 20, "derived": 20}
     assert config.node.base == 10
+
+
+def test_callsite_override_preserves_context_only_merged_ancestor(
+    instantiate_func: Any,
+) -> None:
+    config = OmegaConf.create(
+        {
+            "factory": {
+                "base": "???",
+                "target": {
+                    "_target_": "tests.instantiate.ArgsClass",
+                    "value": "${..base}",
+                },
+            }
+        }
+    )
+    merged = OmegaConf.merge(config.factory, {"base": 10})
+
+    assert merged._get_parent() is config
+    assert config.factory is not merged
+    assert merged.target.value == 10
+
+    result = instantiate_func(merged.target, extra=20)
+
+    assert result.kwargs == {"value": 10, "extra": 20}
+    assert OmegaConf.is_missing(config.factory, "base")
+
+
+def test_callsite_override_preserves_readonly_context_only_merged_ancestor(
+    instantiate_func: Any,
+) -> None:
+    config = OmegaConf.create(
+        {
+            "factory": {
+                "base": "???",
+                "target": {
+                    "_target_": "tests.instantiate.ArgsClass",
+                    "value": "${..base}",
+                },
+            }
+        }
+    )
+    OmegaConf.set_readonly(config, True)
+    merged = OmegaConf.merge(config.factory, {"base": 10})
+
+    result = instantiate_func(merged.target, extra=20)
+
+    assert result.kwargs == {"value": 10, "extra": 20}
+    assert OmegaConf.is_missing(config.factory, "base")
+    assert OmegaConf.is_readonly(config)
+
+
+def test_callsite_override_preserves_nested_readonly_context_only_ancestors(
+    instantiate_func: Any,
+) -> None:
+    config = OmegaConf.create(
+        {
+            "outer": {
+                "base": "???",
+                "inner": {
+                    "offset": "???",
+                    "target": {
+                        "_target_": "tests.instantiate.ArgsClass",
+                        "value": "${...base}",
+                        "offset": "${..offset}",
+                    },
+                },
+            }
+        }
+    )
+    OmegaConf.set_readonly(config, True)
+    merged_outer = OmegaConf.merge(config.outer, {"base": 10})
+    merged_inner = OmegaConf.merge(merged_outer.inner, {"offset": 20})
+
+    result = instantiate_func(merged_inner.target, extra=30)
+
+    assert result.kwargs == {"value": 10, "offset": 20, "extra": 30}
+    assert OmegaConf.is_missing(config.outer, "base")
+    assert OmegaConf.is_readonly(config)
 
 
 def test_callsite_runtime_object_is_visible_to_configured_interpolation(
@@ -975,6 +1068,92 @@ def test_non_recursive_config_argument_is_passed_directly_without_resolving(
     assert payload._get_flag("allow_objects")
     assert payload.alias == 10
     assert str(cfg) == original_config
+
+
+def test_no_override_config_is_readonly_during_instantiation_and_restored(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+            "_recursive_": False,
+            "payload": {"value": 10},
+        }
+    )
+    OmegaConf.set_readonly(cfg.payload, False)
+    original_readonly = cfg._get_node_flag("readonly")
+
+    result = instantiate_func(cfg)
+
+    assert result.readonly
+    assert result.mutation_blocked
+    assert result.payload.value == 10
+    assert cfg.payload.value == 10
+    assert cfg._get_node_flag("readonly") is original_readonly
+    assert cfg.payload._get_node_flag("readonly") is False
+    assert not OmegaConf.is_readonly(cfg.payload)
+
+
+def test_private_config_copy_remains_writable(instantiate_func: Any) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+            "_recursive_": False,
+            "payload": {"value": 10},
+        }
+    )
+
+    result = instantiate_func(cfg, _convert_="none")
+
+    assert not result.readonly
+    assert not result.mutation_blocked
+    assert result.payload.value == 20
+    assert cfg.payload.value == 10
+
+
+def test_top_level_sequence_is_readonly_during_instantiation_and_restored(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        [
+            {
+                "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+                "_recursive_": False,
+                "payload": {"value": 10},
+            }
+        ]
+    )
+    OmegaConf.set_readonly(cfg[0].payload, False)
+    original_readonly = cfg._get_node_flag("readonly")
+
+    result = instantiate_func(cfg)
+
+    assert result[0].readonly
+    assert result[0].mutation_blocked
+    assert cfg[0].payload.value == 10
+    assert cfg._get_node_flag("readonly") is original_readonly
+    assert cfg[0].payload._get_node_flag("readonly") is False
+
+
+def test_no_override_config_readonly_is_restored_after_failure(
+    instantiate_func: Any,
+) -> None:
+    cfg = OmegaConf.create(
+        {
+            "_target_": "tests.instantiate.test_instantiate.ConfigMutationProbe",
+            "_recursive_": False,
+            "payload": {"value": 10},
+            "fail": True,
+        }
+    )
+    original_readonly = cfg._get_node_flag("readonly")
+
+    with raises(InstantiationException, match="expected failure"):
+        instantiate_func(cfg)
+
+    assert cfg.payload.value == 10
+    assert cfg._get_node_flag("readonly") is original_readonly
+    assert not OmegaConf.is_readonly(cfg.payload)
 
 
 def test_non_recursive_config_argument_uses_source_resolver_cache(
