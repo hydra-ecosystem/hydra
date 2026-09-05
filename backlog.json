@@ -1,6 +1,6 @@
 {
-  "generated_on": "2026-09-04",
-  "generated_at": "2026-09-04T18:49:26Z",
+  "generated_on": "2026-09-05",
+  "generated_at": "2026-09-05T07:12:52Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 86,
@@ -1815,6 +1815,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2977"
     },
     {
+      "number": 2981,
+      "title": "[Feature Request] Allow partial instantiation with factories",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2024-11-13",
+      "updated": "2026-09-04",
+      "labels": [
+        "enhancement",
+        "triage"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2981"
+    },
+    {
       "number": 3369,
       "title": "Remove redundant setup-xcode step from macOS CI",
       "category": "Refactor",
@@ -2030,22 +2046,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3426"
-    },
-    {
-      "number": 2981,
-      "title": "[Feature Request] Allow partial instantiation with factories",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2024-11-13",
-      "updated": "2026-09-04",
-      "labels": [
-        "enhancement",
-        "triage"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2981"
     }
   ],
   "updates": [
