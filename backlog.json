@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-05",
-  "generated_at": "2026-09-05T14:44:38Z",
+  "generated_at": "2026-09-05T15:18:42Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 85,
@@ -646,10 +646,9 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2023-12-06",
-      "updated": "2026-07-15",
+      "updated": "2026-09-05",
       "labels": [
-        "enhancement",
-        "triage"
+        "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2814"
     },
@@ -2054,6 +2053,14 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-05T15:18:42Z",
+      "kind": "label",
+      "issue": 2814,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2814",
+      "title": "[Feature Request] Allow setting use_srun from submitit launcher",
+      "detail": "removed \"triage\""
+    },
     {
       "ts": "2026-09-05T14:44:38Z",
       "kind": "closed",
@@ -3651,14 +3658,6 @@
       "issue": 2281,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2281",
       "title": "[Feature Request] RQ Launcher plugin the ability to send tasks to different types of workers"
-    },
-    {
-      "ts": "2026-07-28T19:38:43Z",
-      "kind": "pr",
-      "issue": 2268,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2268",
-      "title": "Enable instantiations without resolution",
-      "detail": "linked #3325"
     }
   ]
 }

@@ -41,7 +41,7 @@
     "3426": "2026-09-02",
     "3436": "2026-09-05"
   },
-  "generated_at": "2026-09-05T14:44:38Z",
+  "generated_at": "2026-09-05T15:18:42Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -335,14 +335,13 @@
       "category": "Enhancement",
       "created_at": "2023-12-06T15:06:23Z",
       "labels": [
-        "enhancement",
-        "triage"
+        "enhancement"
       ],
       "pr_numbers": [],
       "state": "OPEN",
       "status": "not started",
       "title": "[Feature Request] Allow setting use_srun from submitit launcher",
-      "updated_at": "2026-07-15T13:16:19Z"
+      "updated_at": "2026-09-05T15:17:25Z"
     },
     "2824": {
       "category": "Enhancement",
