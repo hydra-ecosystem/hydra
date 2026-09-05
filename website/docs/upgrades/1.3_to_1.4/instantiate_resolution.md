@@ -31,7 +31,8 @@ This has several benefits:
   overrides, Hydra no longer makes a final copy of OmegaConf containers before
   the target call. Containers passed through from the input tree retain their
   identity, lazy interpolations, ancestor context, resolver cache, and inherited
-  flags.
+  flags. Hydra temporarily marks the source configuration read-only during
+  instantiation and restores its previous state afterward.
 
 ## Compatibility impact
 
@@ -175,12 +176,15 @@ eagerly resolving the full configuration.
 With `_recursive_=False`, `_convert_="none"`, and no call-site overrides,
 OmegaConf containers are no longer copied and detached before the target call.
 The target receives the same `DictConfig`, `ListConfig`, or `TupleConfig`
-object from the input tree. Mutations made by the target are therefore visible
-through the original configuration, and an attached subtree retains its
-ancestor configuration when stored or serialized. When call-site overrides
-are present, configured containers come from Hydra's private resolution copy.
-Containers supplied directly as call-site values still retain their identity.
-Other conversion modes retain their documented conversion behavior.
+object from the input tree, temporarily marked read-only for the duration of
+instantiation, including the target constructor call. Hydra restores the
+configuration's previous read-only state before returning. A constructor that
+intentionally needs to mutate the source configuration can opt in explicitly
+with OmegaConf's `read_write()` context manager. When call-site overrides are
+present, configured containers come from Hydra's private resolution copy, and
+Hydra does not add this temporary read-only guard. Containers supplied directly
+as call-site values still retain their identity. Other conversion modes retain
+their documented conversion behavior.
 
 To pass an independent Config object instead, create one explicitly:
 
