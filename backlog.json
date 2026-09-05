@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-05",
-  "generated_at": "2026-09-05T15:18:42Z",
+  "generated_at": "2026-09-05T15:43:24Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 85,
@@ -904,10 +904,9 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2025-09-02",
-      "updated": "2026-06-07",
+      "updated": "2026-09-05",
       "labels": [
-        "enhancement",
-        "triage"
+        "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3082"
     },
@@ -2053,6 +2052,14 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-05T15:43:24Z",
+      "kind": "label",
+      "issue": 3082,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3082",
+      "title": "[Feature Request] `submitit` Multirun without sweeping",
+      "detail": "removed \"triage\""
+    },
     {
       "ts": "2026-09-05T15:18:42Z",
       "kind": "label",
@@ -3651,13 +3658,6 @@
       "issue": 2323,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2323",
       "title": "specify maximum tasks in submitit_local"
-    },
-    {
-      "ts": "2026-07-28T20:14:42Z",
-      "kind": "closed",
-      "issue": 2281,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2281",
-      "title": "[Feature Request] RQ Launcher plugin the ability to send tasks to different types of workers"
     }
   ]
 }
