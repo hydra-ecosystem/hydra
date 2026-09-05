@@ -803,3 +803,4 @@
 {"ts": "2026-09-05T20:55:52Z", "kind": "closed", "issue": 3371, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3371", "title": "Set up CLA, GA4, and privacy policy"}
 {"ts": "2026-09-05T20:59:34Z", "kind": "closed", "issue": 1602, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1602", "title": "[Bug] sporadic transient errors from Ray plugin CI"}
 {"ts": "2026-09-05T21:05:44Z", "kind": "closed", "issue": 1512, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1512", "title": "Support multirun partial failure in Ax Sweeper"}
+{"ts": "2026-09-05T21:30:54Z", "kind": "closed", "issue": 753, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/753", "title": "Explore a the option of a dedicated Prompt-toolkit based Hydra shell"}

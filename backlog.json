@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-05",
-  "generated_at": "2026-09-05T21:05:44Z",
+  "generated_at": "2026-09-05T21:30:54Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 74,
+    "open_total": 73,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 7,
-        "percentage": 9.5
+        "percentage": 9.6
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 55,
-        "percentage": 74.3
+        "count": 54,
+        "percentage": 74.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 8.1
+        "percentage": 8.2
       },
       {
         "category": "Question",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 73
+        "count": 72
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 52
+        "count": 53
       }
     ]
   },
@@ -98,7 +98,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2020-01-19",
-      "updated": "2025-07-08",
+      "updated": "2026-09-05",
       "labels": [
         "enhancement",
         "callbacks"
@@ -172,22 +172,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/733"
     },
     {
-      "number": 753,
-      "title": "Explore a the option of a dedicated Prompt-toolkit based Hydra shell",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2020-07-12",
-      "updated": "2020-07-12",
-      "labels": [
-        "enhancement",
-        "exploratory"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/753"
-    },
-    {
       "number": 802,
       "title": "Improve Hydra test coverage to 100%",
       "category": "Enhancement",
@@ -229,7 +213,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2020-08-07",
-      "updated": "2026-07-25",
+      "updated": "2026-09-05",
       "labels": [
         "enhancement",
         "priority_medium"
@@ -310,7 +294,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2020-11-06",
-      "updated": "2026-07-25",
+      "updated": "2026-09-05",
       "labels": [
         "documentation",
         "priority_low"
@@ -1245,6 +1229,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3438"
     },
     {
+      "number": 1512,
+      "title": "Support multirun partial failure in Ax Sweeper",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2021-03-29",
+      "updated": "2026-07-22",
+      "labels": [
+        "ax",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1512"
+    },
+    {
       "number": 1602,
       "title": "[Bug] sporadic transient errors from Ray plugin CI",
       "category": "Bug",
@@ -2049,23 +2049,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
     },
     {
-      "number": 1512,
-      "title": "Support multirun partial failure in Ax Sweeper",
+      "number": 753,
+      "title": "Explore a the option of a dedicated Prompt-toolkit based Hydra shell",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2021-03-29",
-      "updated": "2026-07-22",
+      "created": "2020-07-12",
+      "updated": "2020-07-12",
       "labels": [
-        "ax",
-        "sweep"
+        "enhancement",
+        "exploratory"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1512"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/753"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-05T21:30:54Z",
+      "kind": "closed",
+      "issue": 753,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/753",
+      "title": "Explore a the option of a dedicated Prompt-toolkit based Hydra shell"
+    },
     {
       "ts": "2026-09-05T21:05:44Z",
       "kind": "closed",
@@ -3656,13 +3663,6 @@
       "issue": 2483,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2483",
       "title": "[Feature Request] Consistent mechanism for defaulting to environment variables"
-    },
-    {
-      "ts": "2026-07-31T06:44:36Z",
-      "kind": "closed",
-      "issue": 2471,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2471",
-      "title": "[Feature Request] Appending to a structured dict from a config file"
     }
   ]
 }
