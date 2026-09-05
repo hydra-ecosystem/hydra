@@ -14,7 +14,7 @@
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="Hydra" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.af05b0d6.css">
-<script src="/assets/js/runtime~main.505ca1dd.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.9f0bbbd6.js" defer="defer"></script>
 <script src="/assets/js/main.fe41c2fc.js" defer="defer"></script>
 </head>
 <body>
@@ -77,7 +77,13 @@ without call-site overrides do not make an additional input copy. When
 overrides are present, Hydra uses a private copy so configured interpolations
 resolve against the call-site values while leaving the input unchanged. Runtime
 state established by an earlier target can still be used while resolving a
-later argument.</p>
+later argument. During copy-free instantiation, Hydra temporarily marks the
+source configuration read-only, including while target constructors run, and
+restores its previous state before returning. Constructors can use OmegaConf&#x27;s
+<code>read_write()</code> context manager to opt in to mutation explicitly.</p>
+<p>Hydra <code>_partial_</code> factories cannot be pickled before invocation. Invoke the
+factory first; whether the constructed object can be pickled is determined by
+that object&#x27;s type.</p>
 <p>Primitive values, native <code>list</code>, <code>tuple</code>, and <code>dict</code> containers, and OmegaConf
 containers passed at the call-site retain Hydra&#x27;s normal configuration
 semantics, including instantiation and conversion where applicable.</p>
