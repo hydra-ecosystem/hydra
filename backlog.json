@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-06",
-  "generated_at": "2026-09-06T04:53:33Z",
+  "generated_at": "2026-09-06T07:13:35Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 71,
@@ -1916,6 +1916,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3398"
     },
     {
+      "number": 3400,
+      "title": "[Bug] dev8 deprecation warning about internal usage?",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-09-06",
+      "labels": [
+        "bug"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3400"
+    },
+    {
       "number": 3402,
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior",
       "category": "Documentation",
@@ -2052,21 +2067,6 @@
         "difficult"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
-    },
-    {
-      "number": 3400,
-      "title": "[Bug] dev8 deprecation warning about internal usage?",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-08-23",
-      "updated": "2026-09-06",
-      "labels": [
-        "bug"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3400"
     }
   ],
   "updates": [
