@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-06",
-  "generated_at": "2026-09-06T08:27:15Z",
+  "generated_at": "2026-09-06T14:03:50Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 70,
+    "open_total": 71,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 6,
-        "percentage": 8.6
+        "percentage": 8.5
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 53,
-        "percentage": 75.7
+        "count": 54,
+        "percentage": 76.1
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 8.6
+        "percentage": 8.5
       },
       {
         "category": "Question",
@@ -33,13 +33,13 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 2,
-        "percentage": 2.9
+        "percentage": 2.8
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 2.9
+        "percentage": 2.8
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 68
+        "count": 69
       },
       {
         "status": "done",
@@ -1189,6 +1189,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3438"
     },
     {
+      "number": 3440,
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-09-06",
+      "updated": "2026-09-06",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
+    },
+    {
       "number": 385,
       "title": "Experimentation tracking support",
       "category": "Enhancement",
@@ -1847,6 +1860,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3386"
     },
     {
+      "number": 3389,
+      "title": "Remove remaining Meta-era repository branding and processes",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-13",
+      "updated": "2026-09-05",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3389"
+    },
+    {
       "number": 3395,
       "title": "[Feature Request]",
       "category": "Enhancement",
@@ -2054,22 +2080,16 @@
         "difficult"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
-    },
-    {
-      "number": 3389,
-      "title": "Remove remaining Meta-era repository branding and processes",
-      "category": "Refactor",
-      "category_emoji": "🔧",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-08-13",
-      "updated": "2026-09-05",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3389"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-06T14:03:50Z",
+      "kind": "new",
+      "issue": 3440,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3440",
+      "title": "hydra.mode discovery composes the config twice on every invocation"
+    },
     {
       "ts": "2026-09-06T08:27:15Z",
       "kind": "closed",
@@ -3656,18 +3676,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3237",
       "title": "Remove version_base and Hydra 1.1 compatibility",
       "detail": "linked #3335"
-    },
-    {
-      "ts": "2026-08-02T21:37:27Z",
-      "kind": "status",
-      "issue": 3237,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3237",
-      "title": "Remove version_base and Hydra 1.1 compatibility",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3335,
-        "url": "https://github.com/facebookresearch/hydra/pull/3335"
-      }
     }
   ]
 }

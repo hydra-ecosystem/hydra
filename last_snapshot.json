@@ -57,7 +57,7 @@
     "385": "2026-09-05",
     "753": "2026-09-05"
   },
-  "generated_at": "2026-09-06T08:27:15Z",
+  "generated_at": "2026-09-06T14:03:50Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -827,6 +827,16 @@
       "status": "not started",
       "title": "Improve type safety of Hydra logging configurations",
       "updated_at": "2026-09-05T17:17:47Z"
+    },
+    "3440": {
+      "category": "Enhancement",
+      "created_at": "2026-09-06T14:02:31Z",
+      "labels": [],
+      "pr_numbers": [],
+      "state": "OPEN",
+      "status": "not started",
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "updated_at": "2026-09-06T14:02:32Z"
     },
     "468": {
       "category": "Enhancement",
