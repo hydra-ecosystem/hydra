@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-06",
-  "generated_at": "2026-09-06T07:13:35Z",
+  "generated_at": "2026-09-06T08:27:15Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 71,
+    "open_total": 70,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 6,
-        "percentage": 8.5
+        "percentage": 8.6
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 53,
-        "percentage": 74.6
+        "percentage": 75.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 8.5
+        "percentage": 8.6
       },
       {
         "category": "Question",
@@ -32,14 +32,14 @@
       {
         "category": "Refactor",
         "emoji": "🔧",
-        "count": 3,
-        "percentage": 4.2
+        "count": 2,
+        "percentage": 2.9
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 2.8
+        "percentage": 2.9
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 69
+        "count": 68
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 55
+        "count": 56
       }
     ]
   },
@@ -1100,19 +1100,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3364"
     },
     {
-      "number": 3389,
-      "title": "Remove remaining Meta-era repository branding and processes",
-      "category": "Refactor",
-      "category_emoji": "🔧",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-13",
-      "updated": "2026-09-05",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3389"
-    },
-    {
       "number": 3401,
       "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5",
       "category": "Refactor",
@@ -2067,9 +2054,29 @@
         "difficult"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
+    },
+    {
+      "number": 3389,
+      "title": "Remove remaining Meta-era repository branding and processes",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-13",
+      "updated": "2026-09-05",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3389"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-06T08:27:15Z",
+      "kind": "closed",
+      "issue": 3389,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3389",
+      "title": "Remove remaining Meta-era repository branding and processes"
+    },
     {
       "ts": "2026-09-06T04:53:33Z",
       "kind": "closed",
@@ -3661,13 +3668,6 @@
         "number": 3335,
         "url": "https://github.com/facebookresearch/hydra/pull/3335"
       }
-    },
-    {
-      "ts": "2026-08-02T05:23:51Z",
-      "kind": "new",
-      "issue": 3334,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3334",
-      "title": "Warn Hydra 1.3 users to prepare for Hydra 1.4"
     }
   ]
 }
