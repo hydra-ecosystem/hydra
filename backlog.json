@@ -1,6 +1,6 @@
 {
-  "generated_on": "2026-09-05",
-  "generated_at": "2026-09-05T21:32:16Z",
+  "generated_on": "2026-09-06",
+  "generated_at": "2026-09-06T04:51:38Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 72,
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 1
+        "count": 2
       },
       {
         "status": "blocked",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 71
+        "count": 70
       },
       {
         "status": "done",
@@ -88,6 +88,27 @@
       "updated": "2026-08-11",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3375"
+    },
+    {
+      "number": 3427,
+      "title": "HydraConfig is unavailable during multirun controller initialization",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "community PR",
+      "status_emoji": "🤝",
+      "prs": [
+        {
+          "number": 3439,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3439"
+        }
+      ],
+      "created": "2026-08-31",
+      "updated": "2026-09-06",
+      "labels": [
+        "bug",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
     },
     {
       "number": 468,
@@ -1100,10 +1121,9 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2026-08-23",
-      "updated": "2026-08-23",
+      "updated": "2026-09-06",
       "labels": [
-        "bug",
-        "awaiting_response"
+        "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3400"
     },
@@ -1182,22 +1202,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3408"
     },
     {
-      "number": 3427,
-      "title": "HydraConfig is unavailable during multirun controller initialization",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-31",
-      "updated": "2026-08-31",
-      "labels": [
-        "bug",
-        "sweep"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
-    },
-    {
       "number": 3438,
       "title": "Improve type safety of Hydra logging configurations",
       "category": "Enhancement",
@@ -1211,6 +1215,22 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3438"
+    },
+    {
+      "number": 385,
+      "title": "Experimentation tracking support",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2020-01-19",
+      "updated": "2026-09-05",
+      "labels": [
+        "callbacks",
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/385"
     },
     {
       "number": 753,
@@ -2047,25 +2067,37 @@
         "difficult"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
-    },
-    {
-      "number": 385,
-      "title": "Experimentation tracking support",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2020-01-19",
-      "updated": "2026-09-05",
-      "labels": [
-        "callbacks",
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/385"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-06T04:51:38Z",
+      "kind": "pr",
+      "issue": 3427,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3427",
+      "title": "HydraConfig is unavailable during multirun controller initialization",
+      "detail": "linked #3439"
+    },
+    {
+      "ts": "2026-09-06T04:51:38Z",
+      "kind": "label",
+      "issue": 3400,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3400",
+      "title": "[Bug] dev8 deprecation warning about internal usage?",
+      "detail": "removed \"awaiting_response\""
+    },
+    {
+      "ts": "2026-09-06T04:51:38Z",
+      "kind": "status",
+      "issue": 3427,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3427",
+      "title": "HydraConfig is unavailable during multirun controller initialization",
+      "detail": "not started → community PR",
+      "pr": {
+        "number": 3439,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3439"
+      }
+    },
     {
       "ts": "2026-09-05T21:32:16Z",
       "kind": "closed",
@@ -3637,32 +3669,6 @@
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2237",
       "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
       "detail": "linked #3333"
-    },
-    {
-      "ts": "2026-08-01T07:47:31Z",
-      "kind": "status",
-      "issue": 2237,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2237",
-      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3333,
-        "url": "https://github.com/facebookresearch/hydra/pull/3333"
-      }
-    },
-    {
-      "ts": "2026-07-31T18:14:58Z",
-      "kind": "closed",
-      "issue": 1865,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/1865",
-      "title": "Instantiation fails when _target_ arg interpolates to another node with _target_ key and object arg"
-    },
-    {
-      "ts": "2026-07-31T11:18:29Z",
-      "kind": "new",
-      "issue": 3329,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3329",
-      "title": "Only suggest HYDRA_FULL_ERROR when a full traceback is likely useful"
     }
   ]
 }
