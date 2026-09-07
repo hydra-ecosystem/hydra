@@ -42,6 +42,7 @@ def test_parse_response_preserves_live_maintenance_evidence() -> None:
             "r0": {
                 "nameWithOwner": "example/project",
                 "url": "https://github.com/example/project",
+                "homepageUrl": "https://example.com",
                 "description": "Example",
                 "isFork": False,
                 "isArchived": False,
@@ -72,9 +73,25 @@ def test_parse_response_preserves_live_maintenance_evidence() -> None:
     )[0]
     assert row["status"] == "ok"
     assert row["stars"] == 100
+    assert row["homepage"] == "https://example.com"
     assert row["default_branch"]["committed_at"] == "2026-07-23T09:19:55Z"
     assert row["default_branch"]["commit_url"].endswith(f"/commit/{'a' * 40}")
     assert row["latest_release"]["tag"] == "1.2.3"
+
+
+def test_query_requests_the_repository_homepage() -> None:
+    assert "homepageUrl" in refresh.build_query(["example/project"])
+
+
+def test_unset_homepages_are_recorded_as_none() -> None:
+    for value in (None, "", "   "):
+        assert refresh.normalize_homepage(value) is None
+
+
+def test_homepage_is_recorded_without_surrounding_whitespace() -> None:
+    assert (
+        refresh.normalize_homepage("  https://example.com  ") == "https://example.com"
+    )
 
 
 def test_fetch_batch_uses_one_graphql_request(

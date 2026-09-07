@@ -265,6 +265,7 @@ def maintenance_summary(
         "fork": bool(metadata.get("fork")),
         "parent": metadata.get("parent"),
         "url": metadata.get("url") or analysis.get("project_url"),
+        "homepage": metadata.get("homepage"),
         "evidence": [
             item
             for item in analysis.get("evidence", [])
@@ -395,10 +396,12 @@ def maintenance_markdown(maintenance: dict[str, Any]) -> str:
         else "none"
     )
     stars = maintenance["stars"] if maintenance["stars"] is not None else "unknown"
+    homepage = maintenance.get("homepage")
     return (
         f"- **Maintenance:** {maintenance['assessment']} · "
         f"default-branch commit: [{committed_at}]({commit_url}) · "
         f"latest release: {release} · stars: {stars} · "
+        f"homepage: {homepage or 'none'} · "
         f"metadata fetched: {maintenance['metadata_fetched_at']}"
     )
 
