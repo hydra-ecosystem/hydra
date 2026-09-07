@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-07",
-  "generated_at": "2026-09-07T07:22:19Z",
+  "generated_at": "2026-09-07T19:46:27Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 71,
+    "open_total": 70,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 6,
-        "percentage": 8.5
+        "count": 5,
+        "percentage": 7.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 54,
-        "percentage": 76.1
+        "percentage": 77.1
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 8.5
+        "percentage": 8.6
       },
       {
         "category": "Question",
@@ -33,13 +33,13 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 2,
-        "percentage": 2.8
+        "percentage": 2.9
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 2.8
+        "percentage": 2.9
       }
     ],
     "by_status": [
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 3
+        "count": 1
       },
       {
         "status": "blocked",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 68
+        "count": 69
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 56
+        "count": 57
       }
     ]
   },
@@ -88,45 +88,6 @@
       "updated": "2026-08-11",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3375"
-    },
-    {
-      "number": 3427,
-      "title": "HydraConfig is unavailable during multirun controller initialization",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3439,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3439"
-        }
-      ],
-      "created": "2026-08-31",
-      "updated": "2026-09-06",
-      "labels": [
-        "bug",
-        "sweep"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
-    },
-    {
-      "number": 3440,
-      "title": "hydra.mode discovery composes the config twice on every invocation",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3441,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3441"
-        }
-      ],
-      "created": "2026-09-06",
-      "updated": "2026-09-07",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
     },
     {
       "number": 468,
@@ -1207,6 +1168,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3438"
     },
     {
+      "number": 3440,
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-09-06",
+      "updated": "2026-09-07",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
+    },
+    {
       "number": 385,
       "title": "Experimentation tracking support",
       "category": "Enhancement",
@@ -2085,9 +2059,53 @@
         "difficult"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
+    },
+    {
+      "number": 3427,
+      "title": "HydraConfig is unavailable during multirun controller initialization",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3439,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3439"
+        }
+      ],
+      "created": "2026-08-31",
+      "updated": "2026-09-06",
+      "labels": [
+        "bug",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3427"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-07T19:46:27Z",
+      "kind": "pr",
+      "issue": 3440,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3440",
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "detail": "unlinked #3441"
+    },
+    {
+      "ts": "2026-09-07T19:46:27Z",
+      "kind": "closed",
+      "issue": 3427,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3427",
+      "title": "HydraConfig is unavailable during multirun controller initialization"
+    },
+    {
+      "ts": "2026-09-07T19:46:27Z",
+      "kind": "status",
+      "issue": 3440,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3440",
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "detail": "community PR → not started"
+    },
     {
       "ts": "2026-09-07T07:22:19Z",
       "kind": "pr",
@@ -3663,28 +3681,6 @@
         "number": 3341,
         "url": "https://github.com/facebookresearch/hydra/pull/3341"
       }
-    },
-    {
-      "ts": "2026-08-03T12:23:00Z",
-      "kind": "new",
-      "issue": 3346,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3346",
-      "title": "Remove remaining Hydra 1.2 transition leftovers"
-    },
-    {
-      "ts": "2026-08-03T12:23:00Z",
-      "kind": "new",
-      "issue": 3345,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3345",
-      "title": "Remove remaining Hydra 1.1 behavior and migration artifacts"
-    },
-    {
-      "ts": "2026-08-03T10:01:46Z",
-      "kind": "pr",
-      "issue": 3237,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3237",
-      "title": "Remove version_base and Hydra 1.1 compatibility",
-      "detail": "unlinked #3335"
     }
   ]
 }
