@@ -47,6 +47,7 @@ log = logging.getLogger(__name__)
 def create_nsgaii_sampler(
     mutation: Optional[Any] = None, **kwargs: Any
 ) -> optuna.samplers.NSGAIISampler:
+    # Optuna v5 adds mutation; omit it when unset for v4 compatibility.
     if mutation is not None:
         kwargs["mutation"] = mutation
     return optuna.samplers.NSGAIISampler(**kwargs)
@@ -59,6 +60,7 @@ def create_nsgaiii_sampler(
 ) -> optuna.samplers.NSGAIIISampler:
     if (points := reference_points) is not None:
         kwargs["reference_points"] = numpy.asarray(points, dtype=float)
+    # Optuna v5 adds mutation; omit it when unset for v4 compatibility.
     if mutation is not None:
         kwargs["mutation"] = mutation
     return optuna.samplers.NSGAIIISampler(**kwargs)
