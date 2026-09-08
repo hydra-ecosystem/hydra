@@ -7,10 +7,12 @@ from typing import (
     Callable,
     Dict,
     List,
+    Literal,
     MutableSequence,
     Optional,
     Sequence,
     Tuple,
+    cast,
 )
 
 import numpy
@@ -291,7 +293,7 @@ class OptunaSweeperImpl(Sweeper):
             study_name=self.study_name,
             storage=self.storage,
             sampler=self.sampler,
-            directions=directions,
+            directions=cast(List[Literal["minimize", "maximize"]], directions),
             load_if_exists=True,
         )
         log.info(f"Study name: {study.study_name}")

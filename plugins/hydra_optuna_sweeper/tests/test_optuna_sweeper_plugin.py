@@ -407,6 +407,28 @@ def test_motpe_sampler_removed() -> None:
         )
 
 
+@mark.parametrize(
+    "config_type, sampler_type",
+    [
+        (NSGAIISamplerConfig, optuna.samplers.NSGAIISampler),
+        (NSGAIIISamplerConfig, optuna.samplers.NSGAIIISampler),
+    ],
+)
+def test_nsga_sampler_omits_default_mutation(
+    config_type: Any, sampler_type: Any
+) -> None:
+    with patch.object(sampler_type, "__init__", return_value=None) as constructor:
+        instantiate(
+            OmegaConf.structured(config_type),
+            _execution_whitelist_=(
+                "optuna.samplers.*",
+                "hydra_plugins.hydra_optuna_sweeper._impl.create_nsgaiii_sampler",
+            ),
+        )
+    constructor.assert_called_once()
+    assert "mutation" not in constructor.call_args.kwargs
+
+
 @mark.filterwarnings("default:NSGAIIISampler is experimental")
 def test_nsgaiii_sampler_reference_points_converted_to_array() -> None:
     reference_points = [[0.0, 1.0], [1.0, 0.0]]
