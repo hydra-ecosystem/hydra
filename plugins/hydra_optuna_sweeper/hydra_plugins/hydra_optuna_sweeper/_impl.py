@@ -44,12 +44,23 @@ from .config import Direction
 log = logging.getLogger(__name__)
 
 
+def create_nsgaii_sampler(
+    mutation: Optional[Any] = None, **kwargs: Any
+) -> optuna.samplers.NSGAIISampler:
+    if mutation is not None:
+        kwargs["mutation"] = mutation
+    return optuna.samplers.NSGAIISampler(**kwargs)
+
+
 def create_nsgaiii_sampler(
     reference_points: Optional[List[List[float]]] = None,
+    mutation: Optional[Any] = None,
     **kwargs: Any,
 ) -> optuna.samplers.NSGAIIISampler:
     if (points := reference_points) is not None:
         kwargs["reference_points"] = numpy.asarray(points, dtype=float)
+    if mutation is not None:
+        kwargs["mutation"] = mutation
     return optuna.samplers.NSGAIIISampler(**kwargs)
 
 

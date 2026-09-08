@@ -4,7 +4,7 @@ import sys
 import warnings
 from pathlib import Path
 from typing import Any, List
-from unittest.mock import patch
+from unittest.mock import patch, sentinel
 
 import numpy
 import optuna
@@ -414,19 +414,27 @@ def test_motpe_sampler_removed() -> None:
         (NSGAIIISamplerConfig, optuna.samplers.NSGAIIISampler),
     ],
 )
-def test_nsga_sampler_omits_default_mutation(
-    config_type: Any, sampler_type: Any
+@mark.parametrize("mutation", [None, sentinel.mutation])
+def test_nsga_sampler_mutation(
+    config_type: Any, sampler_type: Any, mutation: Any
 ) -> None:
+    config = OmegaConf.structured(config_type, flags={"allow_objects": True})
+    assert config.mutation is None
+    config.mutation = mutation
     with patch.object(sampler_type, "__init__", return_value=None) as constructor:
         instantiate(
-            OmegaConf.structured(config_type),
+            config,
             _execution_whitelist_=(
                 "optuna.samplers.*",
+                "hydra_plugins.hydra_optuna_sweeper._impl.create_nsgaii_sampler",
                 "hydra_plugins.hydra_optuna_sweeper._impl.create_nsgaiii_sampler",
             ),
         )
     constructor.assert_called_once()
-    assert "mutation" not in constructor.call_args.kwargs
+    if mutation is None:
+        assert "mutation" not in constructor.call_args.kwargs
+    else:
+        assert constructor.call_args.kwargs["mutation"] is mutation
 
 
 @mark.filterwarnings("default:NSGAIIISampler is experimental")
