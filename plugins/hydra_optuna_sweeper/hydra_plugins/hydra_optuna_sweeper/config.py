@@ -99,11 +99,12 @@ class NSGAIISamplerConfig(SamplerConfig):
     https://optuna.readthedocs.io/en/stable/reference/generated/optuna.samplers.NSGAIISampler.html
     """
 
-    _target_: str = "optuna.samplers.NSGAIISampler"
+    _target_: str = "hydra_plugins.hydra_optuna_sweeper._impl.create_nsgaii_sampler"
     seed: Optional[int] = None
 
     population_size: int = 50
     mutation_prob: Optional[float] = None
+    mutation: Optional[Any] = None
     crossover: Optional[Any] = None
     crossover_prob: float = 0.9
     swapping_prob: float = 0.5
@@ -121,6 +122,7 @@ class NSGAIIISamplerConfig(SamplerConfig):
 
     population_size: int = 50
     mutation_prob: Optional[float] = None
+    mutation: Optional[Any] = None
     crossover: Optional[Any] = None
     crossover_prob: float = 0.9
     swapping_prob: float = 0.5

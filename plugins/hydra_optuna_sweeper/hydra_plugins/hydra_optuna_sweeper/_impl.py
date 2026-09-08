@@ -7,10 +7,12 @@ from typing import (
     Callable,
     Dict,
     List,
+    Literal,
     MutableSequence,
     Optional,
     Sequence,
     Tuple,
+    cast,
 )
 
 import numpy
@@ -42,12 +44,25 @@ from .config import Direction
 log = logging.getLogger(__name__)
 
 
+def create_nsgaii_sampler(
+    mutation: Optional[Any] = None, **kwargs: Any
+) -> optuna.samplers.NSGAIISampler:
+    # Optuna v5 adds mutation; omit it when unset for v4 compatibility.
+    if mutation is not None:
+        kwargs["mutation"] = mutation
+    return optuna.samplers.NSGAIISampler(**kwargs)
+
+
 def create_nsgaiii_sampler(
     reference_points: Optional[List[List[float]]] = None,
+    mutation: Optional[Any] = None,
     **kwargs: Any,
 ) -> optuna.samplers.NSGAIIISampler:
     if (points := reference_points) is not None:
         kwargs["reference_points"] = numpy.asarray(points, dtype=float)
+    # Optuna v5 adds mutation; omit it when unset for v4 compatibility.
+    if mutation is not None:
+        kwargs["mutation"] = mutation
     return optuna.samplers.NSGAIIISampler(**kwargs)
 
 
@@ -291,7 +306,7 @@ class OptunaSweeperImpl(Sweeper):
             study_name=self.study_name,
             storage=self.storage,
             sampler=self.sampler,
-            directions=directions,
+            directions=cast(List[Literal["minimize", "maximize"]], directions),
             load_if_exists=True,
         )
         log.info(f"Study name: {study.study_name}")
