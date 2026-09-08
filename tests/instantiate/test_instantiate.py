@@ -3881,12 +3881,17 @@ def test_blacklist_policy_sections_are_disjoint() -> None:
 
 
 def test_policy_sets_are_immutable() -> None:
-    assert isinstance(target_policy.UNCONTROLLED_EXECUTION_TARGETS, frozenset)
+    assert isinstance(target_policy.DEFAULT_BLACKLISTED_MODULES, frozenset)
     assert isinstance(target_policy.CALLBACK_DISPATCH_TARGETS, frozenset)
     assert isinstance(target_policy.CALLABLE_WRAPPER_TARGETS, frozenset)
+    assert isinstance(target_policy.UNCONTROLLED_EXECUTION_TARGETS, frozenset)
     assert isinstance(
         target_policy.UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS, frozenset
     )
+    assert isinstance(
+        target_policy.LEGACY_COMPATIBLE_NON_WHITELISTABLE_TARGETS, frozenset
+    )
+    assert isinstance(target_policy.DISCOVERY_TARGETS, frozenset)
 
 
 def test_policy_mutation_via_instantiate_is_blocked() -> None:

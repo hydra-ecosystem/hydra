@@ -37,7 +37,7 @@ from hydra.errors import InstantiationException
 # Generally problematic targets are refused on the legacy path, but trusted
 # Python code may authorize them with an execution whitelist. Keep this set
 # for operations whose effect is fully named and bounded by the target itself.
-DEFAULT_BLACKLISTED_MODULES = {
+DEFAULT_BLACKLISTED_MODULES = frozenset({
     "_sitebuiltins.Quitter",
     "builtins.exit",
     "builtins.quit",
@@ -68,7 +68,7 @@ DEFAULT_BLACKLISTED_MODULES = {
     "shutil.rmtree",
     "shutil.move",
     "shutil.chown",
-}
+})
 
 # These dispatchers execute caller-supplied callables and return their results
 # directly or through a container, iterator, or deferred result. That allows
@@ -317,7 +317,7 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS = frozenset({
 # whitelist, but retain temporary legacy compatibility while users migrate.
 # Uncontrolled-execution targets above are independently non-whitelistable and
 # blocked on the legacy path.
-LEGACY_COMPATIBLE_NON_WHITELISTABLE_TARGETS = {
+LEGACY_COMPATIBLE_NON_WHITELISTABLE_TARGETS = frozenset({
     "builtins.delattr",
     "builtins.getattr",
     "builtins.hasattr",
@@ -325,12 +325,12 @@ LEGACY_COMPATIBLE_NON_WHITELISTABLE_TARGETS = {
     "builtins.setattr",
     "builtins.type.__getattribute__",
     "hydra._internal.instantiate._instantiate2.instantiate",
-}
+})
 
 # These targets resolve another object from a config-controlled dotpath. The
 # selected path is itself an authorization boundary, independent of whether the
 # helper is called immediately or returned through Hydra-native partial support.
-DISCOVERY_TARGETS = {
+DISCOVERY_TARGETS = frozenset({
     # Underlying resolver used by the public helpers. Gate it independently so
     # a broad hydra.* whitelist cannot authorize an arbitrary import path.
     "hydra._internal.utils._locate",
@@ -340,7 +340,7 @@ DISCOVERY_TARGETS = {
     # so gating does not depend on that aliasing implementation detail.
     "hydra.utils.get_static_method",
     "hydra.utils.get_object",
-}
+})
 
 
 class _UnsafeDisableExecutionChecks:
