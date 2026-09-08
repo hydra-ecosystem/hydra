@@ -3880,6 +3880,30 @@ def test_blacklist_policy_sections_are_disjoint() -> None:
     )
 
 
+def test_policy_sets_are_immutable() -> None:
+    assert isinstance(target_policy.UNCONTROLLED_EXECUTION_TARGETS, frozenset)
+    assert isinstance(target_policy.CALLBACK_DISPATCH_TARGETS, frozenset)
+    assert isinstance(target_policy.CALLABLE_WRAPPER_TARGETS, frozenset)
+    assert isinstance(
+        target_policy.UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS, frozenset
+    )
+
+
+def test_policy_mutation_via_instantiate_is_blocked() -> None:
+    assert "os.system" in target_policy.UNCONTROLLED_EXECUTION_TARGETS
+
+    cfg = {
+        "disarm": {
+            "_target_": "hydra._internal.target_policy.UNCONTROLLED_EXECUTION_TARGETS.discard",
+            "_args_": ["os.system"],
+        },
+    }
+    with raises(InstantiationException, match="Error locating target"):
+        _instantiate2.instantiate(cfg)
+
+    assert "os.system" in target_policy.UNCONTROLLED_EXECUTION_TARGETS
+
+
 @mark.parametrize(
     "target",
     [

@@ -74,7 +74,7 @@ DEFAULT_BLACKLISTED_MODULES = {
 # directly or through a container, iterator, or deferred result. That allows
 # selection, wrapping, and invocation to happen outside instantiate's immediate
 # callable-result authorization.
-CALLBACK_DISPATCH_TARGETS = {
+CALLBACK_DISPATCH_TARGETS = frozenset({
     "builtins.map",
     "concurrent.futures._base.Executor.map",
     "concurrent.futures._base.Executor.submit",
@@ -96,7 +96,7 @@ CALLBACK_DISPATCH_TARGETS = {
     "multiprocessing.pool.Pool.starmap",
     "multiprocessing.pool.Pool.starmap_async",
     "_functools.reduce",
-}
+})
 
 _CALLABLE_DESCRIPTOR_BINDING_TARGETS: Dict[type, str] = {
     property: "builtins.property.__get__",
@@ -109,7 +109,7 @@ _CALLABLE_DESCRIPTOR_BINDING_TARGETS: Dict[type, str] = {
 # These helpers construct, bind, or relabel callable wrappers whose later
 # invocation can return an unauthorized callable outside instantiate's result
 # mediation.
-CALLABLE_WRAPPER_TARGETS = {
+CALLABLE_WRAPPER_TARGETS = frozenset({
     "builtins.classmethod",
     "builtins.staticmethod",
     "contextlib.AsyncContextDecorator.__call__",
@@ -131,7 +131,7 @@ CALLABLE_WRAPPER_TARGETS = {
     "unittest.mock.PropertyMock",
     "unittest.mock.create_autospec",
     "unittest.mock.mock_open",
-} | set(_CALLABLE_DESCRIPTOR_BINDING_TARGETS.values())
+}) | frozenset(_CALLABLE_DESCRIPTOR_BINDING_TARGETS.values())
 
 _NON_CALLABLE_MOCK_TARGETS = {
     "unittest.mock.NonCallableMagicMock",
@@ -142,7 +142,7 @@ _NON_CALLABLE_MOCK_SAFE_PARAMETERS = {"name", "spec", "spec_set"}
 # These targets allow config data to select or supply executable behavior.
 # They are refused both on the legacy path and by a real execution whitelist.
 # UNSAFE_DISABLE_EXECUTION_CHECKS remains the explicit opt-out from all checks.
-UNCONTROLLED_EXECUTION_TARGETS = (
+UNCONTROLLED_EXECUTION_TARGETS = frozenset(
     {
         "_sitebuiltins._Helper",
         "builtins.__build_class__",
@@ -304,14 +304,14 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIXES = (
 # Exact legitimate constructors within otherwise denied module families. Exact
 # entries in UNCONTROLLED_EXECUTION_TARGETS still take precedence over exceptions.
 # An exception permits only the named target, not its methods or descendants.
-UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS = {
+UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS = frozenset({
     "doctest.DocTest",
     "doctest.DocTestParser",
     "doctest.Example",
     "pydoc.HTMLDoc",
     "pydoc.TextDoc",
     "trace.Trace",
-}
+})
 
 # These additional callables cannot be safely authorized by the target-name
 # whitelist, but retain temporary legacy compatibility while users migrate.
