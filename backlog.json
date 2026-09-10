@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-10",
-  "generated_at": "2026-09-10T07:15:03Z",
+  "generated_at": "2026-09-10T15:50:16Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 70,
+    "open_total": 71,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 5,
-        "percentage": 7.1
+        "percentage": 7.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 54,
-        "percentage": 77.1
+        "percentage": 76.1
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 8.6
+        "percentage": 8.5
       },
       {
         "category": "Question",
@@ -33,13 +33,13 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 2,
-        "percentage": 2.9
+        "percentage": 2.8
       },
       {
         "category": "Build",
         "emoji": "🏗️",
-        "count": 2,
-        "percentage": 2.9
+        "count": 3,
+        "percentage": 4.2
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 69
+        "count": 70
       },
       {
         "status": "done",
@@ -1181,6 +1181,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
     },
     {
+      "number": 3444,
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
+      "category": "Build",
+      "category_emoji": "🏗️",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-09-10",
+      "updated": "2026-09-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3444"
+    },
+    {
       "number": 385,
       "title": "Experimentation tracking support",
       "category": "Enhancement",
@@ -2083,6 +2096,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-10T15:50:16Z",
+      "kind": "new",
+      "issue": 3444,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3444",
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists"
+    },
     {
       "ts": "2026-09-07T19:46:27Z",
       "kind": "pr",
@@ -3664,18 +3684,6 @@
       "issue": 3345,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/3345",
       "title": "Remove remaining Hydra 1.1 behavior and migration artifacts",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3341,
-        "url": "https://github.com/facebookresearch/hydra/pull/3341"
-      }
-    },
-    {
-      "ts": "2026-08-03T12:36:58Z",
-      "kind": "status",
-      "issue": 3237,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3237",
-      "title": "Remove version_base",
       "detail": "not started → in progress",
       "pr": {
         "number": 3341,
