@@ -58,7 +58,7 @@
     "385": "2026-09-05",
     "753": "2026-09-05"
   },
-  "generated_at": "2026-09-11T07:15:05Z",
+  "generated_at": "2026-09-12T07:13:09Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -216,7 +216,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "[Bug] `???` defaults cannot display `--help`",
-      "updated_at": "2026-07-27T17:33:39Z"
+      "updated_at": "2026-09-11T22:42:11Z"
     },
     "2227": {
       "category": "Enhancement",
@@ -244,7 +244,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
-      "updated_at": "2026-07-15T18:04:14Z"
+      "updated_at": "2026-09-11T22:39:02Z"
     },
     "2412": {
       "category": "Enhancement",
@@ -280,7 +280,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "[Not sure if bug/feature] Where does submitit error output go?",
-      "updated_at": "2026-06-10T04:04:27Z"
+      "updated_at": "2026-09-11T22:36:52Z"
     },
     "2758": {
       "category": "Documentation",
@@ -390,7 +390,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "Ray Launcher:  Additional properties are not allowed",
-      "updated_at": "2026-06-26T13:10:08Z"
+      "updated_at": "2026-09-11T22:32:23Z"
     },
     "2944": {
       "category": "Enhancement",
@@ -961,7 +961,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "[Bug] tab completion slow with slow imports",
-      "updated_at": "2026-07-27T06:16:40Z"
+      "updated_at": "2026-09-11T22:45:52Z"
     },
     "993": {
       "category": "Enhancement",

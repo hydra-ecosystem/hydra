@@ -1,6 +1,6 @@
 {
-  "generated_on": "2026-09-11",
-  "generated_at": "2026-09-11T07:15:05Z",
+  "generated_on": "2026-09-12",
+  "generated_at": "2026-09-12T07:13:09Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 72,
@@ -229,7 +229,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2020-09-01",
-      "updated": "2026-07-27",
+      "updated": "2026-09-11",
       "labels": [
         "question"
       ],
@@ -439,7 +439,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2022-04-22",
-      "updated": "2026-07-27",
+      "updated": "2026-09-11",
       "labels": [
         "bug"
       ],
@@ -470,7 +470,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2022-05-26",
-      "updated": "2026-07-15",
+      "updated": "2026-09-11",
       "labels": [
         "bug",
         "plugin",
@@ -518,7 +518,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2023-05-16",
-      "updated": "2026-06-10",
+      "updated": "2026-09-11",
       "labels": [
         "bug"
       ],
@@ -649,7 +649,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2024-07-21",
-      "updated": "2026-06-26",
+      "updated": "2026-09-11",
       "labels": [
         "bug",
         "help wanted",
