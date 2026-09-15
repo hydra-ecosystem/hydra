@@ -138,3 +138,24 @@ def test_example(tmpdir: Path) -> None:
         ],
         allow_warnings=True,
     )
+
+
+def test_failure_preserves_remote_traceback(tmp_path: Path) -> None:
+    _stdout, stderr = run_python_script(
+        [
+            "tests/apps/failing_app.py",
+            "--multirun",
+            "hydra/launcher=submitit_local",
+            "hydra.launcher.gpus_per_node=0",
+            "hydra.launcher.timeout_min=1",
+            "+job=0",
+            f'hydra.sweep.dir="{tmp_path}"',
+        ],
+        allow_warnings=True,
+        print_error=False,
+        raise_exception=False,
+    )
+
+    assert "in main" in stderr
+    assert 'raise RuntimeError(f"submitit remote failure {cfg.job}")' in stderr
+    assert "RuntimeError: submitit remote failure 0" in stderr

@@ -1,8 +1,11 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import pickle
 import sys
+import traceback
 from typing import Any, cast
 
 from omegaconf import OmegaConf, open_dict
+from pytest import raises
 
 from hydra._internal.config_loader_impl import ConfigLoaderImpl
 from hydra._internal.execution_policy import _get_active_execution_whitelist
@@ -62,3 +65,28 @@ def test_run_job_reestablishes_execution_whitelist(monkeypatch: Any) -> None:
 
     assert result is sentinel
     assert _get_active_execution_whitelist() is None
+
+
+def test_job_return_preserves_traceback_after_pickle() -> None:
+    job_return = utils.JobReturn(
+        overrides=["job=0"],
+        status=utils.JobStatus.FAILED,
+    )
+    try:
+        raise ValueError("remote failure")
+    except ValueError as error:
+        job_return.return_value = error
+        job_return._remote_traceback = "".join(
+            traceback.format_exception(type(error), error, error.__traceback__)
+        )
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    with raises(ValueError, match="remote failure") as exc_info:
+        restored.return_value
+
+    assert isinstance(exc_info.value.__cause__, utils._RemoteTraceback)
+    assert "test_job_return_preserves_traceback_after_pickle" in str(
+        exc_info.value.__cause__
+    )
+    assert "ValueError: remote failure" in str(exc_info.value.__cause__)
