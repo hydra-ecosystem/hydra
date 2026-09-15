@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import sys
+import traceback
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -208,6 +209,9 @@ def _run_job(
             except Exception as e:
                 _log_job_error_to_file()
                 ret.return_value = e
+                ret._remote_traceback = "".join(
+                    traceback.format_exception(type(e), e, e.__traceback__)
+                )
                 ret.status = JobStatus.FAILED
             except KeyboardInterrupt as e:
                 # record the interrupt like any other failure so callbacks see
@@ -421,6 +425,10 @@ class JobStatus(Enum):
     FAILED = 2
 
 
+class _RemoteTraceback(Exception):
+    pass
+
+
 @dataclass
 class JobReturn:
     overrides: Optional[Sequence[str]] = None
@@ -430,6 +438,7 @@ class JobReturn:
     task_name: Optional[str] = None
     status: JobStatus = JobStatus.UNKNOWN
     _return_value: Any = None
+    _remote_traceback: Optional[str] = field(default=None, repr=False, compare=False)
 
     @property
     def return_value(self) -> Any:
@@ -440,6 +449,12 @@ class JobReturn:
             sys.stderr.write(
                 f"Error executing job with overrides: {self.overrides}" + os.linesep
             )
+            if (
+                self._remote_traceback is not None
+                and isinstance(self._return_value, BaseException)
+                and self._return_value.__traceback__ is None
+            ):
+                raise self._return_value from _RemoteTraceback(self._remote_traceback)
             raise self._return_value
 
     @return_value.setter
