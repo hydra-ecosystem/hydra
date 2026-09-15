@@ -56,13 +56,24 @@ function LandscapeCard({project}) {
               {project.name}
             </a>
           </h3>
-          <a
-            className={styles.repository}
-            href={`https://github.com/${project.repository}`}
-            rel="noopener noreferrer"
-            target="_blank">
-            {project.repository}
-          </a>
+          <div className={styles.projectLinks}>
+            <a
+              className={styles.repository}
+              href={`https://github.com/${project.repository}`}
+              rel="noopener noreferrer"
+              target="_blank">
+              {project.repository}
+            </a>
+            {project.homepage && (
+              <a
+                className={styles.homepage}
+                href={project.homepage}
+                rel="noopener noreferrer"
+                target="_blank">
+                Homepage
+              </a>
+            )}
+          </div>
         </div>
         <span className={isGoodUsage ? styles.goodUsage : styles.poweredBy}>
           {GROUP_LABELS[project.group]}

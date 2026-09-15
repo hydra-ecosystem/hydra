@@ -7,6 +7,7 @@
     "hydra_ux_score": 4,
     "listing": {
       "description": "verl/HybridFlow: A Flexible and Efficient RL Post-Training Framework",
+      "homepage": "https://verl-project.github.io",
       "kind": "library_tool",
       "name": "verl",
       "relationships": [],
@@ -26,6 +27,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "Official code for \"F5-TTS: A Fairytaler that Fakes Fluent and Faithful Speech with Flow Matching\"",
+      "homepage": "https://arxiv.org/abs/2410.06885",
       "kind": "application",
       "name": "F5-TTS",
       "relationships": [],
@@ -46,6 +48,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "ESPnet3 intentionally uses Hydra for configuration-driven object construction in production training and trainer paths. The dependency is explicitly scoped to ESPnet3 and accompanied by project-specific configuration documentation.",
+      "homepage": "https://espnet.github.io/espnet/",
       "kind": "framework",
       "name": "ESPnet3",
       "relationships": [],
@@ -66,6 +69,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "Democratizing Reinforcement Learning for LLMs",
+      "homepage": "https://docs.rllm-project.com",
       "kind": "framework",
       "name": "rLLM",
       "relationships": [
@@ -88,6 +92,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "ExecuTorch’s LLM Export API directly uses Hydra to provide structured YAML and command-line configuration for exporting models. The Hydra integration is maintained, repository-native subsystem code rather than a copied example, vendored component, or transitive dependency.",
+      "homepage": "https://executorch.ai",
       "kind": "library_tool",
       "name": "ExecuTorch LLM Export API",
       "relationships": [
@@ -130,6 +135,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "A modular, primitive-first, python-first PyTorch library for Reinforcement Learning.",
+      "homepage": "https://pytorch.org/rl",
       "kind": "library_tool",
       "name": "TorchRL",
       "relationships": [
@@ -153,6 +159,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "PhysicsNeMo’s Lagrangian MeshGraphNet reference sample directly runs its training program through Hydra. The usage is an NVIDIA-authored, documented training-recipe capability, while the repository describes training recipes as separate from packaged core artifacts.",
+      "homepage": "https://developer.nvidia.com/physicsnemo",
       "kind": "framework",
       "name": "PhysicsNeMo",
       "relationships": [],
@@ -174,6 +181,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "detrex is a research platform for DETR-based object detection, segmentation, pose estimation and other visual recognition tasks.",
+      "homepage": "https://detrex.readthedocs.io/en/latest/",
       "kind": "library_tool",
       "name": "detrex",
       "relationships": [],
@@ -194,6 +202,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "PDEBench natively uses Hydra as the configuration entry point for its forward baseline-model training subsystem. This is a maintained scientific-machine-learning benchmark and tooling project.",
+      "homepage": "https://arxiv.org/abs/2210.07182",
       "kind": "library_tool",
       "name": "PDEBench",
       "relationships": [],
@@ -221,6 +230,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "NequIP is a code for building E(3)-equivariant interatomic potentials",
+      "homepage": "https://pubs.rsc.org/en/content/articlehtml/2026/dd/d5dd00423c",
       "kind": "library_tool",
       "name": "NequIP",
       "relationships": [],
@@ -242,6 +252,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "Central repository for biomolecular foundation models with shared trainers and pipeline components",
+      "homepage": "https://rosettacommons.github.io/foundry/",
       "kind": "library_tool",
       "name": "Foundry",
       "relationships": [],
@@ -262,6 +273,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "A PyTorch library for all things Reinforcement Learning (RL) for Combinatorial Optimization (CO)",
+      "homepage": "https://rl4co.ai4co.org",
       "kind": "library_tool",
       "name": "rl4co",
       "relationships": [],
@@ -302,6 +314,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "Python Package for Airborne RGB machine learning",
+      "homepage": "https://deepforest.readthedocs.io/",
       "kind": "library_tool",
       "name": "DeepForest",
       "relationships": [],
@@ -349,6 +362,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "BenchMARL is a library for benchmarking Multi-Agent Reinforcement Learning (MARL). BenchMARL allows to quickly compare different MARL algorithms, tasks, and models while being systematically grounded in its two core tenets: reproducibility and standardization.",
+      "homepage": "https://benchmarl.readthedocs.io",
       "kind": "library_tool",
       "name": "BenchMARL",
       "relationships": [],
@@ -387,6 +401,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "A scalable generative AI framework built for researchers and developers working on Large Language Models, Multimodal, and Speech AI (Automatic Speech Recognition and Text-to-Speech)",
+      "homepage": "https://docs.nvidia.com/nemo/speech/nightly/index.html",
       "kind": "framework",
       "name": "NVIDIA NeMo Speech",
       "relationships": [
@@ -455,6 +470,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "ClearML - Auto-Magical CI/CD to streamline your AI workload. Experiment Management, Data Management, Pipeline, Orchestration, Scheduling & Serving in one MLOps/LLMOps solution",
+      "homepage": "https://clear.ml/docs",
       "kind": "ml_experimentation_platform",
       "name": "ClearML",
       "relationships": [
@@ -506,6 +522,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "The RL Bridge for LLM-based Agent Applications. Made Simple & Flexible.",
+      "homepage": "https://areal-ai.io",
       "kind": "framework",
       "name": "AReaL",
       "relationships": [
@@ -545,6 +562,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "Habitat-Lab is a modular embodied-AI library whose own configuration system migrated to Hydra. Its primary configuration API registers a project-defined Hydra search-path plugin.",
+      "homepage": "https://aihabitat.org/",
       "kind": "library_tool",
       "name": "Habitat-Lab",
       "relationships": [
@@ -594,6 +612,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "FAIRChem’s fairchem-core component natively uses Hydra for its primary training/job configuration and runner instantiation. The project provides machine-learning methods for chemistry and materials science.",
+      "homepage": "https://fair-chem.github.io/",
       "kind": "library_tool",
       "name": "FAIRChem",
       "relationships": [],
@@ -614,6 +633,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "DIAMOND (DIffusion As a Model Of eNvironment Dreams) is a reinforcement learning agent trained in a diffusion world model. NeurIPS 2024 Spotlight.",
+      "homepage": "https://diamond-wm.github.io",
       "kind": "application",
       "name": "DIAMOND",
       "relationships": [],
@@ -634,6 +654,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "Official implementation of MatterGen -- a generative model for inorganic materials design across the periodic table that can be fine-tuned to steer the generation towards a wide range of property constraints.",
+      "homepage": "https://www.nature.com/articles/s41586-025-08628-5",
       "kind": "application",
       "name": "MatterGen",
       "relationships": [],
@@ -714,6 +735,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "MyoSuite’s maintained agent-baseline subsystem directly uses Hydra as the configuration and launch interface for MJRL and Stable-Baselines3 training. Hydra is not required by the simulator’s core package.",
+      "homepage": "https://www.myosuite.org",
       "kind": "library_tool",
       "name": "MyoSuite",
       "relationships": [],
@@ -735,6 +757,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "Official implementation of “Splatter Image: Ultra-Fast Single-View 3D Reconstruction” (CVPR 2024).",
+      "homepage": "https://szymanowiczs.github.io/splatter-image",
       "kind": "application",
       "name": "splatter-image",
       "relationships": [],
@@ -755,6 +778,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "SAM-PT: Extending SAM to zero-shot video segmentation with point-based tracking.",
+      "homepage": "https://arxiv.org/abs/2307.01197",
       "kind": "application",
       "name": "SAM-PT",
       "relationships": [],
@@ -781,6 +805,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "[NeurIPS'23 Spotlight] \"Mind2Web: Towards a Generalist Agent for the Web\" -- the first LLM-based web agent and benchmark for generalist web agents",
+      "homepage": "https://osu-nlp-group.github.io/Mind2Web/",
       "kind": "application",
       "name": "Mind2Web",
       "relationships": [],
@@ -801,6 +826,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "open-metric-learning is a metric-learning library whose optional Pipelines component uses Hydra for configuration-driven experiment entry points. The repository documents Hydra as its config parser and provides pipeline examples with Hydra-decorated launch functions.",
+      "homepage": "https://open-metric-learning.readthedocs.io/en/latest/index.html",
       "kind": "library_tool",
       "name": "open-metric-learning",
       "relationships": [],
@@ -821,6 +847,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "🤖 The Full Process Python Package for Robot Learning from Demonstration and Robot Manipulation",
+      "homepage": "https://rofunc.readthedocs.io",
       "kind": "framework",
       "name": "Rofunc",
       "relationships": [],
@@ -903,6 +930,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "BiomedParse: A Foundation Model for Joint Segmentation, Detection, and Recognition of Biomedical Objects Across Nine Modalities",
+      "homepage": "https://microsoft.github.io/BiomedParse/",
       "kind": "application",
       "name": "BiomedParse",
       "relationships": [],
@@ -987,6 +1015,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "Monty is a sensorimotor learning framework based on the thousand brains theory of the neocortex.",
+      "homepage": "https://thousandbrainsproject.readme.io",
       "kind": "framework",
       "name": "tbp.monty",
       "relationships": [],
@@ -1066,6 +1095,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "McByte is an independently named, clean-room-adapted tracker subsystem within the Trackers library. Its optional SAM/Cutie mask pipeline directly uses Hydra to initialize and compose Cutie configurations, while the default tracker configuration leaves mask management disabled.",
+      "homepage": "https://trackers.roboflow.com/",
       "kind": "library_tool",
       "name": "McByte (Trackers)",
       "relationships": [],
@@ -1115,6 +1145,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "verl-agent is an extension of veRL, designed for training LLM/VLM agents via RL. verl-agent is also the official code for paper \"Group-in-Group Policy Optimization for LLM Agent Training\"",
+      "homepage": "https://huggingface.co/papers/2505.10978",
       "kind": "framework",
       "name": "verl-agent",
       "relationships": [],
@@ -1135,6 +1166,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "A ComfyUI custom node designed for advanced image background removal and object, face, clothes, and fashion segmentation, utilizing multiple models including RMBG-2.0, INSPYRENET, BEN, BEN2, BiRefNet, SDMatte, SAM, SAM2, SAM3 and GroundingDINO.",
+      "homepage": "https://1038lab.github.io/ComfyUI-RMBG/",
       "kind": "plugin_integration",
       "name": "ComfyUI-RMBG",
       "relationships": [
@@ -1158,6 +1190,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "[CVPR 2025] Fast3R: Towards 3D Reconstruction of 1000+ Images in One Forward Pass",
+      "homepage": "https://fast3r-3d.github.io/",
       "kind": "application",
       "name": "Fast3R",
       "relationships": [],
@@ -1179,6 +1212,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "[ICASSP 2024] 🍵 Matcha-TTS: A fast TTS architecture with conditional flow matching",
+      "homepage": "https://shivammehta25.github.io/Matcha-TTS/",
       "kind": "application",
       "name": "Matcha-TTS",
       "relationships": [],
@@ -1222,6 +1256,7 @@
     "group": "powered_by_hydra",
     "listing": {
       "description": "Hydra use belongs to the optional DeepSpeech2 model integration, not to the AI Hub Models core. The integration adapts the upstream DeepSpeech2 implementation for Qualcomm-device export and explicitly installs its Hydra-related configuration dependency.",
+      "homepage": "https://aihub.qualcomm.com/models",
       "kind": "library_tool",
       "name": "Qualcomm AI Hub Models — DeepSpeech2",
       "relationships": [],
@@ -1243,6 +1278,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "[NeurIPS 2025] TTRL: Test-Time Reinforcement Learning",
+      "homepage": "https://arxiv.org/abs/2504.16084",
       "kind": "application",
       "name": "TTRL",
       "relationships": [],
@@ -1326,6 +1362,7 @@
     "hydra_ux_score": 2,
     "listing": {
       "description": "SkillRL: Evolving Agents via Recursive Skill-Augmented Reinforcement Learning",
+      "homepage": "https://arxiv.org/abs/2602.08234",
       "kind": "framework",
       "name": "SkillRL",
       "relationships": [],
@@ -1355,6 +1392,7 @@
     "hydra_ux_score": 4,
     "listing": {
       "description": "Official implementation for HyenaDNA, a long-range genomic foundation model built with Hyena",
+      "homepage": "https://arxiv.org/abs/2306.15794",
       "kind": "application",
       "name": "HyenaDNA",
       "relationships": [],
@@ -1377,6 +1415,7 @@
     "hydra_ux_score": 3,
     "listing": {
       "description": "[ICML 2025] Official PyTorch Implementation of \"History-Guided Video Diffusion\"",
+      "homepage": "https://boyuan.space/history-guidance",
       "kind": "application",
       "name": "Diffusion Forcing Transformer with History Guidance",
       "relationships": [],
@@ -1398,6 +1437,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "First-party Hydra tool that generates Structured Config dataclasses from Python class signatures for use with instantiate().",
+      "homepage": "https://hydra.cc/",
       "kind": "hydra_developer_tool",
       "name": "Configen",
       "relationships": [
@@ -1428,6 +1468,7 @@
     "hydra_ux_score": 4,
     "listing": {
       "description": "[3DV 2025] Code for \"FlowMap: High-Quality Camera Poses, Intrinsics, and Depth via Gradient Descent\" by Cameron Smith*, David Charatan*, Ayush Tewari, and Vincent Sitzmann",
+      "homepage": "https://cameronosmith.github.io/flowmap/",
       "kind": "application",
       "name": "FlowMap",
       "relationships": [],
@@ -1472,6 +1513,7 @@
     "hydra_ux_score": 3,
     "listing": {
       "description": "Transformers are Sample-Efficient World Models. ICLR 2023, notable top 5%.",
+      "homepage": "https://openreview.net/forum?id=vhFu1Acb0xb",
       "kind": "application",
       "name": "IRIS",
       "relationships": [],
@@ -1540,6 +1582,7 @@
     "hydra_ux_score": 4,
     "listing": {
       "description": "High-performance inference framework for large language models, focusing on efficiency, flexibility, and availability.",
+      "homepage": "https://chitu.ai/",
       "kind": "framework",
       "name": "Chitu",
       "relationships": [
@@ -1564,6 +1607,7 @@
     "hydra_ux_score": 5,
     "listing": {
       "description": "Open-source deep-learning framework for exploring, building and deploying AI weather/climate workflows.",
+      "homepage": "https://nvidia.github.io/earth2studio/",
       "kind": "library_tool",
       "name": "earth2studio",
       "relationships": [],
@@ -1609,6 +1653,7 @@
     "hydra_ux_score": 4,
     "listing": {
       "description": "BioNeMo Recipes: For building and adapting AI models in drug discovery at scale",
+      "homepage": "https://nvidia-bionemo.github.io/bionemo-recipes/",
       "kind": "framework",
       "name": "bionemo-recipes",
       "relationships": [],
@@ -1651,6 +1696,7 @@
     "hydra_ux_score": 3,
     "listing": {
       "description": "Ego4D Features is a documented feature-extraction component of the Ego4d Python module. It natively uses Hydra for its configurable feature-extraction workflows.",
+      "homepage": "https://ego4d-data.org/docs/",
       "kind": "library_tool",
       "name": "Ego4D Features",
       "relationships": [],
@@ -1786,6 +1832,7 @@
     "hydra_ux_score": 3,
     "listing": {
       "description": "🧬 Generative modeling of regulatory DNA sequences with diffusion probabilistic models 💨",
+      "homepage": "https://pinellolab.github.io/DNA-Diffusion/",
       "kind": "application",
       "name": "DNA-Diffusion",
       "relationships": [],
@@ -1808,6 +1855,7 @@
     "hydra_ux_score": 5,
     "listing": {
       "description": "Create powerful Hydra applications without the yaml files and boilerplate code.",
+      "homepage": "https://mit-ll-responsible-ai.github.io/hydra-zen/",
       "kind": "hydra_developer_tool",
       "name": "hydra-zen",
       "relationships": [
@@ -1878,6 +1926,7 @@
     "hydra_ux_score": 3,
     "listing": {
       "description": "UniRL is a Framework for Unified Multimodal Model Reinforcement Learning",
+      "homepage": "https://unirl-project.github.io/unirl/",
       "kind": "framework",
       "name": "UniRL",
       "relationships": [],
@@ -1922,6 +1971,7 @@
     "hydra_ux_score": 5,
     "listing": {
       "description": "[CoRL 2023] This repository contains data generation and training code for Scaling Up & Distilling Down",
+      "homepage": "https://www.cs.columbia.edu/~huy/scalingup/",
       "kind": "framework",
       "name": "Scaling Up and Distilling Down",
       "relationships": [],
@@ -1945,6 +1995,7 @@
     "hydra_ux_score": 3,
     "listing": {
       "description": "tsl: a PyTorch library for processing spatiotemporal data.",
+      "homepage": "https://torch-spatiotemporal.readthedocs.io/",
       "kind": "library_tool",
       "name": "tsl",
       "relationships": [],
@@ -2034,6 +2085,7 @@
     "hydra_ux_score": 5,
     "listing": {
       "description": "flyteplugins-hydra is an optional Flyte SDK plugin that provides a Hydra launcher plus CLI and Python entry points for running Hydra-composed Flyte tasks and sweeps. Its implementation is native integration code rather than an example or copied tutorial.",
+      "homepage": "https://flyte.org/",
       "kind": "plugin_integration",
       "name": "flyteplugins-hydra",
       "relationships": [
@@ -2081,6 +2133,7 @@
     "hydra_ux_score": 4,
     "listing": {
       "description": "[ICLR '26 - Virne] A simulator & benchmark for resource allocation (RA) problems in network function virtualization (NFV), i.e., NFV-RA, including virtual network embedding, service function chain deployment, network slicing, etc.",
+      "homepage": "https://virne.readthedocs.io",
       "kind": "framework",
       "name": "Virne",
       "relationships": [],
@@ -2126,6 +2179,7 @@
     "hydra_ux_score": 4,
     "listing": {
       "description": "A benchmark dataset collection for bird sound classification",
+      "homepage": "https://huggingface.co/datasets/DBD-research-group/BirdSet",
       "kind": "library_tool",
       "name": "BirdSet",
       "relationships": [],
@@ -2157,6 +2211,7 @@
     "hydra_ux_score": 4,
     "listing": {
       "description": "An I/O benchmark for deep Learning applications",
+      "homepage": "https://dlio-benchmark.readthedocs.io",
       "kind": "application",
       "name": "DLIO Benchmark",
       "relationships": [],
@@ -2180,6 +2235,7 @@
     "hydra_ux_score": 2,
     "listing": {
       "description": "Strands-based agents and harnesses for agentic benchmarks.",
+      "homepage": "https://strandsagents.com",
       "kind": "library_tool",
       "name": "Simple Strands Agent",
       "relationships": [],
@@ -2224,6 +2280,7 @@
     "hydra_ux_score": 5,
     "listing": {
       "description": "TopoBench is a Python library designed to standardize benchmarking and accelerate research in Topological Deep Learning",
+      "homepage": "https://geometric-intelligence.github.io/topobench/",
       "kind": "library_tool",
       "name": "TopoBench",
       "relationships": [],
@@ -2269,6 +2326,7 @@
     "hydra_ux_score": 3,
     "listing": {
       "description": "Benchmarking Agentic LLM and VLM Reasoning On Games",
+      "homepage": "https://balrogai.com",
       "kind": "library_tool",
       "name": "BALROG",
       "relationships": [],
@@ -2291,6 +2349,7 @@
     "hydra_ux_score": 5,
     "listing": {
       "description": "FusionBench: A Comprehensive Benchmark/Toolkit of Deep Model Fusion",
+      "homepage": "https://tanganke.github.io/fusion_bench/",
       "kind": "library_tool",
       "name": "FusionBench",
       "relationships": [],
@@ -2359,6 +2418,7 @@
     "group": "good_hydra_usage",
     "listing": {
       "description": "The AI developer platform. Use Weights & Biases to train and fine-tune models, and manage models from experimentation to production.",
+      "homepage": "https://wandb.ai",
       "kind": "ml_experimentation_platform",
       "name": "Weights & Biases",
       "relationships": [
@@ -2384,6 +2444,7 @@
     "hydra_ux_score": 4,
     "listing": {
       "description": "Quadra: Effortless and reproducible deep learning workflows with configuration files.",
+      "homepage": "https://orobix.github.io/quadra/",
       "kind": "library_tool",
       "name": "Quadra",
       "relationships": [

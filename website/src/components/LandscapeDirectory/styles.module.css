@@ -108,11 +108,24 @@
   line-height: 1.25;
 }
 
+.projectLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.5rem;
+  align-items: baseline;
+}
+
 .repository {
   color: var(--ifm-color-emphasis-700);
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.72rem;
   overflow-wrap: anywhere;
+}
+
+.homepage {
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .goodUsage,

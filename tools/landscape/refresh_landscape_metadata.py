@@ -60,6 +60,7 @@ def build_query(repositories: list[str]) -> str:
             ) {{
               nameWithOwner
               url
+              homepageUrl
               description
               isFork
               isArchived
@@ -88,6 +89,19 @@ def build_query(repositories: list[str]) -> str:
             """
         )
     return "query {\n" + "\n".join(fields) + "\nrateLimit { cost remaining resetAt }\n}"
+
+
+def normalize_homepage(value: Any) -> str | None:
+    """Return the repository homepage as recorded on GitHub, or None.
+
+    GitHub reports an unset homepage as either null or an empty string, and
+    stores whatever the project typed, so the value is kept verbatim apart from
+    surrounding whitespace. Promoting it into a public listing is a maintainer
+    decision, and build_public_landscape.py validates it there.
+    """
+    if not isinstance(value, str):
+        return None
+    return value.strip() or None
 
 
 def parse_response(
@@ -123,6 +137,7 @@ def parse_response(
                 "fetched_at": fetched_at,
                 "canonical_repo": canonical_repo,
                 "url": repository["url"],
+                "homepage": normalize_homepage(repository.get("homepageUrl")),
                 "description": repository.get("description"),
                 "fork": repository["isFork"],
                 "parent": (repository.get("parent") or {}).get("nameWithOwner"),
