@@ -372,7 +372,7 @@ class OptunaSweeperImpl(Sweeper):
 
                 except Exception as e:
                     state = optuna.trial.TrialState.FAIL
-                    study.tell(trial=trial, state=state, values=values)
+                    study.tell(trial=trial, state=state, values=None)
                     log.warning(f"Failed experiment: {e}")
                     failures.append(e)
 

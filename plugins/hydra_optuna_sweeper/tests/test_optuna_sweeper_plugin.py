@@ -1,5 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import functools
+import math
 import os
 import sys
 import warnings
@@ -28,7 +29,7 @@ from optuna.distributions import (
     FloatDistribution,
     IntDistribution,
 )
-from pytest import mark, raises
+from pytest import mark, param, raises
 
 from hydra_plugins.hydra_optuna_sweeper import _impl
 from hydra_plugins.hydra_optuna_sweeper.config import (
@@ -429,6 +430,51 @@ def test_failure_rate(max_failure_rate: float, tmpdir: Path) -> None:
         assert error_string in err
     else:
         assert error_string not in err
+
+
+@mark.parametrize(
+    ("direction", "first_return"),
+    [
+        param("minimize", math.nan, id="nan"),
+        param("[minimize,minimize]", [1.0], id="wrong-number-of-values"),
+    ],
+)
+def test_rejected_result_marks_trial_failed(
+    hydra_sweep_runner: TSweepRunner, tmpdir: Path, direction: str, first_return: Any
+) -> None:
+    storage = "sqlite:///" + os.path.join(str(tmpdir), "test.db")
+    study_name = "test-rejected-result"
+    calls: List[DictConfig] = []
+
+    def task_function(cfg: DictConfig) -> Any:
+        calls.append(cfg)
+        if len(calls) == 1:
+            return first_return
+        return 1.0 if direction == "minimize" else [1.0, 1.0]
+
+    sweep = hydra_sweep_runner(
+        calling_file=None,
+        calling_module="hydra.test_utils.a_module",
+        task_function=task_function,
+        config_path="configs",
+        config_name="compose.yaml",
+        overrides=[
+            "hydra/sweeper=optuna",
+            "hydra/launcher=basic",
+            f"hydra.sweeper.direction={direction}",
+            "hydra.sweeper.n_trials=3",
+            "hydra.sweeper.n_jobs=1",
+            f"hydra.sweeper.storage={storage}",
+            f"hydra.sweeper.study_name={study_name}",
+        ],
+    )
+    with sweep:
+        study = optuna.load_study(storage=storage, study_name=study_name)
+        assert [t.state for t in study.trials] == [
+            optuna.trial.TrialState.FAIL,
+            optuna.trial.TrialState.COMPLETE,
+            optuna.trial.TrialState.COMPLETE,
+        ]
 
 
 def test_motpe_sampler_removed() -> None:

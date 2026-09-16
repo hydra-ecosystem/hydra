@@ -1,0 +1,1 @@
+Mark trials as failed instead of crashing on NaN or invalid results
