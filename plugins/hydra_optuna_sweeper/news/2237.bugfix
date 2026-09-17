@@ -1,1 +1,1 @@
-Mark trials as failed instead of crashing on NaN or invalid results
+Continue Optuna sweeps after individual NaN or invalid trial results
