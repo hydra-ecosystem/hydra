@@ -498,15 +498,27 @@ def _exception_group_members(error: BaseException) -> Sequence[BaseException]:
     return cast(Sequence[BaseException], error.exceptions)
 
 
-def _has_non_string_notes(error: BaseException) -> bool:
+def _has_non_string_notes(
+    error: BaseException, seen: Optional[Set[int]] = None
+) -> bool:
+    if seen is None:
+        seen = set()
+    if id(error) in seen:
+        return False
+    seen.add(id(error))
     notes = getattr(error, "__notes__", ())
     if notes and (
         not isinstance(notes, list) or len(notes) != len(_exception_notes(error))
     ):
         return True
-    return any(
-        _has_non_string_notes(member) for member in _exception_group_members(error)
-    )
+    for related in (
+        *_exception_group_members(error),
+        error.__cause__,
+        error.__context__,
+    ):
+        if related is not None and _has_non_string_notes(related, seen):
+            return True
+    return False
 
 
 def _serialize_exception_node(
@@ -675,6 +687,8 @@ class JobReturn:
                 )
                 if type(restored) is not type(error):
                     raise TypeError("exception type changed after pickle")
+                if _exception_notes(restored) != _exception_notes(error):
+                    raise TypeError("exception notes changed after pickle")
             except Exception:
                 error_type = type(error)
                 fallback = RuntimeError(

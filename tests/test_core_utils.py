@@ -21,6 +21,16 @@ class NonRoundtripError(Exception):
         super().__init__("non-roundtrip failure")
 
 
+class NoteDroppingError(Exception):
+    def __reduce__(self) -> Any:
+        return type(self), self.args
+
+
+class CausePreservingError(Exception):
+    def __reduce__(self) -> Any:
+        return type(self), self.args, {"cause": self.__cause__}
+
+
 def test_accessing_hydra_config(hydra_restore_singletons: Any) -> Any:
     utils.setup_globals()
 
@@ -146,6 +156,47 @@ def test_job_return_drops_non_string_notes() -> None:
         restored.return_value
     assert getattr(exc_info.value, "__notes__", []) == (
         ["full_key: foo"] if hasattr(BaseException, "add_note") else []
+    )
+
+
+@mark.skipif(sys.version_info < (3, 11), reason="Exception notes require Python 3.11")
+def test_job_return_preserves_notes_with_custom_reducer() -> None:
+    error = NoteDroppingError("remote failure")
+    error.add_note("full_key: foo")
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    assert job_return._return_value is error
+    with raises(
+        RuntimeError, match="Remote tests.test_core_utils.NoteDroppingError"
+    ) as exc_info:
+        restored.return_value
+    assert exc_info.value.__notes__ == ["full_key: foo"]
+
+
+def test_job_return_drops_non_string_notes_on_custom_chained_cause() -> None:
+    cause = ValueError("remote cause")
+    setattr(cause, "__notes__", ["full_key: nested", {"unsafe": "note"}])
+    error = CausePreservingError("remote failure")
+    error.__cause__ = cause
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+    job_return._remote_traceback = []
+    job_return._remote_exception_chain = utils._serialize_exception_chain(error)
+
+    serialized = pickle.dumps(job_return)
+
+    assert b"unsafe" not in serialized
+    assert job_return._return_value is error
+    restored = pickle.loads(serialized)  # nosec B301: trusted test data
+    with raises(
+        RuntimeError, match="Remote tests.test_core_utils.CausePreservingError"
+    ) as exc_info:
+        restored.return_value
+    assert getattr(exc_info.value.__cause__, "__notes__", []) == (
+        ["full_key: nested"] if hasattr(BaseException, "add_note") else []
     )
 
 
