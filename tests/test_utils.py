@@ -6,6 +6,7 @@ import os
 import pickle
 import re
 import sys
+import traceback
 from dataclasses import dataclass
 from pathlib import Path
 from textwrap import dedent
@@ -18,7 +19,7 @@ from pytest import mark, param, raises, warns
 
 from hydra import utils
 from hydra._internal.deprecation_warning import deprecation_warning
-from hydra._internal.utils import run_and_report
+from hydra._internal.utils import _hidden_instantiation_frame, run_and_report
 from hydra.conf import HydraConf, RuntimeConf
 from hydra.core.hydra_config import HydraConfig
 from hydra.core.override_parser.overrides_parser import OverridesParser
@@ -163,6 +164,15 @@ class TestRunAndReport:
           test when printing a nicely-formatted error message fails, so
           `run_and_report` falls back to re-raising the exception from `func`.
     """
+
+    def test_hidden_frame_does_not_resolve_local_source(
+        self, tmp_path: Path, monkeypatch: Any
+    ) -> None:
+        (tmp_path / "Hydra frames hidden").write_text("unrelated local source\n")
+        monkeypatch.chdir(tmp_path)
+        with patch("linecache.cache", {}):
+            formatted = "".join(traceback.format_tb(_hidden_instantiation_frame()))
+        assert "unrelated local source" not in formatted
 
     class DemoFunctions:
         """
@@ -458,6 +468,47 @@ class TestRunAndReport:
         assert "in user_target" in output
         assert "_instantiate2.py" not in output
         assert cause.__traceback__ is original_tb
+
+    def test_overridden_with_traceback_is_not_called(self) -> None:
+        class RejectingTraceback(InstantiationException):
+            def with_traceback(
+                self, tb: Optional[TracebackType]
+            ) -> "RejectingTraceback":
+                raise AssertionError("custom with_traceback called")
+
+        root = Path(__file__).resolve().parent.parent
+        error = RejectingTraceback("bad target")
+        error.__traceback__ = _deserialize_traceback(
+            [
+                (str(root / "hydra/core/utils.py"), "_run_job", 208),
+                (str(root / "tests/test_utils.py"), "user_task", 1),
+                (
+                    str(root / "hydra/_internal/instantiate/_instantiate2.py"),
+                    "instantiate",
+                    476,
+                ),
+            ]
+        )
+        captured: list[str] = []
+
+        def hook(
+            error_type: type[BaseException],
+            exception: BaseException,
+            tb: Optional[TracebackType],
+        ) -> None:
+            assert error_type is RejectingTraceback
+            assert exception is error
+            while tb is not None:
+                captured.append(tb.tb_frame.f_code.co_name)
+                tb = tb.tb_next
+
+        def fail() -> None:
+            raise error
+
+        with raises(SystemExit, match="1"), patch("sys.excepthook", new=hook):
+            run_and_report(fail)
+
+        assert captured == ["user_task", "omitted"]
 
     @mark.parametrize("raise_on_bool", [False, True])
     def test_explicit_cause_is_not_truth_tested(self, raise_on_bool: bool) -> None:

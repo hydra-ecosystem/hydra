@@ -265,9 +265,12 @@ def _has_instantiation_frame(tb: Optional[TracebackType]) -> bool:
 
 
 def _hidden_instantiation_frame() -> TracebackType:
+    # A path below the null device cannot resolve to unrelated local source.
     return TracebackType(
         None,
-        _create_synthetic_frame("Hydra frames hidden", "omitted", 1),
+        _create_synthetic_frame(
+            os.path.join(os.devnull, "Hydra frames hidden"), "omitted", 1
+        ),
         -1,
         1,
     )
@@ -387,10 +390,11 @@ def _report_instantiation_traceback(ex: BaseException) -> None:
             seen.add(id(current))
             saved_tracebacks.append((current, current.__traceback__))
             trim_hydra_wrapper = _hydra_cause_wrapper(current)
-            current.with_traceback(
+            BaseException.with_traceback(
+                current,
                 filtered_tb
                 if current is ex
-                else _filter_instantiation_cause(current.__traceback__, in_job)
+                else _filter_instantiation_cause(current.__traceback__, in_job),
             )
             if trim_hydra_wrapper and current.__cause__ is not None:
                 message = str(current)
@@ -425,7 +429,7 @@ def _report_instantiation_traceback(ex: BaseException) -> None:
         for error, original_msg in saved_import_messages:
             error.msg = original_msg
         for error, original_tb in saved_tracebacks:
-            error.with_traceback(original_tb)
+            BaseException.with_traceback(error, original_tb)
 
 
 def run_and_report(func: Any) -> Any:

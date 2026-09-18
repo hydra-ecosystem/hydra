@@ -39,6 +39,10 @@ from tests.test_apps.app_instantiate_exception.my_app import InstantiationCase
 
 chdir_hydra_root()
 
+HIDDEN_HYDRA_FRAME = (
+    f'File "{os.path.join(os.devnull, "Hydra frames hidden")}", line 1, in omitted'
+)
+
 
 def test_migration_warning_categories_are_release_specific() -> None:
     assert issubclass(Hydra14MigrationWarning, UserWarning)
@@ -1613,10 +1617,10 @@ def test_instantiate_exception_traceback(tmpdir: Any, case: InstantiationCase) -
     assert "in my_app\n    return instantiate(" in ret
     assert "hydra/_internal/instantiate/" not in ret.replace("\\", "/")
     if case is InstantiationCase.TARGET:
-        assert ret.count('File "Hydra frames hidden", line 1, in omitted') == 1
+        assert ret.count(HIDDEN_HYDRA_FRAME) == 1
         assert (
             ret.index("in my_app")
-            < ret.index('File "Hydra frames hidden"')
+            < ret.index(HIDDEN_HYDRA_FRAME)
             < ret.index("in __init__")
             < ret.index("in _prepare")
             < ret.index("in _validate")
@@ -1632,12 +1636,12 @@ def test_instantiate_exception_traceback(tmpdir: Any, case: InstantiationCase) -
         assert "ModuleNotFoundError(" not in ret
     elif case is InstantiationCase.NESTED:
         assert "in fail_nested" in ret
-        assert ret.count('File "Hydra frames hidden", line 1, in omitted') == 2
+        assert ret.count(HIDDEN_HYDRA_FRAME) == 2
         assert (
             ret.index("in my_app")
-            < ret.index('File "Hydra frames hidden"')
+            < ret.index(HIDDEN_HYDRA_FRAME)
             < ret.index("in fail_nested")
-            < ret.rindex('File "Hydra frames hidden"')
+            < ret.rindex(HIDDEN_HYDRA_FRAME)
             < ret.index("in __init__")
             < ret.index("in _prepare")
             < ret.index("in _validate")
@@ -1646,7 +1650,7 @@ def test_instantiate_exception_traceback(tmpdir: Any, case: InstantiationCase) -
         assert "InstantiationException" not in ret
         assert "ValueError('target failed')" not in ret
     else:
-        assert ret.count('File "Hydra frames hidden", line 1, in omitted') == 1
+        assert ret.count(HIDDEN_HYDRA_FRAME) == 1
         assert "Expected a callable target, got '123' of type 'int'" in ret
         assert "direct cause" not in ret
 
