@@ -8,6 +8,8 @@ import hydra
 
 
 def task(self: object, cfg: DictConfig, value: int) -> None:
+    if cfg.get("fail", False):
+        raise ValueError("partial callable failed")
     print(value)
 
 

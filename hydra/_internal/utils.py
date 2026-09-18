@@ -6,8 +6,9 @@ import os
 import sys
 import traceback
 import warnings
+from functools import partial
 from os.path import dirname, join, normpath, realpath
-from types import TracebackType
+from types import CodeType, TracebackType
 from typing import Any, List, Optional, Sequence, Tuple
 
 from omegaconf.errors import OmegaConfBaseException
@@ -280,6 +281,19 @@ def _hidden_hydra_frame() -> TracebackType:
     )
 
 
+def _callable_code(candidate: Any) -> Optional[CodeType]:
+    while candidate is not None:
+        code = getattr(candidate, "__code__", None)
+        if code is not None:
+            return code
+        candidate = (
+            candidate.func
+            if isinstance(candidate, partial)
+            else getattr(candidate, "__func__", None)
+        )
+    return None
+
+
 def _job_traceback(tb: Optional[TracebackType]) -> Optional[TracebackType]:
     # The traceback before run_job belongs to Hydra's startup machinery.
     # The next frame is the application's entry point when a job was called.
@@ -295,11 +309,9 @@ def _job_traceback(tb: Optional[TracebackType]) -> Optional[TracebackType]:
                 "hydra."
             ):
                 task_function = tb.tb_frame.f_locals.get("task_function")
-                task_code = getattr(task_function, "__code__", None)
+                task_code = _callable_code(task_function)
                 if task_code is None:
-                    task_code = getattr(
-                        getattr(task_function, "__call__", None), "__code__", None
-                    )
+                    task_code = _callable_code(getattr(task_function, "__call__", None))
                 if next_tb.tb_frame.f_code is task_code or (
                     task_code is None
                     and "_SyntheticTraceback" in tb.tb_frame.f_globals

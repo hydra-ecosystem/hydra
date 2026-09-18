@@ -641,6 +641,20 @@ def test_callable_class_setup_error_precedes_application(
     assert "Hydra frames hidden" not in ret
 
 
+def test_partial_callable_error_shows_application_traceback(tmp_path: Path) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/passes_callable_class_to_hydra_main/partial_app.py",
+            "+fail=true",
+            f'hydra.run.dir="{tmp_path}"',
+        ]
+    )
+
+    assert "in task" in ret
+    assert "ValueError: partial callable failed" in ret
+    assert "in _run_job" not in ret
+
+
 @mark.parametrize(
     "other_flag",
     [None, "--run", "--multirun", "--info", "--shell-completion", "--hydra-help"],
