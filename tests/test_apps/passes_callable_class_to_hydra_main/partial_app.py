@@ -1,4 +1,5 @@
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+# SPDX-FileCopyrightText: Contributors to Hydra
+# SPDX-License-Identifier: MIT
 from functools import partial
 
 from omegaconf import DictConfig
