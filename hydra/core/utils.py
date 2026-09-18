@@ -3,6 +3,7 @@ import builtins
 import copy
 import logging
 import os
+import pickle
 import re
 import sys
 from contextlib import contextmanager
@@ -626,6 +627,25 @@ class JobReturn:
     _remote_exception_group: Optional[_SerializedExceptionGroup] = field(
         default=None, repr=False, compare=False
     )
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = self.__dict__.copy()
+        error = self._return_value
+        if self.status is JobStatus.FAILED and isinstance(error, BaseException):
+            try:
+                # The exception was raised by the local task, not read from a peer.
+                restored = pickle.loads(  # nosec B301
+                    pickle.dumps(error, protocol=pickle.HIGHEST_PROTOCOL)
+                )
+                if type(restored) is not type(error):
+                    raise TypeError("exception type changed after pickle")
+            except Exception:
+                error_type = type(error)
+                state["_return_value"] = RuntimeError(
+                    f"Remote {error_type.__module__}.{error_type.__qualname__}: "
+                    f"{_safe_exception_message(error)}"
+                )
+        return state
 
     @property
     def return_value(self) -> Any:

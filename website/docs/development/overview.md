@@ -26,9 +26,11 @@ may be needed to diagnose a framework bug.
 
 This also applies to failures during `instantiate()`: the application call site
 and available user target frames remain visible. Target exceptions retain their
-original type and chain. `InstantiationException` is not compact; compact
-configuration errors before the application starts still show only their
-messages.
+original type and chain within the process. Across process boundaries, an
+exception that fails a local pickle round-trip becomes a `RuntimeError` naming
+its original type; its serialized traceback and chain remain available.
+`InstantiationException` is not compact; compact configuration errors before
+the application starts still show only their messages.
 
 Set `HYDRA_FULL_ERROR=1` to disable the sanitization and get the complete Hydra
 and OmegaConf call stack:

@@ -16,6 +16,11 @@ from hydra.core.hydra_config import HydraConfig
 from hydra.types import HydraContext, RunMode
 
 
+class NonRoundtripError(Exception):
+    def __init__(self) -> None:
+        super().__init__("non-roundtrip failure")
+
+
 def test_accessing_hydra_config(hydra_restore_singletons: Any) -> Any:
     utils.setup_globals()
 
@@ -97,6 +102,26 @@ def test_job_return_preserves_traceback_after_pickle() -> None:
     )
     assert "test_job_return_preserves_traceback_after_pickle" in formatted
     assert "ValueError: remote failure" in formatted
+
+
+@mark.parametrize(
+    "error",
+    [NonRoundtripError(), ValueError("unpickleable state")],
+)
+def test_job_return_transports_non_picklable_exception(error: Exception) -> None:
+    if isinstance(error, ValueError):
+        setattr(error, "callback", lambda: None)
+    error.__cause__ = ValueError("remote cause")
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+    job_return._remote_exception_chain = utils._serialize_exception_chain(error)
+    job_return._remote_traceback = []
+    assert job_return._return_value is error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+    with raises(RuntimeError, match=rf"Remote .*\.{type(error).__name__}") as exc_info:
+        restored.return_value
+    assert str(exc_info.value.__cause__) == "remote cause"
 
 
 def test_job_return_from_older_pickle_without_remote_traceback_fields() -> None:
