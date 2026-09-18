@@ -31,6 +31,16 @@ class CausePreservingError(Exception):
         return type(self), self.args, {"cause": self.__cause__}
 
 
+class ContextPreservingError(Exception):
+    def __reduce__(self) -> Any:
+        return type(self), self.args, {"context": self.__context__}
+
+
+class MessageChangingError(Exception):
+    def __reduce__(self) -> Any:
+        return type(self), ("changed message",), {"__notes__": self.__notes__}
+
+
 def test_accessing_hydra_config(hydra_restore_singletons: Any) -> Any:
     utils.setup_globals()
 
@@ -198,6 +208,40 @@ def test_job_return_drops_non_string_notes_on_custom_chained_cause() -> None:
     assert getattr(exc_info.value.__cause__, "__notes__", []) == (
         ["full_key: nested"] if hasattr(BaseException, "add_note") else []
     )
+
+
+@mark.skipif(sys.version_info < (3, 11), reason="Exception notes require Python 3.11")
+def test_job_return_preserves_message_with_custom_reducer() -> None:
+    error = MessageChangingError("original message")
+    error.add_note("full_key: foo")
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    assert job_return._return_value is error
+    with raises(RuntimeError, match="original message") as exc_info:
+        restored.return_value
+    assert exc_info.value.__notes__ == ["full_key: foo"]
+
+
+def test_job_return_drops_non_string_notes_in_suppressed_context() -> None:
+    context = ValueError("hidden context")
+    setattr(context, "__notes__", ["full_key: hidden", {"unsafe": "note"}])
+    error = ContextPreservingError("visible failure")
+    error.__context__ = context
+    error.__suppress_context__ = True
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+    job_return._remote_traceback = []
+    job_return._remote_exception_chain = utils._serialize_exception_chain(error)
+
+    serialized = pickle.dumps(job_return)
+
+    assert b"unsafe" not in serialized
+    restored = pickle.loads(serialized)  # nosec B301: trusted test data
+    with raises(RuntimeError, match="visible failure"):
+        restored.return_value
 
 
 def test_job_return_from_older_pickle_without_remote_traceback_fields() -> None:

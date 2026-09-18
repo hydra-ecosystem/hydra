@@ -689,6 +689,8 @@ class JobReturn:
                     raise TypeError("exception type changed after pickle")
                 if _exception_notes(restored) != _exception_notes(error):
                     raise TypeError("exception notes changed after pickle")
+                if _safe_exception_message(restored) != _safe_exception_message(error):
+                    raise TypeError("exception message changed after pickle")
             except Exception:
                 error_type = type(error)
                 fallback = RuntimeError(
