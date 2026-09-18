@@ -1613,8 +1613,11 @@ def test_instantiate_exception_traceback(tmpdir: Any, case: InstantiationCase) -
     assert "in my_app\n    return instantiate(" in ret
     assert "hydra/_internal/instantiate/" not in ret.replace("\\", "/")
     if case is InstantiationCase.TARGET:
+        assert ret.count('File "Hydra frames hidden", line 1, in omitted') == 1
         assert (
-            ret.index("in __init__")
+            ret.index("in my_app")
+            < ret.index('File "Hydra frames hidden"')
+            < ret.index("in __init__")
             < ret.index("in _prepare")
             < ret.index("in _validate")
         )
@@ -1629,8 +1632,13 @@ def test_instantiate_exception_traceback(tmpdir: Any, case: InstantiationCase) -
         assert "ModuleNotFoundError(" not in ret
     elif case is InstantiationCase.NESTED:
         assert "in fail_nested" in ret
+        assert ret.count('File "Hydra frames hidden", line 1, in omitted') == 2
         assert (
-            ret.index("in __init__")
+            ret.index("in my_app")
+            < ret.index('File "Hydra frames hidden"')
+            < ret.index("in fail_nested")
+            < ret.rindex('File "Hydra frames hidden"')
+            < ret.index("in __init__")
             < ret.index("in _prepare")
             < ret.index("in _validate")
         )
@@ -1638,6 +1646,7 @@ def test_instantiate_exception_traceback(tmpdir: Any, case: InstantiationCase) -
         assert "InstantiationException" not in ret
         assert "ValueError('target failed')" not in ret
     else:
+        assert ret.count('File "Hydra frames hidden", line 1, in omitted') == 1
         assert "Expected a callable target, got '123' of type 'int'" in ret
         assert "direct cause" not in ret
 
@@ -1671,6 +1680,7 @@ def test_instantiate_exception_full_error(tmpdir: Any) -> None:
     assert "in _prepare" in ret
     assert "in _validate" in ret
     assert "hydra/_internal/instantiate/_instantiate2.py" in ret.replace("\\", "/")
+    assert "Hydra frames hidden" not in ret
     assert "ValueError: target failed" in ret
     assert "InstantiationException" not in ret
 
@@ -1686,6 +1696,7 @@ def test_direct_exception_traceback(tmpdir: Any) -> None:
 
     assert "in my_app\n    return fail()" in ret
     assert 'in fail\n    raise ValueError("direct call failed")' in ret
+    assert "Hydra frames hidden" not in ret
     assert ret.count("ValueError: direct call failed") == 1
 
 
@@ -1728,6 +1739,7 @@ def test_instantiate_exception_before_run_job(tmpdir: Any) -> None:
     assert "full_key: hydra.callbacks.fail" not in ret
     assert "Traceback (most recent call last):" in ret
     assert "in _call_target" in ret
+    assert "Hydra frames hidden" not in ret
 
 
 def test_instantiate_exception_custom_hook(tmpdir: Any) -> None:
@@ -1741,6 +1753,7 @@ def test_instantiate_exception_custom_hook(tmpdir: Any) -> None:
 
     assert "hook: ValueError" in ret
     assert "frame: my_app" in ret
+    assert "frame: omitted" in ret
     assert "frame: __init__" in ret
     assert "frame: _prepare" in ret
     assert "frame: _validate" in ret

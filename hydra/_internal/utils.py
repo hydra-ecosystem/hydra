@@ -16,6 +16,7 @@ from hydra._internal._locate import _locate as _locate_impl
 from hydra._internal.config_search_path_impl import ConfigSearchPathImpl
 from hydra.core.config_search_path import ConfigSearchPath, SearchPathQuery
 from hydra.core.utils import (
+    _create_synthetic_frame,
     _exception_group_members,
     get_valid_filename,
     validate_config_path,
@@ -263,10 +264,20 @@ def _has_instantiation_frame(tb: Optional[TracebackType]) -> bool:
     return False
 
 
+def _hidden_instantiation_frame() -> TracebackType:
+    return TracebackType(
+        None,
+        _create_synthetic_frame("Hydra frames hidden", "omitted", 1),
+        -1,
+        1,
+    )
+
+
 def _filter_instantiation_traceback(
     ex: BaseException,
-) -> Optional[TracebackType]:
+) -> Tuple[Optional[TracebackType], bool]:
     tb = ex.__traceback__
+    in_job = False
     while tb is not None:
         if _traceback_module(
             tb
@@ -274,6 +285,7 @@ def _filter_instantiation_traceback(
             "run_job",
             "_run_job",
         }:
+            in_job = True
             tb = tb.tb_next
             break
         tb = tb.tb_next
@@ -285,17 +297,28 @@ def _filter_instantiation_traceback(
             tb = tb.tb_next
 
     frames = []
+    hidden = False
     while tb is not None:
-        if not _instantiation_frame(tb):
+        if _instantiation_frame(tb):
+            hidden = True
+        else:
+            if hidden and in_job:
+                frames.append(_hidden_instantiation_frame())
+            hidden = False
             frames.append(tb)
         tb = tb.tb_next
-    return _build_traceback(frames)
+    if hidden and in_job:
+        frames.append(_hidden_instantiation_frame())
+    return _build_traceback(frames), in_job
 
 
-def _filter_instantiation_cause(tb: Optional[TracebackType]) -> Optional[TracebackType]:
+def _filter_instantiation_cause(
+    tb: Optional[TracebackType], in_job: bool
+) -> Optional[TracebackType]:
     # Remove leading lookup machinery and instantiation frames at every depth.
     # A user target can itself call instantiate(), so keep its call site and
     # target frames without exposing either layer of Hydra internals.
+    hidden = False
     while tb is not None:
         module = _traceback_module(tb)
         if not (
@@ -306,13 +329,22 @@ def _filter_instantiation_cause(tb: Optional[TracebackType]) -> Optional[Traceba
             or module.startswith("_frozen_importlib")
         ):
             break
+        if module.startswith("hydra."):
+            hidden = True
         tb = tb.tb_next
 
     frames = []
     while tb is not None:
-        if not _instantiation_frame(tb):
+        if _instantiation_frame(tb):
+            hidden = True
+        else:
+            if hidden and in_job:
+                frames.append(_hidden_instantiation_frame())
+            hidden = False
             frames.append(tb)
         tb = tb.tb_next
+    if hidden and in_job:
+        frames.append(_hidden_instantiation_frame())
     return _build_traceback(frames)
 
 
@@ -340,7 +372,8 @@ def _hydra_cause_wrapper(error: BaseException) -> bool:
 
 
 def _report_instantiation_traceback(ex: BaseException) -> None:
-    filtered_tb = _filter_instantiation_traceback(ex) or ex.__traceback__
+    filtered_tb, in_job = _filter_instantiation_traceback(ex)
+    filtered_tb = filtered_tb or ex.__traceback__
     saved_tracebacks = []
     saved_args = []
     saved_import_messages = []
@@ -357,7 +390,7 @@ def _report_instantiation_traceback(ex: BaseException) -> None:
             current.with_traceback(
                 filtered_tb
                 if current is ex
-                else _filter_instantiation_cause(current.__traceback__)
+                else _filter_instantiation_cause(current.__traceback__, in_job)
             )
             if trim_hydra_wrapper and current.__cause__ is not None:
                 message = str(current)

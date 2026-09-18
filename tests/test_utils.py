@@ -295,7 +295,9 @@ class TestRunAndReport:
             run_and_report(fail)
 
         assert captured == (
-            [["user_task"], ["user_target"]] if with_cause else [["user_task"], []]
+            [["user_task", "omitted"], ["omitted", "user_target"]]
+            if with_cause
+            else [["user_task", "omitted"], []]
         )
 
     def test_restored_nested_instantiation_traceback(self) -> None:
@@ -510,7 +512,7 @@ class TestRunAndReport:
             run_and_report(fail)
 
         assert bool_calls == []
-        assert captured == ["user_target"]
+        assert captured == ["omitted", "user_target"]
 
     @mark.skipif(
         sys.version_info < (3, 11), reason="ExceptionGroup requires Python 3.11"
