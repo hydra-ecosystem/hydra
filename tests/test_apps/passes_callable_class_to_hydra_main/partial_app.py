@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: Contributors to Hydra
 # SPDX-License-Identifier: MIT
-from functools import partial
+from functools import partialmethod
 
 from omegaconf import DictConfig
 
@@ -14,7 +14,7 @@ def task(self: object, cfg: DictConfig, value: int) -> None:
 
 
 class PartialCallable:
-    __call__ = partial(task, value=123)
+    __call__ = partialmethod(task, value=123)
 
 
 my_app = hydra.main()(PartialCallable())

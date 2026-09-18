@@ -8,7 +8,7 @@ import traceback
 import warnings
 from functools import partial
 from os.path import dirname, join, normpath, realpath
-from types import CodeType, TracebackType
+from types import CodeType, MethodType, TracebackType
 from typing import Any, List, Optional, Sequence, Tuple
 
 from omegaconf.errors import OmegaConfBaseException
@@ -282,15 +282,16 @@ def _hidden_hydra_frame() -> TracebackType:
 
 
 def _callable_code(candidate: Any) -> Optional[CodeType]:
-    while candidate is not None:
-        code = getattr(candidate, "__code__", None)
-        if code is not None:
-            return code
+    while isinstance(candidate, (partial, MethodType)):
         candidate = (
-            candidate.func
-            if isinstance(candidate, partial)
-            else getattr(candidate, "__func__", None)
+            candidate.func if isinstance(candidate, partial) else candidate.__func__
         )
+    code = getattr(candidate, "__code__", None)
+    if isinstance(code, CodeType):
+        return code
+    call = getattr(candidate, "__call__", None)
+    if isinstance(call, (partial, MethodType)):
+        return _callable_code(call)
     return None
 
 
@@ -310,8 +311,6 @@ def _job_traceback(tb: Optional[TracebackType]) -> Optional[TracebackType]:
             ):
                 task_function = tb.tb_frame.f_locals.get("task_function")
                 task_code = _callable_code(task_function)
-                if task_code is None:
-                    task_code = _callable_code(getattr(task_function, "__call__", None))
                 if next_tb.tb_frame.f_code is task_code or (
                     task_code is None
                     and "_SyntheticTraceback" in tb.tb_frame.f_globals
