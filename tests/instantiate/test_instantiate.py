@@ -2555,8 +2555,76 @@ def test_instantiate_target_raising_exception_taking_no_arguments_nested(
     instantiate_func: Any,
 ) -> None:
     _target_ = "tests.instantiate.raise_exception_taking_no_argument"
-    with raises(ExceptionTakingNoArgument, match="Err message"):
-        instantiate_func({"foo": {"_target_": _target_}})
+    with raises(ExceptionTakingNoArgument, match="Err message") as exc_info:
+        instantiate_func({"_target_": "builtins.dict", "foo": {"_target_": _target_}})
+    notes = ["full_key: foo"] if sys.version_info >= (3, 11) else []
+    assert getattr(exc_info.value, "__notes__", []) == notes
+    if notes:
+        assert "full_key: foo" in "".join(
+            traceback.TracebackException.from_exception(exc_info.value).format()
+        )
+    assert exc_info.value.__cause__ is None
+
+
+def test_deferred_target_error_has_config_path_note(instantiate_func: Any) -> None:
+    deferred = instantiate_func(
+        {
+            "foo": {
+                "_target_": "tests.instantiate.raise_exception_taking_no_argument",
+                "_partial_": True,
+            }
+        }
+    )
+    with raises(ExceptionTakingNoArgument, match="Err message") as exc_info:
+        deferred.foo()
+    notes = ["full_key: foo"] if sys.version_info >= (3, 11) else []
+    assert getattr(exc_info.value, "__notes__", []) == notes
+    assert exc_info.value.__cause__ is None
+
+
+def test_partial_construction_error_keeps_original_type(
+    instantiate_func: Any, monkeypatch: MonkeyPatch
+) -> None:
+    def fail_deferred(*args: Any, **kwargs: Any) -> Any:
+        raise ValueError("deferred construction failed")
+
+    monkeypatch.setattr(_instantiate2, "_DeferredTarget", fail_deferred)
+    with raises(ValueError, match="deferred construction failed") as exc_info:
+        instantiate_func(
+            {
+                "foo": {
+                    "_target_": "tests.instantiate.module_function",
+                    "_partial_": True,
+                }
+            }
+        )
+    notes = ["full_key: foo"] if sys.version_info >= (3, 11) else []
+    assert getattr(exc_info.value, "__notes__", []) == notes
+    assert exc_info.value.__cause__ is None
+
+
+def test_invalid_positional_args_keep_config_path_without_chain(
+    instantiate_func: Any,
+) -> None:
+    with raises(InstantiationException, match="full_key: foo") as exc_info:
+        instantiate_func(
+            {"foo": {"_target_": "tests.instantiate.module_function", "_args_": 42}}
+        )
+    assert exc_info.value.__cause__ is None
+
+
+def test_invalid_exception_notes_do_not_replace_target_error() -> None:
+    error = ValueError("original failure")
+    setattr(error, "__notes__", "invalid notes")
+
+    def fail() -> None:
+        raise error
+
+    with raises(ValueError, match="original failure") as exc_info:
+        _instantiate2._call_target(
+            fail, False, (), {}, "nested", UNSAFE_DISABLE_EXECUTION_CHECKS, None
+        )
+    assert exc_info.value is error
 
 
 @mark.parametrize(
@@ -3380,6 +3448,16 @@ def test_cannot_locate_target(instantiate_func: Any) -> None:
             Are you sure that module 'not_found' is installed\\?"""),
         chained.args[0],
     )
+
+
+def test_lookup_does_not_wrap_unexpected_error(monkeypatch: MonkeyPatch) -> None:
+    def fail_lookup(path: str) -> Any:
+        raise RuntimeError("import-time failure")
+
+    monkeypatch.setattr(_instantiate2, "_locate", fail_lookup)
+    with raises(RuntimeError, match="import-time failure") as exc_info:
+        _resolve_target("some.module", "nested", UNSAFE_DISABLE_EXECUTION_CHECKS)
+    assert exc_info.value.__cause__ is None
 
 
 @mark.parametrize(

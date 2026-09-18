@@ -1735,8 +1735,20 @@ def test_instantiate_exception_case_rejected_by_composition(tmpdir: Any) -> None
     )
 
     assert "Error merging override case=UNKNOWN" in ret
-    assert "expected one of [TARGET, HOOK, DIRECT" in ret
+    assert "expected one of [TARGET, TARGET_CHILD, HOOK, DIRECT" in ret
     assert "object_type=AppConfig" in ret
+
+
+def test_nested_target_error_shows_config_path_note(tmpdir: Any) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            f"case={InstantiationCase.TARGET_CHILD.name}",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+    assert "ValueError: target failed" in ret
+    assert ("full_key: child" in ret) is (sys.version_info >= (3, 11))
 
 
 def test_instantiate_exception_full_error(tmpdir: Any) -> None:
@@ -1810,7 +1822,7 @@ def test_instantiate_exception_before_run_job(tmpdir: Any) -> None:
     )
 
     assert "TypeError: LogJobReturnCallback.__init__()" in ret
-    assert "full_key: hydra.callbacks.fail" not in ret
+    assert ("full_key: hydra.callbacks.fail" in ret) is (sys.version_info >= (3, 11))
     assert "Traceback (most recent call last):" in ret
     assert "in _call_target" in ret
     assert "Hydra frames hidden" not in ret

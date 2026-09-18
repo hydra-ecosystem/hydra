@@ -60,11 +60,7 @@ def test_instantiate_args_kwargs(cfg: Any, expected: Any) -> None:
     [
         param(
             {"_target_": "tests.instantiate.ArgsClass", "_args_": {"foo": "bar"}},
-            dedent(
-                """\
-                Error in collecting args and kwargs for 'tests\\.instantiate\\.ArgsClass':
-                InstantiationException\\("Unsupported _args_ type: 'DictConfig'\\. value: '{'foo': 'bar'}'",?\\)"""
-            ),
+            "Unsupported _args_ type: 'DictConfig'\\. value: '{'foo': 'bar'}'",
             id="unsupported-args-type",
         ),
         param(
@@ -75,8 +71,7 @@ def test_instantiate_args_kwargs(cfg: Any, expected: Any) -> None:
                 }
             },
             dedent("""\
-                Error in collecting args and kwargs for 'tests\\.instantiate\\.ArgsClass':
-                InstantiationException\\("Unsupported _args_ type: 'DictConfig'\\. value: '{'foo': 'bar'}'",?\\)
+                Unsupported _args_ type: 'DictConfig'\\. value: '{'foo': 'bar'}'
                 full_key: foo"""),
             id="unsupported-args-type-nested",
         ),

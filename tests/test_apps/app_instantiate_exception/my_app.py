@@ -16,6 +16,7 @@ from hydra.utils import UNSAFE_DISABLE_EXECUTION_CHECKS, instantiate
 
 class InstantiationCase(str, Enum):
     TARGET = "target"
+    TARGET_CHILD = "target-child"
     HOOK = "hook"
     DIRECT = "direct"
     INVALID = "invalid"
@@ -99,6 +100,11 @@ def my_app(cfg: AppConfig) -> Any:
     if case in {InstantiationCase.TARGET, InstantiationCase.HOOK}:
         return instantiate(
             {"_target_": "my_app.FailingTarget"},
+            _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
+        )
+    if case is InstantiationCase.TARGET_CHILD:
+        return instantiate(
+            {"child": {"_target_": "my_app.FailingTarget"}},
             _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
         )
     if case is InstantiationCase.DIRECT:

@@ -39,6 +39,7 @@ from hydra._internal.execution_policy import (
     UNSAFE_DISABLE_EXECUTION_CHECKS,
     ExecutionWhitelist,
     NormalizedExecutionWhitelist,
+    _add_full_key_note,
     _authorize_discovery_path,
     _authorize_resolved_target_identity,
     _authorize_target_invocation,
@@ -213,7 +214,7 @@ def _warn_direct_functools_partial_target() -> None:
     )
 
 
-def _extract_pos_args(input_args: Any, kwargs: Any) -> Tuple[Any, Any]:
+def _extract_pos_args(input_args: Any, kwargs: Any, full_key: str) -> Tuple[Any, Any]:
     config_args = kwargs.pop(_Keys.ARGS, ())
     output_args = config_args
 
@@ -221,9 +222,8 @@ def _extract_pos_args(input_args: Any, kwargs: Any) -> Tuple[Any, Any]:
         if len(input_args) > 0:
             output_args = input_args
     else:
-        raise InstantiationException(
-            f"Unsupported _args_ type: '{type(config_args).__name__}'. value: '{config_args}'"
-        )
+        msg = f"Unsupported _args_ type: '{type(config_args).__name__}'. value: '{config_args}'"
+        raise InstantiationException(_with_full_key(msg, full_key))
 
     return output_args, kwargs
 
@@ -238,14 +238,7 @@ def _call_target(
     deferred_call_context: DeferredCallContext,
 ) -> Any:
     """Call target (type) with args and kwargs."""
-    try:
-        args, kwargs = _extract_pos_args(args, kwargs)
-    except Exception as e:
-        msg = (
-            f"Error in collecting args and kwargs for '{_convert_target_to_string(_target_)}':"
-            + f"\n{repr(e)}"
-        )
-        raise InstantiationException(_with_full_key(msg, full_key)) from e
+    args, kwargs = _extract_pos_args(args, kwargs, full_key)
 
     resolved_target_name = _get_resolved_target_name_for_check(_target_)
     effective_target, effective_args, effective_kwargs = _authorize_target_invocation(
@@ -273,13 +266,14 @@ def _call_target(
             deferred._hydra_call_context = deferred_call_context
             return deferred
         except Exception as e:
-            msg = (
-                f"Error in creating partial({_convert_target_to_string(_target_)}, ...) object:"
-                + f"\n{repr(e)}"
-            )
-            raise InstantiationException(_with_full_key(msg, full_key)) from e
+            _add_full_key_note(e, full_key)
+            raise
 
-    result = _target_(*args, **kwargs)
+    try:
+        result = _target_(*args, **kwargs)
+    except Exception as e:
+        _add_full_key_note(e, full_key)
+        raise
 
     return _mediate_target_result(
         result,
@@ -379,7 +373,7 @@ def _resolve_target(
         if isinstance(target, str):
             try:
                 target = _locate(target)
-            except Exception as e:
+            except (ImportError, ValueError) as e:
                 msg = f"Error locating target '{target}'"
                 raise InstantiationException(_with_full_key(msg, full_key)) from e
 

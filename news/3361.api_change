@@ -1,2 +1,5 @@
 Propagate target exceptions without wrapping them in InstantiationException.
 Make InstantiationException no longer inherit from CompactHydraException.
+Add full_key notes to nested target failures on Python 3.11 and newer.
+Stop wrapping failures while constructing deferred targets.
+Preserve string exception notes across launcher transport.
