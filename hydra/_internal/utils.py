@@ -242,9 +242,11 @@ def _traceback_module(tb: TracebackType) -> str:
         head = relative.split("/", 1)[0]
         if head in {
             "_internal",
+            "conf",
             "core",
             "experimental",
             "extra",
+            "grammar",
             "plugins",
             "test_utils",
             "__init__",
@@ -294,7 +296,13 @@ def _job_traceback(tb: Optional[TracebackType]) -> Optional[TracebackType]:
             ):
                 task_function = tb.tb_frame.f_locals.get("task_function")
                 task_code = getattr(task_function, "__code__", None)
-                if task_code is None or next_tb.tb_frame.f_code is task_code:
+                if task_code is None:
+                    task_code = getattr(
+                        getattr(task_function, "__call__", None), "__code__", None
+                    )
+                if next_tb.tb_frame.f_code is task_code or (
+                    task_code is None and "_SyntheticTraceback" in tb.tb_frame.f_globals
+                ):
                     return next_tb
         tb = tb.tb_next
     return None

@@ -617,6 +617,22 @@ def test_pass_callable_class_to_hydra_main(
     assert_text_same(result, expected)
 
 
+def test_callable_class_setup_error_precedes_application(tmp_path: Path) -> None:
+    blocked = tmp_path / "blocked"
+    blocked.write_text("")
+    ret = run_with_error(
+        [
+            "tests/test_apps/passes_callable_class_to_hydra_main/my_app.py",
+            f'hydra.run.dir="{blocked / "child"}"',
+        ]
+    )
+
+    assert "in _run_job" in ret
+    assert "in mkdir" in ret
+    assert "in __call__" not in ret
+    assert "Hydra frames hidden" not in ret
+
+
 @mark.parametrize(
     "other_flag",
     [None, "--run", "--multirun", "--info", "--shell-completion", "--hydra-help"],

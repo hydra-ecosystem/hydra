@@ -226,6 +226,8 @@ class TestRunAndReport:
                     (str(root / "hydra/core/utils.py"), "_run_job", 208),
                     (str(root / "tests/test_utils.py"), "user_task", 1),
                     (str(root / "hydra/utils.py"), "hydra_call", 1),
+                    (str(root / "hydra/conf/__init__.py"), "load", 1),
+                    (str(root / "hydra/grammar/gen/OverrideParser.py"), "parse", 1),
                     (str(root / "tests/test_utils.py"), "user_target", 1),
                 ]
             )
