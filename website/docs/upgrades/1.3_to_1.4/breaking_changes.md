@@ -66,6 +66,10 @@ have been removed:
 
 ### Instantiation
 
+- Direct calls to `hydra.utils.instantiate()` now propagate target exceptions
+  with their original type and chain instead of wrapping them in
+  `InstantiationException`. Catch the target's exception type if your code
+  handles these failures.
 - A `dict` or `DictConfig` call-site argument to `hydra.utils.instantiate()`
   replaces a plain mapping configured for that target parameter instead of
   merging into it. As an exception, a dictionary overriding a Structured Config

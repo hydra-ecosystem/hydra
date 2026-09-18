@@ -57,6 +57,7 @@ from tests.instantiate import (
     CenterCropConf,
     Compose,
     ComposeConf,
+    ExceptionTakingNoArgument,
     IllegalType,
     KeywordsInParamsClass,
     Mapping,
@@ -1579,7 +1580,7 @@ def test_no_override_config_readonly_is_restored_after_failure(
     )
     original_readonly = cfg._get_node_flag("readonly")
 
-    with raises(InstantiationException, match="expected failure"):
+    with raises(RuntimeError, match="expected failure"):
         instantiate_func(cfg)
 
     assert cfg.payload.value == 10
@@ -1743,10 +1744,7 @@ def test_class_instantiate_sequence_item(instantiate_func: Any, config: Any) -> 
 
 @mark.parametrize("src", [{"_target_": "tests.instantiate.Adam"}])
 def test_instantiate_adam(instantiate_func: Any, config: Any) -> None:
-    with raises(
-        InstantiationException,
-        match=r"Error in call to target 'tests\.instantiate\.Adam':\nTypeError\(.*\)",
-    ):
+    with raises(TypeError, match="missing 1 required positional argument: 'params'"):
         # can't instantiate without passing params
         instantiate_func(config)
 
@@ -2506,10 +2504,7 @@ def test_nested_target_can_register_resolver_for_later_argument(
 def test_instantiate_adam_conf(
     instantiate_func: Any, is_partial: bool, expected_params: Any
 ) -> None:
-    with raises(
-        InstantiationException,
-        match=r"Error in call to target 'tests\.instantiate\.Adam':\nTypeError\(.*\)",
-    ):
+    with raises(TypeError, match="missing 1 required positional argument: 'params'"):
         # can't instantiate without passing params
         instantiate_func(AdamConf())
 
@@ -2543,14 +2538,7 @@ def test_instantiate_adam_conf_with_convert(instantiate_func: Any) -> None:
 
 def test_instantiate_with_missing_module(instantiate_func: Any) -> None:
     _target_ = "tests.instantiate.ClassWithMissingModule"
-    with raises(
-        InstantiationException,
-        match=dedent(
-            rf"""
-            Error in call to target '{re.escape(_target_)}':
-            ModuleNotFoundError\("No module named 'some_missing_module'",?\)"""
-        ).strip(),
-    ):
+    with raises(ModuleNotFoundError, match="No module named 'some_missing_module'"):
         # can't instantiate when importing a missing module
         instantiate_func({"_target_": _target_})
 
@@ -2559,14 +2547,7 @@ def test_instantiate_target_raising_exception_taking_no_arguments(
     instantiate_func: Any,
 ) -> None:
     _target_ = "tests.instantiate.raise_exception_taking_no_argument"
-    with raises(
-        InstantiationException,
-        match=(
-            dedent(rf"""
-                Error in call to target '{re.escape(_target_)}':
-                ExceptionTakingNoArgument\('Err message',?\)""").strip()
-        ),
-    ):
+    with raises(ExceptionTakingNoArgument, match="Err message"):
         instantiate_func({}, _target_=_target_)
 
 
@@ -2574,16 +2555,7 @@ def test_instantiate_target_raising_exception_taking_no_arguments_nested(
     instantiate_func: Any,
 ) -> None:
     _target_ = "tests.instantiate.raise_exception_taking_no_argument"
-    with raises(
-        InstantiationException,
-        match=(
-            dedent(rf"""
-                Error in call to target '{re.escape(_target_)}':
-                ExceptionTakingNoArgument\('Err message',?\)
-                full_key: foo
-                """).strip()
-        ),
-    ):
+    with raises(ExceptionTakingNoArgument, match="Err message"):
         instantiate_func({"foo": {"_target_": _target_}})
 
 
@@ -5874,7 +5846,7 @@ def test_resolved_partial_target_preserves_unfilled_placeholder_error() -> None:
     placeholder = getattr(functools, "Placeholder")
     target = partial(pow, placeholder, 2)
 
-    with raises(InstantiationException, match="Error in call to target"):
+    with raises(TypeError, match="missing positional arguments in 'partial' call"):
         _instantiate2.instantiate(
             {"_target_": target},
             _execution_whitelist_="builtins.pow",

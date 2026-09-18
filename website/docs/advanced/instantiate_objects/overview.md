@@ -605,16 +605,17 @@ instantiate(
 
 ### Diagnosing instantiation errors
 
-When `instantiate()` fails inside a Hydra application, the default error output
+When `instantiate()` fails during a Hydra job, the default error output
 shows the application call site and, if the target raised, its frames and
-exception. Routine Hydra instantiation frames are omitted. The
-`InstantiationException` still identifies the target and includes `full_key`
-when the failing target is nested in the config.
+original exception, including any chain created by the target. Hydra does not
+wrap target exceptions. Routine Hydra instantiation frames are omitted when
+user frames are available. Hydra raises `InstantiationException` for errors
+such as invalid targets or failed target lookup.
 
 To see the complete, unfiltered traceback, including Hydra internals, run the
 application with `HYDRA_FULL_ERROR=1`. This changes only Hydra's application
-error output: code calling `instantiate()` directly receives the original
-exception and traceback.
+error output: code calling `instantiate()` directly receives a target's
+original exception and traceback.
 
 ### Dotpath lookup machinery
 

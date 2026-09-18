@@ -23,10 +23,12 @@ points at the application code. That is the right output for someone debugging
 their own app, but it hides the framework internals needed to diagnose a bug in
 Hydra itself.
 
-For `InstantiationException`, Hydra also shows the application call site and
-any user target frames and chained cause, while filtering routine instantiation
-frames. Other compact configuration errors continue to show their messages
-without a traceback.
+For exceptions passing through `instantiate()` during a job, Hydra shows the
+application call site and available user target frames while filtering routine
+instantiation frames.
+Target exceptions retain their original type and any user-created chain.
+`InstantiationException` is not compact; other compact configuration errors
+continue to show their messages without a traceback.
 
 Set `HYDRA_FULL_ERROR=1` to disable the sanitization and get the complete Hydra
 and OmegaConf call stack:

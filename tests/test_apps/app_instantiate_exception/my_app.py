@@ -1,23 +1,56 @@
 # SPDX-FileCopyrightText: Contributors to Hydra
 # SPDX-License-Identifier: MIT
 import sys
+from dataclasses import dataclass
+from enum import Enum
 from types import TracebackType
 from typing import Any, Optional
 
-from omegaconf import DictConfig
+from omegaconf import MISSING
 
 import hydra
+from hydra.core.config_store import ConfigStore
 from hydra.errors import InstantiationException
 from hydra.utils import UNSAFE_DISABLE_EXECUTION_CHECKS, instantiate
 
 
+class InstantiationCase(str, Enum):
+    TARGET = "target"
+    HOOK = "hook"
+    DIRECT = "direct"
+    INVALID = "invalid"
+    NESTED = "nested"
+    EMBEDDED = "embedded"
+    EMBEDDED_INSTANTIATION = "embedded-instantiation"
+    MISSING = "missing"
+
+
+@dataclass
+class AppConfig:
+    case: InstantiationCase = MISSING
+
+
+ConfigStore.instance().store(name="instantiate_exception", node=AppConfig)
+
+
+class FailingTarget:
+    def __init__(self) -> None:
+        self._prepare()
+
+    def _prepare(self) -> None:
+        self._validate()
+
+    def _validate(self) -> None:
+        raise ValueError("target failed")
+
+
 def fail() -> None:
-    raise ValueError("target failed")
+    raise ValueError("direct call failed")
 
 
 def fail_nested() -> None:
     instantiate(
-        {"_target_": "my_app.fail"},
+        {"_target_": "my_app.FailingTarget"},
         _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
     )
 
@@ -36,9 +69,10 @@ def fail_with_embedded_instantiation_cause() -> None:
         raise InstantiationException(f"request failed:\n{cause!r}") from cause
 
 
-@hydra.main(config_path=None, config_name=None)
-def my_app(cfg: DictConfig) -> Any:
-    if cfg.case == "hook":
+@hydra.main(config_path=None, config_name="instantiate_exception")
+def my_app(cfg: AppConfig) -> Any:
+    case = cfg.case
+    if case is InstantiationCase.HOOK:
 
         def hook(
             error_type: type[BaseException],
@@ -62,28 +96,31 @@ def my_app(cfg: DictConfig) -> Any:
 
         sys.excepthook = hook
 
-    if cfg.case in {"target", "hook"}:
+    if case in {InstantiationCase.TARGET, InstantiationCase.HOOK}:
         return instantiate(
-            {"_target_": "my_app.fail"},
+            {"_target_": "my_app.FailingTarget"},
             _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
         )
-    if cfg.case == "invalid":
+    if case is InstantiationCase.DIRECT:
+        return fail()
+    if case is InstantiationCase.INVALID:
         return instantiate({"_target_": 123})
-    if cfg.case == "nested":
+    if case is InstantiationCase.NESTED:
         return instantiate(
             {"_target_": "my_app.fail_nested"},
             _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
         )
-    if cfg.case == "embedded":
+    if case is InstantiationCase.EMBEDDED:
         return instantiate(
             {"_target_": "my_app.fail_with_embedded_cause"},
             _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
         )
-    if cfg.case == "embedded-instantiation":
+    if case is InstantiationCase.EMBEDDED_INSTANTIATION:
         return instantiate(
             {"_target_": "my_app.fail_with_embedded_instantiation_cause"},
             _execution_whitelist_=UNSAFE_DISABLE_EXECUTION_CHECKS,
         )
+    assert case is InstantiationCase.MISSING
     return instantiate({"child": {"_target_": "__main__.missing"}})
 
 

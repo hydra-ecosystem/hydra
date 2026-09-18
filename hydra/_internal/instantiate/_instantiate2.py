@@ -263,8 +263,8 @@ def _call_target(
         full_key,
         execution_whitelist,
     )
-    try:
-        if _partial_:
+    if _partial_:
+        try:
             deferred = _DeferredTarget(_target_, *args, **kwargs)
             deferred._hydra_resolved_from = discovery_path or resolved_target_name
             deferred._hydra_full_key = full_key
@@ -272,16 +272,14 @@ def _call_target(
             deferred._hydra_execution_policy = _get_active_execution_policy()
             deferred._hydra_call_context = deferred_call_context
             return deferred
-        result = _target_(*args, **kwargs)
-    except Exception as e:
-        if _partial_:
+        except Exception as e:
             msg = (
                 f"Error in creating partial({_convert_target_to_string(_target_)}, ...) object:"
                 + f"\n{repr(e)}"
             )
-        else:
-            msg = f"Error in call to target '{_convert_target_to_string(_target_)}':\n{repr(e)}"
-        raise InstantiationException(_with_full_key(msg, full_key)) from e
+            raise InstantiationException(_with_full_key(msg, full_key)) from e
+
+    result = _target_(*args, **kwargs)
 
     return _mediate_target_result(
         result,

@@ -255,8 +255,16 @@ def _instantiation_frame(tb: TracebackType) -> bool:
     )
 
 
+def _has_instantiation_frame(tb: Optional[TracebackType]) -> bool:
+    while tb is not None:
+        if _instantiation_frame(tb):
+            return True
+        tb = tb.tb_next
+    return False
+
+
 def _filter_instantiation_traceback(
-    ex: InstantiationException,
+    ex: BaseException,
 ) -> Optional[TracebackType]:
     tb = ex.__traceback__
     while tb is not None:
@@ -331,8 +339,8 @@ def _hydra_cause_wrapper(error: BaseException) -> bool:
     )
 
 
-def _report_instantiation_exception(ex: InstantiationException) -> None:
-    filtered_tb = _filter_instantiation_traceback(ex)
+def _report_instantiation_traceback(ex: BaseException) -> None:
+    filtered_tb = _filter_instantiation_traceback(ex) or ex.__traceback__
     saved_tracebacks = []
     saved_args = []
     saved_import_messages = []
@@ -395,8 +403,10 @@ def run_and_report(func: Any) -> Any:
             raise ex
         else:
             try:
-                if isinstance(ex, InstantiationException):
-                    _report_instantiation_exception(ex)
+                if isinstance(ex, InstantiationException) or _has_instantiation_frame(
+                    ex.__traceback__
+                ):
+                    _report_instantiation_traceback(ex)
                 elif isinstance(ex, CompactHydraException):
                     sys.stderr.write(str(ex) + os.linesep)
                     if isinstance(ex.__cause__, OmegaConfBaseException):

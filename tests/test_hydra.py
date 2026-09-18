@@ -19,7 +19,6 @@ from hydra.errors import (
     Hydra14MigrationWarning,
     Hydra15MigrationWarning,
     HydraException,
-    InstantiationException,
 )
 from hydra.experimental.callback import Callback
 from hydra.test_utils.test_utils import (
@@ -36,6 +35,7 @@ from hydra.test_utils.test_utils import (
     verify_dir_outputs,
 )
 from hydra.utils import execution_whitelist
+from tests.test_apps.app_instantiate_exception.my_app import InstantiationCase
 
 chdir_hydra_root()
 
@@ -1592,66 +1592,126 @@ def test_job_exception_full_error(tmpdir: Any) -> None:
     assert "ZeroDivisionError: division by zero" in ret
 
 
-@mark.parametrize("case", ["target", "missing", "invalid", "nested"])
-def test_instantiate_exception_traceback(tmpdir: Any, case: str) -> None:
+@mark.parametrize(
+    "case",
+    [
+        InstantiationCase.TARGET,
+        InstantiationCase.MISSING,
+        InstantiationCase.INVALID,
+        InstantiationCase.NESTED,
+    ],
+)
+def test_instantiate_exception_traceback(tmpdir: Any, case: InstantiationCase) -> None:
     ret = run_with_error(
         [
             "tests/test_apps/app_instantiate_exception/my_app.py",
-            f"+case={case}",
+            f"case={case.name}",
             f'hydra.run.dir="{tmpdir}"',
         ]
     )
 
     assert "in my_app\n    return instantiate(" in ret
-    assert "hydra/_internal/instantiate/" not in ret
-    if case == "target":
-        assert "in fail" in ret
+    assert "hydra/_internal/instantiate/" not in ret.replace("\\", "/")
+    if case is InstantiationCase.TARGET:
+        assert (
+            ret.index("in __init__")
+            < ret.index("in _prepare")
+            < ret.index("in _validate")
+        )
         assert ret.count("ValueError: target failed") == 1
+        assert "InstantiationException" not in ret
         assert "ValueError('target failed')" not in ret
-    elif case == "missing":
+    elif case is InstantiationCase.MISSING:
         assert "Error locating target '__main__.missing'" in ret
         assert "full_key: child" in ret
         assert ret.count("ImportError:") == 1
         assert ret.count("ModuleNotFoundError:") == 1
         assert "ModuleNotFoundError(" not in ret
-    elif case == "nested":
+    elif case is InstantiationCase.NESTED:
         assert "in fail_nested" in ret
-        assert "in fail" in ret
+        assert (
+            ret.index("in __init__")
+            < ret.index("in _prepare")
+            < ret.index("in _validate")
+        )
         assert ret.count("ValueError: target failed") == 1
+        assert "InstantiationException" not in ret
         assert "ValueError('target failed')" not in ret
     else:
         assert "Expected a callable target, got '123' of type 'int'" in ret
         assert "direct cause" not in ret
 
 
+def test_instantiate_exception_case_rejected_by_composition(tmpdir: Any) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            "case=UNKNOWN",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+
+    assert "Error merging override case=UNKNOWN" in ret
+    assert "expected one of [TARGET, HOOK, DIRECT" in ret
+    assert "object_type=AppConfig" in ret
+
+
 def test_instantiate_exception_full_error(tmpdir: Any) -> None:
     ret = run_with_error(
         [
             "tests/test_apps/app_instantiate_exception/my_app.py",
-            "+case=target",
+            f"case={InstantiationCase.TARGET.name}",
             f'hydra.run.dir="{tmpdir}"',
         ],
         env={**os.environ, "HYDRA_FULL_ERROR": "1"},
     )
 
     assert "in my_app" in ret
-    assert "in fail" in ret
+    assert "in __init__" in ret
+    assert "in _prepare" in ret
+    assert "in _validate" in ret
     assert "hydra/_internal/instantiate/_instantiate2.py" in ret.replace("\\", "/")
-    assert "ValueError('target failed')" in ret
+    assert "ValueError: target failed" in ret
+    assert "InstantiationException" not in ret
 
 
-@mark.parametrize("case", ["embedded", "embedded-instantiation"])
-def test_instantiate_exception_preserves_user_message(tmpdir: Any, case: str) -> None:
+def test_direct_exception_traceback(tmpdir: Any) -> None:
     ret = run_with_error(
         [
             "tests/test_apps/app_instantiate_exception/my_app.py",
-            f"+case={case}",
+            f"case={InstantiationCase.DIRECT.name}",
             f'hydra.run.dir="{tmpdir}"',
         ]
     )
 
-    error_type = "RuntimeError" if case == "embedded" else "InstantiationException"
+    assert "in my_app\n    return fail()" in ret
+    assert 'in fail\n    raise ValueError("direct call failed")' in ret
+    assert ret.count("ValueError: direct call failed") == 1
+
+
+@mark.parametrize(
+    "case", [InstantiationCase.EMBEDDED, InstantiationCase.EMBEDDED_INSTANTIATION]
+)
+def test_instantiate_exception_preserves_user_message(
+    tmpdir: Any, case: InstantiationCase
+) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            f"case={case.name}",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+
+    error_type = (
+        "RuntimeError"
+        if case is InstantiationCase.EMBEDDED
+        else "InstantiationException"
+    )
     assert f"{error_type}: request failed:\nValueError('root cause')" in ret
+    assert "The above exception was the direct cause" in ret
+    assert "ValueError: root cause" in ret
+    assert "hydra/_internal/instantiate/" not in ret.replace("\\", "/")
 
 
 def test_instantiate_exception_before_run_job(tmpdir: Any) -> None:
@@ -1665,27 +1725,28 @@ def test_instantiate_exception_before_run_job(tmpdir: Any) -> None:
     )
 
     assert "TypeError: LogJobReturnCallback.__init__()" in ret
-    assert "full_key: hydra.callbacks.fail" in ret
-    assert "hydra/_internal/instantiate/" not in ret
-    assert "in run_and_report" not in ret
+    assert "full_key: hydra.callbacks.fail" not in ret
+    assert "Traceback (most recent call last):" in ret
+    assert "in _call_target" in ret
 
 
 def test_instantiate_exception_custom_hook(tmpdir: Any) -> None:
     ret = run_with_error(
         [
             "tests/test_apps/app_instantiate_exception/my_app.py",
-            "+case=hook",
+            f"case={InstantiationCase.HOOK.name}",
             f'hydra.run.dir="{tmpdir}"',
         ]
     )
 
-    assert "hook: InstantiationException" in ret
+    assert "hook: ValueError" in ret
     assert "frame: my_app" in ret
+    assert "frame: __init__" in ret
+    assert "frame: _prepare" in ret
+    assert "frame: _validate" in ret
     assert "frame: instantiate" not in ret
     assert "frame: _call_target" not in ret
-    assert "cause: ValueError: target failed" in ret
-    assert "cause frame: fail" in ret
-    assert "cause frame: _call_target" not in ret
+    assert "cause:" not in ret
 
 
 def test_structured_with_none_list(monkeypatch: Any, tmpdir: Path) -> None:
@@ -2141,7 +2202,7 @@ def test_multirun_restores_hydra_config_when_sweep_raises(
     """HydraConfig must be restored even when the sweep raises."""
     assert not HydraConfig.initialized()
 
-    with raises(InstantiationException, match="boom"):
+    with raises(RuntimeError, match="boom"):
         with (
             execution_whitelist("tests.test_hydra.*"),
             hydra_sweep_runner(

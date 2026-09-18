@@ -1,7 +1,15 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import pickle
 
-from hydra.errors import MissingConfigException
+from hydra.errors import (
+    CompactHydraException,
+    InstantiationException,
+    MissingConfigException,
+)
+
+
+def test_instantiation_exception_is_not_compact() -> None:
+    assert not issubclass(InstantiationException, CompactHydraException)
 
 
 def test_pickle_missing_config_exception() -> None:
