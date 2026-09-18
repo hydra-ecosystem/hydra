@@ -3,6 +3,7 @@ import builtins
 import copy
 import logging
 import os
+import pickle
 import re
 import sys
 from contextlib import contextmanager
@@ -441,6 +442,7 @@ _SerializedExceptionNode = Tuple[
     _SerializedTraceback,
     _SerializedExceptionChain,
     List["_SerializedExceptionNode"],
+    List[str],
 ]
 _SerializedExceptionGroup = List[_SerializedExceptionNode]
 
@@ -459,6 +461,16 @@ def _safe_exception_message(error: BaseException) -> str:
         return str(error)
     except BaseException:
         return "<exception message unavailable>"
+
+
+def _exception_notes(error: BaseException) -> List[str]:
+    try:
+        notes = getattr(error, "__notes__", ())
+    except Exception:
+        return []
+    return (
+        [note for note in notes if type(note) is str] if isinstance(notes, list) else []
+    )
 
 
 def _serialize_exception_chain(
@@ -486,6 +498,29 @@ def _exception_group_members(error: BaseException) -> Sequence[BaseException]:
     return cast(Sequence[BaseException], error.exceptions)
 
 
+def _has_non_string_notes(
+    error: BaseException, seen: Optional[Set[int]] = None
+) -> bool:
+    if seen is None:
+        seen = set()
+    if id(error) in seen:
+        return False
+    seen.add(id(error))
+    notes = getattr(error, "__notes__", ())
+    if notes and (
+        not isinstance(notes, list) or len(notes) != len(_exception_notes(error))
+    ):
+        return True
+    for related in (
+        *_exception_group_members(error),
+        error.__cause__,
+        error.__context__,
+    ):
+        if related is not None and _has_non_string_notes(related, seen):
+            return True
+    return False
+
+
 def _serialize_exception_node(
     error: BaseException, ancestors: Optional[Set[int]] = None
 ) -> _SerializedExceptionNode:
@@ -506,6 +541,7 @@ def _serialize_exception_node(
         _serialize_traceback(error.__traceback__),
         _serialize_exception_chain(error, seen),
         [_serialize_exception_node(child, seen) for child in members],
+        _exception_notes(error),
     )
 
 
@@ -555,8 +591,17 @@ def _deserialize_exception_chain(
     return relation, _deserialize_exception_node(node)
 
 
+def _restore_exception_notes(error: BaseException, notes: Sequence[str]) -> None:
+    add_note = getattr(error, "add_note", None)
+    if add_note is not None:
+        for note in notes:
+            if type(note) is str and note not in getattr(error, "__notes__", ()):
+                add_note(note)
+
+
 def _deserialize_exception_node(serialized: _SerializedExceptionNode) -> BaseException:
-    module, qualname, message, is_exception, tb, chain, group = serialized
+    module, qualname, message, is_exception, tb, chain, group, *extra = serialized
+    notes = extra[0] if extra else []
     children = [_deserialize_exception_node(child) for child in group]
     name = qualname.rsplit(".", maxsplit=1)[-1]
     if children:
@@ -577,6 +622,7 @@ def _deserialize_exception_node(serialized: _SerializedExceptionNode) -> BaseExc
         )
         error = error_type(message)
     error.__traceback__ = _deserialize_traceback(tb)
+    _restore_exception_notes(error, notes)
     if chain:
         relation, chained = cast(
             Tuple[str, BaseException], _deserialize_exception_chain(chain)
@@ -591,8 +637,9 @@ def _deserialize_exception_node(serialized: _SerializedExceptionNode) -> BaseExc
 def _restore_exception_node(
     error: BaseException, serialized: _SerializedExceptionNode
 ) -> None:
-    _, _, _, _, remote_traceback, remote_chain, remote_group = serialized
+    _, _, _, _, remote_traceback, remote_chain, remote_group, *extra = serialized
     error.__traceback__ = _deserialize_traceback(remote_traceback)
+    _restore_exception_notes(error, extra[0] if extra else [])
     if remote_chain:
         relation, chained = cast(
             Tuple[str, BaseException], _deserialize_exception_chain(remote_chain)
@@ -626,6 +673,36 @@ class JobReturn:
     _remote_exception_group: Optional[_SerializedExceptionGroup] = field(
         default=None, repr=False, compare=False
     )
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = self.__dict__.copy()
+        error = self._return_value
+        if self.status is JobStatus.FAILED and isinstance(error, BaseException):
+            try:
+                if _has_non_string_notes(error):
+                    raise TypeError("exception contains non-string notes")
+                # The exception was raised by the local task, not read from a peer.
+                restored = pickle.loads(  # nosec B301
+                    pickle.dumps(error, protocol=pickle.HIGHEST_PROTOCOL)
+                )
+                if type(restored) is not type(error):
+                    raise TypeError("exception type changed after pickle")
+                if _exception_notes(restored) != _exception_notes(error):
+                    raise TypeError("exception notes changed after pickle")
+                if _safe_exception_message(restored) != _safe_exception_message(error):
+                    raise TypeError("exception message changed after pickle")
+            except BaseException:
+                error_type = type(error)
+                fallback = RuntimeError(
+                    f"Remote {error_type.__module__}.{error_type.__qualname__}: "
+                    f"{_safe_exception_message(error)}"
+                )
+                add_note = getattr(fallback, "add_note", None)
+                if add_note is not None:
+                    for note in _exception_notes(error):
+                        add_note(note)
+                state["_return_value"] = fallback
+        return state
 
     @property
     def return_value(self) -> Any:

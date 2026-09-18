@@ -138,20 +138,19 @@ class Plugins(metaclass=Singleton):
             if classname not in self.class_name_to_class.keys():
                 raise RuntimeError(f"Unknown plugin class : '{classname}'")
             clazz = self.class_name_to_class[classname]
-            with _trusted_internal_target(classname):
-                plugin = instantiate(
-                    config=config,
-                    _target_=clazz,
-                    _execution_whitelist_=classname,
-                    _recursive_=False,
-                )
-            assert isinstance(plugin, Plugin)
-
         except ImportError as e:
             raise ImportError(
                 f"Could not instantiate plugin {classname} : {str(e)}\n\n\tIS THE PLUGIN INSTALLED?\n\n"
             )
 
+        with _trusted_internal_target(classname):
+            plugin = instantiate(
+                config=config,
+                _target_=clazz,
+                _execution_whitelist_=classname,
+                _recursive_=False,
+            )
+        assert isinstance(plugin, Plugin)
         return plugin
 
     def instantiate_sweeper(

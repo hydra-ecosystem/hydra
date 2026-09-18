@@ -1279,6 +1279,19 @@ def _with_full_key(message: str, full_key: str) -> str:
     return f"{message}\nfull_key: {full_key}" if full_key else message
 
 
+def _add_full_key_note(error: BaseException, full_key: str) -> None:
+    if full_key:
+        note = f"full_key: {full_key}"
+        add_note = getattr(BaseException, "add_note", None)
+        if add_note is not None:
+            try:
+                if note not in getattr(error, "__notes__", ()):
+                    add_note(error, note)
+            except Exception:
+                # Annotation must not replace the original target failure.
+                pass
+
+
 def _get_target_name_for_check(target: Union[str, type, Callable[..., Any]]) -> str:
     if isinstance(target, str):
         return target
@@ -1917,7 +1930,11 @@ class _DeferredTarget(functools.partial):  # type: ignore[type-arg]
                 self._hydra_full_key,
                 self._hydra_execution_whitelist,
             )
-            result = super().__call__(*args, **kwargs)
+            try:
+                result = super().__call__(*args, **kwargs)
+            except Exception as error:
+                _add_full_key_note(error, self._hydra_full_key)
+                raise
             return _mediate_target_result(
                 result,
                 discovery_path or self._hydra_resolved_from,

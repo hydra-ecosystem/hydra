@@ -15,7 +15,8 @@ class OverrideParseException(CompactHydraException):
         self.message = message
 
 
-class InstantiationException(CompactHydraException): ...
+class InstantiationException(HydraException):
+    """An error raised by Hydra during instantiation."""
 
 
 class ConfigCompositionException(CompactHydraException): ...

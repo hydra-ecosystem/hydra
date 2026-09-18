@@ -51,6 +51,12 @@ class ExternalLauncher(PluginWithNestedTarget):
     pass
 
 
+class ImportFailingLauncher(PluginWithNestedTarget):
+    def __init__(self) -> None:
+        super().__init__(nested=OmegaConf.create({}))
+        raise ImportError("optional dependency unavailable")
+
+
 class ExternalSweeper(Sweeper):
     def setup(
         self,
@@ -241,6 +247,22 @@ def test_unregistered_plugin_is_rejected(hydra_restore_singletons: Any) -> None:
             OmegaConf.create(
                 {
                     "_target_": f"{ExternalLauncher.__module__}.{ExternalLauncher.__qualname__}"
+                }
+            )
+        )
+
+
+def test_plugin_constructor_import_error_is_preserved(
+    hydra_restore_singletons: Any,
+) -> None:
+    plugins = Plugins.instance()
+    plugins.register(ImportFailingLauncher)
+
+    with raises(ImportError, match="^optional dependency unavailable$"):
+        plugins._instantiate(
+            OmegaConf.create(
+                {
+                    "_target_": f"{ImportFailingLauncher.__module__}.{ImportFailingLauncher.__qualname__}"
                 }
             )
         )

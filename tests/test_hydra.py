@@ -19,7 +19,6 @@ from hydra.errors import (
     Hydra14MigrationWarning,
     Hydra15MigrationWarning,
     HydraException,
-    InstantiationException,
 )
 from hydra.experimental.callback import Callback
 from hydra.test_utils.test_utils import (
@@ -36,8 +35,13 @@ from hydra.test_utils.test_utils import (
     verify_dir_outputs,
 )
 from hydra.utils import execution_whitelist
+from tests.test_apps.app_instantiate_exception.my_app import InstantiationCase
 
 chdir_hydra_root()
+
+HIDDEN_HYDRA_FRAME = (
+    f'File "{os.path.join(os.devnull, "Hydra frames hidden")}", line 1, in omitted'
+)
 
 
 def test_migration_warning_categories_are_release_specific() -> None:
@@ -598,6 +602,11 @@ def test_cfg_resolve_interpolation(
                 """),
             id="passes_callable_class_to_hydra_main",
         ),
+        param(
+            "tests/test_apps/passes_callable_class_to_hydra_main/partial_app.py",
+            "123\n",
+            id="passes_partial_callable_to_hydra_main",
+        ),
     ],
 )
 def test_pass_callable_class_to_hydra_main(
@@ -611,6 +620,70 @@ def test_pass_callable_class_to_hydra_main(
 
     result, _err = run_python_script(cmd)
     assert_text_same(result, expected)
+
+
+@mark.parametrize(
+    "script",
+    ["my_app.py", "partial_app.py", "nested_partial_app.py", "class_task_app.py"],
+)
+def test_callable_class_setup_error_precedes_application(
+    tmp_path: Path, script: str
+) -> None:
+    blocked = tmp_path / "blocked"
+    blocked.write_text("")
+    ret = run_with_error(
+        [
+            f"tests/test_apps/passes_callable_class_to_hydra_main/{script}",
+            f'hydra.run.dir="{blocked / "child"}"',
+        ]
+    )
+
+    assert "in _run_job" in ret
+    assert "in mkdir" in ret
+    assert "in __call__" not in ret
+    assert "Hydra frames hidden" not in ret
+
+
+def test_partial_callable_error_shows_application_traceback(tmp_path: Path) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/passes_callable_class_to_hydra_main/partial_app.py",
+            "+fail=true",
+            f'hydra.run.dir="{tmp_path}"',
+        ]
+    )
+
+    assert "in task" in ret
+    assert "ValueError: partial callable failed" in ret
+    assert "in _run_job" not in ret
+
+
+def test_nested_partial_callable_error_shows_application_traceback(
+    tmp_path: Path,
+) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/passes_callable_class_to_hydra_main/nested_partial_app.py",
+            f'hydra.run.dir="{tmp_path}"',
+        ]
+    )
+
+    assert "in __call__" in ret
+    assert "ValueError: nested partial failed" in ret
+    assert "in _run_job" not in ret
+
+
+def test_class_task_error_shows_application_traceback(tmp_path: Path) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/passes_callable_class_to_hydra_main/class_task_app.py",
+            f'hydra.run.dir="{tmp_path}"',
+        ]
+    )
+
+    assert "in __init__" in ret
+    assert "ValueError: class task failed" in ret
+    assert "in _run_job" not in ret
 
 
 @mark.parametrize(
@@ -1458,16 +1531,17 @@ def test_app_with_error_exception_sanitized(tmpdir: Any, monkeypatch: Any) -> No
             {traceback_line}
           File ".*my_app\.py", line 8, in foo
             cfg\.foo = "bar"  # does not exist in the config(\n    \^+)?
-        omegaconf\.errors\.ConfigAttributeError: Key 'foo' is not in struct
-            full_key: foo
-            object_type=dict{suggestion_suffix}
         """)
         .strip()
-        .format(traceback_line=traceback_line, suggestion_suffix=suggestion_suffix)
+        .format(traceback_line=traceback_line)
     )
 
     ret = run_with_error(cmd)
     assert_multiline_regex_search(expected_regex, ret)
+    assert "in __setattr__" in ret
+    assert "omegaconf.errors.ConfigAttributeError: Key 'foo' is not in struct" in ret
+    assert "full_key: foo" in ret
+    assert re.search(r"object_type=dict" + suggestion_suffix, ret)
 
 
 def test_hydra_to_job_config_interpolation(tmpdir: Any) -> Any:
@@ -1592,6 +1666,188 @@ def test_job_exception_full_error(tmpdir: Any) -> None:
     assert "ZeroDivisionError: division by zero" in ret
 
 
+@mark.parametrize(
+    "case",
+    [
+        InstantiationCase.TARGET,
+        InstantiationCase.MISSING,
+        InstantiationCase.INVALID,
+        InstantiationCase.NESTED,
+    ],
+)
+def test_instantiate_exception_traceback(tmpdir: Any, case: InstantiationCase) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            f"case={case.name}",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+
+    assert "in my_app\n    return instantiate(" in ret
+    assert "hydra/_internal/instantiate/" not in ret.replace("\\", "/")
+    if case is InstantiationCase.TARGET:
+        assert ret.count(HIDDEN_HYDRA_FRAME) == 1
+        assert (
+            ret.index("in my_app")
+            < ret.index(HIDDEN_HYDRA_FRAME)
+            < ret.index("in __init__")
+            < ret.index("in _prepare")
+            < ret.index("in _validate")
+        )
+        assert ret.count("ValueError: target failed") == 1
+        assert "InstantiationException" not in ret
+        assert "ValueError('target failed')" not in ret
+    elif case is InstantiationCase.MISSING:
+        assert "Error locating target '__main__.missing'" in ret
+        assert "full_key: child" in ret
+        assert ret.count("ImportError:") == 1
+        assert ret.count("ModuleNotFoundError:") == 1
+        assert "ModuleNotFoundError(" not in ret
+    elif case is InstantiationCase.NESTED:
+        assert "in fail_nested" in ret
+        assert ret.count(HIDDEN_HYDRA_FRAME) == 2
+        assert (
+            ret.index("in my_app")
+            < ret.index(HIDDEN_HYDRA_FRAME)
+            < ret.index("in fail_nested")
+            < ret.rindex(HIDDEN_HYDRA_FRAME)
+            < ret.index("in __init__")
+            < ret.index("in _prepare")
+            < ret.index("in _validate")
+        )
+        assert ret.count("ValueError: target failed") == 1
+        assert "InstantiationException" not in ret
+        assert "ValueError('target failed')" not in ret
+    else:
+        assert ret.count(HIDDEN_HYDRA_FRAME) == 1
+        assert "Expected a callable target, got '123' of type 'int'" in ret
+        assert "direct cause" not in ret
+
+
+def test_instantiate_exception_case_rejected_by_composition(tmpdir: Any) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            "case=UNKNOWN",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+
+    assert "Error merging override case=UNKNOWN" in ret
+    assert "expected one of [TARGET, TARGET_CHILD, HOOK, DIRECT" in ret
+    assert "object_type=AppConfig" in ret
+
+
+def test_nested_target_error_shows_config_path_note(tmpdir: Any) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            f"case={InstantiationCase.TARGET_CHILD.name}",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+    assert "ValueError: target failed" in ret
+    assert ("full_key: child" in ret) is (sys.version_info >= (3, 11))
+
+
+def test_instantiate_exception_full_error(tmpdir: Any) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            f"case={InstantiationCase.TARGET.name}",
+            f'hydra.run.dir="{tmpdir}"',
+        ],
+        env={**os.environ, "HYDRA_FULL_ERROR": "1"},
+    )
+
+    assert "in my_app" in ret
+    assert "in __init__" in ret
+    assert "in _prepare" in ret
+    assert "in _validate" in ret
+    assert "hydra/_internal/instantiate/_instantiate2.py" in ret.replace("\\", "/")
+    assert "Hydra frames hidden" not in ret
+    assert "ValueError: target failed" in ret
+    assert "InstantiationException" not in ret
+
+
+def test_direct_exception_traceback(tmpdir: Any) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            f"case={InstantiationCase.DIRECT.name}",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+
+    assert "in my_app\n    return fail()" in ret
+    assert 'in fail\n    raise ValueError("direct call failed")' in ret
+    assert "Hydra frames hidden" not in ret
+    assert ret.count("ValueError: direct call failed") == 1
+
+
+@mark.parametrize(
+    "case", [InstantiationCase.EMBEDDED, InstantiationCase.EMBEDDED_INSTANTIATION]
+)
+def test_instantiate_exception_preserves_user_message(
+    tmpdir: Any, case: InstantiationCase
+) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            f"case={case.name}",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+
+    error_type = (
+        "RuntimeError"
+        if case is InstantiationCase.EMBEDDED
+        else "InstantiationException"
+    )
+    assert f"{error_type}: request failed:\nValueError('root cause')" in ret
+    assert "The above exception was the direct cause" in ret
+    assert "ValueError: root cause" in ret
+    assert "hydra/_internal/instantiate/" not in ret.replace("\\", "/")
+
+
+def test_instantiate_exception_before_run_job(tmpdir: Any) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            "+hydra.callbacks.fail._target_=hydra.experimental.callbacks.LogJobReturnCallback",
+            "+hydra.callbacks.fail.unknown=1",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+
+    assert "TypeError: LogJobReturnCallback.__init__()" in ret
+    assert ("full_key: hydra.callbacks.fail" in ret) is (sys.version_info >= (3, 11))
+    assert "Traceback (most recent call last):" in ret
+    assert "in _call_target" in ret
+    assert "Hydra frames hidden" not in ret
+
+
+def test_instantiate_exception_custom_hook(tmpdir: Any) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/app_instantiate_exception/my_app.py",
+            f"case={InstantiationCase.HOOK.name}",
+            f'hydra.run.dir="{tmpdir}"',
+        ]
+    )
+
+    assert "hook: ValueError" in ret
+    assert "frame: my_app" in ret
+    assert "frame: omitted" in ret
+    assert "frame: __init__" in ret
+    assert "frame: _prepare" in ret
+    assert "frame: _validate" in ret
+    assert "frame: instantiate" not in ret
+    assert "frame: _call_target" not in ret
+    assert "cause:" not in ret
+
+
 def test_structured_with_none_list(monkeypatch: Any, tmpdir: Path) -> None:
     monkeypatch.chdir("tests/test_apps/structured_with_none_list")
     cmd = [
@@ -1685,8 +1941,7 @@ def test_frozen_primary_config(
                 Traceback \(most recent call last\):
                   File "\S*[/\\]my_app.py", line 10, in my_app
                     deprecation_warning\("Feature FooBar is deprecated"\)(\n    [~\^]+)?
-                  File "\S*\.py", line \d+, in deprecation_warning
-                    raise HydraDeprecationError\(.*\)
+                  File ".*Hydra frames hidden", line 1, in omitted
                 hydra\.errors\.HydraDeprecationError: Feature FooBar is deprecated
                 """).strip(),
             id="deprecation_error",
@@ -2045,7 +2300,7 @@ def test_multirun_restores_hydra_config_when_sweep_raises(
     """HydraConfig must be restored even when the sweep raises."""
     assert not HydraConfig.initialized()
 
-    with raises(InstantiationException, match="boom"):
+    with raises(RuntimeError, match="boom"):
         with (
             execution_whitelist("tests.test_hydra.*"),
             hydra_sweep_runner(

@@ -57,6 +57,7 @@ from tests.instantiate import (
     CenterCropConf,
     Compose,
     ComposeConf,
+    ExceptionTakingNoArgument,
     IllegalType,
     KeywordsInParamsClass,
     Mapping,
@@ -1579,7 +1580,7 @@ def test_no_override_config_readonly_is_restored_after_failure(
     )
     original_readonly = cfg._get_node_flag("readonly")
 
-    with raises(InstantiationException, match="expected failure"):
+    with raises(RuntimeError, match="expected failure"):
         instantiate_func(cfg)
 
     assert cfg.payload.value == 10
@@ -1743,10 +1744,7 @@ def test_class_instantiate_sequence_item(instantiate_func: Any, config: Any) -> 
 
 @mark.parametrize("src", [{"_target_": "tests.instantiate.Adam"}])
 def test_instantiate_adam(instantiate_func: Any, config: Any) -> None:
-    with raises(
-        InstantiationException,
-        match=r"Error in call to target 'tests\.instantiate\.Adam':\nTypeError\(.*\)",
-    ):
+    with raises(TypeError, match="missing 1 required positional argument: 'params'"):
         # can't instantiate without passing params
         instantiate_func(config)
 
@@ -2506,10 +2504,7 @@ def test_nested_target_can_register_resolver_for_later_argument(
 def test_instantiate_adam_conf(
     instantiate_func: Any, is_partial: bool, expected_params: Any
 ) -> None:
-    with raises(
-        InstantiationException,
-        match=r"Error in call to target 'tests\.instantiate\.Adam':\nTypeError\(.*\)",
-    ):
+    with raises(TypeError, match="missing 1 required positional argument: 'params'"):
         # can't instantiate without passing params
         instantiate_func(AdamConf())
 
@@ -2543,14 +2538,7 @@ def test_instantiate_adam_conf_with_convert(instantiate_func: Any) -> None:
 
 def test_instantiate_with_missing_module(instantiate_func: Any) -> None:
     _target_ = "tests.instantiate.ClassWithMissingModule"
-    with raises(
-        InstantiationException,
-        match=dedent(
-            rf"""
-            Error in call to target '{re.escape(_target_)}':
-            ModuleNotFoundError\("No module named 'some_missing_module'",?\)"""
-        ).strip(),
-    ):
+    with raises(ModuleNotFoundError, match="No module named 'some_missing_module'"):
         # can't instantiate when importing a missing module
         instantiate_func({"_target_": _target_})
 
@@ -2559,14 +2547,7 @@ def test_instantiate_target_raising_exception_taking_no_arguments(
     instantiate_func: Any,
 ) -> None:
     _target_ = "tests.instantiate.raise_exception_taking_no_argument"
-    with raises(
-        InstantiationException,
-        match=(
-            dedent(rf"""
-                Error in call to target '{re.escape(_target_)}':
-                ExceptionTakingNoArgument\('Err message',?\)""").strip()
-        ),
-    ):
+    with raises(ExceptionTakingNoArgument, match="Err message"):
         instantiate_func({}, _target_=_target_)
 
 
@@ -2574,17 +2555,76 @@ def test_instantiate_target_raising_exception_taking_no_arguments_nested(
     instantiate_func: Any,
 ) -> None:
     _target_ = "tests.instantiate.raise_exception_taking_no_argument"
-    with raises(
-        InstantiationException,
-        match=(
-            dedent(rf"""
-                Error in call to target '{re.escape(_target_)}':
-                ExceptionTakingNoArgument\('Err message',?\)
-                full_key: foo
-                """).strip()
-        ),
-    ):
-        instantiate_func({"foo": {"_target_": _target_}})
+    with raises(ExceptionTakingNoArgument, match="Err message") as exc_info:
+        instantiate_func({"_target_": "builtins.dict", "foo": {"_target_": _target_}})
+    notes = ["full_key: foo"] if sys.version_info >= (3, 11) else []
+    assert getattr(exc_info.value, "__notes__", []) == notes
+    if notes:
+        assert "full_key: foo" in "".join(
+            traceback.TracebackException.from_exception(exc_info.value).format()
+        )
+    assert exc_info.value.__cause__ is None
+
+
+def test_deferred_target_error_has_config_path_note(instantiate_func: Any) -> None:
+    deferred = instantiate_func(
+        {
+            "foo": {
+                "_target_": "tests.instantiate.raise_exception_taking_no_argument",
+                "_partial_": True,
+            }
+        }
+    )
+    with raises(ExceptionTakingNoArgument, match="Err message") as exc_info:
+        deferred.foo()
+    notes = ["full_key: foo"] if sys.version_info >= (3, 11) else []
+    assert getattr(exc_info.value, "__notes__", []) == notes
+    assert exc_info.value.__cause__ is None
+
+
+def test_partial_construction_error_keeps_original_type(
+    instantiate_func: Any, monkeypatch: MonkeyPatch
+) -> None:
+    def fail_deferred(*args: Any, **kwargs: Any) -> Any:
+        raise ValueError("deferred construction failed")
+
+    monkeypatch.setattr(_instantiate2, "_DeferredTarget", fail_deferred)
+    with raises(ValueError, match="deferred construction failed") as exc_info:
+        instantiate_func(
+            {
+                "foo": {
+                    "_target_": "tests.instantiate.module_function",
+                    "_partial_": True,
+                }
+            }
+        )
+    notes = ["full_key: foo"] if sys.version_info >= (3, 11) else []
+    assert getattr(exc_info.value, "__notes__", []) == notes
+    assert exc_info.value.__cause__ is None
+
+
+def test_invalid_positional_args_keep_config_path_without_chain(
+    instantiate_func: Any,
+) -> None:
+    with raises(InstantiationException, match="full_key: foo") as exc_info:
+        instantiate_func(
+            {"foo": {"_target_": "tests.instantiate.module_function", "_args_": 42}}
+        )
+    assert exc_info.value.__cause__ is None
+
+
+def test_invalid_exception_notes_do_not_replace_target_error() -> None:
+    error = ValueError("original failure")
+    setattr(error, "__notes__", "invalid notes")
+
+    def fail() -> None:
+        raise error
+
+    with raises(ValueError, match="original failure") as exc_info:
+        _instantiate2._call_target(
+            fail, False, (), {}, "nested", UNSAFE_DISABLE_EXECUTION_CHECKS, None
+        )
+    assert exc_info.value is error
 
 
 @mark.parametrize(
@@ -3408,6 +3448,16 @@ def test_cannot_locate_target(instantiate_func: Any) -> None:
             Are you sure that module 'not_found' is installed\\?"""),
         chained.args[0],
     )
+
+
+def test_lookup_does_not_wrap_unexpected_error(monkeypatch: MonkeyPatch) -> None:
+    def fail_lookup(path: str) -> Any:
+        raise RuntimeError("import-time failure")
+
+    monkeypatch.setattr(_instantiate2, "_locate", fail_lookup)
+    with raises(RuntimeError, match="import-time failure") as exc_info:
+        _resolve_target("some.module", "nested", UNSAFE_DISABLE_EXECUTION_CHECKS)
+    assert exc_info.value.__cause__ is None
 
 
 @mark.parametrize(
@@ -5874,7 +5924,7 @@ def test_resolved_partial_target_preserves_unfilled_placeholder_error() -> None:
     placeholder = getattr(functools, "Placeholder")
     target = partial(pow, placeholder, 2)
 
-    with raises(InstantiationException, match="Error in call to target"):
+    with raises(TypeError, match="missing positional arguments in 'partial' call"):
         _instantiate2.instantiate(
             {"_target_": target},
             _execution_whitelist_="builtins.pow",

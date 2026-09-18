@@ -16,6 +16,36 @@ from hydra.core.hydra_config import HydraConfig
 from hydra.types import HydraContext, RunMode
 
 
+class NonRoundtripError(Exception):
+    def __init__(self) -> None:
+        super().__init__("non-roundtrip failure")
+
+
+class NoteDroppingError(Exception):
+    def __reduce__(self) -> Any:
+        return type(self), self.args
+
+
+class CausePreservingError(Exception):
+    def __reduce__(self) -> Any:
+        return type(self), self.args, {"cause": self.__cause__}
+
+
+class ContextPreservingError(Exception):
+    def __reduce__(self) -> Any:
+        return type(self), self.args, {"context": self.__context__}
+
+
+class MessageChangingError(Exception):
+    def __reduce__(self) -> Any:
+        return type(self), ("changed message",), {"__notes__": self.__notes__}
+
+
+class InterruptingReducerError(Exception):
+    def __reduce__(self) -> Any:
+        raise KeyboardInterrupt("reducer interrupted")
+
+
 def test_accessing_hydra_config(hydra_restore_singletons: Any) -> Any:
     utils.setup_globals()
 
@@ -76,6 +106,8 @@ def test_job_return_preserves_traceback_after_pickle() -> None:
     try:
         raise ValueError("remote failure")
     except ValueError as error:
+        if hasattr(error, "add_note"):
+            error.add_note("full_key: foo")
         job_return.return_value = error
         job_return._remote_traceback = utils._serialize_traceback(error.__traceback__)
         expected_traceback = job_return._remote_traceback
@@ -86,6 +118,8 @@ def test_job_return_preserves_traceback_after_pickle() -> None:
         restored.return_value
 
     assert exc_info.value.__cause__ is None
+    if hasattr(exc_info.value, "add_note"):
+        assert exc_info.value.__notes__ == ["full_key: foo"]
     reconstructed = traceback.extract_tb(exc_info.value.__traceback__)
     assert [
         (frame.filename, frame.name, frame.lineno)
@@ -97,6 +131,136 @@ def test_job_return_preserves_traceback_after_pickle() -> None:
     )
     assert "test_job_return_preserves_traceback_after_pickle" in formatted
     assert "ValueError: remote failure" in formatted
+
+
+@mark.parametrize(
+    "error",
+    [NonRoundtripError(), ValueError("unpickleable state")],
+)
+def test_job_return_transports_non_picklable_exception(error: Exception) -> None:
+    if isinstance(error, ValueError):
+        setattr(error, "callback", lambda: None)
+    error.__cause__ = ValueError("remote cause")
+    if hasattr(error, "add_note"):
+        error.add_note("full_key: foo")
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+    job_return._remote_exception_chain = utils._serialize_exception_chain(error)
+    job_return._remote_traceback = []
+    assert job_return._return_value is error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+    with raises(RuntimeError, match=rf"Remote .*\.{type(error).__name__}") as exc_info:
+        restored.return_value
+    assert str(exc_info.value.__cause__) == "remote cause"
+    if hasattr(error, "add_note"):
+        assert exc_info.value.__notes__ == ["full_key: foo"]
+
+
+def test_job_return_drops_non_string_notes() -> None:
+    error = ValueError("remote failure")
+    setattr(error, "__notes__", ["full_key: foo", {"unsafe": "note"}])
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    assert job_return._return_value is error
+    assert error.__notes__ == ["full_key: foo", {"unsafe": "note"}]
+    with raises(RuntimeError, match="Remote builtins.ValueError") as exc_info:
+        restored.return_value
+    assert getattr(exc_info.value, "__notes__", []) == (
+        ["full_key: foo"] if hasattr(BaseException, "add_note") else []
+    )
+
+
+@mark.skipif(sys.version_info < (3, 11), reason="Exception notes require Python 3.11")
+def test_job_return_preserves_notes_with_custom_reducer() -> None:
+    error = NoteDroppingError("remote failure")
+    error.add_note("full_key: foo")
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    assert job_return._return_value is error
+    with raises(
+        RuntimeError, match="Remote tests.test_core_utils.NoteDroppingError"
+    ) as exc_info:
+        restored.return_value
+    assert exc_info.value.__notes__ == ["full_key: foo"]
+
+
+def test_job_return_drops_non_string_notes_on_custom_chained_cause() -> None:
+    cause = ValueError("remote cause")
+    setattr(cause, "__notes__", ["full_key: nested", {"unsafe": "note"}])
+    error = CausePreservingError("remote failure")
+    error.__cause__ = cause
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+    job_return._remote_traceback = []
+    job_return._remote_exception_chain = utils._serialize_exception_chain(error)
+
+    serialized = pickle.dumps(job_return)
+
+    assert b"unsafe" not in serialized
+    assert job_return._return_value is error
+    restored = pickle.loads(serialized)  # nosec B301: trusted test data
+    with raises(
+        RuntimeError, match="Remote tests.test_core_utils.CausePreservingError"
+    ) as exc_info:
+        restored.return_value
+    assert getattr(exc_info.value.__cause__, "__notes__", []) == (
+        ["full_key: nested"] if hasattr(BaseException, "add_note") else []
+    )
+
+
+@mark.skipif(sys.version_info < (3, 11), reason="Exception notes require Python 3.11")
+def test_job_return_preserves_message_with_custom_reducer() -> None:
+    error = MessageChangingError("original message")
+    error.add_note("full_key: foo")
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    assert job_return._return_value is error
+    with raises(RuntimeError, match="original message") as exc_info:
+        restored.return_value
+    assert exc_info.value.__notes__ == ["full_key: foo"]
+
+
+def test_job_return_drops_non_string_notes_in_suppressed_context() -> None:
+    context = ValueError("hidden context")
+    setattr(context, "__notes__", ["full_key: hidden", {"unsafe": "note"}])
+    error = ContextPreservingError("visible failure")
+    error.__context__ = context
+    error.__suppress_context__ = True
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+    job_return._remote_traceback = []
+    job_return._remote_exception_chain = utils._serialize_exception_chain(error)
+
+    serialized = pickle.dumps(job_return)
+
+    assert b"unsafe" not in serialized
+    restored = pickle.loads(serialized)  # nosec B301: trusted test data
+    with raises(RuntimeError, match="visible failure"):
+        restored.return_value
+
+
+def test_job_return_falls_back_when_reducer_raises_base_exception() -> None:
+    error = InterruptingReducerError("remote failure")
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    assert job_return._return_value is error
+    with raises(
+        RuntimeError, match="Remote tests.test_core_utils.InterruptingReducerError"
+    ):
+        restored.return_value
 
 
 def test_job_return_from_older_pickle_without_remote_traceback_fields() -> None:
@@ -115,6 +279,13 @@ def test_job_return_from_older_pickle_without_remote_traceback_fields() -> None:
         restored.return_value
 
 
+def test_legacy_serialized_exception_node_without_notes() -> None:
+    legacy_node = ("builtins", "ValueError", "old failure", True, [], [], [])
+    restored = utils._deserialize_exception_node(cast(Any, legacy_node))
+    assert type(restored).__name__ == "ValueError"
+    assert str(restored) == "old failure"
+
+
 def test_job_return_preserves_exception_chain_after_pickle() -> None:
     job_return = utils.JobReturn(
         overrides=["job=0"],
@@ -124,6 +295,8 @@ def test_job_return_preserves_exception_chain_after_pickle() -> None:
         try:
             raise ValueError("remote cause")
         except ValueError as cause:
+            if hasattr(cause, "add_note"):
+                cause.add_note("full_key: nested")
             raise RuntimeError("remote failure") from cause
     except RuntimeError as error:
         job_return.return_value = error
@@ -138,12 +311,31 @@ def test_job_return_preserves_exception_chain_after_pickle() -> None:
     cause = exc_info.value.__cause__
     assert cause is not None
     assert type(cause).__name__ == "ValueError"
+    if hasattr(cause, "add_note"):
+        assert cause.__notes__ == ["full_key: nested"]
     formatted = "".join(
         traceback.TracebackException.from_exception(exc_info.value).format()
     )
     assert "ValueError: remote cause" in formatted
     assert "The above exception was the direct cause" in formatted
     assert "RuntimeError: remote failure" in formatted
+
+
+@mark.skipif(sys.version_info < (3, 11), reason="ExceptionGroup requires Python 3.11")
+def test_job_return_drops_non_string_group_member_notes() -> None:
+    exception_group_type = cast(Any, getattr(builtins, "ExceptionGroup"))
+    member = ValueError("member failure")
+    setattr(member, "__notes__", ["full_key: child", {"unsafe": "note"}])
+    error = exception_group_type("remote group", [member])
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+    job_return._remote_exception_group = utils._serialize_exception_group(error)
+
+    serialized = pickle.dumps(job_return)
+    assert b"unsafe" not in serialized
+    restored = pickle.loads(serialized)  # nosec B301: trusted test data
+    with raises(RuntimeError, match="Remote builtins.ExceptionGroup"):
+        restored.return_value
 
 
 @mark.skipif(sys.version_info < (3, 11), reason="ExceptionGroup requires Python 3.11")

@@ -479,7 +479,7 @@ def test_rejected_result_marks_trial_failed(
 
 def test_motpe_sampler_removed() -> None:
     with raises(
-        InstantiationException,
+        ValueError,
         match="The 'motpe' sampler was removed in Optuna 4.0",
     ):
         instantiate(
