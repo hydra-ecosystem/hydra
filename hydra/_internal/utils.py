@@ -238,7 +238,25 @@ def _traceback_module(tb: TracebackType) -> str:
     # JobReturn restores remote frames with only their original code location.
     filename = frame.f_code.co_filename.replace("\\", "/")
     if "/hydra/" in filename and filename.endswith(".py"):
-        return "hydra." + filename.rsplit("/hydra/", 1)[1][:-3].replace("/", ".")
+        relative = filename.rsplit("/hydra/", 1)[1][:-3]
+        head = relative.split("/", 1)[0]
+        if head in {
+            "_internal",
+            "core",
+            "experimental",
+            "extra",
+            "plugins",
+            "test_utils",
+            "__init__",
+            "compose",
+            "errors",
+            "initialize",
+            "main",
+            "types",
+            "utils",
+            "version",
+        }:
+            return "hydra." + relative.replace("/", ".")
     if "/importlib/" in filename:
         return "importlib." + filename.rsplit("/importlib/", 1)[1].removesuffix(
             ".py"
@@ -248,23 +266,7 @@ def _traceback_module(tb: TracebackType) -> str:
     return ""
 
 
-def _instantiation_frame(tb: TracebackType) -> bool:
-    module = _traceback_module(tb)
-    return (
-        module.startswith("hydra._internal.instantiate.")
-        or module == "hydra._internal.execution_policy"
-    )
-
-
-def _has_instantiation_frame(tb: Optional[TracebackType]) -> bool:
-    while tb is not None:
-        if _instantiation_frame(tb):
-            return True
-        tb = tb.tb_next
-    return False
-
-
-def _hidden_instantiation_frame() -> TracebackType:
+def _hidden_hydra_frame() -> TracebackType:
     # A path below the null device cannot resolve to unrelated local source.
     return TracebackType(
         None,
@@ -276,11 +278,9 @@ def _hidden_instantiation_frame() -> TracebackType:
     )
 
 
-def _filter_instantiation_traceback(
-    ex: BaseException,
-) -> Tuple[Optional[TracebackType], bool]:
-    tb = ex.__traceback__
-    in_job = False
+def _job_traceback(tb: Optional[TracebackType]) -> Optional[TracebackType]:
+    # The traceback before run_job belongs to Hydra's startup machinery.
+    # The next frame is the application's entry point when a job was called.
     while tb is not None:
         if _traceback_module(
             tb
@@ -288,66 +288,32 @@ def _filter_instantiation_traceback(
             "run_job",
             "_run_job",
         }:
-            in_job = True
-            tb = tb.tb_next
-            break
+            next_tb = tb.tb_next
+            if next_tb is not None and not _traceback_module(next_tb).startswith(
+                "hydra."
+            ):
+                task_function = tb.tb_frame.f_locals.get("task_function")
+                task_code = getattr(task_function, "__code__", None)
+                if task_code is None or next_tb.tb_frame.f_code is task_code:
+                    return next_tb
         tb = tb.tb_next
+    return None
 
-    if tb is None:
-        # Callback and logging targets can fail before run_job starts.
-        tb = ex.__traceback__
-        while tb is not None and _traceback_module(tb).startswith("hydra."):
-            tb = tb.tb_next
 
+def _filter_hydra_frames(tb: Optional[TracebackType]) -> Optional[TracebackType]:
     frames = []
     hidden = False
     while tb is not None:
-        if _instantiation_frame(tb):
+        if _traceback_module(tb).startswith("hydra."):
             hidden = True
         else:
-            if hidden and in_job:
-                frames.append(_hidden_instantiation_frame())
+            if hidden:
+                frames.append(_hidden_hydra_frame())
             hidden = False
             frames.append(tb)
         tb = tb.tb_next
-    if hidden and in_job:
-        frames.append(_hidden_instantiation_frame())
-    return _build_traceback(frames), in_job
-
-
-def _filter_instantiation_cause(
-    tb: Optional[TracebackType], in_job: bool
-) -> Optional[TracebackType]:
-    # Remove leading lookup machinery and instantiation frames at every depth.
-    # A user target can itself call instantiate(), so keep its call site and
-    # target frames without exposing either layer of Hydra internals.
-    hidden = False
-    while tb is not None:
-        module = _traceback_module(tb)
-        if not (
-            _instantiation_frame(tb)
-            or module in {"hydra._internal._locate", "hydra._internal.utils"}
-            or module == "importlib"
-            or module.startswith("importlib.")
-            or module.startswith("_frozen_importlib")
-        ):
-            break
-        if module.startswith("hydra."):
-            hidden = True
-        tb = tb.tb_next
-
-    frames = []
-    while tb is not None:
-        if _instantiation_frame(tb):
-            hidden = True
-        else:
-            if hidden and in_job:
-                frames.append(_hidden_instantiation_frame())
-            hidden = False
-            frames.append(tb)
-        tb = tb.tb_next
-    if hidden and in_job:
-        frames.append(_hidden_instantiation_frame())
+    if hidden:
+        frames.append(_hidden_hydra_frame())
     return _build_traceback(frames)
 
 
@@ -369,14 +335,14 @@ def _hydra_cause_wrapper(error: BaseException) -> bool:
     # The last frame is the raise site; user errors may traverse Hydra frames.
     while tb.tb_next is not None:
         tb = tb.tb_next
-    return (instantiation_wrapper and _instantiation_frame(tb)) or (
-        import_wrapper and _traceback_module(tb) == "hydra._internal._locate"
-    )
+    return (
+        instantiation_wrapper
+        and _traceback_module(tb).startswith("hydra._internal.instantiate.")
+    ) or (import_wrapper and _traceback_module(tb) == "hydra._internal._locate")
 
 
-def _report_instantiation_traceback(ex: BaseException) -> None:
-    filtered_tb, in_job = _filter_instantiation_traceback(ex)
-    filtered_tb = filtered_tb or ex.__traceback__
+def _report_job_traceback(ex: BaseException, job_tb: TracebackType) -> None:
+    filtered_tb = _filter_hydra_frames(job_tb)
     saved_tracebacks = []
     saved_args = []
     saved_import_messages = []
@@ -394,7 +360,7 @@ def _report_instantiation_traceback(ex: BaseException) -> None:
                 current,
                 filtered_tb
                 if current is ex
-                else _filter_instantiation_cause(current.__traceback__, in_job),
+                else _filter_hydra_frames(current.__traceback__),
             )
             if trim_hydra_wrapper and current.__cause__ is not None:
                 message = str(current)
@@ -440,74 +406,15 @@ def run_and_report(func: Any) -> Any:
             raise ex
         else:
             try:
-                if isinstance(ex, InstantiationException) or _has_instantiation_frame(
-                    ex.__traceback__
-                ):
-                    _report_instantiation_traceback(ex)
+                job_tb = _job_traceback(ex.__traceback__)
+                if job_tb is not None:
+                    _report_job_traceback(ex, job_tb)
                 elif isinstance(ex, CompactHydraException):
                     sys.stderr.write(str(ex) + os.linesep)
                     if isinstance(ex.__cause__, OmegaConfBaseException):
                         sys.stderr.write(str(ex.__cause__) + os.linesep)
                 else:
-                    # Custom printing that strips the Hydra related stack frames from the top
-                    # And any omegaconf frames from the bottom.
-                    # It is possible to add additional libraries to sanitize from the bottom later,
-                    # maybe even make it configurable.
-
-                    tb = ex.__traceback__
-                    search_max = 10
-                    # strip Hydra frames from start of stack
-                    # will strip until it hits run_job()
-                    while search_max > 0:
-                        if tb is None:
-                            break
-                        frame = tb.tb_frame
-                        tb = tb.tb_next
-                        search_max = search_max - 1
-                        if inspect.getframeinfo(frame).function in {
-                            "run_job",
-                            "_run_job",
-                        }:
-                            break
-
-                    if search_max == 0 or tb is None:
-                        # could not detect run_job, probably a runtime exception before we got there.
-                        # do not sanitize the stack trace.
-                        traceback.print_exc()
-                        sys.exit(1)
-
-                    # strip OmegaConf frames from bottom of stack
-                    filtered_traceback: List[TracebackType] = []
-                    current_tb: Optional[TracebackType] = tb
-                    while current_tb is not None:
-                        frame = current_tb.tb_frame
-                        mdl = inspect.getmodule(frame)
-                        name = mdl.__name__ if mdl is not None else ""
-                        if name.startswith("omegaconf."):
-                            break
-                        filtered_traceback.append(current_tb)
-                        current_tb = current_tb.tb_next
-
-                    final_tb: Optional[TracebackType] = None
-                    for traceback_frame in reversed(filtered_traceback):
-                        final_tb = TracebackType(
-                            final_tb,
-                            traceback_frame.tb_frame,
-                            traceback_frame.tb_lasti,
-                            traceback_frame.tb_lineno,
-                        )
-                    assert final_tb is not None
-
-                    exception_hook = sys.excepthook
-                    if exception_hook is sys.__excepthook__ or not callable(
-                        exception_hook
-                    ):
-                        traceback.print_exception(None, value=ex, tb=final_tb)
-                    else:
-                        try:
-                            exception_hook(type(ex), ex, final_tb)
-                        except Exception:
-                            traceback.print_exception(None, value=ex, tb=final_tb)
+                    traceback.print_exc()
             except Exception as ex2:
                 sys.stderr.write(
                     "An error occurred during Hydra's exception formatting:"

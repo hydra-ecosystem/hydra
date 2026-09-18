@@ -19,7 +19,7 @@ from pytest import mark, param, raises, warns
 
 from hydra import utils
 from hydra._internal.deprecation_warning import deprecation_warning
-from hydra._internal.utils import _hidden_instantiation_frame, run_and_report
+from hydra._internal.utils import _hidden_hydra_frame, run_and_report
 from hydra.conf import HydraConf, RuntimeConf
 from hydra.core.hydra_config import HydraConfig
 from hydra.core.override_parser.overrides_parser import OverridesParser
@@ -171,7 +171,7 @@ class TestRunAndReport:
         (tmp_path / "Hydra frames hidden").write_text("unrelated local source\n")
         monkeypatch.chdir(tmp_path)
         with patch("linecache.cache", {}):
-            formatted = "".join(traceback.format_tb(_hidden_instantiation_frame()))
+            formatted = "".join(traceback.format_tb(_hidden_hydra_frame()))
         assert "unrelated local source" not in formatted
 
     class DemoFunctions:
@@ -191,9 +191,7 @@ class TestRunAndReport:
         @staticmethod
         def run_job_wrapper() -> None:
             """
-            Trigger special logic in `run_and_report` that looks for a function
-            called "run_job" in the stack and strips away the leading stack
-            frames.
+            A user function named run_job is not Hydra's job boundary.
             """
 
             def run_job() -> None:
@@ -206,11 +204,7 @@ class TestRunAndReport:
 
         @staticmethod
         def omegaconf_job_wrapper() -> None:
-            """
-            Trigger special logic in `run_and_report` that looks for the
-            `omegaconf` module in the stack and strips away the bottom stack
-            frames.
-            """
+            """An error before Hydra's job boundary retains its full traceback."""
 
             def run_job() -> None:
                 def job_calling_omconf() -> None:
@@ -222,6 +216,20 @@ class TestRunAndReport:
                 job_calling_omconf()
 
             run_job()
+
+        @staticmethod
+        def restored_job_failure() -> None:
+            root = Path(__file__).resolve().parent.parent
+            error = ValueError("job failed")
+            error.__traceback__ = _deserialize_traceback(
+                [
+                    (str(root / "hydra/core/utils.py"), "_run_job", 208),
+                    (str(root / "tests/test_utils.py"), "user_task", 1),
+                    (str(root / "hydra/utils.py"), "hydra_call", 1),
+                    (str(root / "tests/test_utils.py"), "user_target", 1),
+                ]
+            )
+            raise error
 
     def test_success(self) -> None:
         assert run_and_report(self.DemoFunctions.success_func) == 123
@@ -235,6 +243,28 @@ class TestRunAndReport:
             run_and_report(fail)
 
         assert mock_stderr.getvalue() == f"bad config{os.linesep}"
+
+    def test_compact_exception_from_application_has_traceback(self) -> None:
+        root = Path(__file__).resolve().parent.parent
+        error = ConfigCompositionException("bad config")
+        error.__traceback__ = _deserialize_traceback(
+            [
+                (str(root / "hydra/core/utils.py"), "_run_job", 208),
+                (str(root / "tests/test_utils.py"), "user_task", 1),
+            ]
+        )
+
+        def fail() -> None:
+            raise error
+
+        mock_stderr = io.StringIO()
+        with raises(SystemExit, match="1"), patch("sys.stderr", new=mock_stderr):
+            run_and_report(fail)
+
+        output = mock_stderr.getvalue()
+        assert "Traceback (most recent call last):" in output
+        assert "in user_task" in output
+        assert "ConfigCompositionException: bad config" in output
 
     def test_instantiation_error_under_debugger_is_unmodified(self) -> None:
         error = InstantiationException("bad target")
@@ -614,76 +644,47 @@ class TestRunAndReport:
         assert "in user_nested" in output
         assert "_instantiate2.py" not in output
 
-    @mark.parametrize(
-        "demo_func, expected_traceback_regex",
-        [
-            param(
-                DemoFunctions.simple_error,
-                dedent(r"""
-                    Traceback \(most recent call last\):
-                      File "[^"]+", line \d+, in run_and_report
-                        return func\(\)(
-                               \^+)?
-                      File "[^"]+", line \d+, in simple_error
-                        assert False, "simple_err_msg"
-                    AssertionError: simple_err_msg
-                    assert False
-                    """).strip(),
-                id="simple_failure_full_traceback",
-            ),
-            param(
-                DemoFunctions.run_job_wrapper,
-                dedent(r"""
-                    Traceback \(most recent call last\):
-                      File "[^"]+", line \d+, in nested_error
-                        assert False, "nested_err"
-                    AssertionError: nested_err
-                    assert False
-                    """).strip(),
-                id="strip_run_job_from_top_of_stack",
-            ),
-            param(
-                DemoFunctions.omegaconf_job_wrapper,
-                dedent(r"""
-                    Traceback \(most recent call last\):
-                      File "[^"]+", line \d+, in job_calling_omconf
-                        OmegaConf.resolve\(123\)  # type: ignore(\n    [~\^]+)?
-                    ValueError: Invalid config type \(int\), expected an OmegaConf Container
-                    """).strip(),
-                id="strip_omegaconf_from_bottom_of_stack",
-            ),
-        ],
-    )
-    def test_failure(self, demo_func: Any, expected_traceback_regex: str) -> None:
+    def test_failure(self) -> None:
+        expected_traceback_regex = dedent(r"""
+            Traceback \(most recent call last\):
+              File "[^"]+", line \d+, in run_and_report
+                return func\(\)(
+                       \^+)?
+              File "[^"]+", line \d+, in simple_error
+                assert False, "simple_err_msg"
+            AssertionError: simple_err_msg
+            assert False
+            """).strip()
         mock_stderr = io.StringIO()
         with (
             raises(SystemExit, match="1"),
             patch("sys.excepthook", new=sys.__excepthook__),
             patch("sys.stderr", new=mock_stderr),
         ):
-            run_and_report(demo_func)
+            run_and_report(self.DemoFunctions.simple_error)
         mock_stderr.seek(0)
         stderr_output = mock_stderr.read()
         assert_multiline_regex_search(expected_traceback_regex, stderr_output)
 
-    @mark.parametrize(
-        "demo_func,expected_frames",
-        [
-            param(
-                DemoFunctions.run_job_wrapper,
-                ["nested_error"],
-                id="strip_run_job_from_top_of_stack",
-            ),
-            param(
-                DemoFunctions.omegaconf_job_wrapper,
-                ["job_calling_omconf"],
-                id="strip_omegaconf_from_bottom_of_stack",
-            ),
-        ],
-    )
-    def test_custom_excepthook_receives_sanitized_traceback(
-        self, demo_func: Any, expected_frames: list[str]
-    ) -> None:
+    def test_named_run_job_before_application_is_not_boundary(self) -> None:
+        mock_stderr = io.StringIO()
+        with raises(SystemExit, match="1"), patch("sys.stderr", new=mock_stderr):
+            run_and_report(self.DemoFunctions.run_job_wrapper)
+        output = mock_stderr.getvalue()
+        assert "in run_and_report" in output
+        assert "in run_job" in output
+        assert "in nested_error" in output
+        assert "Hydra frames hidden" not in output
+
+    def test_omegaconf_error_before_application_is_not_trimmed(self) -> None:
+        mock_stderr = io.StringIO()
+        with raises(SystemExit, match="1"), patch("sys.stderr", new=mock_stderr):
+            run_and_report(self.DemoFunctions.omegaconf_job_wrapper)
+        output = mock_stderr.getvalue()
+        assert "in job_calling_omconf" in output
+        assert "omegaconf/omegaconf.py" in output.replace("\\", "/")
+
+    def test_custom_excepthook_receives_sanitized_traceback(self) -> None:
         captured: list[tuple[type[BaseException], BaseException, TracebackType]] = []
 
         def custom_excepthook(
@@ -697,7 +698,7 @@ class TestRunAndReport:
             raises(SystemExit, match="1"),
             patch("sys.excepthook", new=custom_excepthook),
         ):
-            run_and_report(demo_func)
+            run_and_report(self.DemoFunctions.restored_job_failure)
 
         assert len(captured) == 1
         exception_type, exception, tb = captured[0]
@@ -708,7 +709,7 @@ class TestRunAndReport:
         while current_tb is not None:
             frames.append(current_tb.tb_frame.f_code.co_name)
             current_tb = current_tb.tb_next
-        assert frames == expected_frames
+        assert frames == ["user_task", "omitted", "user_target"]
 
     def test_custom_excepthook_failure_uses_default_renderer(self) -> None:
         def broken_excepthook(*args: Any) -> NoReturn:
@@ -720,46 +721,31 @@ class TestRunAndReport:
             patch("sys.excepthook", new=broken_excepthook),
             patch("sys.stderr", new=mock_stderr),
         ):
-            run_and_report(self.DemoFunctions.run_job_wrapper)
+            run_and_report(self.DemoFunctions.restored_job_failure)
 
-        assert "AssertionError: nested_err" in mock_stderr.getvalue()
+        assert "ValueError: job failed" in mock_stderr.getvalue()
 
-    def test_simplified_traceback_with_no_module(self) -> None:
-        """
-        Test that simplified traceback logic can succeed even if
-        `inspect.getmodule(frame)` returns `None` for one of
-        the frames in the stacktrace.
-        """
-        demo_func = self.DemoFunctions.run_job_wrapper
-        expected_traceback_regex = dedent(r"""
-            Traceback \(most recent call last\):$
-              File "[^"]+", line \d+, in nested_error$
-                assert False, "nested_err"$
-            AssertionError: nested_err$
-            assert False$
-            """)
+    def test_restored_traceback_with_no_module(self) -> None:
+        """Remote frames without module globals still retain user locations."""
         mock_stderr = io.StringIO()
         with (
             raises(SystemExit, match="1"),
             patch("sys.excepthook", new=sys.__excepthook__),
             patch("sys.stderr", new=mock_stderr),
         ):
-            # Patch `inspect.getmodule` so that it will return None. This simulates a
-            # situation where a python module cannot be identified from a traceback
-            # stack frame. This can occur when python extension modules or
-            # multithreading are involved.
-            with patch("inspect.getmodule", new=lambda *args: None):
-                run_and_report(demo_func)
+            run_and_report(self.DemoFunctions.restored_job_failure)
         mock_stderr.seek(0)
         stderr_output = mock_stderr.read()
-        assert_regex_match(expected_traceback_regex, stderr_output)
+        assert "in user_task" in stderr_output
+        assert "in user_target" in stderr_output
+        assert "in hydra_call" not in stderr_output
 
     def test_simplified_traceback_failure(self) -> None:
         """
         Test that a warning is printed and the original exception is re-raised
         when an exception occurs during the simplified traceback logic.
         """
-        demo_func = self.DemoFunctions.run_job_wrapper
+        demo_func = self.DemoFunctions.restored_job_failure
 
         def throws(*args: Any, **kwargs: Any) -> NoReturn:
             assert False, "Error thrown"
@@ -770,7 +756,7 @@ class TestRunAndReport:
             """)
         mock_stderr = io.StringIO()
         with (
-            raises(AssertionError, match="nested_err"),
+            raises(ValueError, match="job failed"),
             patch("sys.excepthook", new=sys.__excepthook__),
             patch("sys.stderr", new=mock_stderr),
         ):

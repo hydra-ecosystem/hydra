@@ -1462,16 +1462,17 @@ def test_app_with_error_exception_sanitized(tmpdir: Any, monkeypatch: Any) -> No
             {traceback_line}
           File ".*my_app\.py", line 8, in foo
             cfg\.foo = "bar"  # does not exist in the config(\n    \^+)?
-        omegaconf\.errors\.ConfigAttributeError: Key 'foo' is not in struct
-            full_key: foo
-            object_type=dict{suggestion_suffix}
         """)
         .strip()
-        .format(traceback_line=traceback_line, suggestion_suffix=suggestion_suffix)
+        .format(traceback_line=traceback_line)
     )
 
     ret = run_with_error(cmd)
     assert_multiline_regex_search(expected_regex, ret)
+    assert "in __setattr__" in ret
+    assert "omegaconf.errors.ConfigAttributeError: Key 'foo' is not in struct" in ret
+    assert "full_key: foo" in ret
+    assert re.search(r"object_type=dict" + suggestion_suffix, ret)
 
 
 def test_hydra_to_job_config_interpolation(tmpdir: Any) -> Any:
@@ -1859,8 +1860,7 @@ def test_frozen_primary_config(
                 Traceback \(most recent call last\):
                   File "\S*[/\\]my_app.py", line 10, in my_app
                     deprecation_warning\("Feature FooBar is deprecated"\)(\n    [~\^]+)?
-                  File "\S*\.py", line \d+, in deprecation_warning
-                    raise HydraDeprecationError\(.*\)
+                  File ".*Hydra frames hidden", line 1, in omitted
                 hydra\.errors\.HydraDeprecationError: Feature FooBar is deprecated
                 """).strip(),
             id="deprecation_error",
