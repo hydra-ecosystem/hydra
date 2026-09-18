@@ -53,6 +53,7 @@ class ExternalLauncher(PluginWithNestedTarget):
 
 class ImportFailingLauncher(PluginWithNestedTarget):
     def __init__(self) -> None:
+        super().__init__(nested=OmegaConf.create({}))
         raise ImportError("optional dependency unavailable")
 
 

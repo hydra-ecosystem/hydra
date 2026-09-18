@@ -691,7 +691,7 @@ class JobReturn:
                     raise TypeError("exception notes changed after pickle")
                 if _safe_exception_message(restored) != _safe_exception_message(error):
                     raise TypeError("exception message changed after pickle")
-            except Exception:
+            except BaseException:
                 error_type = type(error)
                 fallback = RuntimeError(
                     f"Remote {error_type.__module__}.{error_type.__qualname__}: "

@@ -41,6 +41,11 @@ class MessageChangingError(Exception):
         return type(self), ("changed message",), {"__notes__": self.__notes__}
 
 
+class InterruptingReducerError(Exception):
+    def __reduce__(self) -> Any:
+        raise KeyboardInterrupt("reducer interrupted")
+
+
 def test_accessing_hydra_config(hydra_restore_singletons: Any) -> Any:
     utils.setup_globals()
 
@@ -241,6 +246,20 @@ def test_job_return_drops_non_string_notes_in_suppressed_context() -> None:
     assert b"unsafe" not in serialized
     restored = pickle.loads(serialized)  # nosec B301: trusted test data
     with raises(RuntimeError, match="visible failure"):
+        restored.return_value
+
+
+def test_job_return_falls_back_when_reducer_raises_base_exception() -> None:
+    error = InterruptingReducerError("remote failure")
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    assert job_return._return_value is error
+    with raises(
+        RuntimeError, match="Remote tests.test_core_utils.InterruptingReducerError"
+    ):
         restored.return_value
 
 
