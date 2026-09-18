@@ -224,7 +224,8 @@ class TestRunAndReport:
             error.__traceback__ = _deserialize_traceback(
                 [
                     (str(root / "hydra/core/utils.py"), "_run_job", 208),
-                    (str(root / "tests/test_utils.py"), "user_task", 1),
+                    (str(root / "app/hydra/main.py"), "user_task", 1),
+                    (str(root / "app/hydra/utils.py"), "user_hydra_utils", 1),
                     (str(root / "hydra/utils.py"), "hydra_call", 1),
                     (str(root / "hydra/conf/__init__.py"), "load", 1),
                     (str(root / "hydra/grammar/gen/OverrideParser.py"), "parse", 1),
@@ -711,7 +712,7 @@ class TestRunAndReport:
         while current_tb is not None:
             frames.append(current_tb.tb_frame.f_code.co_name)
             current_tb = current_tb.tb_next
-        assert frames == ["user_task", "omitted", "user_target"]
+        assert frames == ["user_task", "user_hydra_utils", "omitted", "user_target"]
 
     def test_custom_excepthook_failure_uses_default_renderer(self) -> None:
         def broken_excepthook(*args: Any) -> NoReturn:
@@ -739,6 +740,7 @@ class TestRunAndReport:
         mock_stderr.seek(0)
         stderr_output = mock_stderr.read()
         assert "in user_task" in stderr_output
+        assert "in user_hydra_utils" in stderr_output
         assert "in user_target" in stderr_output
         assert "in hydra_call" not in stderr_output
 

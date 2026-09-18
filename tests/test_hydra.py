@@ -622,7 +622,10 @@ def test_pass_callable_class_to_hydra_main(
     assert_text_same(result, expected)
 
 
-@mark.parametrize("script", ["my_app.py", "partial_app.py", "nested_partial_app.py"])
+@mark.parametrize(
+    "script",
+    ["my_app.py", "partial_app.py", "nested_partial_app.py", "class_task_app.py"],
+)
 def test_callable_class_setup_error_precedes_application(
     tmp_path: Path, script: str
 ) -> None:
@@ -667,6 +670,19 @@ def test_nested_partial_callable_error_shows_application_traceback(
 
     assert "in __call__" in ret
     assert "ValueError: nested partial failed" in ret
+    assert "in _run_job" not in ret
+
+
+def test_class_task_error_shows_application_traceback(tmp_path: Path) -> None:
+    ret = run_with_error(
+        [
+            "tests/test_apps/passes_callable_class_to_hydra_main/class_task_app.py",
+            f'hydra.run.dir="{tmp_path}"',
+        ]
+    )
+
+    assert "in __init__" in ret
+    assert "ValueError: class task failed" in ret
     assert "in _run_job" not in ret
 
 
