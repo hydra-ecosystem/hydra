@@ -17,18 +17,18 @@ issues on a supported Python version.
 
 ## Unsanitized tracebacks
 
-When an application raises, Hydra sanitizes the traceback: it strips its own
-frames from the top and OmegaConf frames from the bottom, so that what remains
-points at the application code. That is the right output for someone debugging
-their own app, but it hides the framework internals needed to diagnose a bug in
-Hydra itself.
+When an application raises, Hydra removes its startup frames before the
+application entry point. After that point, it replaces spans of Hydra frames
+with a "Hydra frames hidden" marker while retaining application and third-party
+frames, including OmegaConf frames. User-created exception chains remain
+visible. This output highlights application code but hides Hydra internals that
+may be needed to diagnose a framework bug.
 
-For exceptions passing through `instantiate()` during a job, Hydra shows the
-application call site and available user target frames while filtering routine
-instantiation frames.
-Target exceptions retain their original type and any user-created chain.
-`InstantiationException` is not compact; other compact configuration errors
-continue to show their messages without a traceback.
+This also applies to failures during `instantiate()`: the application call site
+and available user target frames remain visible. Target exceptions retain their
+original type and chain. `InstantiationException` is not compact; compact
+configuration errors before the application starts still show only their
+messages.
 
 Set `HYDRA_FULL_ERROR=1` to disable the sanitization and get the complete Hydra
 and OmegaConf call stack:

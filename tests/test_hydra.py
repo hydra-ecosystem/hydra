@@ -602,6 +602,11 @@ def test_cfg_resolve_interpolation(
                 """),
             id="passes_callable_class_to_hydra_main",
         ),
+        param(
+            "tests/test_apps/passes_callable_class_to_hydra_main/partial_app.py",
+            "123\n",
+            id="passes_partial_callable_to_hydra_main",
+        ),
     ],
 )
 def test_pass_callable_class_to_hydra_main(
@@ -617,12 +622,15 @@ def test_pass_callable_class_to_hydra_main(
     assert_text_same(result, expected)
 
 
-def test_callable_class_setup_error_precedes_application(tmp_path: Path) -> None:
+@mark.parametrize("script", ["my_app.py", "partial_app.py"])
+def test_callable_class_setup_error_precedes_application(
+    tmp_path: Path, script: str
+) -> None:
     blocked = tmp_path / "blocked"
     blocked.write_text("")
     ret = run_with_error(
         [
-            "tests/test_apps/passes_callable_class_to_hydra_main/my_app.py",
+            f"tests/test_apps/passes_callable_class_to_hydra_main/{script}",
             f'hydra.run.dir="{blocked / "child"}"',
         ]
     )

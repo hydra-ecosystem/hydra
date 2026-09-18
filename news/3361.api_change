@@ -1,1 +1,2 @@
 Propagate target exceptions without wrapping them in InstantiationException.
+Make InstantiationException no longer inherit from CompactHydraException.

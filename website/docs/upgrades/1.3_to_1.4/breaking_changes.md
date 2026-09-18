@@ -70,6 +70,10 @@ have been removed:
   with their original type and chain instead of wrapping them in
   `InstantiationException`. Catch the target's exception type if your code
   handles these failures.
+- `InstantiationException` now inherits directly from `HydraException`, not
+  `CompactHydraException`. Code that catches `CompactHydraException` to handle
+  Hydra-generated instantiation failures must catch `InstantiationException`
+  explicitly.
 - A `dict` or `DictConfig` call-site argument to `hydra.utils.instantiate()`
   replaces a plain mapping configured for that target parameter instead of
   merging into it. As an exception, a dictionary overriding a Structured Config

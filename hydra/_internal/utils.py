@@ -301,7 +301,9 @@ def _job_traceback(tb: Optional[TracebackType]) -> Optional[TracebackType]:
                         getattr(task_function, "__call__", None), "__code__", None
                     )
                 if next_tb.tb_frame.f_code is task_code or (
-                    task_code is None and "_SyntheticTraceback" in tb.tb_frame.f_globals
+                    task_code is None
+                    and "_SyntheticTraceback" in tb.tb_frame.f_globals
+                    and "__name__" not in tb.tb_frame.f_globals
                 ):
                     return next_tb
         tb = tb.tb_next
