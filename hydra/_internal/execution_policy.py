@@ -1287,7 +1287,7 @@ def _add_full_key_note(error: BaseException, full_key: str) -> None:
             try:
                 if note not in getattr(error, "__notes__", ()):
                     add_note(error, note)
-            except Exception:
+            except BaseException:
                 # Annotation must not replace the original target failure.
                 pass
 

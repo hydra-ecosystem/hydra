@@ -2627,6 +2627,29 @@ def test_invalid_exception_notes_do_not_replace_target_error() -> None:
     assert exc_info.value is error
 
 
+@mark.skipif(sys.version_info < (3, 11), reason="Exception notes require Python 3.11")
+def test_interrupting_exception_notes_do_not_replace_target_error() -> None:
+    class InterruptingNotesError(Exception):
+        def __getattribute__(self, name: str) -> Any:
+            if name == "__notes__":
+                raise KeyboardInterrupt("notes unavailable")
+            return super().__getattribute__(name)
+
+    error = InterruptingNotesError("original failure")
+
+    def fail() -> None:
+        raise error
+
+    caught = None
+    try:
+        _instantiate2._call_target(
+            fail, False, (), {}, "nested", UNSAFE_DISABLE_EXECUTION_CHECKS, None
+        )
+    except BaseException as exc:
+        caught = exc
+    assert caught is error
+
+
 @mark.parametrize(
     ("config", "sequence_type"),
     [

@@ -1,6 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import builtins
 import copy
+import importlib
 import logging
 import os
 import pickle
@@ -466,11 +467,9 @@ def _safe_exception_message(error: BaseException) -> str:
 def _exception_notes(error: BaseException) -> List[str]:
     try:
         notes = getattr(error, "__notes__", ())
-    except Exception:
+    except BaseException:
         return []
-    return (
-        [note for note in notes if type(note) is str] if isinstance(notes, list) else []
-    )
+    return [note for note in notes if type(note) is str] if type(notes) is list else []
 
 
 def _serialize_exception_chain(
@@ -496,6 +495,24 @@ def _exception_group_members(error: BaseException) -> Sequence[BaseException]:
     if group_type is None or not isinstance(error, group_type):
         return ()
     return cast(Sequence[BaseException], error.exceptions)
+
+
+def _exception_payload_matches(
+    original: BaseException, restored: BaseException
+) -> bool:
+    original_members = _exception_group_members(original)
+    restored_members = _exception_group_members(restored)
+    if (
+        type(restored) is not type(original)
+        or (not original_members and restored.args != original.args)
+        or _exception_notes(restored) != _exception_notes(original)
+        or _safe_exception_message(restored) != _safe_exception_message(original)
+    ):
+        return False
+    return len(original_members) == len(restored_members) and all(
+        _exception_payload_matches(left, right)
+        for left, right in zip(original_members, restored_members)
+    )
 
 
 def _has_non_string_notes(
@@ -594,9 +611,13 @@ def _deserialize_exception_chain(
 def _restore_exception_notes(error: BaseException, notes: Sequence[str]) -> None:
     add_note = getattr(error, "add_note", None)
     if add_note is not None:
+        existing_notes = _exception_notes(error)
         for note in notes:
-            if type(note) is str and note not in getattr(error, "__notes__", ()):
-                add_note(note)
+            if type(note) is str:
+                if note in existing_notes:
+                    existing_notes.remove(note)
+                else:
+                    add_note(note)
 
 
 def _deserialize_exception_node(serialized: _SerializedExceptionNode) -> BaseException:
@@ -682,27 +703,45 @@ class JobReturn:
                 if _has_non_string_notes(error):
                     raise TypeError("exception contains non-string notes")
                 # The exception was raised by the local task, not read from a peer.
-                restored = pickle.loads(  # nosec B301
-                    pickle.dumps(error, protocol=pickle.HIGHEST_PROTOCOL)
-                )
-                if type(restored) is not type(error):
-                    raise TypeError("exception type changed after pickle")
-                if _exception_notes(restored) != _exception_notes(error):
-                    raise TypeError("exception notes changed after pickle")
-                if _safe_exception_message(restored) != _safe_exception_message(error):
-                    raise TypeError("exception message changed after pickle")
-            except BaseException:
+                dumper = pickle
                 error_type = type(error)
-                fallback = RuntimeError(
-                    f"Remote {error_type.__module__}.{error_type.__qualname__}: "
-                    f"{_safe_exception_message(error)}"
-                )
-                add_note = getattr(fallback, "add_note", None)
-                if add_note is not None:
-                    for note in _exception_notes(error):
-                        add_note(note)
-                state["_return_value"] = fallback
+                if (
+                    error_type.__module__ == "__main__"
+                    or "<locals>" in error_type.__qualname__
+                ):
+                    try:
+                        dumper = importlib.import_module("cloudpickle")
+                    except ImportError:
+                        # cloudpickle is optional; keep the standard pickle dumper.
+                        pass
+                serialized_error = dumper.dumps(error, protocol=pickle.HIGHEST_PROTOCOL)
+                restored = pickle.loads(serialized_error)  # nosec B301
+                if not _exception_payload_matches(error, restored):
+                    raise TypeError("exception payload changed after pickle")
+                state["_return_value_pickle"] = serialized_error
+            except BaseException:
+                pass
+            error_type = type(error)
+            fallback = RuntimeError(
+                f"Remote {error_type.__module__}.{error_type.__qualname__}: "
+                f"{_safe_exception_message(error)}"
+            )
+            add_note = getattr(fallback, "add_note", None)
+            if add_note is not None:
+                for note in _exception_notes(error):
+                    add_note(note)
+            state["_return_value"] = fallback
         return state
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        serialized_error = state.pop("_return_value_pickle", None)
+        self.__dict__.update(state)
+        if serialized_error is not None:
+            try:
+                self._return_value = pickle.loads(serialized_error)  # nosec B301
+            except BaseException:
+                # Preserve the serialized fallback if reconstruction fails.
+                pass
 
     @property
     def return_value(self) -> Any:
@@ -732,8 +771,8 @@ class JobReturn:
                     if len(members) == len(self._remote_exception_group):
                         for member, child in zip(members, self._remote_exception_group):
                             _restore_exception_node(member, child)
-                raise self._return_value.with_traceback(
-                    _deserialize_traceback(self._remote_traceback)
+                raise BaseException.with_traceback(
+                    self._return_value, _deserialize_traceback(self._remote_traceback)
                 )
             raise self._return_value
 
