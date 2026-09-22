@@ -6,7 +6,9 @@ import re
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
+import zipfile
 from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
@@ -428,10 +430,40 @@ def _python_bin(venv_path: Path) -> Path:
     return venv_path / "bin" / "python"
 
 
+# The ANTLR generator JAR is redistributed in the sdist, so the sdist has to
+# carry ANTLR's license. It is a build-time tool and has no business in a wheel.
+ANTLR_LICENSE = "ATTRIBUTION/LICENSE-antlr4"
+
+
+def _archive_names(path: Path) -> List[str]:
+    if path.name.endswith(".tar.gz"):
+        with tarfile.open(path) as tar:
+            return tar.getnames()
+    with zipfile.ZipFile(path) as zf:
+        return zf.namelist()
+
+
+def check_bundled_jar_licenses(artifacts: List[Path]) -> None:
+    """An sdist that ships a JAR must ship its license; a wheel must ship no JAR."""
+    for path in artifacts:
+        if not (path.name.endswith(".tar.gz") or path.suffix == ".whl"):
+            continue
+        names = _archive_names(path)
+        jars = [name for name in names if name.endswith(".jar")]
+        if not jars:
+            continue
+        if path.suffix == ".whl":
+            raise ValueError(f"{path.name} is a wheel and contains a JAR: {jars}")
+        if not any(name.endswith(ANTLR_LICENSE) for name in names):
+            raise ValueError(f"{path.name} contains {jars} but no {ANTLR_LICENSE}")
+
+
 def check_build_artifacts(build_dir_path: Path) -> None:
     artifacts = sorted(path for path in build_dir_path.iterdir() if path.is_file())
     if not artifacts:
         raise ValueError(f"No artifacts found in {build_dir_path}")
+
+    check_bundled_jar_licenses(artifacts)
 
     _run_checked([sys.executable, "-m", "twine", "check", *map(str, artifacts)])
 

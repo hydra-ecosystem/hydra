@@ -1,14 +1,17 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import io
 import logging
 import os
 import pathlib
 import re
 import subprocess
 import sys
+import tarfile
 import tempfile
 import textwrap
+import zipfile
 from contextlib import nullcontext
-from typing import cast
+from typing import List, cast
 
 import pytest
 from omegaconf import OmegaConf
@@ -682,8 +685,7 @@ def test_dev_release_dispatches_requested_commit_without_mutating_checkout(
 def test_check_build_artifacts_upgrades_smoke_environment_pip(
     monkeypatch, tmp_path
 ) -> None:
-    wheel = tmp_path / "package.whl"
-    wheel.touch()
+    wheel = _make_wheel(tmp_path / "package.whl", ["package/__init__.py"])
     smoke_dir = tmp_path / "smoke"
     calls = []
 
@@ -743,3 +745,75 @@ def test_get_remote_url_accepts_sapling_path_output_formats(
 )
 def test_get_github_repo_slug_accepts_common_github_remote_urls(remote_url) -> None:
     assert release.get_github_repo_slug(remote_url) == "hydra-ecosystem/hydra"
+
+
+ANTLR_JAR = "build_helpers/bin/antlr-4.11.1-complete.jar"
+
+
+def _make_sdist(path: pathlib.Path, names: List[str]) -> pathlib.Path:
+    with tarfile.open(path, "w:gz") as tar:
+        for name in names:
+            tar.addfile(tarfile.TarInfo(name), io.BytesIO(b""))
+    return path
+
+
+def _make_wheel(path: pathlib.Path, names: List[str]) -> pathlib.Path:
+    with zipfile.ZipFile(path, "w") as zf:
+        for name in names:
+            zf.writestr(name, b"")
+    return path
+
+
+def test_sdist_shipping_a_jar_must_ship_its_license(tmp_path) -> None:
+    sdist = _make_sdist(
+        tmp_path / "hydra-core-1.4.0.tar.gz",
+        [
+            f"hydra-core-1.4.0/{ANTLR_JAR}",
+            "hydra-core-1.4.0/ATTRIBUTION/LICENSE-antlr4",
+        ],
+    )
+
+    release.check_bundled_jar_licenses([sdist])
+
+
+def test_sdist_shipping_a_jar_without_its_license_is_rejected(tmp_path) -> None:
+    sdist = _make_sdist(
+        tmp_path / "hydra-core-1.4.0.tar.gz", [f"hydra-core-1.4.0/{ANTLR_JAR}"]
+    )
+
+    with pytest.raises(ValueError, match="ATTRIBUTION/LICENSE-antlr4"):
+        release.check_bundled_jar_licenses([sdist])
+
+
+def test_sdist_without_a_jar_needs_no_license(tmp_path) -> None:
+    sdist = _make_sdist(
+        tmp_path / "hydra-colorlog-1.4.0.tar.gz", ["hydra-colorlog-1.4.0/setup.py"]
+    )
+
+    release.check_bundled_jar_licenses([sdist])
+
+
+def test_wheel_carrying_a_build_only_jar_is_rejected(tmp_path) -> None:
+    wheel = _make_wheel(
+        tmp_path / "hydra_core-1.4.0-py3-none-any.whl",
+        [
+            "hydra/__init__.py",
+            ANTLR_JAR,
+            "hydra_core-1.4.0.dist-info/licenses/ATTRIBUTION/LICENSE-antlr4",
+        ],
+    )
+
+    with pytest.raises(ValueError, match="is a wheel and contains a JAR"):
+        release.check_bundled_jar_licenses([wheel])
+
+
+def test_wheel_without_a_jar_is_accepted(tmp_path) -> None:
+    wheel = _make_wheel(
+        tmp_path / "hydra_core-1.4.0-py3-none-any.whl",
+        [
+            "hydra/__init__.py",
+            "hydra_core-1.4.0.dist-info/licenses/ATTRIBUTION/LICENSE-antlr4",
+        ],
+    )
+
+    release.check_bundled_jar_licenses([wheel])
