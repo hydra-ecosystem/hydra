@@ -1,5 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import copy
+import warnings
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
@@ -23,9 +24,15 @@ class ConfigStoreWithProvider:
         node: Any,
         group: Optional[str] = None,
         package: Optional[str] = None,
+        replace: Optional[bool] = None,
     ) -> None:
         ConfigStore.instance().store(
-            group=group, name=name, node=node, package=package, provider=self.provider
+            group=group,
+            name=name,
+            node=node,
+            package=package,
+            provider=self.provider,
+            replace=replace,
         )
 
     def __exit__(self, exc_type: Any, exc_value: Any, exc_traceback: Any) -> Any: ...
@@ -57,6 +64,7 @@ class ConfigStore(metaclass=Singleton):
         group: Optional[str] = None,
         package: Optional[str] = None,
         provider: Optional[str] = None,
+        replace: Optional[bool] = None,
     ) -> None:
         """
         Stores a config node into the repository
@@ -69,6 +77,12 @@ class ConfigStore(metaclass=Singleton):
             Child separator is '.', for example foo.bar.baz
         :param provider: the name of the module/app providing this config.
             Helps debugging.
+        :param replace: what to do when a *different* config is already stored
+            under the same group and name. True replaces it, False raises a
+            ValueError. The default, None, replaces it and issues a UserWarning.
+            Storing a config that equals the stored one is never a clobber:
+            Hydra re-executes plugin modules on every plugin discovery pass, so
+            their module level store() calls repeat by design.
         """
         # An empty string group is treated as a config without a config group.
         if group == "":
@@ -85,9 +99,24 @@ class ConfigStore(metaclass=Singleton):
             name = f"{name}.yaml"
         assert isinstance(cur, dict)
         cfg = OmegaConf.structured(node)
-        cur[name] = ConfigNode(
+        new = ConfigNode(
             name=name, node=cfg, group=group, package=package, provider=provider
         )
+
+        if replace is not True and name in cur and cur[name] != new:
+            full_name = name if group is None else f"{group}/{name}"
+            msg = f"A different config is already stored at '{full_name}'"
+            if replace is False:
+                raise ValueError(msg)
+            warnings.warn(
+                f"{msg} and is being replaced. Pass replace=True to store() to"
+                " silence this warning, or replace=False to raise a ValueError"
+                " instead.",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        cur[name] = new
 
     def load(self, config_path: str) -> ConfigNode:
         ret = self._load(config_path)
