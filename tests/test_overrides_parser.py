@@ -1997,6 +1997,97 @@ def test_cast_conversions(value: Any, expected_value: Any) -> None:
 
 
 @mark.parametrize(
+    "expression,expected",
+    [
+        param(
+            "float(tag(log,shuffle(range(1,4))))",
+            RangeSweep(tags={"log"}, start=1.0, stop=4.0, step=1.0, shuffle=True),
+            id="float:cast:range",
+        ),
+        param(
+            "int(tag(log,shuffle(range(1.0,4.0))))",
+            RangeSweep(tags={"log"}, start=1, stop=4, step=1, shuffle=True),
+            id="int:cast:range",
+        ),
+        param(
+            "tag(log,shuffle(range(1,4)))",
+            RangeSweep(tags={"log"}, start=1, stop=4, step=1, shuffle=True),
+            id="range:no:cast",
+        ),
+        param(
+            "str(tag(log,shuffle(choice(1,2,3))))",
+            ChoiceSweep(tags={"log"}, list=["1", "2", "3"], shuffle=True),
+            id="str:cast:choice",
+        ),
+        param(
+            "float(tag(log,shuffle(choice(1.5,2,3))))",
+            ChoiceSweep(tags={"log"}, list=[1.5, 2.0, 3.0], shuffle=True),
+            id="float:cast:choice",
+        ),
+        param(
+            "tag(log,shuffle(choice(1,2,3)))",
+            ChoiceSweep(tags={"log"}, list=[1, 2, 3], shuffle=True),
+            id="choice:no:cast",
+        ),
+        param(
+            "bool(tag(log,shuffle(choice(1,0))))",
+            ChoiceSweep(tags={"log"}, list=[True, False], shuffle=True),
+            id="bool:cast:choice",
+        ),
+        param(
+            "str(tag(log,shuffle(1,2,3)))",
+            ChoiceSweep(
+                tags={"log"}, list=["1", "2", "3"], simple_form=True, shuffle=True
+            ),
+            id="str:cast:simple:choice",
+        ),
+        param(
+            "json_str(tag(log,shuffle(choice(1,2))))",
+            ChoiceSweep(tags={"log"}, list=["1", "2"], shuffle=True),
+            id="json_str:cast:choice",
+        ),
+    ],
+)
+def test_cast_preserves_sweep_metadata(expression: str, expected: Any) -> None:
+    warning = (
+        warns(UserWarning, match=re.escape(JSON_STR_DEPRECATION_WARNING))
+        if expression.startswith("json_str")
+        else nullcontext()
+    )
+    with warning:
+        assert eq(parse_rule(expression, "function"), expected)
+
+
+@mark.parametrize(
+    "expression,expected_str_list",
+    [
+        param(
+            "x=float(tag(log,shuffle(range(1,4))))",
+            ["1.0", "2.0", "3.0"],
+            id="float:cast:range:shuffled-iteration",
+        ),
+        param(
+            "x=str(tag(log,shuffle(choice(1,2,3))))",
+            ["1", "2", "3"],
+            id="str:cast:choice:shuffled-iteration",
+        ),
+    ],
+)
+def test_cast_sweep_still_shuffles(
+    expression: str, expected_str_list: List[str]
+) -> None:
+    ret = parser.parse_override(expression)
+    actual = list(ret.sweep_string_iterator())
+    assert sorted(expected_str_list) == sorted(actual)
+
+    for _ in range(1, 10):
+        actual = list(ret.sweep_string_iterator())
+        if actual != expected_str_list:
+            return
+    assert False
+
+
+@mark.parametrize(
     "value,expected_value",
     [
         param("abs(10)", 10, id="abs(10)"),

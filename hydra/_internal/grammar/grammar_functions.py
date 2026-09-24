@@ -40,7 +40,12 @@ def cast_choice(value: ChoiceSweep, function: Callable[..., Any]) -> ChoiceSweep
         choice = function(item)
         assert is_type_matching(choice, ElementType)
         choices.append(choice)
-    return ChoiceSweep(simple_form=value.simple_form, list=choices)
+    return ChoiceSweep(
+        simple_form=value.simple_form,
+        list=choices,
+        tags=copy(value.tags),
+        shuffle=value.shuffle,
+    )
 
 
 def cast_interval(value: IntervalSweep, function: Callable[..., Any]) -> IntervalSweep:
@@ -56,6 +61,8 @@ def cast_range(value: RangeSweep, function: Callable[..., Any]) -> RangeSweep:
         start=function(value.start),
         stop=function(value.stop),
         step=function(value.step),
+        tags=copy(value.tags),
+        shuffle=value.shuffle,
     )
 
 
