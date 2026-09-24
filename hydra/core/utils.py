@@ -523,9 +523,10 @@ def _has_non_string_notes(
     if id(error) in seen:
         return False
     seen.add(id(error))
-    notes = getattr(error, "__notes__", ())
-    if notes and (
-        not isinstance(notes, list) or len(notes) != len(_exception_notes(error))
+    missing = object()
+    notes = getattr(error, "__notes__", missing)
+    if notes is not missing and (
+        type(notes) is not list or len(notes) != len(_exception_notes(error))
     ):
         return True
     for related in (

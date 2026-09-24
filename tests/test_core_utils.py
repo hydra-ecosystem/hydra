@@ -90,6 +90,11 @@ class InterruptingNoteList(list[str]):
         raise RuntimeError("note iteration unavailable")
 
 
+class FalseyNoteList(list[Any]):
+    def __bool__(self) -> bool:
+        return False
+
+
 def test_accessing_hydra_config(hydra_restore_singletons: Any) -> Any:
     utils.setup_globals()
 
@@ -439,6 +444,21 @@ def test_job_return_drops_custom_exception_note_list() -> None:
     with raises(RuntimeError, match="Remote builtins.ValueError") as exc_info:
         restored.return_value
     assert getattr(exc_info.value, "__notes__", []) == []
+
+
+@mark.skipif(sys.version_info < (3, 11), reason="Exception notes require Python 3.11")
+def test_job_return_drops_falsey_custom_exception_note_list() -> None:
+    error = ValueError("remote failure")
+    setattr(error, "__notes__", FalseyNoteList([{"unsafe": "note"}]))
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+
+    serialized = pickle.dumps(job_return)
+    restored = pickle.loads(serialized)  # nosec B301: trusted test data
+
+    assert b"unsafe" not in serialized
+    with raises(RuntimeError, match="Remote builtins.ValueError"):
+        restored.return_value
 
 
 def test_job_return_from_older_state_without_remote_traceback_fields() -> None:
