@@ -217,6 +217,16 @@ def test_job_return_transports_non_picklable_exception(error: Exception) -> None
         assert exc_info.value.__notes__ == ["full_key: foo"]
 
 
+def test_job_return_preserves_exception_with_nan_arg() -> None:
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = ValueError(float("nan"))
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    with raises(ValueError, match="nan"):
+        restored.return_value
+
+
 def test_job_return_drops_non_string_notes() -> None:
     error = ValueError("remote failure")
     setattr(error, "__notes__", ["full_key: foo", {"unsafe": "note"}])

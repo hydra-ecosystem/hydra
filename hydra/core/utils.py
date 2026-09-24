@@ -3,6 +3,7 @@ import builtins
 import copy
 import importlib
 import logging
+import math
 import os
 import pickle
 import re
@@ -497,6 +498,18 @@ def _exception_group_members(error: BaseException) -> Sequence[BaseException]:
     return cast(Sequence[BaseException], error.exceptions)
 
 
+def _exception_args_match(original: BaseException, restored: BaseException) -> bool:
+    if len(original.args) != len(restored.args):
+        return False
+    for left, right in zip(original.args, restored.args):
+        if type(left) is float and type(right) is float:
+            if math.isnan(left) and math.isnan(right):
+                continue
+        if left != right:
+            return False
+    return True
+
+
 def _exception_payload_matches(
     original: BaseException, restored: BaseException
 ) -> bool:
@@ -504,7 +517,7 @@ def _exception_payload_matches(
     restored_members = _exception_group_members(restored)
     if (
         type(restored) is not type(original)
-        or (not original_members and restored.args != original.args)
+        or (not original_members and not _exception_args_match(original, restored))
         or _exception_notes(restored) != _exception_notes(original)
         or _safe_exception_message(restored) != _safe_exception_message(original)
     ):
