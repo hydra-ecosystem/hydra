@@ -52,6 +52,13 @@ class OverridingTracebackError(Exception):
         raise RuntimeError("custom with_traceback called")
 
 
+class RejectingTracebackAssignmentError(Exception):
+    def __setattr__(self, name: str, value: Any) -> None:
+        if name == "__traceback__":
+            raise RuntimeError("custom traceback setter called")
+        super().__setattr__(name, value)
+
+
 class InterruptingReducerError(Exception):
     def __reduce__(self) -> Any:
         raise KeyboardInterrupt("reducer interrupted")
@@ -602,6 +609,41 @@ def test_job_return_preserves_exception_group_tracebacks_after_pickle() -> None:
     assert "The above exception was the direct cause" in formatted
     assert "in member_failure" in formatted
     assert "RuntimeError: member failure" in formatted
+
+
+@mark.skipif(sys.version_info < (3, 11), reason="ExceptionGroup requires Python 3.11")
+def test_job_return_bypasses_group_member_traceback_setter() -> None:
+    exception_group_type = cast(Any, getattr(builtins, "ExceptionGroup"))
+    member = RejectingTracebackAssignmentError("member failure")
+    error = exception_group_type("remote group", [member])
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+    job_return._remote_traceback = []
+    job_return._remote_exception_group = utils._serialize_exception_group(error)
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    with raises(exception_group_type, match="remote group"):
+        restored.return_value
+
+
+@mark.skipif(sys.version_info < (3, 11), reason="ExceptionGroup requires Python 3.11")
+def test_job_return_preserves_local_exception_group_member() -> None:
+    importorskip("cloudpickle")
+    exception_group_type = cast(Any, getattr(builtins, "ExceptionGroup"))
+
+    class LocalError(Exception):
+        pass
+
+    error = exception_group_type("remote group", [LocalError("member failure")])
+    job_return = utils.JobReturn(status=utils.JobStatus.FAILED)
+    job_return.return_value = error
+
+    restored = pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+
+    with raises(exception_group_type, match="remote group") as exc_info:
+        restored.return_value
+    assert isinstance(exc_info.value.exceptions[0], LocalError)
 
 
 @mark.skipif(sys.version_info < (3, 11), reason="ExceptionGroup requires Python 3.11")

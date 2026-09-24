@@ -498,6 +498,15 @@ def _exception_group_members(error: BaseException) -> Sequence[BaseException]:
     return cast(Sequence[BaseException], error.exceptions)
 
 
+def _needs_cloudpickle(error: BaseException) -> bool:
+    error_type = type(error)
+    return (
+        error_type.__module__ == "__main__"
+        or "<locals>" in error_type.__qualname__
+        or any(_needs_cloudpickle(member) for member in _exception_group_members(error))
+    )
+
+
 def _exception_args_match(original: BaseException, restored: BaseException) -> bool:
     if len(original.args) != len(restored.args):
         return False
@@ -673,7 +682,7 @@ def _restore_exception_node(
     error: BaseException, serialized: _SerializedExceptionNode
 ) -> None:
     _, _, _, _, remote_traceback, remote_chain, remote_group, *extra = serialized
-    error.__traceback__ = _deserialize_traceback(remote_traceback)
+    BaseException.with_traceback(error, _deserialize_traceback(remote_traceback))
     _restore_exception_notes(error, extra[0] if extra else [])
     if remote_chain:
         relation, chained = cast(
@@ -718,11 +727,7 @@ class JobReturn:
                     raise TypeError("exception contains non-string notes")
                 # The exception was raised by the local task, not read from a peer.
                 dumper = pickle
-                error_type = type(error)
-                if (
-                    error_type.__module__ == "__main__"
-                    or "<locals>" in error_type.__qualname__
-                ):
+                if _needs_cloudpickle(error):
                     try:
                         dumper = importlib.import_module("cloudpickle")
                     except ImportError:
