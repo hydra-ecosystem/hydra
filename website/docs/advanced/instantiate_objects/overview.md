@@ -607,15 +607,18 @@ instantiate(
 
 When `instantiate()` fails during a Hydra job, the default error output
 shows the application call site and, if the target raised, its frames and
-original exception, including any chain created by the target. Hydra does not
-wrap target exceptions. On Python 3.11 and newer, nested target failures also
-carry a `full_key` note identifying their config path; Python 3.10 retains the
-original exception without that note. This also applies when invoking a
-deferred `_partial_` target. Routine Hydra instantiation frames are omitted
-when user frames are available. Hydra raises `InstantiationException` for errors
-such as invalid targets or failed target lookup.
-Only string exception notes are preserved when Hydra transports a failed job
-between processes.
+exception chain. Hydra does not wrap target exceptions within a process.
+On Python 3.11 and newer, nested target failures also carry a `full_key` note
+identifying their config path; Python 3.10 does not add that note. This also
+applies when invoking a deferred `_partial_` target. Routine Hydra
+instantiation frames are omitted when user frames are available. Hydra raises
+`InstantiationException` for errors such as invalid targets or failed target
+lookup.
+
+Across processes, an exception that fails Hydra's serialization check becomes
+a `RuntimeError` naming its original type. Only string exception notes are
+preserved, and arbitrary custom exception attributes are not guaranteed to
+survive transport.
 
 To see the complete, unfiltered traceback, including Hydra internals, run the
 application with `HYDRA_FULL_ERROR=1`. This changes only Hydra's application
