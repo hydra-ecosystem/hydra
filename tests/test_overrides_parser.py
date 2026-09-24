@@ -10,7 +10,7 @@ try:
     from _pytest.raises import RaisesExc as RaisesContext
 except ImportError:
     from _pytest.python_api import RaisesContext  # type: ignore[attr-defined,no-redef]
-from pytest import mark, param, raises, warns
+from pytest import MonkeyPatch, mark, param, raises, warns
 
 from hydra._internal.grammar import grammar_functions
 from hydra._internal.grammar.functions import Functions
@@ -1994,6 +1994,43 @@ def test_cast_conversions(value: Any, expected_value: Any) -> None:
             else:
                 result = parser.parse_rule(cast_str, "function")
                 assert eq(result, expected), f"{field} cast result mismatch"
+
+
+@mark.parametrize(
+    "expression,expected",
+    [
+        param(
+            "int(tag(meta,shuffle(choice(1.5,2.5,3.5))))", [3, 2, 1], id="choice:int"
+        ),
+        param(
+            "float(tag(meta,shuffle(choice(1,2,3))))",
+            [3.0, 2.0, 1.0],
+            id="choice:float",
+        ),
+        param(
+            "str(tag(meta,shuffle(choice(1,2,3))))", ["3", "2", "1"], id="choice:str"
+        ),
+        param(
+            "bool(tag(meta,shuffle(choice(0,1,2))))",
+            [True, True, False],
+            id="choice:bool",
+        ),
+        param("int(tag(meta,shuffle(range(1.0,4.0))))", [3, 2, 1], id="range:int"),
+        param(
+            "float(tag(meta,shuffle(range(1,4))))", [3.0, 2.0, 1.0], id="range:float"
+        ),
+    ],
+)
+def test_cast_preserves_sweep_metadata(
+    expression: str, expected: List[Any], monkeypatch: MonkeyPatch
+) -> None:
+    monkeypatch.setattr("hydra.core.override_parser.types.shuffle", list.reverse)
+    override = parser.parse_override(f"key={expression}")
+    sweep = override.value()
+    assert isinstance(sweep, (ChoiceSweep, RangeSweep))
+    assert sweep.tags == {"meta"}
+    assert sweep.shuffle
+    assert list(override.sweep_iterator()) == expected
 
 
 @mark.parametrize(
