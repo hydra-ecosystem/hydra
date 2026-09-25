@@ -7,12 +7,15 @@ import warnings
 from logging import getLogger
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, List, Optional, Set
+from typing import Any, List, Optional, Set, cast
+from unittest.mock import Mock
 
 from omegaconf import DictConfig, OmegaConf
 from pytest import mark, param, raises, warns
 
 from hydra import MissingConfigException, __version__, main, version
+from hydra._internal.hydra import Hydra
+from hydra.core.config_loader import ConfigLoader
 from hydra.core.hydra_config import HydraConfig
 from hydra.errors import (
     ConfigCompositionException,
@@ -34,6 +37,7 @@ from hydra.test_utils.test_utils import (
     run_with_error,
     verify_dir_outputs,
 )
+from hydra.types import RunMode
 from hydra.utils import execution_whitelist
 from tests.test_apps.app_instantiate_exception.my_app import InstantiationCase
 
@@ -997,6 +1001,55 @@ def test_help(
     cmd.extend(flags)
     result, _err = run_python_script(cmd)
     assert_text_same(result, expected.format(script=script))
+
+
+def test_help_with_missing_default() -> None:
+    out, err = run_python_script(
+        [
+            "tests/test_apps/app_with_cfg_groups/my_app.py",
+            "--config-name=missing_default",
+            "--help",
+            "hydra.verbose=true",
+        ]
+    )
+    assert "optimizer: adam, nesterov" in out
+    assert "== Config ==\nOverride anything in the config (foo.bar=value)\n\n{}" in out
+    assert err == ""
+
+
+def test_help_rejects_sweep_override() -> None:
+    err = run_with_error(
+        [
+            "tests/test_apps/app_with_cfg_groups/my_app.py",
+            "--help",
+            "optimizer=adam,nesterov",
+        ]
+    )
+    assert "Ambiguous value for argument 'optimizer=adam,nesterov'" in err
+
+
+def test_help_preserves_custom_config_loader_signature(
+    hydra_restore_singletons: Any,
+) -> None:
+    def legacy_load_configuration(
+        config_name: Optional[str],
+        overrides: List[str],
+        run_mode: RunMode,
+        from_shell: bool = True,
+        validate_sweep_overrides: bool = True,
+    ) -> DictConfig:
+        return OmegaConf.create({"value": 1})
+
+    loader = Mock(spec=ConfigLoader)
+    loader.load_configuration.side_effect = legacy_load_configuration
+    hydra = Hydra(task_name="test", config_loader=cast(ConfigLoader, loader))
+    cfg = hydra.compose_config(
+        config_name=None,
+        overrides=[],
+        run_mode=RunMode.RUN,
+        skip_missing_defaults=True,
+    )
+    assert cfg.value == 1
 
 
 def test_shell_completion_help(tmpdir: Path) -> None:

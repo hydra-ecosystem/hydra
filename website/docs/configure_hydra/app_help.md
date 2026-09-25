@@ -12,6 +12,10 @@ Hydra provides two different help options:
 * `--help` : Application specific help
 * `--hydra-help` Hydra specific help. 
 
+If a Defaults List choice is mandatory (`group: ???`), `--help` still lists the
+available options. `$CONFIG` shows the partial configuration until a choice is
+provided.
+
 Example output of `--help`:
 ```text
 $ python my_app.py --help

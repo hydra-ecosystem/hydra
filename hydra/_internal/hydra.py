@@ -429,11 +429,13 @@ class Hydra:
     def app_help(
         self, config_name: Optional[str], args_parser: ArgumentParser, args: Any
     ) -> None:
+        # Help can show available choices without selecting mandatory defaults.
         cfg = self.compose_config(
             config_name=config_name,
             overrides=args.overrides,
             run_mode=RunMode.RUN,
             with_log_configuration=True,
+            skip_missing_defaults=True,
         )
         HydraConfig.instance().set_config(cfg)
         help_cfg = cfg.hydra.help
@@ -486,6 +488,7 @@ class Hydra:
         config_name: Optional[str],
         overrides: List[str],
         run_mode: RunMode = RunMode.RUN,
+        skip_missing_defaults: bool = False,
     ) -> None:
         assert log is not None
         log.debug("")
@@ -498,6 +501,7 @@ class Hydra:
             overrides=overrides,
             run_mode=run_mode,
             with_log_configuration=False,
+            skip_missing_defaults=skip_missing_defaults,
         )
         HydraConfig.instance().set_config(cfg)
         cfg = self.get_sanitized_cfg(cfg, cfg_type="hydra")
@@ -563,13 +567,27 @@ class Hydra:
         config_name: Optional[str],
         overrides: List[str],
         run_mode: RunMode = RunMode.RUN,
+        skip_missing_defaults: bool = False,
     ) -> None:
         assert log is not None
         self._print_search_path(
-            config_name=config_name, overrides=overrides, run_mode=run_mode
+            config_name=config_name,
+            overrides=overrides,
+            run_mode=run_mode,
+            skip_missing_defaults=skip_missing_defaults,
         )
-        self._print_defaults_tree(config_name=config_name, overrides=overrides)
-        self._print_defaults_list(config_name=config_name, overrides=overrides)
+        self._print_defaults_tree(
+            config_name=config_name,
+            overrides=overrides,
+            run_mode=run_mode,
+            skip_missing_defaults=skip_missing_defaults,
+        )
+        self._print_defaults_list(
+            config_name=config_name,
+            overrides=overrides,
+            run_mode=run_mode,
+            skip_missing_defaults=skip_missing_defaults,
+        )
 
         cfg = run_and_report(
             lambda: self.compose_config(
@@ -577,6 +595,7 @@ class Hydra:
                 overrides=overrides,
                 run_mode=run_mode,
                 with_log_configuration=False,
+                skip_missing_defaults=skip_missing_defaults,
             )
         )
         HydraConfig.instance().set_config(cfg)
@@ -590,12 +609,13 @@ class Hydra:
         config_name: Optional[str],
         overrides: List[str],
         run_mode: RunMode = RunMode.RUN,
+        skip_missing_defaults: bool = False,
     ) -> None:
         assert log is not None
         defaults = self.config_loader.compute_defaults_list(
             config_name=config_name,
             overrides=overrides,
-            run_mode=run_mode,
+            run_mode=RunMode.MULTIRUN if skip_missing_defaults else run_mode,
         )
 
         box: List[List[str]] = [
@@ -644,10 +664,13 @@ class Hydra:
         config_name: Optional[str],
         overrides: List[str],
         run_mode: RunMode = RunMode.RUN,
+        skip_missing_defaults: bool = False,
     ) -> None:
         assert log is not None
         if log.isEnabledFor(logging.DEBUG):
-            self._print_all_info(config_name, overrides, run_mode)
+            self._print_all_info(
+                config_name, overrides, run_mode, skip_missing_defaults
+            )
 
     def compose_config(
         self,
@@ -658,6 +681,7 @@ class Hydra:
         from_shell: bool = True,
         validate_sweep_overrides: bool = True,
         activate_config_repository: bool = False,
+        skip_missing_defaults: bool = False,
     ) -> DictConfig:
         """
         :param config_name:
@@ -667,6 +691,7 @@ class Hydra:
         :param from_shell: True if the parameters are passed from the shell. used for more helpful error messages
         :param validate_sweep_overrides: True if sweep overrides should be validated
         :param activate_config_repository: True to retain the effective repository on the invocation loader
+        :param skip_missing_defaults: True to omit unresolved mandatory Defaults List choices
         :return:
         """
 
@@ -680,6 +705,16 @@ class Hydra:
                 from_shell=from_shell,
                 validate_sweep_overrides=validate_sweep_overrides,
             )
+        # Preserve the existing call signature for custom config loaders.
+        elif skip_missing_defaults and type(self.config_loader) is ConfigLoaderImpl:
+            cfg = self.config_loader.load_configuration(
+                config_name=config_name,
+                overrides=overrides,
+                run_mode=run_mode,
+                from_shell=from_shell,
+                validate_sweep_overrides=validate_sweep_overrides,
+                skip_missing_defaults=True,
+            )
         else:
             cfg = self.config_loader.load_configuration(
                 config_name=config_name,
@@ -692,7 +727,9 @@ class Hydra:
             configure_log(cfg.hydra.hydra_logging, cfg.hydra.verbose)
             global log
             log = logging.getLogger(__name__)
-            self._print_debug_info(config_name, overrides, run_mode)
+            self._print_debug_info(
+                config_name, overrides, run_mode, skip_missing_defaults
+            )
         return cfg
 
     def _print_plugins_info(
@@ -709,12 +746,13 @@ class Hydra:
         config_name: Optional[str],
         overrides: List[str],
         run_mode: RunMode = RunMode.RUN,
+        skip_missing_defaults: bool = False,
     ) -> None:
         from .. import __version__
 
         self._log_header(f"Hydra {__version__}", filler="=")
         self._print_plugins()
-        self._print_config_info(config_name, overrides, run_mode)
+        self._print_config_info(config_name, overrides, run_mode, skip_missing_defaults)
 
     def _print_defaults_tree_impl(
         self,
@@ -754,12 +792,13 @@ class Hydra:
         config_name: Optional[str],
         overrides: List[str],
         run_mode: RunMode = RunMode.RUN,
+        skip_missing_defaults: bool = False,
     ) -> None:
         assert log is not None
         defaults = self.config_loader.compute_defaults_list(
             config_name=config_name,
             overrides=overrides,
-            run_mode=run_mode,
+            run_mode=RunMode.MULTIRUN if skip_missing_defaults else run_mode,
         )
         log.info("")
         self._log_header("Defaults Tree", filler="*")

@@ -141,6 +141,7 @@ class ConfigLoaderImpl(ConfigLoader):
         run_mode: RunMode,
         from_shell: bool = True,
         validate_sweep_overrides: bool = True,
+        skip_missing_defaults: bool = False,
     ) -> DictConfig:
         return self._load_configuration(
             config_name=config_name,
@@ -148,6 +149,7 @@ class ConfigLoaderImpl(ConfigLoader):
             run_mode=run_mode,
             from_shell=from_shell,
             validate_sweep_overrides=validate_sweep_overrides,
+            skip_missing_defaults=skip_missing_defaults,
             activate_config_repository=False,
         )
 
@@ -165,6 +167,7 @@ class ConfigLoaderImpl(ConfigLoader):
             run_mode=run_mode,
             from_shell=from_shell,
             validate_sweep_overrides=validate_sweep_overrides,
+            skip_missing_defaults=False,
             activate_config_repository=True,
         )
 
@@ -175,6 +178,7 @@ class ConfigLoaderImpl(ConfigLoader):
         run_mode: RunMode,
         from_shell: bool,
         validate_sweep_overrides: bool,
+        skip_missing_defaults: bool,
         activate_config_repository: bool,
     ) -> DictConfig:
         try:
@@ -184,6 +188,7 @@ class ConfigLoaderImpl(ConfigLoader):
                 run_mode=run_mode,
                 from_shell=from_shell,
                 validate_sweep_overrides=validate_sweep_overrides,
+                skip_missing_defaults=skip_missing_defaults,
                 activate_config_repository=activate_config_repository,
             )
         except OmegaConfBaseException as e:
@@ -277,6 +282,7 @@ class ConfigLoaderImpl(ConfigLoader):
         run_mode: RunMode,
         from_shell: bool = True,
         validate_sweep_overrides: bool = True,
+        skip_missing_defaults: bool = False,
         activate_config_repository: bool = False,
     ) -> DictConfig:
         from hydra import __version__, version
@@ -296,7 +302,7 @@ class ConfigLoaderImpl(ConfigLoader):
             config_name=config_name,
             overrides_list=parsed_overrides,
             prepend_hydra=True,
-            skip_missing=run_mode == RunMode.MULTIRUN,
+            skip_missing=skip_missing_defaults or run_mode == RunMode.MULTIRUN,
         )
 
         config_overrides = defaults_list.config_overrides
