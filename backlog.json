@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-25",
-  "generated_at": "2026-09-25T07:07:48Z",
+  "generated_at": "2026-09-25T07:18:10Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 69,
@@ -2028,6 +2028,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3402"
     },
     {
+      "number": 3403,
+      "title": "Accept an instantiate whitelist on @hydra.main",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3403"
+    },
+    {
       "number": 3405,
       "title": "Reject optional and override on the same Defaults List entry",
       "category": "Bug",
@@ -2200,21 +2215,6 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
-    },
-    {
-      "number": 3403,
-      "title": "Accept an instantiate whitelist on @hydra.main",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-08-23",
-      "updated": "2026-08-23",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3403"
     }
   ],
   "updates": [
