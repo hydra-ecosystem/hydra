@@ -863,3 +863,4 @@
 {"ts": "2026-09-25T07:07:48Z", "kind": "closed", "issue": 3403, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3403", "title": "Accept an instantiate whitelist on @hydra.main"}
 {"ts": "2026-09-25T08:58:00Z", "kind": "status", "issue": 2170, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2170", "title": "[Bug] `???` defaults cannot display `--help`", "detail": "not started → in progress", "pr": {"number": 3467, "url": "https://github.com/hydra-ecosystem/hydra/pull/3467"}}
 {"ts": "2026-09-25T08:58:00Z", "kind": "pr", "issue": 2170, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2170", "title": "[Bug] `???` defaults cannot display `--help`", "detail": "linked #3467"}
+{"ts": "2026-09-25T09:35:14Z", "kind": "closed", "issue": 2170, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2170", "title": "[Bug] `???` defaults cannot display `--help`"}

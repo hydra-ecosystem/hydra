@@ -1,52 +1,52 @@
 {
   "generated_on": "2026-09-25",
-  "generated_at": "2026-09-25T09:26:49Z",
+  "generated_at": "2026-09-25T09:35:14Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 69,
+    "open_total": 68,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 4,
-        "percentage": 5.8
+        "count": 3,
+        "percentage": 4.4
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 54,
-        "percentage": 78.3
+        "percentage": 79.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 8.7
+        "percentage": 8.8
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 1.4
+        "percentage": 1.5
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 1,
-        "percentage": 1.4
+        "percentage": 1.5
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 4.3
+        "percentage": 4.4
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,31 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 65
+        "count": 66
       }
     ]
   },
   "issues": [
-    {
-      "number": 2170,
-      "title": "[Bug] `???` defaults cannot display `--help`",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3467,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3467"
-        }
-      ],
-      "created": "2022-04-22",
-      "updated": "2026-09-11",
-      "labels": [
-        "bug"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2170"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2220,9 +2200,36 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
+    },
+    {
+      "number": 2170,
+      "title": "[Bug] `???` defaults cannot display `--help`",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3467,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3467"
+        }
+      ],
+      "created": "2022-04-22",
+      "updated": "2026-09-11",
+      "labels": [
+        "bug"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2170"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-25T09:35:14Z",
+      "kind": "closed",
+      "issue": 2170,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2170",
+      "title": "[Bug] `???` defaults cannot display `--help`"
+    },
     {
       "ts": "2026-09-25T08:58:00Z",
       "kind": "pr",
@@ -3812,13 +3819,6 @@
       "issue": 2660,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2660",
       "title": "[Feature Request] Make hydra-submitit-launcher available via Conda"
-    },
-    {
-      "ts": "2026-08-10T17:08:25Z",
-      "kind": "closed",
-      "issue": 2657,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2657",
-      "title": "[Feature Request] Support commas in key names (override grammar)"
     }
   ]
 }
