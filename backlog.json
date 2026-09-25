@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-25",
-  "generated_at": "2026-09-25T00:05:20Z",
+  "generated_at": "2026-09-25T06:13:53Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 70,
@@ -120,6 +120,14 @@
         {
           "number": 3462,
           "url": "https://github.com/hydra-ecosystem/hydra/pull/3462"
+        },
+        {
+          "number": 3465,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3465"
+        },
+        {
+          "number": 3466,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3466"
         }
       ],
       "created": "2026-09-19",
@@ -2211,6 +2219,14 @@
   ],
   "updates": [
     {
+      "ts": "2026-09-25T06:13:53Z",
+      "kind": "pr",
+      "issue": 3456,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3456",
+      "title": "[Bug] Casting sweeps drops tags and shuffle settings",
+      "detail": "linked #3465, #3466"
+    },
+    {
       "ts": "2026-09-24T18:59:27Z",
       "kind": "pr",
       "issue": 3456,
@@ -3792,13 +3808,6 @@
       "issue": 2551,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2551",
       "title": "keep simulating in multirun even if some failed "
-    },
-    {
-      "ts": "2026-08-10T13:30:00Z",
-      "kind": "closed",
-      "issue": 3362,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/3362",
-      "title": "Reject backslashes in Defaults List paths"
     }
   ]
 }
