@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-25",
-  "generated_at": "2026-09-25T06:13:53Z",
+  "generated_at": "2026-09-25T07:07:48Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 70,
+    "open_total": 69,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 4,
-        "percentage": 5.7
+        "percentage": 5.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 55,
-        "percentage": 78.6
+        "count": 54,
+        "percentage": 78.3
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 8.6
+        "percentage": 8.7
       },
       {
         "category": "Question",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 67
+        "count": 66
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 64
+        "count": 65
       }
     ]
   },
@@ -1061,21 +1061,6 @@
       "updated": "2026-08-11",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3375"
-    },
-    {
-      "number": 3403,
-      "title": "Accept an instantiate whitelist on @hydra.main",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-23",
-      "updated": "2026-08-23",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3403"
     },
     {
       "number": 3404,
@@ -2215,9 +2200,31 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
+    },
+    {
+      "number": 3403,
+      "title": "Accept an instantiate whitelist on @hydra.main",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3403"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-25T07:07:48Z",
+      "kind": "closed",
+      "issue": 3403,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3403",
+      "title": "Accept an instantiate whitelist on @hydra.main"
+    },
     {
       "ts": "2026-09-25T06:13:53Z",
       "kind": "pr",
@@ -3801,13 +3808,6 @@
       "issue": 2587,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2587",
       "title": "How to instantiate a child class which inherited from super class?"
-    },
-    {
-      "ts": "2026-08-10T14:42:28Z",
-      "kind": "closed",
-      "issue": 2551,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2551",
-      "title": "keep simulating in multirun even if some failed "
     }
   ]
 }
