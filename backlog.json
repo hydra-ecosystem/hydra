@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-25",
-  "generated_at": "2026-09-25T07:18:10Z",
+  "generated_at": "2026-09-25T08:58:00Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 69,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 66
+        "count": 65
       },
       {
         "status": "done",
@@ -71,6 +71,26 @@
     ]
   },
   "issues": [
+    {
+      "number": 2170,
+      "title": "[Bug] `???` defaults cannot display `--help`",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3467,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3467"
+        }
+      ],
+      "created": "2022-04-22",
+      "updated": "2026-09-11",
+      "labels": [
+        "bug"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2170"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -477,21 +497,6 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1944"
-    },
-    {
-      "number": 2170,
-      "title": "[Bug] `???` defaults cannot display `--help`",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2022-04-22",
-      "updated": "2026-09-11",
-      "labels": [
-        "bug"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2170"
     },
     {
       "number": 2227,
@@ -1161,14 +1166,14 @@
     },
     {
       "number": 3461,
-      "title": "Hydra 1.4: drop Python 3.10 and evaluate Python 3.15",
+      "title": "Post-1.4: drop Python 3.10",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "not started",
       "status_emoji": "⬜",
       "prs": [],
       "created": "2026-09-23",
-      "updated": "2026-09-23",
+      "updated": "2026-09-25",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3461"
     },
@@ -2218,6 +2223,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-25T08:58:00Z",
+      "kind": "pr",
+      "issue": 2170,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2170",
+      "title": "[Bug] `???` defaults cannot display `--help`",
+      "detail": "linked #3467"
+    },
+    {
+      "ts": "2026-09-25T08:58:00Z",
+      "kind": "status",
+      "issue": 2170,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2170",
+      "title": "[Bug] `???` defaults cannot display `--help`",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3467,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3467"
+      }
+    },
     {
       "ts": "2026-09-25T07:07:48Z",
       "kind": "closed",
@@ -3794,20 +3819,6 @@
       "issue": 2657,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2657",
       "title": "[Feature Request] Support commas in key names (override grammar)"
-    },
-    {
-      "ts": "2026-08-10T15:31:45Z",
-      "kind": "closed",
-      "issue": 2590,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2590",
-      "title": "Is there a way to disable Hydra exceptions/errors override?"
-    },
-    {
-      "ts": "2026-08-10T15:16:14Z",
-      "kind": "closed",
-      "issue": 2587,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2587",
-      "title": "How to instantiate a child class which inherited from super class?"
     }
   ]
 }

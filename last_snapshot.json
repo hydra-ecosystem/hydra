@@ -66,7 +66,7 @@
     "385": "2026-09-05",
     "753": "2026-09-05"
   },
-  "generated_at": "2026-09-25T07:18:10Z",
+  "generated_at": "2026-09-25T08:58:00Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -220,9 +220,11 @@
       "labels": [
         "bug"
       ],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3467"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "in progress",
       "title": "[Bug] `???` defaults cannot display `--help`",
       "updated_at": "2026-09-11T22:42:11Z"
     },
@@ -812,8 +814,8 @@
       "pr_numbers": [],
       "state": "OPEN",
       "status": "not started",
-      "title": "Hydra 1.4: drop Python 3.10 and evaluate Python 3.15",
-      "updated_at": "2026-09-23T20:57:54Z"
+      "title": "Post-1.4: drop Python 3.10",
+      "updated_at": "2026-09-25T07:39:50Z"
     },
     "468": {
       "category": "Enhancement",
