@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-25",
-  "generated_at": "2026-09-25T09:35:14Z",
+  "generated_at": "2026-09-25T22:29:41Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 68,
+    "open_total": 67,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 3,
-        "percentage": 4.4
+        "count": 2,
+        "percentage": 3.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 54,
-        "percentage": 79.4
+        "percentage": 80.6
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 8.8
+        "percentage": 9.0
       },
       {
         "category": "Question",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 4.4
+        "percentage": 4.5
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 65
+        "count": 64
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 66
+        "count": 67
       }
     ]
   },
@@ -110,32 +110,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3444"
     },
     {
-      "number": 3456,
-      "title": "[Bug] Casting sweeps drops tags and shuffle settings",
-      "category": "Bug",
-      "category_emoji": "🐛",
+      "number": 3408,
+      "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates",
+      "category": "Enhancement",
+      "category_emoji": "✨",
       "status": "community PR",
       "status_emoji": "🤝",
       "prs": [
         {
-          "number": 3462,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3462"
-        },
-        {
-          "number": 3465,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3465"
-        },
-        {
-          "number": 3466,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3466"
+          "number": 3468,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3468"
         }
       ],
-      "created": "2026-09-19",
-      "updated": "2026-09-22",
-      "labels": [
-        "bug"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3456"
+      "created": "2026-08-24",
+      "updated": "2026-08-24",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3408"
     },
     {
       "number": 468,
@@ -1078,19 +1068,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3406"
     },
     {
-      "number": 3408,
-      "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-24",
-      "updated": "2026-08-24",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3408"
-    },
-    {
       "number": 3438,
       "title": "Improve type safety of Hydra logging configurations",
       "category": "Enhancement",
@@ -1219,6 +1196,26 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1602"
+    },
+    {
+      "number": 2170,
+      "title": "[Bug] `???` defaults cannot display `--help`",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3467,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3467"
+        }
+      ],
+      "created": "2022-04-22",
+      "updated": "2026-09-11",
+      "labels": [
+        "bug"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2170"
     },
     {
       "number": 2237,
@@ -2202,27 +2199,62 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
     },
     {
-      "number": 2170,
-      "title": "[Bug] `???` defaults cannot display `--help`",
+      "number": 3456,
+      "title": "[Bug] Casting sweeps drops tags and shuffle settings",
       "category": "Bug",
       "category_emoji": "🐛",
       "status": "done",
       "status_emoji": "✅",
       "prs": [
         {
-          "number": 3467,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3467"
+          "number": 3462,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3462"
+        },
+        {
+          "number": 3465,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3465"
+        },
+        {
+          "number": 3466,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3466"
         }
       ],
-      "created": "2022-04-22",
-      "updated": "2026-09-11",
+      "created": "2026-09-19",
+      "updated": "2026-09-22",
       "labels": [
         "bug"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2170"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3456"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-25T22:29:41Z",
+      "kind": "pr",
+      "issue": 3408,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3408",
+      "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates",
+      "detail": "linked #3468"
+    },
+    {
+      "ts": "2026-09-25T22:29:41Z",
+      "kind": "closed",
+      "issue": 3456,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3456",
+      "title": "[Bug] Casting sweeps drops tags and shuffle settings"
+    },
+    {
+      "ts": "2026-09-25T22:29:41Z",
+      "kind": "status",
+      "issue": 3408,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3408",
+      "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates",
+      "detail": "not started → community PR",
+      "pr": {
+        "number": 3468,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3468"
+      }
+    },
     {
       "ts": "2026-09-25T09:35:14Z",
       "kind": "closed",
@@ -3798,27 +3830,6 @@
       "issue": 2711,
       "issue_url": "https://github.com/facebookresearch/hydra/issues/2711",
       "title": "[Feature Request] API Docs?"
-    },
-    {
-      "ts": "2026-08-10T18:09:36Z",
-      "kind": "closed",
-      "issue": 2704,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2704",
-      "title": "Outdated tutorial on job.chdir"
-    },
-    {
-      "ts": "2026-08-10T18:03:54Z",
-      "kind": "closed",
-      "issue": 2673,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2673",
-      "title": "[Feature Request] Support multirun in compose API"
-    },
-    {
-      "ts": "2026-08-10T17:51:17Z",
-      "kind": "closed",
-      "issue": 2660,
-      "issue_url": "https://github.com/facebookresearch/hydra/issues/2660",
-      "title": "[Feature Request] Make hydra-submitit-launcher available via Conda"
     }
   ]
 }

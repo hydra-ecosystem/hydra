@@ -62,12 +62,13 @@
     "3426": "2026-09-02",
     "3427": "2026-09-07",
     "3436": "2026-09-05",
+    "3456": "2026-09-25",
     "3457": "2026-09-22",
     "3458": "2026-09-22",
     "385": "2026-09-05",
     "753": "2026-09-05"
   },
-  "generated_at": "2026-09-25T09:35:14Z",
+  "generated_at": "2026-09-25T22:29:41Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -718,9 +719,11 @@
       "category": "Enhancement",
       "created_at": "2026-08-24T10:56:10Z",
       "labels": [],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3468"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "community PR",
       "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates",
       "updated_at": "2026-08-24T10:56:10Z"
     },
@@ -777,22 +780,6 @@
       "status": "not started",
       "title": "Improve provenance and default presentation of config composition errors",
       "updated_at": "2026-09-17T20:01:12Z"
-    },
-    "3456": {
-      "category": "Bug",
-      "created_at": "2026-09-19T10:42:39Z",
-      "labels": [
-        "bug"
-      ],
-      "pr_numbers": [
-        "3462",
-        "3465",
-        "3466"
-      ],
-      "state": "OPEN",
-      "status": "community PR",
-      "title": "[Bug] Casting sweeps drops tags and shuffle settings",
-      "updated_at": "2026-09-22T22:34:39Z"
     },
     "3461": {
       "category": "Enhancement",
@@ -1720,6 +1707,22 @@
       "status": "done",
       "title": "`instantiate()` loses merged ancestor values when copying a context-parented subtree",
       "updated_at": "2026-09-04T18:47:46Z"
+    },
+    "3456": {
+      "category": "Bug",
+      "created_at": "2026-09-19T10:42:39Z",
+      "labels": [
+        "bug"
+      ],
+      "pr_numbers": [
+        "3462",
+        "3465",
+        "3466"
+      ],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "[Bug] Casting sweeps drops tags and shuffle settings",
+      "updated_at": "2026-09-22T22:34:39Z"
     },
     "3457": {
       "category": "Bug",
