@@ -6,7 +6,7 @@ runs:
   using: composite
   steps:
   - name: restore_cache
-    uses: actions/cache@v4.2.0
+    uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
     with:
       key: "macos-sys-v1-${{ runner.arch }}-${{ inputs.py_version }}"
       path: |-

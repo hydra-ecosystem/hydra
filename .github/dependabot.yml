@@ -14,3 +14,10 @@ updates:
     cooldown:
       default-days: 10
 
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+      - "/.github/actions/macos"
+      - "/.github/actions/windows"
+    schedule:
+      interval: "monthly"
