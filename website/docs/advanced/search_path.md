@@ -15,6 +15,10 @@ similar to the Python `PYTHONPATH`.
     - `pkg://` points to an importable Python module, with `.` being the separator. `__init__.py` files are needed in
     directories for Python to treat them as packages.
 
+The application's primary config source comes before paths added with `hydra.searchpath` or `--config-dir`.
+Additional paths can provide configs missing from the primary source, but cannot override same-named configs in it.
+The order of additional paths still matters: the first matching config wins.
+
 You can inspect the search path and the configurations loaded by Hydra via the `--info` flag:
 
 ```bash
@@ -151,8 +155,28 @@ dataset:
 python my_app.py 'hydra.searchpath=[pkg://additional_conf]'
 ```
 
-#### Overriding `--config-dir` from the command line
-This is a less flexible alternative to `hydra.searchpath`.
+If an external directory must take precedence over an application's installed configs, make it the primary config
+source instead:
+
+```bash
+python -m foo --config-path=/my/path/to/configs --config-name=config
+```
+
+This selects `/my/path/to/configs/config.yaml` as the primary config. To use configs from the installed package as
+fallbacks, add its importable config package to `hydra.searchpath` in that file:
+
+```yaml title="/my/path/to/configs/config.yaml"
+hydra:
+  searchpath:
+    - pkg://foo.conf
+```
+
+Define any defaults needed by the application in the new primary config; the installed primary config is not merged
+automatically.
+
+#### Adding `--config-dir` from the command line
+Like `hydra.searchpath`, `--config-dir` adds a source after the primary config source. It cannot shadow configs found
+there.
 See this [page](hydra-command-line-flags.md) for more info.
 
 
@@ -163,5 +187,6 @@ See this [page](hydra-command-line-flags.md) for more info.
 Framework authors may want to add their configs to the search path automatically once their package is installed,
 eliminating the need for any actions from the users.
 This can be achieved using a `SearchPathPlugin`. Check the example plugin linked above for more details.
+To change precedence programmatically, a plugin can prepend a config source.
 For an organization-wide override of Hydra's own defaults, see
 [Environment-specific overrides](../patterns/environment_specific_overrides.md).
