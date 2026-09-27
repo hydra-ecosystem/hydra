@@ -88,6 +88,19 @@ The above configuration methods only apply to Hydra's default `BasicSweeper` for
 corresponding documentations.
 :::
 
+### Stop on the first failed job
+
+By default, the basic sweeper runs the jobs in a batch before reporting a job failure.
+To stop as soon as one job fails, set `hydra.sweeper.fail_fast=true`:
+
+```commandline
+python my_app.py -m db=mysql,postgresql schema=warehouse,support hydra.sweeper.fail_fast=true
+```
+
+Fail-fast is supported with Hydra's basic launcher, which runs jobs sequentially.
+It is not supported with parallel or remote launchers.
+Jobs are launched one at a time even if `hydra.sweeper.max_batch_size` is larger.
+
 ### Additional sweep types
 Hydra supports other kinds of sweeps, e.g.:
 ```python
@@ -105,4 +118,3 @@ For example, the [Ax Sweeper](/plugins/ax_sweeper.md) can automatically find the
 By default, Hydra runs your multi-run jobs locally and serially. 
 Other launchers are available as plugins for launching in parallel and on different clusters. For example, the [JobLib Launcher](/plugins/joblib_launcher.md)
 can execute the different parameter combinations in parallel on your local machine using multi-processing.
-

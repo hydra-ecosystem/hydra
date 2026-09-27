@@ -27,6 +27,7 @@ from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 from omegaconf import DictConfig, OmegaConf
 
+from hydra._internal.core_plugins.basic_launcher import BasicLauncher
 from hydra.core.config_store import ConfigStore
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.override_parser.types import Override
@@ -42,6 +43,7 @@ class BasicSweeperConf:
     _target_: str = "hydra._internal.core_plugins.basic_sweeper.BasicSweeper"
     max_batch_size: Optional[int] = None
     params: Optional[Dict[str, str]] = None
+    fail_fast: bool = False
 
 
 ConfigStore.instance().store(
@@ -58,7 +60,10 @@ class BasicSweeper(Sweeper):
     """
 
     def __init__(
-        self, max_batch_size: Optional[int], params: Optional[Dict[str, str]] = None
+        self,
+        max_batch_size: Optional[int],
+        params: Optional[Dict[str, str]] = None,
+        fail_fast: bool = False,
     ) -> None:
         """
         Instantiates
@@ -71,6 +76,7 @@ class BasicSweeper(Sweeper):
         self.batch_index = 0
         self.max_batch_size = max_batch_size
         self.params = params
+        self.fail_fast = fail_fast
 
         self.hydra_context: Optional[HydraContext] = None
         self.config: Optional[DictConfig] = None
@@ -93,6 +99,10 @@ class BasicSweeper(Sweeper):
             task_function=task_function,
             config=config,
         )
+        if self.fail_fast and not isinstance(self.launcher, BasicLauncher):
+            raise HydraException(
+                "hydra.sweeper.fail_fast is supported only with hydra/launcher=basic"
+            )
 
     @staticmethod
     def split_overrides_to_chunks(
@@ -176,14 +186,28 @@ class BasicSweeper(Sweeper):
                 f"Validated configs of {len(batch)} jobs in {elapsed:0.2f} seconds, "
                 f"{len(batch) / elapsed:.2f} / second)"
             )
-            results = self.launcher.launch(batch, initial_job_idx=initial_job_idx)
+            launch_batches: Iterable[Sequence[Sequence[str]]]
+            if self.fail_fast:
+                launch_batches = ([job] for job in batch)
+            else:
+                launch_batches = [batch]
+            batch_results: List[JobReturn] = []
+            for launch_batch in launch_batches:
+                results = self.launcher.launch(
+                    launch_batch, initial_job_idx=initial_job_idx
+                )
 
-            for r in results:
-                # access the result to trigger an exception in case the job failed.
-                _ = r.return_value
+                for r in results:
+                    # access the result to trigger an exception in case the job failed.
+                    _ = r.return_value
 
-            initial_job_idx += len(batch)
-            returns.append(results)
+                initial_job_idx += len(launch_batch)
+                if self.fail_fast:
+                    batch_results.extend(results)
+                else:
+                    returns.append(results)
+            if self.fail_fast:
+                returns.append(batch_results)
 
         return returns
 

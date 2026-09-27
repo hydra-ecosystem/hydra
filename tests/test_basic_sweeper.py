@@ -3,12 +3,21 @@ import re
 import sys
 from textwrap import dedent
 from typing import Any, List, Optional
+from unittest.mock import MagicMock, patch
 
-from pytest import mark, param
+from omegaconf import OmegaConf
+from pytest import mark, param, raises
 
 from hydra._internal.core_plugins.basic_sweeper import BasicSweeper
 from hydra.core.override_parser.overrides_parser import OverridesParser
-from hydra.test_utils.test_utils import assert_multiline_regex_search, run_process
+from hydra.errors import HydraException
+from hydra.plugins.launcher import Launcher
+from hydra.test_utils.test_utils import (
+    TSweepRunner,
+    assert_multiline_regex_search,
+    run_process,
+)
+from hydra.types import HydraContext
 
 
 @mark.parametrize(
@@ -131,6 +140,83 @@ def test_multiple_failures_log_to_own_job_files(
     type_error_log = (tmpdir / "2" / "my_app.log").read()
     assert "Job failed" in type_error_log
     assert "TypeError" in type_error_log
+
+
+@mark.parametrize(
+    "divisors,launched_jobs,max_batch_size",
+    [
+        param("0,1", 1, None, id="first_job_fails"),
+        param("1,0,1", 2, 2, id="later_job_fails_in_batch"),
+    ],
+)
+def test_fail_fast_stops_after_first_failed_job(
+    tmpdir: Any, divisors: str, launched_jobs: int, max_batch_size: Optional[int]
+) -> None:
+    cmd = [
+        sys.executable,
+        "tests/test_apps/app_can_fail/my_app.py",
+        "--multirun",
+        f"+divisor={divisors}",
+        "hydra.sweeper.fail_fast=true",
+        f'hydra.sweep.dir="{str(tmpdir)}"',
+        "hydra.job.chdir=True",
+    ]
+    if max_batch_size is not None:
+        cmd.append(f"hydra.sweeper.max_batch_size={max_batch_size}")
+    out, err = run_process(cmd=cmd, print_error=False, raise_exception=False)
+
+    assert out.count("Launching 1 jobs locally") == launched_jobs
+    assert "ZeroDivisionError: division by zero" in err
+    for job_idx in range(launched_jobs):
+        assert (tmpdir / str(job_idx) / "my_app.log").exists()
+    assert not (tmpdir / str(launched_jobs)).exists()
+
+
+def test_fail_fast_successful_sweep(tmpdir: Any) -> None:
+    cmd = [
+        sys.executable,
+        "tests/test_apps/app_can_fail/my_app.py",
+        "--multirun",
+        "+divisor=1,2,3",
+        "hydra.sweeper.fail_fast=true",
+        f'hydra.sweep.dir="{str(tmpdir)}"',
+        "hydra.job.chdir=True",
+    ]
+    out, err = run_process(cmd=cmd, print_error=False, raise_exception=False)
+
+    assert err == ""
+    assert out.count("Launching 1 jobs locally") == 3
+    for job_idx in range(3):
+        assert (tmpdir / str(job_idx) / "my_app.log").exists()
+
+
+def test_fail_fast_preserves_return_batches(
+    hydra_restore_singletons: Any, hydra_sweep_runner: TSweepRunner
+) -> None:
+    with hydra_sweep_runner(
+        calling_file="tests/test_apps/app_can_fail/my_app.py",
+        calling_module=None,
+        config_path=None,
+        config_name=None,
+        task_function=lambda cfg: cfg.divisor,
+        overrides=["+divisor=1,2", "hydra.sweeper.fail_fast=true"],
+    ) as sweep:
+        assert sweep.returns is not None
+        assert len(sweep.returns) == 1
+        assert [job.return_value for job in sweep.returns[0]] == [1, 2]
+
+
+def test_fail_fast_rejects_nonbasic_launcher() -> None:
+    sweeper = BasicSweeper(max_batch_size=None, fail_fast=True)
+    launcher = MagicMock(spec=Launcher)
+    with patch("hydra.core.plugins.Plugins.instance") as plugins:
+        plugins.return_value.instantiate_launcher.return_value = launcher
+        with raises(HydraException, match="supported only with hydra/launcher=basic"):
+            sweeper.setup(
+                hydra_context=MagicMock(spec=HydraContext),
+                task_function=lambda _: None,
+                config=OmegaConf.create({}),
+            )
 
 
 def test_glob_uses_primary_config_searchpath(tmpdir: Any) -> None:
