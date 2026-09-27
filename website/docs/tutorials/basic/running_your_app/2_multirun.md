@@ -99,7 +99,7 @@ python my_app.py -m db=mysql,postgresql schema=warehouse,support hydra.sweeper.f
 
 Fail-fast is supported with Hydra's basic launcher, which runs jobs sequentially.
 It is not supported with parallel or remote launchers.
-Jobs are launched one at a time even if `hydra.sweeper.max_batch_size` is larger.
+The basic launcher receives batches as usual but stops executing jobs after the first failure.
 
 ### Additional sweep types
 Hydra supports other kinds of sweeps, e.g.:

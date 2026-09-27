@@ -186,28 +186,20 @@ class BasicSweeper(Sweeper):
                 f"Validated configs of {len(batch)} jobs in {elapsed:0.2f} seconds, "
                 f"{len(batch) / elapsed:.2f} / second)"
             )
-            launch_batches: Iterable[Sequence[Sequence[str]]]
             if self.fail_fast:
-                launch_batches = ([job] for job in batch)
-            else:
-                launch_batches = [batch]
-            batch_results: List[JobReturn] = []
-            for launch_batch in launch_batches:
+                assert isinstance(self.launcher, BasicLauncher)
                 results = self.launcher.launch(
-                    launch_batch, initial_job_idx=initial_job_idx
+                    batch, initial_job_idx=initial_job_idx, stop_on_failure=True
                 )
+            else:
+                results = self.launcher.launch(batch, initial_job_idx=initial_job_idx)
 
-                for r in results:
-                    # access the result to trigger an exception in case the job failed.
-                    _ = r.return_value
+            for r in results:
+                # access the result to trigger an exception in case the job failed.
+                _ = r.return_value
 
-                initial_job_idx += len(launch_batch)
-                if self.fail_fast:
-                    batch_results.extend(results)
-                else:
-                    returns.append(results)
-            if self.fail_fast:
-                returns.append(batch_results)
+            initial_job_idx += len(batch)
+            returns.append(results)
 
         return returns
 

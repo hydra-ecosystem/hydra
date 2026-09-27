@@ -165,7 +165,7 @@ def test_fail_fast_stops_after_first_failed_job(
         cmd.append(f"hydra.sweeper.max_batch_size={max_batch_size}")
     out, err = run_process(cmd=cmd, print_error=False, raise_exception=False)
 
-    assert out.count("Launching 1 jobs locally") == launched_jobs
+    assert out.count("Launching up to 2 jobs locally") == 1
     assert "ZeroDivisionError: division by zero" in err
     for job_idx in range(launched_jobs):
         assert (tmpdir / str(job_idx) / "my_app.log").exists()
@@ -185,7 +185,7 @@ def test_fail_fast_successful_sweep(tmpdir: Any) -> None:
     out, err = run_process(cmd=cmd, print_error=False, raise_exception=False)
 
     assert err == ""
-    assert out.count("Launching 1 jobs locally") == 3
+    assert out.count("Launching up to 3 jobs locally") == 1
     for job_idx in range(3):
         assert (tmpdir / str(job_idx) / "my_app.log").exists()
 

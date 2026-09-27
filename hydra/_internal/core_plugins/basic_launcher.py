@@ -9,6 +9,7 @@ from omegaconf import DictConfig, open_dict
 from hydra.core.config_store import ConfigStore
 from hydra.core.utils import (
     JobReturn,
+    JobStatus,
     configure_log,
     filter_overrides,
     run_job,
@@ -49,7 +50,11 @@ class BasicLauncher(Launcher):
         self.task_function = task_function
 
     def launch(
-        self, job_overrides: Sequence[Sequence[str]], initial_job_idx: int
+        self,
+        job_overrides: Sequence[Sequence[str]],
+        initial_job_idx: int,
+        *,
+        stop_on_failure: bool = False,
     ) -> Sequence[JobReturn]:
         setup_globals()
         assert self.hydra_context is not None
@@ -63,7 +68,12 @@ class BasicLauncher(Launcher):
         )
         sweep_dir = self.config.hydra.sweep.dir
         Path(str(sweep_dir)).mkdir(parents=True, exist_ok=True)
-        log.info(f"Launching {len(job_overrides)} jobs locally")
+        count = len(job_overrides)
+        log.info(
+            f"Launching up to {count} jobs locally"
+            if stop_on_failure
+            else f"Launching {count} jobs locally"
+        )
         runs: List[JobReturn] = []
         for idx, overrides in enumerate(job_overrides):
             idx = initial_job_idx + idx
@@ -88,4 +98,6 @@ class BasicLauncher(Launcher):
                 self.config.hydra.verbose,
                 execution_whitelist=self.hydra_context.execution_whitelist,
             )
+            if stop_on_failure and ret.status == JobStatus.FAILED:
+                break
         return runs
