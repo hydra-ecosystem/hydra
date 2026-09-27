@@ -495,7 +495,7 @@ def _exception_group_members(error: BaseException) -> Sequence[BaseException]:
     group_type = getattr(builtins, "BaseExceptionGroup", None)
     if group_type is None or not isinstance(error, group_type):
         return ()
-    return cast(Sequence[BaseException], error.exceptions)
+    return cast(Sequence[BaseException], getattr(error, "exceptions"))
 
 
 def _needs_cloudpickle(error: BaseException) -> bool:
