@@ -878,3 +878,4 @@
 {"ts": "2026-09-27T05:59:24Z", "kind": "closed", "issue": 3408, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3408", "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates"}
 {"ts": "2026-09-27T08:14:22Z", "kind": "status", "issue": 2824, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2824", "title": "Option to raise exception upon first failure in multirun", "detail": "not started → in progress", "pr": {"number": 3482, "url": "https://github.com/hydra-ecosystem/hydra/pull/3482"}}
 {"ts": "2026-09-27T08:14:22Z", "kind": "pr", "issue": 2824, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2824", "title": "Option to raise exception upon first failure in multirun", "detail": "linked #3482"}
+{"ts": "2026-09-27T19:21:16Z", "kind": "closed", "issue": 2824, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2824", "title": "Option to raise exception upon first failure in multirun"}

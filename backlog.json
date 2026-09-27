@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-27",
-  "generated_at": "2026-09-27T18:04:36Z",
+  "generated_at": "2026-09-27T19:21:16Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 66,
+    "open_total": 65,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 3.0
+        "percentage": 3.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 53,
-        "percentage": 80.3
+        "count": 52,
+        "percentage": 80.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 6,
-        "percentage": 9.1
+        "percentage": 9.2
       },
       {
         "category": "Question",
@@ -39,14 +39,14 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 4.5
+        "percentage": 4.6
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,32 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 69
+        "count": 70
       }
     ]
   },
   "issues": [
-    {
-      "number": 2824,
-      "title": "Option to raise exception upon first failure in multirun",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3482,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3482"
-        }
-      ],
-      "created": "2023-12-22",
-      "updated": "2026-08-24",
-      "labels": [
-        "enhancement",
-        "sweep"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2824"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2238,9 +2217,37 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
+    },
+    {
+      "number": 2824,
+      "title": "Option to raise exception upon first failure in multirun",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3482,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3482"
+        }
+      ],
+      "created": "2023-12-22",
+      "updated": "2026-08-24",
+      "labels": [
+        "enhancement",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2824"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-27T19:21:16Z",
+      "kind": "closed",
+      "issue": 2824,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2824",
+      "title": "Option to raise exception upon first failure in multirun"
+    },
     {
       "ts": "2026-09-27T08:14:22Z",
       "kind": "pr",
@@ -3832,13 +3839,6 @@
       "issue": 3386,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3386",
       "title": "Backlog Atlas canary: external-fork catch-up"
-    },
-    {
-      "ts": "2026-08-12T20:27:43Z",
-      "kind": "new",
-      "issue": 3385,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3385",
-      "title": "Backlog Atlas canary: trusted prompt update"
     }
   ]
 }
