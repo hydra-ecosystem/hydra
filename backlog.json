@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-09-27",
-  "generated_at": "2026-09-27T20:44:54Z",
+  "generated_at": "2026-09-27T22:16:59Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 65,
+    "open_total": 64,
     "by_category": [
       {
         "category": "Bug",
@@ -15,38 +15,38 @@
         "category": "Enhancement",
         "emoji": "✨",
         "count": 52,
-        "percentage": 80.0
+        "percentage": 81.2
       },
       {
         "category": "Documentation",
         "emoji": "📄",
-        "count": 6,
-        "percentage": 9.2
+        "count": 5,
+        "percentage": 7.8
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 1.5
+        "percentage": 1.6
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 1,
-        "percentage": 1.5
+        "percentage": 1.6
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 4.6
+        "percentage": 4.7
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,32 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 70
+        "count": 71
       }
     ]
   },
   "issues": [
-    {
-      "number": 2758,
-      "title": "[Feature Request] How to specify orders in `hydra.searchpath`?",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3483,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3483"
-        }
-      ],
-      "created": "2023-09-30",
-      "updated": "2026-08-11",
-      "labels": [
-        "documentation",
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2758"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2243,9 +2222,37 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
+    },
+    {
+      "number": 2758,
+      "title": "[Feature Request] How to specify orders in `hydra.searchpath`?",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3483,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3483"
+        }
+      ],
+      "created": "2023-09-30",
+      "updated": "2026-08-11",
+      "labels": [
+        "documentation",
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2758"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-27T22:16:59Z",
+      "kind": "closed",
+      "issue": 2758,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2758",
+      "title": "[Feature Request] How to specify orders in `hydra.searchpath`?"
+    },
     {
       "ts": "2026-09-27T20:22:59Z",
       "kind": "pr",
@@ -3841,14 +3848,6 @@
         "number": 3383,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3383"
       }
-    },
-    {
-      "ts": "2026-08-12T20:31:43Z",
-      "kind": "pr",
-      "issue": 3385,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3385",
-      "title": "Backlog Atlas canary: trusted prompt update",
-      "detail": "unlinked #3383"
     }
   ]
 }
