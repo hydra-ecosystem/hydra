@@ -44,6 +44,7 @@ You can view the Hydra config using `--cfg hydra`:
     sweeper:
       _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
       max_batch_size: null
+      fail_fast: false
     hydra_logging:
       version: 1
       formatters:
