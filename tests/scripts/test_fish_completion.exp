@@ -1,6 +1,9 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 log_user 0
 set timeout 15
+if {[info exists env(HYDRA_EXPECT_TIMEOUT)]} {
+    set timeout $env(HYDRA_EXPECT_TIMEOUT)
+}
 
 # Start fish without user configuration
 set env(HOME) [exec mktemp -d]
@@ -28,6 +31,7 @@ set command "[lindex $argv 0] $line\t"
 puts "command: '$command'"
 
 send "complete --do-complete \"$command\"\r"
+expect -exact "complete --do-complete \"[lindex $argv 0] $line"
 
 puts "\nMatching:\n"
 foreach arg [lrange $argv 3 end] {
