@@ -70,7 +70,7 @@
     "385": "2026-09-05",
     "753": "2026-09-05"
   },
-  "generated_at": "2026-09-27T07:15:26Z",
+  "generated_at": "2026-09-27T08:14:22Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -317,9 +317,11 @@
         "enhancement",
         "sweep"
       ],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3482"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "in progress",
       "title": "Option to raise exception upon first failure in multirun",
       "updated_at": "2026-08-24T08:25:11Z"
     },

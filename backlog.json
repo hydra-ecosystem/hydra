@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-27",
-  "generated_at": "2026-09-27T07:15:26Z",
+  "generated_at": "2026-09-27T08:14:22Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 66,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 64
+        "count": 63
       },
       {
         "status": "done",
@@ -71,6 +71,27 @@
     ]
   },
   "issues": [
+    {
+      "number": 2824,
+      "title": "Option to raise exception upon first failure in multirun",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3482,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3482"
+        }
+      ],
+      "created": "2023-12-22",
+      "updated": "2026-08-24",
+      "labels": [
+        "enhancement",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2824"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -545,22 +566,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2814"
-    },
-    {
-      "number": 2824,
-      "title": "Option to raise exception upon first failure in multirun",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2023-12-22",
-      "updated": "2026-08-24",
-      "labels": [
-        "enhancement",
-        "sweep"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2824"
     },
     {
       "number": 2851,
@@ -2237,6 +2242,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-09-27T08:14:22Z",
+      "kind": "pr",
+      "issue": 2824,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2824",
+      "title": "Option to raise exception upon first failure in multirun",
+      "detail": "linked #3482"
+    },
+    {
+      "ts": "2026-09-27T08:14:22Z",
+      "kind": "status",
+      "issue": 2824,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2824",
+      "title": "Option to raise exception upon first failure in multirun",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3482,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3482"
+      }
+    },
+    {
       "ts": "2026-09-27T05:59:24Z",
       "kind": "closed",
       "issue": 3408,
@@ -3814,22 +3839,6 @@
       "issue": 3385,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3385",
       "title": "Backlog Atlas canary: trusted prompt update"
-    },
-    {
-      "ts": "2026-08-12T20:04:34Z",
-      "kind": "pr",
-      "issue": 3375,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3375",
-      "title": "Show project homepages in the Hydra Landscape",
-      "detail": "linked #3381"
-    },
-    {
-      "ts": "2026-08-12T20:04:34Z",
-      "kind": "pr",
-      "issue": 3369,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3369",
-      "title": "Remove redundant setup-xcode step from macOS CI",
-      "detail": "linked #3380"
     }
   ]
 }
