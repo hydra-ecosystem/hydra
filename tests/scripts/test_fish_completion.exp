@@ -30,13 +30,22 @@ expect >
 set command "[lindex $argv 0] $line\t"
 puts "command: '$command'"
 
-send "complete --do-complete \"$command\"\r"
-expect -exact "complete --do-complete \"[lindex $argv 0] $line"
+set output_file "$env(HOME)/completions"
+send "complete --do-complete \"$command\" > $output_file; echo HYDRA_COMPLETION_DONE\r"
+expect {
+    -re {\nHYDRA_COMPLETION_DONE\r?\n} {}
+    timeout {puts "Error: completion command did not finish\nbuffer: '$expect_out(buffer)'"; exit 2}
+}
+set output [open $output_file r]
+set completions [read $output]
+close $output
+file delete $output_file
 
 puts "\nMatching:\n"
 foreach arg [lrange $argv 3 end] {
-    expect {
-	"$arg" {puts "matched '$arg' to '$expect_out(0,string)'\nbuffer: '$expect_out(buffer)'";continue}
-        timeout {puts "Error matching $arg\nbuffer: '$expect_out(buffer)'"; exit 1}
+    if {[string first $arg $completions] < 0} {
+        puts "Error matching $arg\noutput: '$completions'"
+        exit 1
     }
+    puts "matched '$arg' to completion output"
 }

@@ -43,8 +43,14 @@ while {$num_tabs > 0} {
 puts "command: '$command'"
 
 send $command
-expect -exact "[lindex $argv 0] $line"
-expect -exact "Output suggestions:"
+expect {
+    -exact "[lindex $argv 0] $line" {}
+    timeout {puts "Error: input echo not seen\nbuffer: '$expect_out(buffer)'"; exit 2}
+}
+expect {
+    -exact "Output suggestions:" {}
+    timeout {puts "Error: no completion output\nbuffer: '$expect_out(buffer)'"; exit 2}
+}
 
 puts "\nMatching:\n"
 foreach arg [lrange $argv 3 end] {
