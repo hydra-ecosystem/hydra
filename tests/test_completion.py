@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import List
 
 from packaging import version
-from pytest import mark, param, skip, xfail
+from pytest import mark, param, skip
 
 from hydra._internal.config_loader_impl import ConfigLoaderImpl
 from hydra._internal.core_plugins.bash_completion import BashCompletion
@@ -215,7 +215,6 @@ base_completion_list: List[str] = [
         param("group=", 2, ["group=dict", "group=list"], id="group"),
         param("group=dict group.dict=", 2, ["group.dict=true"], id="group"),
         param("group=dict group=", 2, ["group=dict", "group=list"], id="group"),
-        param("group=dict group=", 2, ["group=dict", "group=list"], id="group"),
         param("+", 2, ["+group=", "+hydra", "+test_hydra/"], id="bare_plus"),
         param("+gro", 2, ["+group="], id="append_group_partial"),
         param("+group=di", 2, ["+group=dict"], id="append_group_partial_option"),
@@ -274,63 +273,104 @@ class TestRunCompletion:
 
         assert ret == expected
 
-    @mark.skipif(
-        not is_expect_exists(),
-        reason="expect should be installed to run the expects tests",
+
+@mark.skipif(not is_expect_exists(), reason="expect is required for shell integration")
+@mark.parametrize(
+    "line,expected",
+    [
+        param("", base_completion_list, id="root"),
+        param("dict", ["dict.", "dict_prefix="], id="partial_key"),
+        param("group=", ["group=dict", "group=list"], id="group_options"),
+        param("+gro", ["+group="], id="append"),
+        param(
+            "group=dict dict.", ["dict.key1=", "dict.key2=", "dict.key3="], id="context"
+        ),
+    ],
+)
+@mark.parametrize("shell", ["bash", "fish", "zsh"])
+def test_shell_integration(shell: str, line: str, expected: List[str]) -> None:
+    if shell == "fish" and not is_fish_supported():
+        skip("fish is not installed or its version is unsupported")
+    if shell == "zsh" and not is_zsh_supported():
+        skip("zsh is not installed or its version is unsupported")
+
+    # The Expect scripts invoke `python` through PATH, so it must be the test Python.
+    ret = subprocess.check_output(["python", "-c", "import sys; print(sys.executable)"])
+    assert os.path.realpath(ret.decode().strip()) == os.path.realpath(sys.executable)
+
+    cmd = [
+        "expect",
+        f"tests/scripts/test_{shell}_completion.exp",
+        "python hydra/test_utils/completion.py",
+        f"line={line}",
+        "2" if shell == "zsh" else "1",
+        *expected,
+    ]
+    subprocess.check_call(cmd)
+
+
+@mark.skipif(not is_expect_exists(), reason="expect is required for shell integration")
+@mark.parametrize("shell", ["bash", "fish", "zsh"])
+def test_shell_completion_does_not_match_input_echo(shell: str) -> None:
+    if shell == "fish" and not is_fish_supported():
+        skip("fish is not installed or its version is unsupported")
+    if shell == "zsh" and not is_zsh_supported():
+        skip("zsh is not installed or its version is unsupported")
+
+    proc = subprocess.run(
+        [
+            "expect",
+            f"tests/scripts/test_{shell}_completion.exp",
+            "python hydra/test_utils/completion.py",
+            "line=bogus",
+            "2" if shell == "zsh" else "1",
+            "bogus",
+        ],
+        env={**os.environ, "HYDRA_EXPECT_TIMEOUT": "2"},
+        stdout=subprocess.PIPE,
+        text=True,
     )
-    @mark.parametrize("prog", [["python", "hydra/test_utils/completion.py"]])
-    @mark.parametrize(
-        "shell",
-        ["bash", "fish", "zsh"],
+    assert proc.returncode != 0
+    assert "Error matching bogus" in proc.stdout
+
+
+@mark.skipif(not is_expect_exists(), reason="expect is required for shell integration")
+@mark.parametrize(
+    "shell",
+    [
+        "bash",
+        param(
+            "zsh",
+            marks=mark.xfail(
+                reason="zsh expands unquoted ~ during completion", strict=True
+            ),
+        ),
+        param(
+            "fish",
+            marks=mark.xfail(
+                reason="fish expands unquoted ~ during completion", strict=True
+            ),
+        ),
+    ],
+)
+def test_shell_tilde_completion(shell: str) -> None:
+    if shell == "fish" and not is_fish_supported():
+        skip("fish is not installed or its version is unsupported")
+    if shell == "zsh" and not is_zsh_supported():
+        skip("zsh is not installed or its version is unsupported")
+
+    subprocess.check_call(
+        [
+            "expect",
+            f"tests/scripts/test_{shell}_completion.exp",
+            "python hydra/test_utils/completion.py",
+            "line=~",
+            "2" if shell == "zsh" else "1",
+            "~group",
+            "~hydra",
+            "~test_hydra/",
+        ]
     )
-    def test_shell_integration(
-        self,
-        shell: str,
-        prog: List[str],
-        num_tabs: int,
-        line_prefix: str,
-        line: str,
-        expected: List[str],
-    ) -> None:
-        if shell == "fish" and not is_fish_supported():
-            skip("fish is not installed or the version is too old")
-        if shell == "zsh" and not is_zsh_supported():
-            skip("zsh is not installed or the version is too old")
-        if shell in ("zsh", "fish") and any(
-            word.startswith("~") for word in line.split(" ")
-        ):
-            xfail(f"{shell} treats words prefixed by the tilde symbol specially")
-
-        # verify expect will be running the correct Python.
-        # This preemptively detect a much harder to understand error from expect.
-        ret = subprocess.check_output(
-            ["python", "-c", "import sys; print(sys.executable)"],
-            env={"PATH": os.environ["PATH"]},
-        )
-        assert os.path.realpath(ret.decode("utf-8").strip()) == os.path.realpath(
-            sys.executable.strip()
-        )
-
-        verbose = os.environ.get("VERBOSE", "0") != "0"
-
-        cmd = ["expect"]
-        if verbose:
-            cmd.append("-d")
-
-        cmd.extend(
-            [
-                f"tests/scripts/test_{shell}_completion.exp",
-                f"{' '.join(prog)}",
-                f"line={line_prefix + line}",
-                str(num_tabs),
-            ]
-        )
-
-        cmd.extend(expected)
-        if verbose:
-            print("\nCOMMAND:\n" + " ".join(f"'{x}'" for x in cmd))
-
-        subprocess.check_call(cmd)
 
 
 @mark.parametrize(
@@ -488,38 +528,28 @@ def test_file_completion(
         os.chdir(pwd)
 
 
-@mark.parametrize("prefix", ["", " ", "\t", "/foo/bar", " /foo/bar/"])
 @mark.parametrize(
-    "app_prefix",
+    "prefix,app_prefix,args_line",
     [
-        "python foo.py",
-        "hydra_app",
-        "hydra_app ",
-        "hy1-_=ra_app",
-        "foo.par",
-        "f_o-o1=2.par",
-        "python  foo.py",
-        "python tutorials/hydra_app/example/hydra_app/main.py",
-        "python foo.py",
-        "python my-app/run.py",
+        ("", "python foo.py", ""),
+        ("", "python foo.py", "foo=bar"),
+        ("", "python foo.py", "foo=bar bar=baz0"),
+        (" ", "python foo.py", "dict."),
+        ("\t", "python foo.py", "foo=bar"),
+        ("/foo/bar", "python foo.py", "foo=bar"),
+        (" /foo/bar/", "python foo.py", "foo=bar"),
+        ("", "python  foo.py", "foo=bar"),
+        ("", "python my-app/run.py", "foo=bar"),
+        ("", "python tutorials/hydra_app/example/hydra_app/main.py", "foo=bar"),
+        ("", "hydra_app", ""),
+        ("", "hydra_app", "foo=bar"),
+        ("", "hydra_app ", "foo=bar"),
+        ("", "hy1-_=ra_app", "foo=bar"),
+        ("", "foo.par", "foo=bar"),
+        ("", "f_o-o1=2.par", "foo=bar"),
     ],
 )
-@mark.parametrize(
-    "args_line, args_line_index",
-    [
-        ("", None),
-        ("foo=bar", None),
-        ("foo=bar bar=baz0", None),
-        ("", 0),
-        ("foo=bar", 3),
-        ("foo=bar bar=baz0", 3),
-        ("dict.", 0),
-        ("dict.", 5),
-    ],
-)
-def test_strip(
-    prefix: str, app_prefix: str, args_line: str, args_line_index: int
-) -> None:
+def test_strip(prefix: str, app_prefix: str, args_line: str) -> None:
     app_prefix = prefix + app_prefix
     if args_line:
         app_prefix = app_prefix + " "

@@ -1,6 +1,9 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 log_user 0
 set timeout 15
+if {[info exists env(HYDRA_EXPECT_TIMEOUT)]} {
+    set timeout $env(HYDRA_EXPECT_TIMEOUT)
+}
 set env(PS1) >>
 
 # Under pycharm, for some unknown reason readline displays
@@ -21,6 +24,10 @@ set in_line [lindex $argv 1]
 set len [expr [string length $in_line] - 1]
 set line [string range $in_line 5 $len]
 set num_tabs [lindex $argv 2]
+if {$num_tabs != 1} {
+    puts "Bash completion assertions require exactly one tab"
+    exit 1
+}
 puts "input line: '$line'"
 puts "num_tabs: $num_tabs"
 
@@ -36,6 +43,8 @@ while {$num_tabs > 0} {
 puts "command: '$command'"
 
 send $command
+expect -exact "[lindex $argv 0] $line"
+expect -exact "Output suggestions:"
 
 puts "\nMatching:\n"
 foreach arg [lrange $argv 3 end] {

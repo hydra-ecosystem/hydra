@@ -1,14 +1,19 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 log_user 0
 set timeout 15
+if {[info exists env(HYDRA_EXPECT_TIMEOUT)]} {
+    set timeout $env(HYDRA_EXPECT_TIMEOUT)
+}
 set env(PS1) >>
 
 # parray env
 
 spawn zsh --no-globalrcs --no-rcs
+expect >>
 # For MacOS `compinit -u` is required to prevent warning from appearing
 # https://stackoverflow.com/questions/13762280/zsh-compinit-insecure-directories
 send "autoload -Uz compinit && compinit -u\r"
+expect >>
 # Enable usage of bash completions in Zsh
 send "autoload -Uz bashcompinit && bashcompinit\r"
 
@@ -33,6 +38,7 @@ while {$num_tabs > 0} {
 puts "command: '$command'"
 
 send $command
+expect -exact "[lindex $argv 0] $line"
 
 puts "\nMatching:\n"
 foreach arg [lrange $argv 3 end] {
