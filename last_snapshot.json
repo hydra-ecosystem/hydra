@@ -72,7 +72,7 @@
     "385": "2026-09-05",
     "753": "2026-09-05"
   },
-  "generated_at": "2026-09-28T21:21:29Z",
+  "generated_at": "2026-09-28T21:33:34Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -501,11 +501,9 @@
       "labels": [
         "enhancement"
       ],
-      "pr_numbers": [
-        "3485"
-      ],
+      "pr_numbers": [],
       "state": "OPEN",
-      "status": "in progress",
+      "status": "not started",
       "title": "Add Compose API initializer for multiple config search path entries",
       "updated_at": "2026-06-21T20:45:03Z"
     },
