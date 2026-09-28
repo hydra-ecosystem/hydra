@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-28",
-  "generated_at": "2026-09-28T21:45:32Z",
+  "generated_at": "2026-09-28T22:05:02Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 63,
+    "open_total": 64,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 3.2
+        "percentage": 3.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 51,
-        "percentage": 81.0
+        "percentage": 79.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 5,
-        "percentage": 7.9
+        "percentage": 7.8
       },
       {
         "category": "Question",
@@ -32,14 +32,14 @@
       {
         "category": "Refactor",
         "emoji": "🔧",
-        "count": 1,
-        "percentage": 1.6
+        "count": 2,
+        "percentage": 3.1
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 4.8
+        "percentage": 4.7
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 61
+        "count": 62
       },
       {
         "status": "done",
@@ -1070,6 +1070,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
     },
     {
+      "number": 3486,
+      "title": "Modernize type annotations for Python 3.10+",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-09-28",
+      "updated": "2026-09-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3486"
+    },
+    {
       "number": 385,
       "title": "Experimentation tracking support",
       "category": "Enhancement",
@@ -1792,6 +1805,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3202"
     },
     {
+      "number": 3230,
+      "title": "Add Compose API initializer for multiple config search path entries",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-06-21",
+      "updated": "2026-06-21",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3230"
+    },
+    {
       "number": 3252,
       "title": "Migrate Hydra plugin discovery from namespace scanning to entry points",
       "category": "Enhancement",
@@ -2228,24 +2256,16 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
-    },
-    {
-      "number": 3230,
-      "title": "Add Compose API initializer for multiple config search path entries",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-06-21",
-      "updated": "2026-06-21",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3230"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-28T22:05:02Z",
+      "kind": "new",
+      "issue": 3486,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3486",
+      "title": "Modernize type annotations for Python 3.10+"
+    },
     {
       "ts": "2026-09-28T21:45:32Z",
       "kind": "closed",
@@ -3839,14 +3859,6 @@
       "issue": 3385,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3385",
       "title": "Backlog Atlas canary: trusted prompt update"
-    },
-    {
-      "ts": "2026-08-12T20:48:25Z",
-      "kind": "pr",
-      "issue": 3385,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3385",
-      "title": "Backlog Atlas canary: trusted prompt update",
-      "detail": "unlinked #3383"
     }
   ]
 }

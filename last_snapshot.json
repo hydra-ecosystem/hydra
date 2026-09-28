@@ -73,7 +73,7 @@
     "385": "2026-09-05",
     "753": "2026-09-05"
   },
-  "generated_at": "2026-09-28T21:45:32Z",
+  "generated_at": "2026-09-28T22:05:02Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -745,6 +745,16 @@
       "status": "not started",
       "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4",
       "updated_at": "2026-09-26T19:34:26Z"
+    },
+    "3486": {
+      "category": "Refactor",
+      "created_at": "2026-09-28T22:03:40Z",
+      "labels": [],
+      "pr_numbers": [],
+      "state": "OPEN",
+      "status": "not started",
+      "title": "Modernize type annotations for Python 3.10+",
+      "updated_at": "2026-09-28T22:03:40Z"
     },
     "468": {
       "category": "Enhancement",
