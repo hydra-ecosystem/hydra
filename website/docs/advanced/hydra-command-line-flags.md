@@ -30,8 +30,8 @@ Running Hydra applications:
 - **--config-path,-cp**: Overrides the `config_path` specified in `hydra.main()`. The `config_path` is absolute or relative to the Python file declaring `@hydra.main()`.
 - **--config-name,-cn**: Overrides the `config_name` specified in `hydra.main()`.
 - **--config-dir,-cd**: Adds an additional config directory to the [config search path](search_path.md).   
-This is useful for installed apps that want to allow their users to provide additional configs.
+  A relative directory is resolved from the current working directory. This is
+  useful for installed apps that want to allow their users to provide additional configs.
 
 Misc:
 - **--shell-completion,-sc**: Install or Uninstall [shell tab completion](/tutorials/basic/running_your_app/6_tab_completion.md).
-

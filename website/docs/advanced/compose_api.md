@@ -6,40 +6,72 @@ sidebar_label: Compose API
 
 import GithubLink,{ExampleGithubLink} from "@site/src/components/GithubLink"
 
-The compose API can compose a config similarly to `@hydra.main()` anywhere in the code.  
-Prior to calling compose(), you have to initialize Hydra: This can be done by using the standard `@hydra.main()`
-or by calling one of the initialization methods listed below.
+The Compose API lets you compose configs programmatically after Hydra has been
+initialized, either by `@hydra.main()` or by one of the initialization methods below.
 
 ### When to use the Compose API
 
-The Compose API is useful when `@hydra.main()` is not applicable.
-For example:
+Use the Compose API when `@hydra.main()` is not suitable as an entry point, or
+when an application needs to compose additional configs after initialization:
 
-- Inside a Jupyter notebook ([Example](jupyter_notebooks.md))
-- Inside a unit test ([Example](unit_testing.md))
-- In parts of your application that does not have access to the command line (<GithubLink to="examples/advanced/ad_hoc_composition">Example</GithubLink>).
-- To compose multiple configuration objects (<GithubLink to="examples/advanced/ray_example/ray_compose_example.py">Example with Ray</GithubLink>).
+- In application code without a standard Hydra command-line entry point (<GithubLink to="examples/advanced/ad_hoc_composition">example</GithubLink>).
+- In a unit test ([example](unit_testing.md)).
+- In a Jupyter notebook ([example](jupyter_notebooks.md)).
+- To compose multiple configs within an `@hydra.main()` application (<GithubLink to="examples/advanced/ray_example/ray_compose_example.py">Ray example</GithubLink>).
 
 <div class="alert alert--info" role="alert">
-Please avoid using the Compose API in cases where <b>@hydra.main()</b> can be used.  
-Doing so forfeits many of the benefits of Hydra
-(e.g., Tab completion, Multirun, Working directory management, Logging management and more)
+Prefer <b>@hydra.main()</b> for your application's entry point when possible.
+Replacing it with the Compose API forfeits features such as tab completion,
+multirun, working directory management, and logging management.
 </div>
 
 ### Initialization methods
-There are 3 initialization methods:
-- <GithubLink to="hydra/initialize.py#L37">initialize()</GithubLink>: Initialize with a config path relative to the caller
-- <GithubLink to="hydra/initialize.py#L108">initialize_config_module()</GithubLink>: Initialize with config_module (absolute)
-- <GithubLink to="hydra/initialize.py#L143">initialize_config_dir()</GithubLink>: Initialize with a config_dir on the file system (absolute)
 
-All 3 can be used as methods or contexts.
+There are 4 initialization methods:
+
+- `initialize()`: Initialize with an absolute filesystem path or one relative to the caller.
+- `initialize_config_dir()`: Initialize with an absolute filesystem directory.
+- `initialize_config_module()`: Initialize with an importable config package.
+- `initialize_config_search_path()`: Initialize with multiple ordered config sources.
+
+All 4 can be used as methods or contexts.
 When used as methods, they are initializing Hydra globally and should only be called once.
 When used as contexts, they are initializing Hydra within the context and can be used multiple times.
-Like <b>@hydra.main()</b>, all three still accept the deprecated `version_base`
+Like <b>@hydra.main()</b>, the original three still accept the deprecated `version_base`
 parameter in Hydra 1.4. Remove it after upgrading; see the
 [Hydra 1.4 preparation guide](../upgrades/1.3_to_1.4/prepare_for_1_4.md).
+`initialize_config_search_path()` does not accept `version_base`.
+
+Use `initialize_config_search_path()` when a Compose API session needs more than one config source.
+Entries are searched in the order provided; the first matching config wins.
+`file://` entries must name absolute directories, and `pkg://` entries name
+importable config packages. `caller://` resolves to the caller's directory;
+`caller://conf` resolves to its `conf` subdirectory, like a relative
+`initialize(config_path="conf")`. `caller://` is supported by this initializer,
+not by `hydra.searchpath` in a config file. It refers to the immediate call site;
+if a wrapper calls the initializer, it resolves relative to the wrapper.
+
+Pass the source directory or package to the initializer, then pass a config
+name relative to those sources to `compose()`. For example, with
+`file:///models` as a source, use `compose(config_name="model")` for
+`/models/model.yaml`, not `compose(config_name="/models/model.yaml")`.
+Unlike `initialize()`, this initializer defaults `job_name` to `"app"`;
+specify it if you need to preserve a caller-derived job name.
+
+For example, a caller-relative primary config can use defaults supplied by a
+packaged config source:
+
+```python
+from hydra import compose, initialize_config_search_path
+
+with initialize_config_search_path(
+    ["caller://conf", "pkg://my_app.conf"]
+):
+    cfg = compose(config_name="config")
+```
 
 ### Code example
+
 ```python
 from hydra import compose, initialize
 from omegaconf import OmegaConf
@@ -72,7 +104,7 @@ def compose(
     """
 ```
 
-```python title="Relative initialization"
+```python title="Initialization with a filesystem path"
 def initialize(
     config_path: Optional[str] = None,
     job_name: Optional[str] = None,
@@ -81,7 +113,8 @@ def initialize(
 ) -> None:
     """
     Initializes Hydra and add the config_path to the config search path.
-    config_path is relative to the parent of the caller.
+    A relative config_path is resolved relative to the parent of the caller.
+    An absolute config_path is used as is.
     Hydra detects the caller type automatically at runtime.
 
     Supported callers:
@@ -89,36 +122,44 @@ def initialize(
     - Python modules
     - Unit tests
     - Jupyter notebooks.
-    :param config_path: path relative to the parent of the caller
+    :param config_path: absolute path or path relative to the parent of the caller
     :param job_name: the value for hydra.job.name (By default it is automatically detected based on the caller)
     :param caller_stack_depth: stack depth of the caller, defaults to 1 (direct caller).
     """
 ```
 
-```python title="Initialzing with config module"
+```python title="Initializing with a config module"
 def initialize_config_module(
     config_module: str,
     job_name: str = "app",
     version_base: Optional[str] = ...,
 ) -> None:
     """
-    Initializes Hydra and add the config_module to the config search path.
+    Initializes Hydra and adds the config_module to the config search path.
     The config module must be importable (an __init__.py must exist at its top level)
-    :param config_module: absolute module name, for example "foo.bar.conf".
+    :param config_module: importable module name, for example "foo.bar.conf".
     :param job_name: the value for hydra.job.name (default is 'app')
     """
 ```
-```python title="Initialzing with config directory"
+```python title="Initializing with a config directory"
 def initialize_config_dir(
     config_dir: str,
     job_name: str = "app",
     version_base: Optional[str] = ...,
 ) -> None:
     """
-    Initializes Hydra and add an absolute config dir to the to the config search path.
-    The config_dir is always a path on the file system and is must be an absolute path.
+    Initializes Hydra and adds an absolute config directory to the config search path.
+    The config_dir is always a filesystem path and must be absolute.
     Relative paths will result in an error.
     :param config_dir: absolute file system path
     :param job_name: the value for hydra.job.name (default is 'app')
     """
+```
+
+```python title="Initializing with multiple config sources"
+def initialize_config_search_path(
+    config_search_path: Sequence[str],
+    job_name: str = "app",
+) -> None:
+    """Initialize with ordered config source URIs, including caller://."""
 ```

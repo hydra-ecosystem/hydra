@@ -197,14 +197,19 @@ def create_automatic_config_search_path(
 
 
 def create_config_search_path(search_path_dir: Optional[str]) -> ConfigSearchPath:
+    sources = [] if search_path_dir is None else [search_path_dir]
+    return create_config_search_path_from_sources(sources)
+
+
+def create_config_search_path_from_sources(sources: Sequence[str]) -> ConfigSearchPath:
     from hydra.core.plugins import Plugins
     from hydra.plugins.search_path_plugin import SearchPathPlugin
 
     search_path = ConfigSearchPathImpl()
     search_path.append("hydra", "pkg://hydra.conf")
 
-    if search_path_dir is not None:
-        search_path.append("main", search_path_dir)
+    for source in sources:
+        search_path.append("main", source)
 
     search_path_plugins = Plugins.instance().discover(SearchPathPlugin)
     for spp in search_path_plugins:

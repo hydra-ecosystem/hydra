@@ -125,7 +125,14 @@ module.exports = {
                 ]
             },
             'advanced/compose_api',
-            'advanced/search_path',
+            {
+                type: 'category',
+                label: 'Config Search Path',
+                items: [
+                    'advanced/search_path',
+                    'advanced/search_path/hydra_searchpath',
+                ]
+            },
             {
                 type: 'category',
                 label: 'Plugins',
