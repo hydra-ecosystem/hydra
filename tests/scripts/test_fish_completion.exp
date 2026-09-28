@@ -1,45 +1,21 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-log_user 0
-set timeout 15
-if {[info exists env(HYDRA_EXPECT_TIMEOUT)]} {
-    set timeout $env(HYDRA_EXPECT_TIMEOUT)
-}
-
 # Start fish without user configuration
 set env(HOME) [exec mktemp -d]
 puts "HOME: $env(HOME)"
 
-spawn fish -C "function fish_prompt; echo '> '; end; function fish_greeting; ; end"
-expect >
-
-send "fish --version\r"
-expect >
-
-send "set TERM dumb\r"
-expect >
-
 set in_line [lindex $argv 1]
 set len [expr [string length $in_line] - 1]
 set line [string range $in_line 5 $len]
-set num_tabs [lindex $argv 2]
 puts "input line: '$line'"
 
-send "[lindex $argv 0] -sc install=fish | source\r"
-expect >
-
-set command "[lindex $argv 0] $line\t"
+set command "[lindex $argv 0] $line"
 puts "command: '$command'"
 
-set output_file "$env(HOME)/completions"
-send "complete --do-complete \"$command\" > $output_file; echo HYDRA_COMPLETION_DONE\r"
-expect {
-    -re {\nHYDRA_COMPLETION_DONE\r?\n} {}
-    timeout {puts "Error: completion command did not finish\nbuffer: '$expect_out(buffer)'"; exit 2}
+set fish_script "[lindex $argv 0] -sc install=fish | source; complete --do-complete \"$command\""
+if {[catch {exec fish -c $fish_script} completions]} {
+    puts "Error running fish completion: '$completions'"
+    exit 2
 }
-set output [open $output_file r]
-set completions [read $output]
-close $output
-file delete $output_file
 
 puts "\nMatching:\n"
 foreach arg [lrange $argv 3 end] {
