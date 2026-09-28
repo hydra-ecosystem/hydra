@@ -890,3 +890,4 @@
 {"ts": "2026-09-28T08:28:10Z", "kind": "pr", "issue": 3230, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3230", "title": "Add Compose API initializer for multiple config search path entries", "detail": "linked #3485"}
 {"ts": "2026-09-28T21:33:34Z", "kind": "status", "issue": 3230, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3230", "title": "Add Compose API initializer for multiple config search path entries", "detail": "in progress → not started"}
 {"ts": "2026-09-28T21:33:34Z", "kind": "pr", "issue": 3230, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3230", "title": "Add Compose API initializer for multiple config search path entries", "detail": "unlinked #3485"}
+{"ts": "2026-09-28T21:45:32Z", "kind": "closed", "issue": 3230, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3230", "title": "Add Compose API initializer for multiple config search path entries"}

@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-28",
-  "generated_at": "2026-09-28T21:33:34Z",
+  "generated_at": "2026-09-28T21:45:32Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 64,
+    "open_total": 63,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 3.1
+        "percentage": 3.2
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 52,
-        "percentage": 81.2
+        "count": 51,
+        "percentage": 81.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 5,
-        "percentage": 7.8
+        "percentage": 7.9
       },
       {
         "category": "Question",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 4.7
+        "percentage": 4.8
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 62
+        "count": 61
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 71
+        "count": 72
       }
     ]
   },
@@ -1068,21 +1068,6 @@
       "updated": "2026-09-26",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
-    },
-    {
-      "number": 3230,
-      "title": "Add Compose API initializer for multiple config search path entries",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-06-21",
-      "updated": "2026-06-21",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3230"
     },
     {
       "number": 385,
@@ -2243,9 +2228,31 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
+    },
+    {
+      "number": 3230,
+      "title": "Add Compose API initializer for multiple config search path entries",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-06-21",
+      "updated": "2026-06-21",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3230"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-28T21:45:32Z",
+      "kind": "closed",
+      "issue": 3230,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3230",
+      "title": "Add Compose API initializer for multiple config search path entries"
+    },
     {
       "ts": "2026-09-28T21:33:34Z",
       "kind": "pr",
@@ -3840,14 +3847,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3385",
       "title": "Backlog Atlas canary: trusted prompt update",
       "detail": "unlinked #3383"
-    },
-    {
-      "ts": "2026-08-12T20:48:25Z",
-      "kind": "status",
-      "issue": 3385,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3385",
-      "title": "Backlog Atlas canary: trusted prompt update",
-      "detail": "in progress → not started"
     }
   ]
 }
