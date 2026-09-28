@@ -27,17 +27,35 @@ Doing so forfeits many of the benefits of Hydra
 </div>
 
 ### Initialization methods
-There are 3 initialization methods:
+There are 4 initialization methods:
 - <GithubLink to="hydra/initialize.py#L37">initialize()</GithubLink>: Initialize with a config path relative to the caller
 - <GithubLink to="hydra/initialize.py#L108">initialize_config_module()</GithubLink>: Initialize with config_module (absolute)
 - <GithubLink to="hydra/initialize.py#L143">initialize_config_dir()</GithubLink>: Initialize with a config_dir on the file system (absolute)
+- `initialize_config_search_path()`: Initialize with multiple ordered config sources
 
-All 3 can be used as methods or contexts.
+All 4 can be used as methods or contexts.
 When used as methods, they are initializing Hydra globally and should only be called once.
 When used as contexts, they are initializing Hydra within the context and can be used multiple times.
-Like <b>@hydra.main()</b>, all three still accept the deprecated `version_base`
+Like <b>@hydra.main()</b>, the original three still accept the deprecated `version_base`
 parameter in Hydra 1.4. Remove it after upgrading; see the
 [Hydra 1.4 preparation guide](../upgrades/1.3_to_1.4/prepare_for_1_4.md).
+`initialize_config_search_path()` does not accept `version_base`.
+
+Use `initialize_config_search_path()` when a Compose API session needs more than one config source:
+
+```python
+from hydra import compose, initialize_config_search_path
+
+with initialize_config_search_path(
+    ["file:///absolute/path/to/configs", "pkg://my_app.conf"]
+):
+    cfg = compose(config_name="config")
+```
+
+Entries are config source URIs, searched in the order provided; the first matching
+config wins. `file://` entries must name absolute directories. `pkg://` entries
+name importable config packages. This allows an external primary config to use
+defaults supplied by a packaged config source.
 
 ### Code example
 ```python
@@ -121,4 +139,12 @@ def initialize_config_dir(
     :param config_dir: absolute file system path
     :param job_name: the value for hydra.job.name (default is 'app')
     """
+```
+
+```python title="Initializing with multiple config sources"
+def initialize_config_search_path(
+    config_search_path: Sequence[str],
+    job_name: str = "app",
+) -> None:
+    """Initialize with ordered config source URIs."""
 ```

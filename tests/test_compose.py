@@ -5,6 +5,7 @@ import sys
 import warnings
 from dataclasses import dataclass, field
 from enum import Enum
+from inspect import signature
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -17,6 +18,7 @@ from hydra import (
     initialize,
     initialize_config_dir,
     initialize_config_module,
+    initialize_config_search_path,
     version,
 )
 from hydra._internal.config_search_path_impl import ConfigSearchPathImpl
@@ -184,6 +186,91 @@ def test_initialize_with_config_path(hydra_restore_singletons: Any) -> None:
         SearchPathQuery(provider="main", path=None)
     )
     assert idx != -1
+
+
+def test_initialize_config_search_path_composes_across_sources(
+    hydra_restore_singletons: Any, tmp_path: Path
+) -> None:
+    (tmp_path / "config.yaml").write_text(
+        "defaults:\n  - group1: file1\n  - _self_\nsource: external\n",
+        encoding="utf-8",
+    )
+    paths = [f"file://{tmp_path}", "pkg://hydra.test_utils.configs"]
+
+    with initialize_config_search_path(paths):
+        assert compose(config_name="config") == {"foo": 10, "source": "external"}
+        search_path = GlobalHydra.instance().config_loader().get_search_path()
+        assert [
+            entry.path for entry in search_path.get_path() if entry.provider == "main"
+        ] == paths
+
+
+def test_initialize_config_search_path_uses_first_match(
+    hydra_restore_singletons: Any, tmp_path: Path
+) -> None:
+    first, second = tmp_path / "first", tmp_path / "second"
+    first.mkdir()
+    second.mkdir()
+    (first / "config.yaml").write_text("source: first\n", encoding="utf-8")
+    (second / "config.yaml").write_text("source: second\n", encoding="utf-8")
+
+    with initialize_config_search_path([f"file://{first}", f"file://{second}"]):
+        assert compose(config_name="config") == {"source": "first"}
+    with initialize_config_search_path([f"file://{second}", f"file://{first}"]):
+        assert compose(config_name="config") == {"source": "second"}
+
+
+def test_initialize_config_search_path_restores_global_hydra(
+    hydra_restore_singletons: Any, tmp_path: Path
+) -> None:
+    (tmp_path / "config.yaml").write_text("source: outer\n", encoding="utf-8")
+    with initialize_config_search_path(
+        ["pkg://hydra.test_utils.configs"], job_name="inner"
+    ):
+        assert compose(return_hydra_config=True).hydra.job.name == "inner"
+    assert not GlobalHydra.instance().is_initialized()
+
+    with initialize_config_dir(config_dir=str(tmp_path)):
+        assert compose(config_name="config") == {"source": "outer"}
+    assert not GlobalHydra.instance().is_initialized()
+
+
+def test_initialize_config_search_path_globally(
+    hydra_restore_singletons: Any,
+) -> None:
+    initialize_config_search_path(["pkg://hydra.test_utils.configs"])
+    assert GlobalHydra.instance().is_initialized()
+    assert compose(config_name="group1/file1") == {"foo": 10}
+
+
+@mark.parametrize(
+    ("paths", "message"),
+    [
+        ([], "at least one"),
+        ("pkg://hydra.test_utils.configs", "sequence"),
+        ([42], "entry 0"),
+        (["hydra.test_utils.configs"], "URI"),
+        (["pkg://"], "entry 0"),
+        (["file://relative/path"], "absolute"),
+    ],
+)
+def test_initialize_config_search_path_rejects_invalid_entries(
+    hydra_restore_singletons: Any, paths: Any, message: str
+) -> None:
+    with raises(HydraException, match=message):
+        initialize_config_search_path(paths)
+    assert not GlobalHydra.instance().is_initialized()
+
+
+def test_initialize_config_search_path_rejects_unregistered_scheme(
+    hydra_restore_singletons: Any,
+) -> None:
+    with raises(ValueError, match="No config source registered for schema unknown"):
+        initialize_config_search_path(["unknown://configs"])
+
+
+def test_initialize_config_search_path_has_no_version_base_parameter() -> None:
+    assert "version_base" not in signature(initialize_config_search_path).parameters
 
 
 @mark.usefixtures("initialize_hydra")

@@ -29,6 +29,9 @@ There are a few ways to modify the config search path, enabling Hydra to access 
 different locations.
 Use a combination of the methods described below:
 
+The [Compose API](compose_api.md#initialization-methods) can initialize one session
+with multiple ordered config sources using `initialize_config_search_path()`.
+
 #### Using `@hydra.main()`
 Using the  `config_path` parameter `@hydra.main()`.  The `config_path` is relative to location of the Python script.
 

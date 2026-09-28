@@ -1,12 +1,13 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import copy
 import os
-from typing import Any, Optional
+from typing import Any, Optional, Sequence
 
 from hydra import version
 from hydra._internal.hydra import Hydra
 from hydra._internal.utils import (
     create_config_search_path,
+    create_config_search_path_from_sources,
     detect_calling_file_or_module_from_stack_frame,
     detect_task_name,
 )
@@ -152,3 +153,46 @@ class initialize_config_dir:
 
     def __repr__(self) -> str:
         return "hydra.initialize_config_dir()"
+
+
+class initialize_config_search_path:
+    """Initialize Hydra with ordered, explicit config source URIs."""
+
+    def __init__(
+        self, config_search_path: Sequence[str], job_name: str = "app"
+    ) -> None:
+        if isinstance(config_search_path, (str, bytes)) or not isinstance(
+            config_search_path, Sequence
+        ):
+            raise HydraException("config_search_path must be a sequence of URI strings")
+        if not config_search_path:
+            raise HydraException("config_search_path requires at least one entry")
+        for index, entry in enumerate(config_search_path):
+            if not isinstance(entry, str):
+                raise HydraException(
+                    f"config_search_path entry {index} must be a URI string"
+                )
+            scheme, separator, path = entry.partition("://")
+            if not separator:
+                raise HydraException(f"config_search_path entry {index} must be a URI")
+            if not scheme or not path:
+                raise HydraException(
+                    f"config_search_path entry {index} must have a scheme and path"
+                )
+            if scheme == "file" and not os.path.isabs(path):
+                raise HydraException(
+                    f"config_search_path entry {index} requires an absolute file path"
+                )
+
+        self._gh_backup = get_gh_backup()
+        version.setbase(version._UNSPECIFIED_)
+        csp = create_config_search_path_from_sources(config_search_path)
+        Hydra.create_main_hydra2(task_name=job_name, config_search_path=csp)
+
+    def __enter__(self, *args: Any, **kwargs: Any) -> None: ...
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        restore_gh_from_backup(self._gh_backup)
+
+    def __repr__(self) -> str:
+        return "hydra.initialize_config_search_path()"
