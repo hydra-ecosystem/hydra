@@ -7,7 +7,8 @@ sidebar_label: Compose API
 import GithubLink,{ExampleGithubLink} from "@site/src/components/GithubLink"
 
 The Compose API lets you compose configs programmatically after Hydra has been
-initialized, either by `@hydra.main()` or by one of the initialization methods below.
+initialized, either by [`@hydra.main()`](hydra_main.md) or by one of the
+initialization methods below.
 
 ### When to use the Compose API
 
