@@ -1,4 +1,10 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+log_user 0
+set timeout 15
+if {[info exists env(HYDRA_EXPECT_TIMEOUT)]} {
+    set timeout $env(HYDRA_EXPECT_TIMEOUT)
+}
+
 # Start fish without user configuration
 set env(HOME) [exec mktemp -d]
 puts "HOME: $env(HOME)"
@@ -12,7 +18,14 @@ set command "[lindex $argv 0] $line"
 puts "command: '$command'"
 
 set fish_script "[lindex $argv 0] -sc install=fish | source; complete --do-complete \"$command\""
-if {[catch {exec fish -c $fish_script} completions]} {
+spawn -noecho fish -c $fish_script
+match_max 100000
+expect {
+    eof {set completions $expect_out(buffer)}
+    timeout {puts "Error: fish completion timed out"; exit 2}
+}
+set status [wait]
+if {[lindex $status 3] != 0} {
     puts "Error running fish completion: '$completions'"
     exit 2
 }
