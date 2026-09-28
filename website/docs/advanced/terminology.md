@@ -35,7 +35,7 @@ class User:
 ```
 
 ## Other configs
-**Primary Config**: The input config named in [**@hydra.main()**](../tutorials/basic/your_first_app/2_config_file.md) or in the [**Compose API**](compose_api.md).
+**Primary Config**: The input config named in [**@hydra.main()**](hydra_main.md) or in the [**Compose API**](compose_api.md).
 **Output Config**: A config composed from the [Input Configs](#input-configs) and [Overrides](#overrides) by **@hydra.main()**, or the Compose API.
 
 ## Overrides
