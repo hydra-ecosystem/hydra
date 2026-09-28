@@ -73,7 +73,7 @@
     "385": "2026-09-05",
     "753": "2026-09-05"
   },
-  "generated_at": "2026-09-28T22:05:02Z",
+  "generated_at": "2026-09-28T22:38:42Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -754,7 +754,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "Modernize type annotations for Python 3.10+",
-      "updated_at": "2026-09-28T22:03:40Z"
+      "updated_at": "2026-09-28T22:06:10Z"
     },
     "468": {
       "category": "Enhancement",
@@ -831,9 +831,11 @@
       "labels": [
         "documentation"
       ],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3487"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "in progress",
       "title": "Add a standalone page describing @hydra.main() in details.",
       "updated_at": "2026-07-27T07:38:08Z"
     },

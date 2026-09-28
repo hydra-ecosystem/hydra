@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-28",
-  "generated_at": "2026-09-28T22:05:02Z",
+  "generated_at": "2026-09-28T22:38:42Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 64,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 62
+        "count": 61
       },
       {
         "status": "done",
@@ -71,6 +71,26 @@
     ]
   },
   "issues": [
+    {
+      "number": 845,
+      "title": "Add a standalone page describing @hydra.main() in details.",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3487,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3487"
+        }
+      ],
+      "created": "2020-08-05",
+      "updated": "2026-07-27",
+      "labels": [
+        "documentation"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/845"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -192,21 +212,6 @@
         "priority_low"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/802"
-    },
-    {
-      "number": 845,
-      "title": "Add a standalone page describing @hydra.main() in details.",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2020-08-05",
-      "updated": "2026-07-27",
-      "labels": [
-        "documentation"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/845"
     },
     {
       "number": 851,
@@ -2260,6 +2265,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-09-28T22:38:42Z",
+      "kind": "pr",
+      "issue": 845,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/845",
+      "title": "Add a standalone page describing @hydra.main() in details.",
+      "detail": "linked #3487"
+    },
+    {
+      "ts": "2026-09-28T22:38:42Z",
+      "kind": "status",
+      "issue": 845,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/845",
+      "title": "Add a standalone page describing @hydra.main() in details.",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3487,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3487"
+      }
+    },
+    {
       "ts": "2026-09-28T22:05:02Z",
       "kind": "new",
       "issue": 3486,
@@ -3845,20 +3870,6 @@
       "issue": 3389,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3389",
       "title": "Remove remaining Meta-era repository branding and processes"
-    },
-    {
-      "ts": "2026-08-12T20:50:21Z",
-      "kind": "closed",
-      "issue": 3386,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3386",
-      "title": "Backlog Atlas canary: external-fork catch-up"
-    },
-    {
-      "ts": "2026-08-12T20:50:21Z",
-      "kind": "closed",
-      "issue": 3385,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3385",
-      "title": "Backlog Atlas canary: trusted prompt update"
     }
   ]
 }
