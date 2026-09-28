@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-28",
-  "generated_at": "2026-09-28T07:32:28Z",
+  "generated_at": "2026-09-28T08:28:10Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 64,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 62
+        "count": 61
       },
       {
         "status": "done",
@@ -71,6 +71,26 @@
     ]
   },
   "issues": [
+    {
+      "number": 3230,
+      "title": "Add Compose API initializer for multiple config search path entries",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3485,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3485"
+        }
+      ],
+      "created": "2026-06-21",
+      "updated": "2026-06-21",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3230"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -770,21 +790,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3224"
-    },
-    {
-      "number": 3230,
-      "title": "Add Compose API initializer for multiple config search path entries",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-06-21",
-      "updated": "2026-06-21",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3230"
     },
     {
       "number": 3236,
@@ -2246,6 +2251,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-28T08:28:10Z",
+      "kind": "pr",
+      "issue": 3230,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3230",
+      "title": "Add Compose API initializer for multiple config search path entries",
+      "detail": "linked #3485"
+    },
+    {
+      "ts": "2026-09-28T08:28:10Z",
+      "kind": "status",
+      "issue": 3230,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3230",
+      "title": "Add Compose API initializer for multiple config search path entries",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3485,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3485"
+      }
+    },
     {
       "ts": "2026-09-28T06:17:06Z",
       "kind": "pr",
@@ -3828,26 +3853,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3386",
       "title": "Backlog Atlas canary: external-fork catch-up",
       "detail": "in progress → not started"
-    },
-    {
-      "ts": "2026-08-12T20:42:32Z",
-      "kind": "pr",
-      "issue": 3386,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3386",
-      "title": "Backlog Atlas canary: external-fork catch-up",
-      "detail": "linked #3384"
-    },
-    {
-      "ts": "2026-08-12T20:42:32Z",
-      "kind": "status",
-      "issue": 3386,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3386",
-      "title": "Backlog Atlas canary: external-fork catch-up",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3384,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3384"
-      }
     }
   ]
 }
