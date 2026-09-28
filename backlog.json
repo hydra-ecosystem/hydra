@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-28",
-  "generated_at": "2026-09-28T00:51:46Z",
+  "generated_at": "2026-09-28T06:17:06Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 64,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 61
+        "count": 62
       },
       {
         "status": "done",
@@ -71,26 +71,6 @@
     ]
   },
   "issues": [
-    {
-      "number": 1885,
-      "title": "follow up with shell testing for #1842",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3484,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3484"
-        }
-      ],
-      "created": "2021-11-11",
-      "updated": "2026-09-27",
-      "labels": [
-        "tests"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1885"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -1088,6 +1068,21 @@
       "updated": "2026-09-26",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
+    },
+    {
+      "number": 1885,
+      "title": "follow up with shell testing for #1842",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2021-11-11",
+      "updated": "2026-09-27",
+      "labels": [
+        "tests"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1885"
     },
     {
       "number": 385,
@@ -2251,6 +2246,22 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-28T06:17:06Z",
+      "kind": "pr",
+      "issue": 1885,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1885",
+      "title": "follow up with shell testing for #1842",
+      "detail": "unlinked #3484"
+    },
+    {
+      "ts": "2026-09-28T06:17:06Z",
+      "kind": "status",
+      "issue": 1885,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1885",
+      "title": "follow up with shell testing for #1842",
+      "detail": "in progress → not started"
+    },
     {
       "ts": "2026-09-27T23:24:18Z",
       "kind": "pr",
@@ -3837,22 +3848,6 @@
         "number": 3384,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3384"
       }
-    },
-    {
-      "ts": "2026-08-12T20:35:52Z",
-      "kind": "pr",
-      "issue": 3386,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3386",
-      "title": "Backlog Atlas canary: external-fork catch-up",
-      "detail": "unlinked #3384"
-    },
-    {
-      "ts": "2026-08-12T20:35:52Z",
-      "kind": "status",
-      "issue": 3386,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3386",
-      "title": "Backlog Atlas canary: external-fork catch-up",
-      "detail": "in progress → not started"
     }
   ]
 }

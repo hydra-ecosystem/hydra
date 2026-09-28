@@ -72,7 +72,7 @@
     "385": "2026-09-05",
     "753": "2026-09-05"
   },
-  "generated_at": "2026-09-28T00:51:46Z",
+  "generated_at": "2026-09-28T06:17:06Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -189,11 +189,9 @@
       "labels": [
         "tests"
       ],
-      "pr_numbers": [
-        "3484"
-      ],
+      "pr_numbers": [],
       "state": "OPEN",
-      "status": "in progress",
+      "status": "not started",
       "title": "follow up with shell testing for #1842",
       "updated_at": "2026-09-27T22:26:04Z"
     },

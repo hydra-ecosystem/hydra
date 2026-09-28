@@ -884,3 +884,5 @@
 {"ts": "2026-09-27T22:16:59Z", "kind": "closed", "issue": 2758, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2758", "title": "[Feature Request] How to specify orders in `hydra.searchpath`?"}
 {"ts": "2026-09-27T23:24:18Z", "kind": "status", "issue": 1885, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1885", "title": "follow up with shell testing for #1842", "detail": "not started → in progress", "pr": {"number": 3484, "url": "https://github.com/hydra-ecosystem/hydra/pull/3484"}}
 {"ts": "2026-09-27T23:24:18Z", "kind": "pr", "issue": 1885, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1885", "title": "follow up with shell testing for #1842", "detail": "linked #3484"}
+{"ts": "2026-09-28T06:17:06Z", "kind": "status", "issue": 1885, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1885", "title": "follow up with shell testing for #1842", "detail": "in progress → not started"}
+{"ts": "2026-09-28T06:17:06Z", "kind": "pr", "issue": 1885, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1885", "title": "follow up with shell testing for #1842", "detail": "unlinked #3484"}
