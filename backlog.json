@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-28",
-  "generated_at": "2026-09-28T06:17:06Z",
+  "generated_at": "2026-09-28T07:32:28Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 64,
@@ -403,6 +403,21 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1869"
+    },
+    {
+      "number": 1885,
+      "title": "follow up with shell testing for #1842",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2021-11-11",
+      "updated": "2026-09-27",
+      "labels": [
+        "tests"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1885"
     },
     {
       "number": 1890,
@@ -1068,21 +1083,6 @@
       "updated": "2026-09-26",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
-    },
-    {
-      "number": 1885,
-      "title": "follow up with shell testing for #1842",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2021-11-11",
-      "updated": "2026-09-27",
-      "labels": [
-        "tests"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1885"
     },
     {
       "number": 385,
