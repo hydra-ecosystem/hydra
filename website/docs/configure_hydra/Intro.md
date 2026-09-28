@@ -77,7 +77,7 @@ def my_app(cfg: DictConfig) -> None:
 The following fields are present at the top level of the Hydra Config.
 - mode: Optional, one of `RUN` or `MULTIRUN`. See [multirun](/tutorials/basic/running_your_app/2_multirun.md) for more info.
 - **searchpath**: A list of paths that Hydra searches in order to find configs.
-  See [overriding `hydra.searchpath`](advanced/search_path.md#overriding-hydrasearchpath-config)
+  See [adding config sources with `hydra.searchpath`](../advanced/search_path/hydra_searchpath.md)
 - **job_logging** and **hydra_logging**: Configure logging settings.
   See [logging](/tutorials/basic/running_your_app/4_logging.md) and [customizing logging](logging.md).
 - **sweeper**: [Sweeper](/tutorials/basic/running_your_app/2_multirun.md#sweeper) plugin settings. Defaults to basic sweeper.

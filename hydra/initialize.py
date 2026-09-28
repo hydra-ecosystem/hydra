@@ -1,12 +1,14 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import copy
 import os
-from typing import Any, Optional
+from typing import Any, Optional, Sequence
 
 from hydra import version
 from hydra._internal.hydra import Hydra
 from hydra._internal.utils import (
+    compute_search_path_dir,
     create_config_search_path,
+    create_config_search_path_from_sources,
     detect_calling_file_or_module_from_stack_frame,
     detect_task_name,
 )
@@ -32,7 +34,8 @@ def restore_gh_from_backup(_gh_backup: Any) -> Any:
 class initialize:
     """
     Initializes Hydra and add the config_path to the config search path.
-    config_path is relative to the parent of the caller.
+    A relative config_path is resolved relative to the parent of the caller.
+    An absolute config_path is used as is.
     Hydra detects the caller type automatically at runtime.
 
     Supported callers:
@@ -40,7 +43,7 @@ class initialize:
     - Python modules
     - Unit tests
     - Jupyter notebooks.
-    :param config_path: path relative to the parent of the caller
+    :param config_path: absolute path or path relative to the parent of the caller
     :param job_name: the value for hydra.job.name (By default it is automatically detected based on the caller)
     :param caller_stack_depth: stack depth of the caller, defaults to 1 (direct caller).
     """
@@ -56,8 +59,6 @@ class initialize:
 
         version.setbase(version_base)
 
-        if config_path is not None and os.path.isabs(config_path):
-            raise HydraException("config_path in initialize() must be relative")
         calling_file, calling_module = detect_calling_file_or_module_from_stack_frame(
             caller_stack_depth + 1
         )
@@ -152,3 +153,67 @@ class initialize_config_dir:
 
     def __repr__(self) -> str:
         return "hydra.initialize_config_dir()"
+
+
+class initialize_config_search_path:
+    """Initialize Hydra with ordered config source URIs, including caller://."""
+
+    def __init__(
+        self, config_search_path: Sequence[str], job_name: str = "app"
+    ) -> None:
+        if isinstance(config_search_path, (str, bytes)) or not isinstance(
+            config_search_path, Sequence
+        ):
+            raise HydraException("config_search_path must be a sequence of URI strings")
+        if not config_search_path:
+            raise HydraException("config_search_path requires at least one entry")
+        sources = []
+        for index, entry in enumerate(config_search_path):
+            if not isinstance(entry, str):
+                raise HydraException(
+                    f"config_search_path entry {index} must be a URI string"
+                )
+            scheme, separator, path = entry.partition("://")
+            if not separator:
+                raise HydraException(f"config_search_path entry {index} must be a URI")
+            if scheme == "caller":
+                if path.startswith("/") or os.path.isabs(path) or "://" in path:
+                    raise HydraException(
+                        f"config_search_path entry {index} requires a relative caller path"
+                    )
+                calling_file, calling_module = (
+                    detect_calling_file_or_module_from_stack_frame(2)
+                )
+                caller_path = compute_search_path_dir(
+                    calling_file,
+                    calling_module,
+                    path or ("." if calling_file is not None else None),
+                )
+                assert caller_path is not None
+                if "://" not in caller_path:
+                    caller_path = f"file://{caller_path}"
+                sources.append(caller_path)
+                continue
+            if not scheme or not path:
+                raise HydraException(
+                    f"config_search_path entry {index} must have a scheme and path"
+                )
+            if scheme == "file" and not os.path.isabs(path):
+                raise HydraException(
+                    f"config_search_path entry {index} requires an absolute file path"
+                )
+            sources.append(entry)
+
+        self._gh_backup = get_gh_backup()
+        version.setbase(version._UNSPECIFIED_)
+        csp = create_config_search_path_from_sources(sources)
+        Hydra.create_main_hydra2(task_name=job_name, config_search_path=csp)
+
+    def __enter__(self, *args: Any, **kwargs: Any) -> None:
+        return None
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        restore_gh_from_backup(self._gh_backup)
+
+    def __repr__(self) -> str:
+        return "hydra.initialize_config_search_path()"

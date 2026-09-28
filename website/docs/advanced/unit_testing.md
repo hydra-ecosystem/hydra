@@ -5,7 +5,7 @@ title: Hydra in Unit Tests
 
 import GithubLink from "@site/src/components/GithubLink"
 
-Use `initialize()`, `initialize_config_module()` or `initialize_config_dir()` in conjunction with `compose()`
+Use `initialize()`, `initialize_config_module()`, `initialize_config_dir()` or `initialize_config_search_path()` in conjunction with `compose()`
 to compose configs inside your unit tests.  
 Be sure to read the [Compose API documentation](compose_api.md).
 
@@ -29,4 +29,4 @@ def test_with_initialize() -> None:
 
 For an idea about how to modify Hydra's search path when using `compose` in
 unit tests, see the page on
-[overriding the `hydra.searchpath` config](search_path.md#overriding-hydrasearchpath-config).
+[adding config sources with `hydra.searchpath`](search_path/hydra_searchpath.md).
