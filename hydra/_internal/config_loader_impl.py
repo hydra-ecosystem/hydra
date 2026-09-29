@@ -40,6 +40,10 @@ from hydra.plugins.config_source import ConfigResult, ConfigSource
 from hydra.types import RunMode
 
 
+def _parse_overrides(overrides: List[str]) -> List[Override]:
+    return OverridesParser.create().parse_overrides(overrides)
+
+
 class ConfigLoaderImpl(ConfigLoader):
     """
     Configuration loader
@@ -269,8 +273,7 @@ class ConfigLoaderImpl(ConfigLoader):
     def _parse_overrides_and_create_caching_repo(
         self, config_name: Optional[str], overrides: List[str]
     ) -> Tuple[List[Override], CachingConfigRepository]:
-        parser = OverridesParser.create()
-        parsed_overrides = parser.parse_overrides(overrides=overrides)
+        parsed_overrides = _parse_overrides(overrides)
         caching_repo = CachingConfigRepository(self.repository)
         self._process_config_searchpath(config_name, parsed_overrides, caching_repo)
         return parsed_overrides, caching_repo

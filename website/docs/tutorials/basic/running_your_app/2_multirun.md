@@ -10,9 +10,23 @@ E.g. running a performance test on each of the databases with each of the schema
 You can multirun a Hydra application via either commandline or configuration:
 
 ### Configure `hydra.mode` (new in Hydra 1.2)
-You can configure `hydra.mode` in any supported way. The legal values are `RUN` and `MULTIRUN`.
-The following shows how to override from the command-line and sweep over all combinations of the dbs and schemas.
-Setting `hydra.mode=MULTIRUN` in your input config would make your application multi-run by default.
+The legal values are `RUN` and `MULTIRUN`. Set `hydra.mode` in the primary config
+or override it on the command line. For example, this primary config makes the
+application multi-run by default:
+
+```yaml
+hydra:
+  mode: MULTIRUN
+```
+
+Hydra reads the mode before composing the Defaults List. A value supplied by a
+config group cannot select the run mode. An interpolation in `hydra.mode` can
+refer to values in the primary config or to command-line value overrides, but
+not to values supplied by a config group. Self-contained resolvers, such as
+`${oc.env:HYDRA_MODE}`, are also supported.
+
+The following command-line override sweeps over all combinations of databases
+and schemas:
 
 ```text title="$ python my_app.py hydra.mode=MULTIRUN db=mysql,postgresql schema=warehouse,support,school"
 [2021-01-20 17:25:03,317][HYDRA] Launching 6 jobs locally
@@ -105,4 +119,3 @@ For example, the [Ax Sweeper](/plugins/ax_sweeper.md) can automatically find the
 By default, Hydra runs your multi-run jobs locally and serially. 
 Other launchers are available as plugins for launching in parallel and on different clusters. For example, the [JobLib Launcher](/plugins/joblib_launcher.md)
 can execute the different parameter combinations in parallel on your local machine using multi-processing.
-
