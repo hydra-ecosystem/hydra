@@ -14,14 +14,16 @@ from omegaconf import (
     ListConfig,
     OmegaConf,
     flag_override,
+    open_dict,
 )
-from omegaconf.errors import InterpolationToMissingValueError
+from omegaconf.errors import InterpolationToMissingValueError, OmegaConfBaseException
 
 from hydra._internal.execution_policy import _get_active_execution_whitelist
 from hydra._internal.utils import get_column_widths, run_and_report
 from hydra.core.config_loader import ConfigLoader
 from hydra.core.config_search_path import ConfigSearchPath
 from hydra.core.hydra_config import HydraConfig
+from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.plugins import Plugins
 from hydra.core.utils import (
     JobReturn,
@@ -32,6 +34,7 @@ from hydra.core.utils import (
     setup_globals,
     simple_stdout_log_config,
 )
+from hydra.errors import ConfigCompositionException
 from hydra.plugins.completion_plugin import CompletionPlugin
 from hydra.plugins.config_source import ConfigSource
 from hydra.plugins.launcher import Launcher
@@ -39,7 +42,7 @@ from hydra.plugins.search_path_plugin import SearchPathPlugin
 from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, RunMode, TaskFunction
 
-from ..core.default_element import DefaultsTreeNode, InputDefault
+from ..core.default_element import ConfigDefault, DefaultsTreeNode, InputDefault
 from .callbacks import Callbacks
 from .config_loader_impl import ConfigLoaderImpl
 from .utils import create_automatic_config_search_path
@@ -125,18 +128,104 @@ class Hydra:
         self,
         config_name: Optional[str],
         overrides: List[str],
-    ) -> Any:
-        try:
-            cfg = self.compose_config(
-                config_name=config_name,
-                overrides=overrides,
-                with_log_configuration=False,
-                run_mode=RunMode.MULTIRUN,
-                validate_sweep_overrides=False,
-            )
-            return cfg.hydra.mode
-        except Exception:
+    ) -> Optional[RunMode]:
+        mode: Any = None
+        mode_override_found = False
+        parsed_overrides = OverridesParser.create().parse_overrides(overrides)
+        for override in parsed_overrides:
+            if override.key_or_group == "hydra.mode" and override.package is None:
+                if override.is_sweep_override():
+                    raise ConfigCompositionException(
+                        "Sweeping over Hydra's configuration is not supported"
+                    )
+                mode = override.value()
+                mode_override_found = True
+
+        needs_resolution = not mode_override_found or (
+            isinstance(mode, str) and "${" in mode
+        )
+        if needs_resolution and isinstance(self.config_loader, ConfigLoaderImpl):
+            mode_config: Any = OmegaConf.create()
+            if config_name is not None:
+                loaded = self.config_loader.repository.load_config(config_name)
+                if loaded is not None:
+                    primary = ConfigDefault(path=config_name, primary=True)
+                    primary.update_parent(parent_base_dir="", parent_package="")
+                    primary.set_package_header(loaded.header["package"])
+                    package = primary.get_final_package()
+
+                    raw_config = OmegaConf.create(
+                        OmegaConf.to_container(loaded.config, resolve=False)
+                    )
+                    if isinstance(raw_config, DictConfig):
+                        if "defaults" in raw_config:
+                            with open_dict(raw_config):
+                                del raw_config["defaults"]
+                        if package == "":
+                            mode_config = raw_config
+                        else:
+                            OmegaConf.update(
+                                mode_config, package, raw_config, merge=False
+                            )
+
+            for override in parsed_overrides:
+                if override.key_or_group == "hydra.mode" and override.package is None:
+                    continue
+                if override.package is not None or override.is_sweep_override():
+                    continue
+                if self.config_loader.repository.group_exists(
+                    override.key_or_group
+                ) and not isinstance(override.value(), dict):
+                    continue
+                OmegaConf.update(
+                    mode_config,
+                    override.key_or_group,
+                    override.value(),
+                    merge=True,
+                    force_add=True,
+                )
+
+            if mode_override_found:
+                OmegaConf.update(
+                    mode_config, "hydra.mode", mode, merge=True, force_add=True
+                )
+
+            try:
+                mode = OmegaConf.select(
+                    mode_config,
+                    "hydra.mode",
+                    throw_on_resolution_failure=True,
+                )
+            except OmegaConfBaseException as e:
+                if mode_override_found:
+                    raise ConfigCompositionException(
+                        "hydra.mode must be resolvable from the primary config "
+                        "or command line without composition"
+                    ) from e
+                raise ConfigCompositionException(
+                    "hydra.mode must be resolvable from the primary config "
+                    "without composing its defaults list"
+                ) from e
+
+        if mode is None:
             return None
+
+        if isinstance(mode, str) and "${" in mode:
+            try:
+                mode = OmegaConf.create({"mode": mode}).mode
+            except OmegaConfBaseException as e:
+                raise ConfigCompositionException(
+                    "hydra.mode must be resolvable from the primary config "
+                    "or command line without composition"
+                ) from e
+
+        if isinstance(mode, RunMode):
+            return mode
+        if isinstance(mode, str) and mode in RunMode.__members__:
+            return RunMode[mode]
+        raise ConfigCompositionException(
+            f"Invalid hydra.mode {mode!r}; expected RUN or MULTIRUN"
+        )
 
     def run(
         self,
@@ -154,8 +243,11 @@ class Hydra:
         )
         if cfg.hydra.mode is None:
             cfg.hydra.mode = RunMode.RUN
-        else:
-            assert cfg.hydra.mode == RunMode.RUN
+        elif cfg.hydra.mode != RunMode.RUN:
+            raise ConfigCompositionException(
+                "hydra.mode must be set in the primary config or command line, "
+                "not in a config group"
+            )
 
         callbacks = Callbacks(cfg)
         callbacks.on_run_start(config=cfg, config_name=config_name)
@@ -207,6 +299,13 @@ class Hydra:
             run_mode=RunMode.MULTIRUN,
             activate_config_repository=True,
         )
+        if cfg.hydra.mode is None:
+            cfg.hydra.mode = RunMode.MULTIRUN
+        elif cfg.hydra.mode != RunMode.MULTIRUN:
+            raise ConfigCompositionException(
+                "hydra.mode must be set in the primary config or command line, "
+                "not in a config group"
+            )
 
         # Install the composed controller config so controller-side components
         # (callbacks, sweeper, launcher) can resolve ${hydra:...} interpolations

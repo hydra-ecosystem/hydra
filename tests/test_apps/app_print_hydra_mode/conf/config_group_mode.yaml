@@ -1,0 +1,4 @@
+defaults:
+  - mode: multirun
+  - _self_
+x: 1
