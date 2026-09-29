@@ -27,6 +27,10 @@ complete. The final release notes will be the authoritative list.
   only supported config group separator. Paths that used `\` previously
   composed on Windows only, where the operating system resolved the backslash
   as a filesystem separator.
+- The optional `hydra.mode` is no longer effective when set in a config other
+  than the primary config. Interpolations that require Defaults List composition
+  also cannot select the mode. Move such a value to the primary config or pass
+  `hydra.mode=RUN` or `hydra.mode=MULTIRUN` on the command line.
 
 ### Hydra 1.1 compatibility behavior
 

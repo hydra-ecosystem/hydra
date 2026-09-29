@@ -1,0 +1,6 @@
+defaults:
+  - mode: multirun
+  - _self_
+hydra:
+  mode: ${from_group}
+x: 1

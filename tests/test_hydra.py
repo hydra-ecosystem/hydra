@@ -8,7 +8,7 @@ from logging import getLogger
 from pathlib import Path
 from textwrap import dedent
 from typing import Any, List, Optional, Set, cast
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from omegaconf import DictConfig, OmegaConf
 from pytest import mark, param, raises, warns
@@ -2166,6 +2166,17 @@ def test_hydra_resolver_in_output_dir(tmpdir: Path, multirun: bool) -> None:
             id="multi_run_config",
         ),
         param(
+            ["x=1", "++hydra.mode=MULTIRUN"],
+            dedent("""\
+                [HYDRA] Launching 1 jobs locally
+                [HYDRA] \t#0 : x=1
+                RunMode.MULTIRUN"""),
+            False,
+            False,
+            None,
+            id="multi_run_force_add_override",
+        ),
+        param(
             ["--multirun", "x=1"],
             dedent("""\
                 [HYDRA] Launching 1 jobs locally
@@ -2309,6 +2320,113 @@ def test_hydra_mode(
             from_name="Expected output",
             to_name="Actual output",
         )
+
+
+@mark.parametrize(
+    "config_name,overrides,expected",
+    [
+        ("config", [], None),
+        ("config_multirun", [], RunMode.MULTIRUN),
+        ("config_primary_reference", [], RunMode.RUN),
+        ("config_multirun", ["hydra.mode=RUN"], RunMode.RUN),
+        ("config_multirun", ["hydra.mode=null"], None),
+        ("config", ["hydra.mode=RUN", "hydra.mode=MULTIRUN"], RunMode.MULTIRUN),
+        ("config", ["++hydra.mode=MULTIRUN"], RunMode.MULTIRUN),
+    ],
+)
+def test_hydra_mode_discovery_does_not_compose(
+    hydra_restore_singletons: Any,
+    config_name: str,
+    overrides: List[str],
+    expected: Optional[RunMode],
+) -> None:
+    hydra = Hydra.create_main_hydra_file_or_module(
+        calling_file="tests/test_apps/app_print_hydra_mode/my_app.py",
+        calling_module=None,
+        config_path="conf",
+        job_name="test",
+    )
+    with patch.object(hydra, "compose_config", side_effect=AssertionError):
+        assert hydra.get_mode(config_name, overrides) == expected
+
+
+def test_hydra_mode_from_packaged_primary_is_ignored(tmpdir: Path) -> None:
+    out, _ = run_python_script(
+        [
+            "tests/test_apps/app_print_hydra_mode/my_app.py",
+            "--config-name=config_packaged_mode",
+            f"hydra.run.dir={tmpdir}",
+            "hydra.job.chdir=False",
+        ]
+    )
+    assert out.strip() == "RunMode.RUN"
+
+
+def test_hydra_mode_from_cli_value_interpolation(
+    hydra_restore_singletons: Any,
+) -> None:
+    hydra = Hydra.create_main_hydra_file_or_module(
+        calling_file="tests/test_apps/app_print_hydra_mode/my_app.py",
+        calling_module=None,
+        config_path="conf",
+        job_name="test",
+    )
+    with patch.object(hydra, "compose_config", side_effect=AssertionError):
+        assert hydra.get_mode("config_primary_reference", ["x=MULTIRUN"]) == (
+            RunMode.MULTIRUN
+        )
+
+
+def test_hydra_mode_cli_interpolation_uses_cli_value_override(
+    hydra_restore_singletons: Any,
+) -> None:
+    hydra = Hydra.create_main_hydra_file_or_module(
+        calling_file="tests/test_apps/app_print_hydra_mode/my_app.py",
+        calling_module=None,
+        config_path="conf",
+        job_name="test",
+    )
+    with patch.object(hydra, "compose_config", side_effect=AssertionError):
+        assert (
+            hydra.get_mode(
+                "config_primary_reference", ["hydra.mode=${y}", "+y=MULTIRUN"]
+            )
+            == RunMode.MULTIRUN
+        )
+
+
+def test_hydra_mode_from_primary_config(tmpdir: Path) -> None:
+    out, _ = run_python_script(
+        [
+            "tests/test_apps/app_print_hydra_mode/my_app.py",
+            "--config-name=config_multirun",
+            "x=1,2",
+            f"hydra.sweep.dir={tmpdir}",
+            "hydra.job.chdir=False",
+        ]
+    )
+    assert out.count("RunMode.MULTIRUN") == 2
+
+
+def test_hydra_mode_from_config_group_is_rejected(tmpdir: Path) -> None:
+    err = run_with_error(
+        [
+            "tests/test_apps/app_print_hydra_mode/my_app.py",
+            "--config-name=config_group_mode",
+            f"hydra.run.dir={tmpdir}",
+        ]
+    )
+    assert "hydra.mode must be set in the primary config or command line" in err
+
+
+def test_hydra_mode_requires_resolvable_primary_value() -> None:
+    err = run_with_error(
+        [
+            "tests/test_apps/app_print_hydra_mode/my_app.py",
+            "--config-name=config_unresolved_mode",
+        ]
+    )
+    assert "hydra.mode must be resolvable from the primary config" in err
 
 
 def test_hydra_runtime_choice_1882(tmpdir: Path) -> None:
