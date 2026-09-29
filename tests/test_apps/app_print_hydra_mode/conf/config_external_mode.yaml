@@ -1,0 +1,5 @@
+# @package _global_
+hydra:
+  mode: ${choice}
+  searchpath:
+    - file://tests/test_apps/app_print_hydra_mode/external_conf

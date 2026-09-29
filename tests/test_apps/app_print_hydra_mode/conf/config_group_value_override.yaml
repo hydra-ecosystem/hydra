@@ -1,0 +1,6 @@
+defaults:
+  - _self_
+  - mode: multirun
+from_group: RUN
+hydra:
+  mode: MULTIRUN
