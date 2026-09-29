@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-29",
-  "generated_at": "2026-09-29T07:15:54Z",
+  "generated_at": "2026-09-29T07:21:42Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 63,
@@ -1098,6 +1098,26 @@
         "exploratory"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/753"
+    },
+    {
+      "number": 845,
+      "title": "Add a standalone page describing @hydra.main() in details.",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3487,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3487"
+        }
+      ],
+      "created": "2020-08-05",
+      "updated": "2026-07-27",
+      "labels": [
+        "documentation"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/845"
     },
     {
       "number": 1512,
@@ -2241,26 +2261,6 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
-    },
-    {
-      "number": 845,
-      "title": "Add a standalone page describing @hydra.main() in details.",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3487,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3487"
-        }
-      ],
-      "created": "2020-08-05",
-      "updated": "2026-07-27",
-      "labels": [
-        "documentation"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/845"
     }
   ],
   "updates": [
