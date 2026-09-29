@@ -1,0 +1,4 @@
+# @package _global_
+modes: [RUN, MULTIRUN]
+hydra:
+  mode: ${modes.0}

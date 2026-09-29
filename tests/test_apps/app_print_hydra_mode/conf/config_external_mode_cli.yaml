@@ -1,0 +1,3 @@
+# @package _global_
+hydra:
+  mode: ${choice}

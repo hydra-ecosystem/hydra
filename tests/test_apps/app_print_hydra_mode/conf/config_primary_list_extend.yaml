@@ -1,0 +1,4 @@
+# @package _global_
+modes: [RUN]
+hydra:
+  mode: ${modes.1}

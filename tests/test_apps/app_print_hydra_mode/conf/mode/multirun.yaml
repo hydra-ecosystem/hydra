@@ -1,0 +1,4 @@
+# @package _global_
+hydra:
+  mode: MULTIRUN
+from_group: MULTIRUN

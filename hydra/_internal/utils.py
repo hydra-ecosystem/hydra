@@ -525,7 +525,9 @@ def _run_hydra(
         overrides = args.overrides
 
         if args.run or args.multirun:
-            run_mode = hydra.get_mode(config_name=config_name, overrides=overrides)
+            run_mode = run_and_report(
+                lambda: hydra.get_mode(config_name=config_name, overrides=overrides)
+            )
             _run_app(
                 run=args.run,
                 multirun=args.multirun,
@@ -574,7 +576,6 @@ def _run_app(
     if mode is None:
         if run:
             mode = RunMode.RUN
-            overrides.extend(["hydra.mode=RUN"])
         else:
             mode = RunMode.MULTIRUN
             overrides.extend(["hydra.mode=MULTIRUN"])
