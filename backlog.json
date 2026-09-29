@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-29",
-  "generated_at": "2026-09-29T17:34:59Z",
+  "generated_at": "2026-09-29T22:15:11Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 62,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 60
+        "count": 59
       },
       {
         "status": "done",
@@ -71,6 +71,24 @@
     ]
   },
   "issues": [
+    {
+      "number": 3440,
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3489,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3489"
+        }
+      ],
+      "created": "2026-09-06",
+      "updated": "2026-09-07",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -987,19 +1005,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3438"
     },
     {
-      "number": 3440,
-      "title": "hydra.mode discovery composes the config twice on every invocation",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-09-06",
-      "updated": "2026-09-07",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
-    },
-    {
       "number": 3445,
       "title": "Reach and enforce 100% public type coverage",
       "category": "Enhancement",
@@ -1133,6 +1138,27 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1602"
+    },
+    {
+      "number": 1622,
+      "title": "keyword documentation for config.yaml",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3488,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3488"
+        }
+      ],
+      "created": "2021-05-17",
+      "updated": "2026-07-19",
+      "labels": [
+        "documentation",
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1622"
     },
     {
       "number": 2170,
@@ -2245,30 +2271,29 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
-    },
-    {
-      "number": 1622,
-      "title": "keyword documentation for config.yaml",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3488,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3488"
-        }
-      ],
-      "created": "2021-05-17",
-      "updated": "2026-07-19",
-      "labels": [
-        "documentation",
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1622"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-29T22:15:11Z",
+      "kind": "pr",
+      "issue": 3440,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3440",
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "detail": "linked #3489"
+    },
+    {
+      "ts": "2026-09-29T22:15:11Z",
+      "kind": "status",
+      "issue": 3440,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3440",
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3489,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3489"
+      }
+    },
     {
       "ts": "2026-09-29T17:34:59Z",
       "kind": "closed",
@@ -3865,20 +3890,6 @@
       "issue": 3398,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3398",
       "title": "password"
-    },
-    {
-      "ts": "2026-08-14T13:31:35Z",
-      "kind": "new",
-      "issue": 3397,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3397",
-      "title": "password"
-    },
-    {
-      "ts": "2026-08-14T13:31:35Z",
-      "kind": "new",
-      "issue": 3396,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3396",
-      "title": "[Feature Request]"
     }
   ]
 }

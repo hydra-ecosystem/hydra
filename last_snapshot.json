@@ -75,7 +75,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-09-29T17:34:59Z",
+  "generated_at": "2026-09-29T22:15:11Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -687,9 +687,11 @@
       "category": "Enhancement",
       "created_at": "2026-09-06T14:02:31Z",
       "labels": [],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3489"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "in progress",
       "title": "hydra.mode discovery composes the config twice on every invocation",
       "updated_at": "2026-09-07T19:40:55Z"
     },
