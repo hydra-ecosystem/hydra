@@ -897,3 +897,4 @@
 {"ts": "2026-09-29T07:15:54Z", "kind": "closed", "issue": 845, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/845", "title": "Add a standalone page describing @hydra.main() in details."}
 {"ts": "2026-09-29T10:22:34Z", "kind": "status", "issue": 1622, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1622", "title": "keyword documentation for config.yaml", "detail": "not started → in progress", "pr": {"number": 3488, "url": "https://github.com/hydra-ecosystem/hydra/pull/3488"}}
 {"ts": "2026-09-29T10:22:34Z", "kind": "pr", "issue": 1622, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1622", "title": "keyword documentation for config.yaml", "detail": "linked #3488"}
+{"ts": "2026-09-29T17:34:59Z", "kind": "closed", "issue": 1622, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1622", "title": "keyword documentation for config.yaml"}

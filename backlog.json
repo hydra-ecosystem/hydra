@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-09-29",
-  "generated_at": "2026-09-29T11:25:20Z",
+  "generated_at": "2026-09-29T17:34:59Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 63,
+    "open_total": 62,
     "by_category": [
       {
         "category": "Bug",
@@ -15,13 +15,13 @@
         "category": "Enhancement",
         "emoji": "✨",
         "count": 51,
-        "percentage": 81.0
+        "percentage": 82.3
       },
       {
         "category": "Documentation",
         "emoji": "📄",
-        "count": 4,
-        "percentage": 6.3
+        "count": 3,
+        "percentage": 4.8
       },
       {
         "category": "Question",
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,32 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 73
+        "count": 74
       }
     ]
   },
   "issues": [
-    {
-      "number": 1622,
-      "title": "keyword documentation for config.yaml",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3488,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3488"
-        }
-      ],
-      "created": "2021-05-17",
-      "updated": "2026-07-19",
-      "labels": [
-        "documentation",
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1622"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2266,9 +2245,37 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
+    },
+    {
+      "number": 1622,
+      "title": "keyword documentation for config.yaml",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3488,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3488"
+        }
+      ],
+      "created": "2021-05-17",
+      "updated": "2026-07-19",
+      "labels": [
+        "documentation",
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1622"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-29T17:34:59Z",
+      "kind": "closed",
+      "issue": 1622,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1622",
+      "title": "keyword documentation for config.yaml"
+    },
     {
       "ts": "2026-09-29T10:22:34Z",
       "kind": "pr",
@@ -3871,13 +3878,6 @@
       "kind": "new",
       "issue": 3396,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3396",
-      "title": "[Feature Request]"
-    },
-    {
-      "ts": "2026-08-14T13:31:35Z",
-      "kind": "new",
-      "issue": 3395,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3395",
       "title": "[Feature Request]"
     }
   ]
