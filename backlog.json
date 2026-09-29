@@ -1,27 +1,27 @@
 {
-  "generated_on": "2026-09-28",
-  "generated_at": "2026-09-28T23:06:20Z",
+  "generated_on": "2026-09-29",
+  "generated_at": "2026-09-29T07:15:54Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 64,
+    "open_total": 63,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 3.1
+        "percentage": 3.2
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 51,
-        "percentage": 79.7
+        "percentage": 81.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
-        "count": 5,
-        "percentage": 7.8
+        "count": 4,
+        "percentage": 6.3
       },
       {
         "category": "Question",
@@ -33,20 +33,20 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 2,
-        "percentage": 3.1
+        "percentage": 3.2
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 4.7
+        "percentage": 4.8
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,31 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 72
+        "count": 73
       }
     ]
   },
   "issues": [
-    {
-      "number": 845,
-      "title": "Add a standalone page describing @hydra.main() in details.",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3487,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3487"
-        }
-      ],
-      "created": "2020-08-05",
-      "updated": "2026-07-27",
-      "labels": [
-        "documentation"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/845"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2261,9 +2241,36 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
+    },
+    {
+      "number": 845,
+      "title": "Add a standalone page describing @hydra.main() in details.",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3487,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3487"
+        }
+      ],
+      "created": "2020-08-05",
+      "updated": "2026-07-27",
+      "labels": [
+        "documentation"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/845"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-29T07:15:54Z",
+      "kind": "closed",
+      "issue": 845,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/845",
+      "title": "Add a standalone page describing @hydra.main() in details."
+    },
     {
       "ts": "2026-09-28T22:38:42Z",
       "kind": "pr",
@@ -3863,13 +3870,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3389",
       "title": "Remove remaining Meta-era repository branding and processes",
       "detail": "in progress → not started"
-    },
-    {
-      "ts": "2026-08-13T18:01:42Z",
-      "kind": "new",
-      "issue": 3389,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3389",
-      "title": "Remove remaining Meta-era repository branding and processes"
     }
   ]
 }

@@ -894,3 +894,4 @@
 {"ts": "2026-09-28T22:05:02Z", "kind": "new", "issue": 3486, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3486", "title": "Modernize type annotations for Python 3.10+"}
 {"ts": "2026-09-28T22:38:42Z", "kind": "status", "issue": 845, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/845", "title": "Add a standalone page describing @hydra.main() in details.", "detail": "not started → in progress", "pr": {"number": 3487, "url": "https://github.com/hydra-ecosystem/hydra/pull/3487"}}
 {"ts": "2026-09-28T22:38:42Z", "kind": "pr", "issue": 845, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/845", "title": "Add a standalone page describing @hydra.main() in details.", "detail": "linked #3487"}
+{"ts": "2026-09-29T07:15:54Z", "kind": "closed", "issue": 845, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/845", "title": "Add a standalone page describing @hydra.main() in details."}
