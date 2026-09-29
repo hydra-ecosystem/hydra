@@ -126,11 +126,8 @@ defaults:
 ```
 
 Without a package override, the resulting package is `config_group.server.db`.
-With the **@\_here\_** keyword, The resulting package is the same as the containing config (`config_group`).
-##### Absolute keywords:
-* **@\_group\_**: \_group\_ is the absolute default package of the config (`server.db`)
-* **@\_global\_**: The global package. Anything following \_global\_ is absolute.
-  e.g. **@\_global\_.foo** becomes `foo`.
+With the **@\_here\_** keyword, the resulting package is the same as the containing config (`config_group`).
+With **@\_global\_**, the resulting package is the global package. Anything following \_global\_ is absolute; for example, **@\_global\_.foo** becomes `foo`.
 
 ### Overriding the package via the package directive
 
