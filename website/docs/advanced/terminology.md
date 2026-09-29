@@ -132,3 +132,26 @@ the Python [PYTHONPATH](https://docs.python.org/3/using/cmdline.html#envvar-PYTH
 
 ## Plugins
 [Plugins](plugins/intro.md) extend Hydra's capabilities. Hydra has several plugin types, for example Launcher and Sweeper.
+
+## Special fields and directives
+
+Hydra assigns special meaning to a few config fields and Defaults List entries. Most of these work in both YAML and Structured Configs; the `# @package` header is specific to YAML config files.
+
+### Defaults List
+
+- [`defaults`](defaults_list.md#introduction) lists the configs and config group options used to compose a config.
+- [`_self_`](defaults_list.md#composition-order) sets where the containing config is composed relative to its Defaults List entries.
+- [`override` and `optional`](defaults_list.md#introduction) modify a config group choice: `override` replaces an earlier choice, while `optional` allows a missing option.
+
+### Packages
+
+- [`@PACKAGE`](overriding_packages.md#overriding-packages-using-the-defaults-list) in a Defaults List entry selects where the included config is placed in the output config.
+- [`_here_`, `_group_`, and `_global_`](overriding_packages.md#default-list-package-keywords) are special package values for the containing config's package, the included config group's default package, and the global package, respectively.
+- [`# @package`](overriding_packages.md#overriding-the-package-via-the-package-directive) sets the package in a YAML config file header.
+
+### Instantiation
+
+- [`_target_`](instantiate_objects/overview.md) identifies the callable to instantiate; [`_args_`](instantiate_objects/overview.md) supplies positional arguments.
+- [`_recursive_`](instantiate_objects/overview.md#disable-recursive-instantiation) controls whether nested configs are instantiated.
+- [`_convert_`](instantiate_objects/overview.md#parameter-conversion-strategies) controls conversion of OmegaConf containers passed to the target.
+- [`_partial_`](instantiate_objects/overview.md#partial-instantiation) creates a partial callable instead of invoking the target immediately.
