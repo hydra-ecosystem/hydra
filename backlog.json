@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-09-29",
-  "generated_at": "2026-09-29T07:21:42Z",
+  "generated_at": "2026-09-29T10:22:34Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 63,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 61
+        "count": 60
       },
       {
         "status": "done",
@@ -71,6 +71,27 @@
     ]
   },
   "issues": [
+    {
+      "number": 1622,
+      "title": "keyword documentation for config.yaml",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3488,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3488"
+        }
+      ],
+      "created": "2021-05-17",
+      "updated": "2026-07-19",
+      "labels": [
+        "documentation",
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1622"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -340,22 +361,6 @@
         "internal"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1547"
-    },
-    {
-      "number": 1622,
-      "title": "keyword documentation for config.yaml",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2021-05-17",
-      "updated": "2026-07-19",
-      "labels": [
-        "documentation",
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1622"
     },
     {
       "number": 1749,
@@ -2265,6 +2270,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-09-29T10:22:34Z",
+      "kind": "pr",
+      "issue": 1622,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1622",
+      "title": "keyword documentation for config.yaml",
+      "detail": "linked #3488"
+    },
+    {
+      "ts": "2026-09-29T10:22:34Z",
+      "kind": "status",
+      "issue": 1622,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1622",
+      "title": "keyword documentation for config.yaml",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3488,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3488"
+      }
+    },
+    {
       "ts": "2026-09-29T07:15:54Z",
       "kind": "closed",
       "issue": 845,
@@ -3854,22 +3879,6 @@
       "issue": 3395,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3395",
       "title": "[Feature Request]"
-    },
-    {
-      "ts": "2026-08-14T04:03:50Z",
-      "kind": "pr",
-      "issue": 3389,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3389",
-      "title": "Remove remaining Meta-era repository branding and processes",
-      "detail": "unlinked #3391"
-    },
-    {
-      "ts": "2026-08-14T04:03:50Z",
-      "kind": "status",
-      "issue": 3389,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3389",
-      "title": "Remove remaining Meta-era repository branding and processes",
-      "detail": "in progress → not started"
     }
   ]
 }
