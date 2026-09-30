@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-30",
-  "generated_at": "2026-09-30T12:32:55Z",
+  "generated_at": "2026-09-30T13:21:54Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 62,
+    "open_total": 61,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 3.2
+        "percentage": 3.3
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 51,
-        "percentage": 82.3
+        "count": 50,
+        "percentage": 82.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 4.8
+        "percentage": 4.9
       },
       {
         "category": "Question",
@@ -33,20 +33,20 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 2,
-        "percentage": 3.2
+        "percentage": 3.3
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 4.8
+        "percentage": 4.9
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,29 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 74
+        "count": 75
       }
     ]
   },
   "issues": [
-    {
-      "number": 3440,
-      "title": "hydra.mode discovery composes the config twice on every invocation",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3489,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3489"
-        }
-      ],
-      "created": "2026-09-06",
-      "updated": "2026-09-07",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2271,9 +2253,34 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
+    },
+    {
+      "number": 3440,
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3489,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3489"
+        }
+      ],
+      "created": "2026-09-06",
+      "updated": "2026-09-07",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-30T13:21:54Z",
+      "kind": "closed",
+      "issue": 3440,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3440",
+      "title": "hydra.mode discovery composes the config twice on every invocation"
+    },
     {
       "ts": "2026-09-29T22:15:11Z",
       "kind": "pr",
@@ -3883,13 +3890,6 @@
       "issue": 3395,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3395",
       "title": "[Feature Request]"
-    },
-    {
-      "ts": "2026-08-14T13:31:35Z",
-      "kind": "new",
-      "issue": 3398,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3398",
-      "title": "password"
     }
   ]
 }
