@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-09-30",
-  "generated_at": "2026-09-30T13:21:54Z",
+  "generated_at": "2026-09-30T19:02:34Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 61,
+    "open_total": 62,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 3.3
+        "percentage": 3.2
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 50,
-        "percentage": 82.0
+        "count": 51,
+        "percentage": 82.3
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 4.9
+        "percentage": 4.8
       },
       {
         "category": "Question",
@@ -33,13 +33,13 @@
         "category": "Refactor",
         "emoji": "🔧",
         "count": 2,
-        "percentage": 3.3
+        "percentage": 3.2
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 3,
-        "percentage": 4.9
+        "percentage": 4.8
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 59
+        "count": 60
       },
       {
         "status": "done",
@@ -1037,6 +1037,19 @@
       "updated": "2026-09-28",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3486"
+    },
+    {
+      "number": 3490,
+      "title": "邀请 hydra 加入 GithubStarMate，让更多人发现你的作品",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-09-30",
+      "updated": "2026-09-30",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3490"
     },
     {
       "number": 385,
@@ -2184,6 +2197,24 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3436"
     },
     {
+      "number": 3440,
+      "title": "hydra.mode discovery composes the config twice on every invocation",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3489,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3489"
+        }
+      ],
+      "created": "2026-09-06",
+      "updated": "2026-09-07",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
+    },
+    {
       "number": 3454,
       "title": "Improve provenance and default presentation of config composition errors",
       "category": "Enhancement",
@@ -2253,27 +2284,16 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
-    },
-    {
-      "number": 3440,
-      "title": "hydra.mode discovery composes the config twice on every invocation",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3489,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3489"
-        }
-      ],
-      "created": "2026-09-06",
-      "updated": "2026-09-07",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-30T19:02:34Z",
+      "kind": "new",
+      "issue": 3490,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3490",
+      "title": "邀请 hydra 加入 GithubStarMate，让更多人发现你的作品"
+    },
     {
       "ts": "2026-09-30T13:21:54Z",
       "kind": "closed",
@@ -3882,13 +3902,6 @@
       "kind": "closed",
       "issue": 3396,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3396",
-      "title": "[Feature Request]"
-    },
-    {
-      "ts": "2026-08-15T07:12:57Z",
-      "kind": "closed",
-      "issue": 3395,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3395",
       "title": "[Feature Request]"
     }
   ]
