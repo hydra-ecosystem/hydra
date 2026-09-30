@@ -30,7 +30,7 @@ from hydra._internal.defaults_list import DefaultsList, create_defaults_list
 from hydra.conf import ConfigSourceInfo
 from hydra.core.config_loader import ConfigLoader
 from hydra.core.config_search_path import ConfigSearchPath
-from hydra.core.default_element import ResultDefault
+from hydra.core.default_element import ConfigDefault, ResultDefault
 from hydra.core.object_type import ObjectType
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.override_parser.types import Override, ValueType
@@ -52,6 +52,69 @@ class ConfigLoaderImpl(ConfigLoader):
         self.config_search_path = config_search_path
         self.repository = ConfigRepository(config_search_path=config_search_path)
         self._active_repository: Optional[IConfigRepository] = None
+
+    def get_mode(self, config_name: Optional[str], overrides: List[str]) -> Any:
+        mode: Any = None
+        mode_override_found = False
+        parsed_overrides = OverridesParser.create().parse_overrides(overrides)
+        for override in parsed_overrides:
+            if override.package is not None or override.key_or_group not in {
+                "hydra",
+                "hydra.mode",
+            }:
+                continue
+
+            if override.is_sweep_override():
+                raise ConfigCompositionException(
+                    "Sweeping over Hydra's configuration is not supported"
+                )
+
+            value = override.value()
+            if override.key_or_group == "hydra":
+                if not isinstance(value, dict) or "mode" not in value:
+                    continue
+                value = value["mode"]
+
+            mode = value
+            mode_override_found = True
+
+        if mode_override_found:
+            try:
+                return OmegaConf.create({"mode": mode}).mode
+            except OmegaConfBaseException as e:
+                raise ConfigCompositionException(
+                    "hydra.mode command-line override must be resolvable without "
+                    "config composition"
+                ) from e
+
+        return self._get_primary_mode(config_name)
+
+    def _get_primary_mode(self, config_name: Optional[str]) -> Any:
+        if config_name is None:
+            return None
+
+        loaded = self.repository.load_config(config_name)
+        if loaded is None:
+            return None
+
+        primary = ConfigDefault(path=config_name, primary=True)
+        primary.update_parent(parent_base_dir="", parent_package="")
+        primary.set_package_header(loaded.header["package"])
+        if primary.get_final_package() != "":
+            return None
+
+        try:
+            mode = OmegaConf.select(
+                loaded.config,
+                "hydra.mode",
+                throw_on_resolution_failure=True,
+            )
+        except OmegaConfBaseException as e:
+            raise ConfigCompositionException(
+                "hydra.mode must be resolvable from the primary config "
+                "without composing its defaults list"
+            ) from e
+        return mode
 
     @staticmethod
     def validate_sweep_overrides_legal(

@@ -15,6 +15,24 @@ class ConfigLoader(ABC):
     Config loader interface
     """
 
+    def get_mode(self, config_name: Optional[str], overrides: List[str]) -> Any:
+        """Return the mode used to dispatch to run or multirun.
+
+        Custom loaders retain the legacy composition-based behavior. The built-in
+        loader overrides this method to inspect only the primary config.
+        """
+        try:
+            cfg = self.load_configuration(
+                config_name=config_name,
+                overrides=overrides,
+                run_mode=RunMode.MULTIRUN,
+                from_shell=True,
+                validate_sweep_overrides=False,
+            )
+            return cfg.hydra.mode
+        except Exception:
+            return None
+
     @abstractmethod
     def load_configuration(
         self,

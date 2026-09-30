@@ -32,6 +32,7 @@ from hydra.core.utils import (
     setup_globals,
     simple_stdout_log_config,
 )
+from hydra.errors import ConfigCompositionException
 from hydra.plugins.completion_plugin import CompletionPlugin
 from hydra.plugins.config_source import ConfigSource
 from hydra.plugins.launcher import Launcher
@@ -125,18 +126,17 @@ class Hydra:
         self,
         config_name: Optional[str],
         overrides: List[str],
-    ) -> Any:
-        try:
-            cfg = self.compose_config(
-                config_name=config_name,
-                overrides=overrides,
-                with_log_configuration=False,
-                run_mode=RunMode.MULTIRUN,
-                validate_sweep_overrides=False,
-            )
-            return cfg.hydra.mode
-        except Exception:
+    ) -> Optional[RunMode]:
+        mode = self.config_loader.get_mode(config_name, overrides)
+        if mode is None:
             return None
+        if isinstance(mode, RunMode):
+            return mode
+        if isinstance(mode, str) and mode in RunMode.__members__:
+            return RunMode[mode]
+        raise ConfigCompositionException(
+            f"Invalid hydra.mode {mode!r}; expected RUN or MULTIRUN"
+        )
 
     def run(
         self,
@@ -154,8 +154,11 @@ class Hydra:
         )
         if cfg.hydra.mode is None:
             cfg.hydra.mode = RunMode.RUN
-        else:
-            assert cfg.hydra.mode == RunMode.RUN
+        elif cfg.hydra.mode != RunMode.RUN:
+            raise ConfigCompositionException(
+                "hydra.mode changed during config composition; set it directly "
+                "in the primary config or on the command line"
+            )
 
         callbacks = Callbacks(cfg)
         callbacks.on_run_start(config=cfg, config_name=config_name)
@@ -207,6 +210,13 @@ class Hydra:
             run_mode=RunMode.MULTIRUN,
             activate_config_repository=True,
         )
+        if cfg.hydra.mode is None:
+            cfg.hydra.mode = RunMode.MULTIRUN
+        elif cfg.hydra.mode != RunMode.MULTIRUN:
+            raise ConfigCompositionException(
+                "hydra.mode changed during config composition; set it directly "
+                "in the primary config or on the command line"
+            )
 
         # Install the composed controller config so controller-side components
         # (callbacks, sweeper, launcher) can resolve ${hydra:...} interpolations
