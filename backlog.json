@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-09-30",
-  "generated_at": "2026-09-30T19:02:34Z",
+  "generated_at": "2026-09-30T21:00:34Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 62,
+    "open_total": 63,
     "by_category": [
       {
         "category": "Bug",
@@ -14,8 +14,8 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 51,
-        "percentage": 82.3
+        "count": 52,
+        "percentage": 82.5
       },
       {
         "category": "Documentation",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 60
+        "count": 61
       },
       {
         "status": "done",
@@ -1050,6 +1050,21 @@
       "updated": "2026-09-30",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3490"
+    },
+    {
+      "number": 3491,
+      "title": "Harden callback lifecycle guarantees",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-09-30",
+      "updated": "2026-09-30",
+      "labels": [
+        "callbacks"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
     },
     {
       "number": 385,
@@ -2287,6 +2302,13 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-09-30T21:00:34Z",
+      "kind": "new",
+      "issue": 3491,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491",
+      "title": "Harden callback lifecycle guarantees"
+    },
     {
       "ts": "2026-09-30T19:02:34Z",
       "kind": "new",
@@ -3896,13 +3918,6 @@
       "issue": 3397,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3397",
       "title": "password"
-    },
-    {
-      "ts": "2026-08-15T07:12:57Z",
-      "kind": "closed",
-      "issue": 3396,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3396",
-      "title": "[Feature Request]"
     }
   ]
 }

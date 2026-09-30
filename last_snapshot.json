@@ -76,7 +76,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-09-30T19:02:34Z",
+  "generated_at": "2026-09-30T21:00:34Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -745,6 +745,18 @@
       "status": "not started",
       "title": "\u9080\u8bf7 hydra \u52a0\u5165 GithubStarMate\uff0c\u8ba9\u66f4\u591a\u4eba\u53d1\u73b0\u4f60\u7684\u4f5c\u54c1",
       "updated_at": "2026-09-30T19:01:08Z"
+    },
+    "3491": {
+      "category": "Enhancement",
+      "created_at": "2026-09-30T20:59:08Z",
+      "labels": [
+        "callbacks"
+      ],
+      "pr_numbers": [],
+      "state": "OPEN",
+      "status": "not started",
+      "title": "Harden callback lifecycle guarantees",
+      "updated_at": "2026-09-30T20:59:08Z"
     },
     "468": {
       "category": "Enhancement",
