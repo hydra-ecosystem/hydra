@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T19:56:45Z",
+  "generated_at": "2026-10-01T22:29:18Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 54,
@@ -2299,6 +2299,24 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
     },
     {
+      "number": 3486,
+      "title": "Modernize type annotations for Python 3.10+",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3501,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3501"
+        }
+      ],
+      "created": "2026-09-28",
+      "updated": "2026-09-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3486"
+    },
+    {
       "number": 3491,
       "title": "Harden callback lifecycle guarantees",
       "category": "Enhancement",
@@ -2317,24 +2335,6 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 3486,
-      "title": "Modernize type annotations for Python 3.10+",
-      "category": "Refactor",
-      "category_emoji": "🔧",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3501,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3501"
-        }
-      ],
-      "created": "2026-09-28",
-      "updated": "2026-09-28",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3486"
     }
   ],
   "updates": [
