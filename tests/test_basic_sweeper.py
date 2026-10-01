@@ -2,7 +2,7 @@
 import re
 import sys
 from textwrap import dedent
-from typing import Any, List, Optional
+from typing import Any
 
 from pytest import mark, param
 
@@ -51,7 +51,7 @@ from hydra.test_utils.test_utils import assert_multiline_regex_search, run_proce
     ],
 )
 def test_split(
-    args: List[str], max_batch_size: Optional[int], expected: List[List[List[str]]]
+    args: list[str], max_batch_size: int | None, expected: list[list[list[str]]]
 ) -> None:
     parser = OverridesParser.create()
     ret = BasicSweeper.split_arguments(

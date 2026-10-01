@@ -3,14 +3,9 @@ import logging
 from dataclasses import dataclass
 from typing import (
     Any,
-    Dict,
     Iterable,
-    List,
     Literal,
     Mapping,
-    Optional,
-    Tuple,
-    Union,
     cast,
 )
 
@@ -33,24 +28,24 @@ log = logging.getLogger(__name__)
 
 AxRangeParameterType = Literal["float", "int"]
 AxChoiceParameterType = Literal["float", "int", "str", "bool"]
-AxParameterConfig = Union[RangeParameterConfig, ChoiceParameterConfig]
-AxMetricValue = Union[float, Tuple[float, float]]
+AxParameterConfig = RangeParameterConfig | ChoiceParameterConfig
+AxMetricValue = float | tuple[float, float]
 AxRawData = Mapping[str, AxMetricValue]
 
 
 @dataclass
 class Trial:
-    overrides: List[str]
+    overrides: list[str]
     trial_index: int
 
 
 @dataclass
 class TrialBatch:
-    list_of_trials: List[Trial]
+    list_of_trials: list[Trial]
     is_search_space_exhausted: bool
 
 
-def encoder_parameters_into_string(parameters: List[Dict[str, Any]]) -> str:
+def encoder_parameters_into_string(parameters: list[dict[str, Any]]) -> str:
     """Convert a list of params into a string"""
     mandatory_keys = {"name", "type", "bounds", "values", "value"}
     parameter_log_string = ""
@@ -71,8 +66,8 @@ def encoder_parameters_into_string(parameters: List[Dict[str, Any]]) -> str:
 
 
 def map_params_to_arg_list(
-    params: Mapping[str, Union[str, float, int, bool]],
-) -> List[str]:
+    params: Mapping[str, str | float | int | bool],
+) -> list[str]:
     """Method to map a dictionary of params to a list of string arguments"""
     arg_list = []
     for key in params:
@@ -93,7 +88,7 @@ def get_ax_choice_parameter_type(values: Iterable[Any]) -> AxChoiceParameterType
     raise ValueError(f"Unsupported mixed Ax parameter value types: {value_types}")
 
 
-def create_ax_parameter_config(param: Dict[Any, Any]) -> AxParameterConfig:
+def create_ax_parameter_config(param: dict[Any, Any]) -> AxParameterConfig:
     name = param["name"]
     if param["type"] == "range":
         bounds = param["bounds"]
@@ -102,7 +97,7 @@ def create_ax_parameter_config(param: Dict[Any, Any]) -> AxParameterConfig:
         )
         return RangeParameterConfig(
             name=name,
-            bounds=cast(Tuple[float, float], tuple(bounds)),
+            bounds=cast(tuple[float, float], tuple(bounds)),
             parameter_type=range_parameter_type,
             scaling="log" if param.get("log_scale") else None,
         )
@@ -143,7 +138,7 @@ def create_ax_raw_data(value: Any, objective_name: str, is_noisy: bool) -> AxRaw
 
     assert isinstance(value, (int, float, tuple, dict))
     if isinstance(value, dict):
-        raw_data: Dict[str, AxMetricValue] = {}
+        raw_data: dict[str, AxMetricValue] = {}
         for metric_name, metric_value in value.items():
             assert isinstance(metric_name, str)
             raw_data[metric_name] = normalize_metric(metric_value)
@@ -180,10 +175,10 @@ def get_one_batch_of_trials(
 class CoreAxSweeper(Sweeper):
     """Class to interface with the Ax Platform"""
 
-    def __init__(self, ax_config: AxConfig, max_batch_size: Optional[int]):
-        self.config: Optional[DictConfig] = None
-        self.launcher: Optional[Launcher] = None
-        self.hydra_context: Optional[HydraContext] = None
+    def __init__(self, ax_config: AxConfig, max_batch_size: int | None):
+        self.config: DictConfig | None = None
+        self.launcher: Launcher | None = None
+        self.hydra_context: HydraContext | None = None
 
         self.job_results = None
         self.experiment: ExperimentConfig = ax_config.experiment
@@ -198,7 +193,7 @@ class CoreAxSweeper(Sweeper):
         if hasattr(ax_config, "params"):
             self.ax_params.update(ax_config.params)
         self.sweep_dir: str
-        self.job_idx: Optional[int] = None
+        self.job_idx: int | None = None
         self.max_batch_size = max_batch_size
         self.is_noisy: bool = ax_config.is_noisy
 
@@ -216,7 +211,7 @@ class CoreAxSweeper(Sweeper):
         )
         self.sweep_dir = config.hydra.sweep.dir
 
-    def sweep(self, arguments: List[str]) -> None:
+    def sweep(self, arguments: list[str]) -> None:
         self.job_idx = 0
         ax_client = self.setup_ax_client(arguments)
 
@@ -264,7 +259,7 @@ class CoreAxSweeper(Sweeper):
         log.info("Best parameters: " + str(best_parameters))
 
     def sweep_over_batches(
-        self, ax_client: Client, list_of_trials: List[Trial]
+        self, ax_client: Client, list_of_trials: list[Trial]
     ) -> None:
         assert self.launcher is not None
         assert self.job_idx is not None
@@ -295,7 +290,7 @@ class CoreAxSweeper(Sweeper):
 
     def get_best_point(
         self, ax_client: Client
-    ) -> Optional[Tuple[Mapping[str, Any], float]]:
+    ) -> tuple[Mapping[str, Any], float] | None:
         try:
             best_parameters, metrics, _, _ = ax_client.get_best_parameterization(
                 use_model_predictions=False
@@ -310,12 +305,12 @@ class CoreAxSweeper(Sweeper):
             metric = metric[0]
         return best_parameters, float(metric)
 
-    def setup_ax_client(self, arguments: List[str]) -> Client:
+    def setup_ax_client(self, arguments: list[str]) -> Client:
         """Method to setup the Ax Client"""
-        parameters: List[Dict[Any, Any]] = []
+        parameters: list[dict[Any, Any]] = []
         for key, value in self.ax_params.items():
             param = OmegaConf.to_container(value, resolve=True)
-            assert isinstance(param, Dict)
+            assert isinstance(param, dict)
             if param["type"] == "range":
                 bounds = param["bounds"]
                 if not (all(isinstance(x, int) for x in bounds)):
@@ -361,12 +356,12 @@ class CoreAxSweeper(Sweeper):
         return ax_client
 
     def parse_commandline_args(
-        self, arguments: List[str]
-    ) -> List[Dict[str, Union[ax_types.TParamValue, List[ax_types.TParamValue]]]]:
+        self, arguments: list[str]
+    ) -> list[dict[str, ax_types.TParamValue | list[ax_types.TParamValue]]]:
         """Method to parse the command line arguments and convert them into Ax parameters"""
         parser = OverridesParser.create()
         parsed = parser.parse_overrides(arguments)
-        parameters: List[Dict[str, Any]] = []
+        parameters: list[dict[str, Any]] = []
         for override in parsed:
             if override.is_sweep_override():
                 if override.is_choice_sweep():
@@ -386,7 +381,7 @@ class CoreAxSweeper(Sweeper):
         return parameters
 
     @staticmethod
-    def chunks(batch: List[Any], n: Optional[int]) -> Iterable[List[Any]]:
+    def chunks(batch: list[Any], n: int | None) -> Iterable[list[Any]]:
         """
         Chunk the batch into chunks of upto to n items (each)
         """
@@ -398,7 +393,7 @@ class CoreAxSweeper(Sweeper):
             yield batch[i : i + n]
 
 
-def create_range_param_using_interval_override(override: Override) -> Dict[str, Any]:
+def create_range_param_using_interval_override(override: Override) -> dict[str, Any]:
     key = override.get_key_element()
     value = override.value()
     assert isinstance(value, IntervalSweep)
@@ -411,7 +406,7 @@ def create_range_param_using_interval_override(override: Override) -> Dict[str, 
     return param
 
 
-def create_choice_param_from_choice_override(override: Override) -> Dict[str, Any]:
+def create_choice_param_from_choice_override(override: Override) -> dict[str, Any]:
     key = override.get_key_element()
     param = {
         "name": key,
@@ -421,7 +416,7 @@ def create_choice_param_from_choice_override(override: Override) -> Dict[str, An
     return param
 
 
-def create_choice_param_from_range_override(override: Override) -> Dict[str, Any]:
+def create_choice_param_from_range_override(override: Override) -> dict[str, Any]:
     key = override.get_key_element()
     param = {
         "name": key,
@@ -432,7 +427,7 @@ def create_choice_param_from_range_override(override: Override) -> Dict[str, Any
     return param
 
 
-def create_fixed_param_from_element_override(override: Override) -> Dict[str, Any]:
+def create_fixed_param_from_element_override(override: Override) -> dict[str, Any]:
     key = override.get_key_element()
     param = {
         "name": key,

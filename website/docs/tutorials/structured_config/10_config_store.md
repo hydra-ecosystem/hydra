@@ -18,9 +18,9 @@ class ConfigStore(metaclass=Singleton):
         self,
         name: str,
         node: Any,
-        group: Optional[str] = None,
-        package: Optional[str] = None,
-        provider: Optional[str] = None,
+        group: str | None = None,
+        package: str | None = None,
+        provider: str | None = None,
     ) -> None:
         """
         Stores a config node into the repository

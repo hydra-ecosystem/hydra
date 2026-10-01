@@ -4,7 +4,7 @@ Sweeper plugin interface
 """
 
 from abc import abstractmethod
-from typing import Any, List, Optional, Sequence
+from typing import Any, Sequence
 
 from omegaconf import DictConfig
 
@@ -21,9 +21,9 @@ class Sweeper(Plugin):
     (where each job typically takes a different command line arguments)
     """
 
-    hydra_context: Optional[HydraContext]
-    config: Optional[DictConfig]
-    launcher: Optional[Launcher]
+    hydra_context: HydraContext | None
+    config: DictConfig | None
+    launcher: Launcher | None
 
     @abstractmethod
     def setup(
@@ -36,7 +36,7 @@ class Sweeper(Plugin):
         raise NotImplementedError()
 
     @abstractmethod
-    def sweep(self, arguments: List[str]) -> Any:
+    def sweep(self, arguments: list[str]) -> Any:
         """
         Execute a sweep
         :param arguments: list of strings describing what this sweeper should do.

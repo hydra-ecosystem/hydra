@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from inspect import signature
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from omegaconf import MISSING, OmegaConf
 from pytest import fixture, mark, param, raises, warns
@@ -44,7 +44,7 @@ EXTEND_LIST_DEPRECATION_WARNING = (
 
 
 @fixture
-def initialize_hydra(config_path: Optional[str]) -> Any:
+def initialize_hydra(config_path: str | None) -> Any:
     try:
         init = initialize(config_path=config_path)
         init.__enter__()
@@ -321,14 +321,14 @@ class TestCompose:
     def test_compose_config(
         self,
         config_file: str,
-        overrides: List[str],
+        overrides: list[str],
         expected: Any,
     ) -> None:
         cfg = compose(config_file, overrides)
         assert cfg == expected
 
     def test_strict_failure_global_strict(
-        self, config_file: str, overrides: List[str], expected: Any
+        self, config_file: str, overrides: list[str], expected: Any
     ) -> None:
         # default strict True, call is unspecified
         overrides.append("fooooooooo=bar")
@@ -417,7 +417,7 @@ def test_top_level_config_is_list() -> None:
 )
 class TestComposeInits:
     def test_initialize_ctx(
-        self, config_file: str, overrides: List[str], expected: Any
+        self, config_file: str, overrides: list[str], expected: Any
     ) -> None:
         with initialize(
             config_path="../examples/jupyter_notebooks/cloud_app/conf",
@@ -426,7 +426,7 @@ class TestComposeInits:
             assert ret == expected
 
     def test_initialize_config_dir_ctx_with_relative_dir(
-        self, config_file: str, overrides: List[str], expected: Any
+        self, config_file: str, overrides: list[str], expected: Any
     ) -> None:
         with raises(
             HydraException,
@@ -442,7 +442,7 @@ class TestComposeInits:
                 assert ret == expected
 
     def test_initialize_config_module_ctx(
-        self, config_file: str, overrides: List[str], expected: Any
+        self, config_file: str, overrides: list[str], expected: Any
     ) -> None:
         with initialize_config_module(
             config_module="examples.jupyter_notebooks.cloud_app.conf",
@@ -482,7 +482,7 @@ def test_initialize_config_dir_ctx_with_absolute_dir(
     "job_name,expected", [(None, "test_compose"), ("test_job", "test_job")]
 )
 def test_jobname_override_initialize_ctx(
-    hydra_restore_singletons: Any, job_name: Optional[str], expected: str
+    hydra_restore_singletons: Any, job_name: str | None, expected: str
 ) -> None:
     with initialize(
         config_path="../examples/jupyter_notebooks/cloud_app/conf",
@@ -591,11 +591,11 @@ def test_initialization_root_module(monkeypatch: Any) -> None:
     ],
 )
 def test_adding_to_sc_dict(
-    hydra_restore_singletons: Any, overrides: List[str], expected: Any
+    hydra_restore_singletons: Any, overrides: list[str], expected: Any
 ) -> None:
     @dataclass
     class Config:
-        map: Dict[str, str] = field(default_factory=dict)
+        map: dict[str, str] = field(default_factory=dict)
 
     ConfigStore.instance().store(name="config", node=Config)
 
@@ -634,7 +634,7 @@ def test_adding_to_sc_dict(
     ],
 )
 def test_extending_list(
-    hydra_restore_singletons: Any, overrides: List[str], expected: Any
+    hydra_restore_singletons: Any, overrides: list[str], expected: Any
 ) -> None:
     @dataclass
     class Config:
@@ -811,7 +811,7 @@ class TestConfigSearchPathOverride:
         self,
         init_configs: Any,
         config_name: str,
-        overrides: List[str],
+        overrides: list[str],
         expected: Any,
     ) -> None:
         cfg = compose(config_name=config_name, overrides=overrides)
@@ -882,7 +882,7 @@ class TestConfigSearchPathOverride:
         self,
         init_configs: Any,
         config_name: str,
-        overrides: List[str],
+        overrides: list[str],
         expected: Any,
     ) -> None:
         with expected:
@@ -972,7 +972,7 @@ def test_initialize_without_config_path(tmpdir: Path) -> None:
     ],
 )
 def test_error_assigning_null_to_hydra_config(
-    hydra_restore_singletons: Any, overrides: List[str], expected: Any
+    hydra_restore_singletons: Any, overrides: list[str], expected: Any
 ) -> None:
     with expected:
         compose(overrides=overrides)
@@ -986,7 +986,7 @@ def test_error_assigning_null_to_hydra_config(
         param(False, id="strict=False"),
     ],
 )
-def test_removed_compose_strict_flag(strict: Optional[bool]) -> None:
+def test_removed_compose_strict_flag(strict: bool | None) -> None:
     compose_func = globals()["compose"]
     with raises(TypeError, match="got an unexpected keyword argument 'strict'"):
         compose_func(overrides=[], strict=strict)
@@ -996,12 +996,12 @@ def test_removed_compose_strict_flag(strict: Optional[bool]) -> None:
 def test_missing_node_with_defaults_list(hydra_restore_singletons: Any) -> None:
     @dataclass
     class Reducer:
-        defaults: List[Any] = field(default_factory=lambda: [])
+        defaults: list[Any] = field(default_factory=lambda: [])
 
     @dataclass
     class Trainer:
         reducer: Reducer = MISSING
-        defaults: List[Any] = field(
+        defaults: list[Any] = field(
             default_factory=lambda: [{"/reducer": "base_reducer"}]
         )
 
@@ -1022,9 +1022,9 @@ def test_enum_with_removed_defaults_list(hydra_restore_singletons: Any) -> None:
 
     @dataclass
     class Conf:
-        enum_dict: Dict[Category, str] = field(default_factory=dict)
-        int_dict: Dict[int, str] = field(default_factory=dict)
-        str_dict: Dict[str, str] = field(default_factory=dict)
+        enum_dict: dict[Category, str] = field(default_factory=dict)
+        int_dict: dict[int, str] = field(default_factory=dict)
+        str_dict: dict[str, str] = field(default_factory=dict)
 
     cs = ConfigStore.instance()
     cs.store(name="conf", node=Conf)

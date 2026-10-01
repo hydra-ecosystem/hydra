@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
 from pytest import mark, param
 
@@ -93,7 +93,7 @@ def test_cli_error(
     tmpdir: Any,
     monkeypatch: Any,
     override: Any,
-    expected_substrings: List[str],
+    expected_substrings: list[str],
 ) -> None:
     monkeypatch.chdir("tests/test_apps/app_without_config/")
     if isinstance(override, str):

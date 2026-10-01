@@ -8,7 +8,7 @@ import sys
 import warnings
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, Callable, Dict, Tuple, cast
+from typing import Any, Callable, cast
 
 from hydra._internal.deprecation_warning import deprecation_warning
 from hydra._internal.execution_policy import (
@@ -34,7 +34,7 @@ from hydra.errors import InstantiationException
 # Hydra's built-in logging configurations must continue to work when an
 # application enables a restrictive execution whitelist. Keep this list exact so
 # it does not broaden instantiate() authorization or trust a package namespace.
-_BUILTIN_LOGGING_TARGETS: Tuple[str, ...] = (
+_BUILTIN_LOGGING_TARGETS: tuple[str, ...] = (
     "colorlog.ColoredFormatter",
     "logging.FileHandler",
     "logging.StreamHandler",
@@ -85,7 +85,7 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
 
     def __init__(
         self,
-        config: Dict[str, Any],
+        config: dict[str, Any],
         execution_whitelist: NormalizedExecutionWhitelist,
     ) -> None:
         super().__init__(config)
@@ -97,8 +97,8 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
                 "5e70100572e2183db32478e51b32d1edd9b9e1af4a47747d10c7b80b8fadf76e"
             )
         )
-        self._resolved_targets: Dict[str, Any] = {}
-        self._resolved_target_sources: Dict[int, str] = {}
+        self._resolved_targets: dict[str, Any] = {}
+        self._resolved_target_sources: dict[int, str] = {}
 
     def configure(self) -> None:
         with _execution_policy_context(self._execution_policy):
@@ -135,8 +135,8 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
     def _invoke_authorized_callable(
         self,
         target: Callable[..., Any],
-        args: Tuple[Any, ...],
-        kwargs: Dict[str, Any],
+        args: tuple[Any, ...],
+        kwargs: dict[str, Any],
         resolved_from: str,
     ) -> Any:
         effective_target, effective_args, effective_kwargs = (
@@ -253,10 +253,10 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
                 fmt = config.get("format")
                 datefmt = config.get("datefmt")
                 style = config.get("style", "%")
-                args: Tuple[Any, ...] = (fmt, datefmt, style)
+                args: tuple[Any, ...] = (fmt, datefmt, style)
                 if "validate" in config:
                     args += (config["validate"],)
-                kwargs: Dict[str, Any] = {}
+                kwargs: dict[str, Any] = {}
                 if sys.version_info >= (3, 12):
                     defaults = config.get("defaults")
                     if defaults is not None:
@@ -384,7 +384,7 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
 
 
 def configure_logging(
-    config: Dict[str, Any], execution_whitelist: ExecutionWhitelist = None
+    config: dict[str, Any], execution_whitelist: ExecutionWhitelist = None
 ) -> None:
     if logging.config.dictConfigClass is not logging.config.DictConfigurator:
         raise ValueError(

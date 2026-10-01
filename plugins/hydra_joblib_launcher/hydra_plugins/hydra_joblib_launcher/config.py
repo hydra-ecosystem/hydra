@@ -1,6 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass
-from typing import Optional
 
 from hydra.core.config_store import ConfigStore
 
@@ -13,22 +12,22 @@ class JobLibLauncherConf:
     n_jobs: int = -1
 
     # limit the number of threads used by third-party libraries in each worker process
-    inner_max_num_threads: Optional[int] = None
+    inner_max_num_threads: int | None = None
 
     # process backend: loky (default) or multiprocessing
-    backend: Optional[str] = "loky"
+    backend: str | None = "loky"
 
     # processes or threads, soft hint to choose backend
     prefer: str = "processes"
 
     # null or sharedmem, sharedmem will select thread-based backend
-    require: Optional[str] = None
+    require: str | None = None
 
     # if greater than zero, prints progress messages
     verbose: int = 0
 
     # timeout limit for each task. Unit dependent on backend implementation; miliseconds for loky.
-    timeout: Optional[float] = None
+    timeout: float | None = None
 
     # number of batches to be pre-dispatched
     pre_dispatch: str = "2*n_jobs"
@@ -37,10 +36,10 @@ class JobLibLauncherConf:
     batch_size: str = "auto"
 
     # path used for memmapping large arrays for sharing memory with workers
-    temp_folder: Optional[str] = None
+    temp_folder: str | None = None
 
     # thresholds size of arrays that triggers automated memmapping
-    max_nbytes: Optional[str] = None
+    max_nbytes: str | None = None
 
     # memmapping mode for numpy arrays passed to workers
     mmap_mode: str = "r"

@@ -10,7 +10,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from importlib.metadata import entry_points
 from timeit import default_timer as timer
-from typing import Any, Dict, List, Optional, Tuple, Type
+from typing import Any
 
 from omegaconf import DictConfig
 
@@ -26,7 +26,7 @@ from hydra.plugins.sweeper import Sweeper
 from hydra.types import HydraContext, TaskFunction
 from hydra.utils import instantiate
 
-PLUGIN_TYPES: List[Type[Plugin]] = [
+PLUGIN_TYPES: list[type[Plugin]] = [
     Plugin,
     ConfigSource,
     CompletionPlugin,
@@ -40,7 +40,7 @@ PLUGIN_TYPES: List[Type[Plugin]] = [
 class ScanStats:
     total_time: float = 0
     total_modules_import_time: float = 0
-    modules_import_time: Dict[str, float] = field(default_factory=dict)
+    modules_import_time: dict[str, float] = field(default_factory=dict)
 
 
 class Plugins(metaclass=Singleton):
@@ -51,13 +51,13 @@ class Plugins(metaclass=Singleton):
         return ret
 
     def __init__(self) -> None:
-        self.plugin_type_to_subclass_list: Dict[Type[Plugin], List[Type[Plugin]]] = {}
-        self.class_name_to_class: Dict[str, Type[Plugin]] = {}
-        self.stats: Optional[ScanStats] = None
+        self.plugin_type_to_subclass_list: dict[type[Plugin], list[type[Plugin]]] = {}
+        self.class_name_to_class: dict[str, type[Plugin]] = {}
+        self.stats: ScanStats | None = None
         self._initialize()
 
     def _initialize(self) -> None:
-        top_level: List[Any] = []
+        top_level: list[Any] = []
         core_plugins = importlib.import_module("hydra._internal.core_plugins")
         top_level.append(core_plugins)
 
@@ -108,7 +108,7 @@ class Plugins(metaclass=Singleton):
         for clazz in scanned_plugins:
             self._register(clazz)
 
-    def register(self, clazz: Type[Plugin]) -> None:
+    def register(self, clazz: type[Plugin]) -> None:
         """
         Call Plugins.instance().register(MyPlugin) to manually register a plugin class.
         """
@@ -116,7 +116,7 @@ class Plugins(metaclass=Singleton):
             raise ValueError("Not a valid Hydra Plugin")
         self._register(clazz)
 
-    def _register(self, clazz: Type[Plugin]) -> None:
+    def _register(self, clazz: type[Plugin]) -> None:
         assert _is_concrete_plugin_type(clazz)
         for plugin_type in PLUGIN_TYPES:
             if issubclass(clazz, plugin_type):
@@ -189,12 +189,12 @@ class Plugins(metaclass=Singleton):
 
     @staticmethod
     def _scan_all_plugins(
-        modules: List[Any],
-    ) -> Tuple[List[Type[Plugin]], ScanStats]:
+        modules: list[Any],
+    ) -> tuple[list[type[Plugin]], ScanStats]:
         stats = ScanStats()
         stats.total_time = timer()
 
-        scanned_plugins: List[Type[Plugin]] = []
+        scanned_plugins: list[type[Plugin]] = []
 
         for mdl in modules:
             for importer, modname, ispkg in pkgutil.walk_packages(
@@ -263,18 +263,16 @@ class Plugins(metaclass=Singleton):
         stats.total_time = timer() - stats.total_time
         return scanned_plugins, stats
 
-    def get_stats(self) -> Optional[ScanStats]:
+    def get_stats(self) -> ScanStats | None:
         return self.stats
 
-    def discover(
-        self, plugin_type: Optional[Type[Plugin]] = None
-    ) -> List[Type[Plugin]]:
+    def discover(self, plugin_type: type[Plugin] | None = None) -> list[type[Plugin]]:
         """
         :param plugin_type: class of plugin to discover, None for all
         :return: a list of plugins implementing the plugin type (or all if plugin type is None)
         """
         Plugins.check_usage(self)
-        ret: List[Type[Plugin]] = []
+        ret: list[type[Plugin]] = []
         if plugin_type is None:
             plugin_type = Plugin
         assert issubclass(plugin_type, Plugin)

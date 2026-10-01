@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass, field
-from typing import Any, List
+from typing import Any
 
 from omegaconf import MISSING
 
@@ -54,7 +54,7 @@ class PostGreSQLConfig(DBConfig):
 
 @dataclass
 class Config:
-    defaults: List[Any] = field(
+    defaults: list[Any] = field(
         default_factory=lambda: [
             "_self_",
             {"db": "mysql"},

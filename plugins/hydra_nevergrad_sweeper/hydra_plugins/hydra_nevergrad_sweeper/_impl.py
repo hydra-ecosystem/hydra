@@ -3,13 +3,8 @@ import logging
 import math
 from typing import (
     Any,
-    Dict,
-    List,
     MutableMapping,
     MutableSequence,
-    Optional,
-    Tuple,
-    Union,
 )
 
 import nevergrad as ng
@@ -34,7 +29,7 @@ log = logging.getLogger(__name__)
 
 
 def create_nevergrad_param_from_config(
-    config: Union[MutableSequence[Any], MutableMapping[str, Any]],
+    config: MutableSequence[Any] | MutableMapping[str, Any],
 ) -> Any:
     if isinstance(config, MutableSequence):
         if isinstance(config, ListConfig):
@@ -89,19 +84,19 @@ class NevergradSweeperImpl(Sweeper):
     def __init__(
         self,
         optim: OptimConf,
-        parametrization: Optional[DictConfig] = None,
-        params: Optional[DictConfig] = None,
+        parametrization: DictConfig | None = None,
+        params: DictConfig | None = None,
     ):
         self.opt_config = optim
-        self.config: Optional[DictConfig] = None
-        self.launcher: Optional[Launcher] = None
-        self.hydra_context: Optional[HydraContext] = None
+        self.config: DictConfig | None = None
+        self.launcher: Launcher | None = None
+        self.hydra_context: HydraContext | None = None
         self.job_results = None
         self.parametrization = parametrization
         self.params = params
-        self.job_idx: Optional[int] = None
+        self.job_idx: int | None = None
 
-    def _process_parameter_config(self) -> Tuple[Dict[str, Any], List[str]]:
+    def _process_parameter_config(self) -> tuple[dict[str, Any], list[str]]:
         if self.params is not None and self.parametrization is not None:
             raise ValueError(
                 "hydra.sweeper.params and hydra.sweeper.parametrization "
@@ -125,7 +120,7 @@ class NevergradSweeperImpl(Sweeper):
                 [],
             )
 
-        params: Dict[str, Any] = {}
+        params: dict[str, Any] = {}
         overrides = []
         if self.params is not None:
             for key, value in self.params.items():
@@ -149,7 +144,7 @@ class NevergradSweeperImpl(Sweeper):
             hydra_context=hydra_context, task_function=task_function, config=config
         )
 
-    def sweep(self, arguments: List[str]) -> None:
+    def sweep(self, arguments: list[str]) -> None:
         assert self.config is not None
         assert self.launcher is not None
         assert self.job_idx is not None
@@ -187,8 +182,8 @@ class NevergradSweeperImpl(Sweeper):
             num_workers=nw,
         )
         # loop!
-        all_returns: List[Any] = []
-        best: Tuple[float, ng.p.Parameter] = (float("inf"), parametrization)
+        all_returns: list[Any] = []
+        best: tuple[float, ng.p.Parameter] = (float("inf"), parametrization)
         while remaining_budget > 0:
             batch = min(nw, remaining_budget)
             remaining_budget -= batch

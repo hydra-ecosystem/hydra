@@ -1,7 +1,8 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import inspect
 import re
-from typing import Any, Union
+from types import UnionType
+from typing import Any, Union, get_args, get_origin
 
 from omegaconf._utils import is_dict_annotation, is_list_annotation
 
@@ -42,8 +43,8 @@ def escape_special_characters(s: str) -> str:
 
 def is_type_matching(value: Any, type_: Any) -> bool:
     # Union
-    if hasattr(type_, "__origin__") and type_.__origin__ is Union:
-        types = list(type_.__args__)
+    if get_origin(type_) in (Union, UnionType):
+        types = list(get_args(type_))
         for idx, t in enumerate(types):
             # for now treat any Dict[X,Y] as dict and any List[X] as list, ignoring element types
             if is_dict_annotation(t):

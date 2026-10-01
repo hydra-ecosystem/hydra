@@ -37,7 +37,7 @@ defaults = [
 @dataclass
 class Config:
     # this is unfortunately verbose due to @dataclass limitations
-    defaults: List[Any] = field(default_factory=lambda: defaults)
+    defaults: list[Any] = field(default_factory=lambda: defaults)
 
     # Hydra will populate this field based on the defaults list
     db: Any = MISSING
@@ -79,7 +79,7 @@ For example, if the primary config is:
 ```python {6}
 @dataclass
 class Config:
-    defaults: List[Any] = field(default_factory=lambda: [
+    defaults: list[Any] = field(default_factory=lambda: [
         "debug/activate",
         # If you do not specify _self_, it will be appended to the end of the defaults list by default.
         "_self_"
@@ -92,7 +92,7 @@ To get `debug/activate.yaml` to override this config, explicitly specify `_self_
 ```python {4}
 @dataclass
 class Config:
-    defaults: List[Any] = field(default_factory=lambda: [
+    defaults: list[Any] = field(default_factory=lambda: [
         "_self_",
         "debug/activate",
     ])

@@ -1,5 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import Any, Optional
+from typing import Any
 
 from omegaconf import DictConfig, OmegaConf
 
@@ -9,7 +9,7 @@ from hydra.core.singleton import Singleton
 
 class HydraConfig(metaclass=Singleton):
     def __init__(self) -> None:
-        self.cfg: Optional[HydraConf] = None
+        self.cfg: HydraConf | None = None
 
     def set_config(self, cfg: DictConfig) -> None:
         assert cfg is not None

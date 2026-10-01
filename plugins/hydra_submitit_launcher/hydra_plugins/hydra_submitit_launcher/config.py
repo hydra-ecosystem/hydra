@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from hydra.core.config_store import ConfigStore
 
@@ -14,13 +14,13 @@ class BaseQueueConf:
     # maximum time for the job in minutes
     timeout_min: int = 60
     # number of cpus to use for each task
-    cpus_per_task: Optional[int] = None
+    cpus_per_task: int | None = None
     # number of gpus to use on each node
-    gpus_per_node: Optional[int] = None
+    gpus_per_node: int | None = None
     # number of tasks to spawn on each node
-    tasks_per_node: Optional[int] = 1
+    tasks_per_node: int | None = 1
     # memory to reserve for the job on each node (in GB)
-    mem_gb: Optional[int] = None
+    mem_gb: int | None = None
     # number of nodes to use for the job
     nodes: int = 1
     # name of the job
@@ -44,17 +44,17 @@ class SlurmQueueConf(BaseQueueConf):
     # More information: https://slurm.schedmd.com/sbatch.html
     #
     # slurm partition to use on the cluster
-    partition: Optional[str] = None
-    qos: Optional[str] = None
-    comment: Optional[str] = None
-    constraint: Optional[str] = None
-    exclude: Optional[str] = None
-    gres: Optional[str] = None
-    cpus_per_gpu: Optional[int] = None
-    gpus_per_task: Optional[int] = None
-    mem_per_gpu: Optional[str] = None
-    mem_per_cpu: Optional[str] = None
-    account: Optional[str] = None
+    partition: str | None = None
+    qos: str | None = None
+    comment: str | None = None
+    constraint: str | None = None
+    exclude: str | None = None
+    gres: str | None = None
+    cpus_per_gpu: int | None = None
+    gpus_per_task: int | None = None
+    mem_per_gpu: str | None = None
+    mem_per_cpu: str | None = None
+    account: str | None = None
 
     # Following parameters are submitit specifics
     #
@@ -67,16 +67,16 @@ class SlurmQueueConf(BaseQueueConf):
     # https://github.com/facebookincubator/submitit/blob/main/docs/checkpointing.md
     max_num_timeout: int = 0
     # Python executable to use instead of the default sys.executable
-    python: Optional[str] = None
+    python: str | None = None
     # Useful to add parameters which are not currently available in the plugin.
     # Eg: {"mail-user": "user@example.com", "mail-type": "BEGIN"}
-    additional_parameters: Dict[str, Any] = field(default_factory=dict)
+    additional_parameters: dict[str, Any] = field(default_factory=dict)
     # Maximum number of jobs running in parallel
     array_parallelism: int = 256
     # A list of commands to run in sbatch befure running srun
-    setup: Optional[List[str]] = None
+    setup: list[str] | None = None
     # Any additional arguments that should be passed to srun
-    srun_args: Optional[List[str]] = None
+    srun_args: list[str] | None = None
     # Launch tasks through srun rather than directly in the batch script
     use_srun: bool = True
 

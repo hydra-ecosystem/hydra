@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional
+from typing import Any
 
 from omegaconf import DictConfig
 
@@ -15,7 +15,7 @@ class ConfigLoader(ABC):
     Config loader interface
     """
 
-    def get_mode(self, config_name: Optional[str], overrides: List[str]) -> Any:
+    def get_mode(self, config_name: str | None, overrides: list[str]) -> Any:
         """Return the mode used to dispatch to run or multirun.
 
         Custom loaders retain the legacy composition-based behavior. The built-in
@@ -36,8 +36,8 @@ class ConfigLoader(ABC):
     @abstractmethod
     def load_configuration(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode,
         from_shell: bool = True,
         validate_sweep_overrides: bool = True,
@@ -45,31 +45,31 @@ class ConfigLoader(ABC):
 
     @abstractmethod
     def load_sweep_config(
-        self, master_config: DictConfig, sweep_overrides: List[str]
+        self, master_config: DictConfig, sweep_overrides: list[str]
     ) -> DictConfig: ...
 
     @abstractmethod
     def get_search_path(self) -> ConfigSearchPath: ...
 
     @abstractmethod
-    def get_sources(self) -> List[ConfigSource]: ...
+    def get_sources(self) -> list[ConfigSource]: ...
 
     @abstractmethod
-    def list_groups(self, parent_name: str) -> List[str]: ...
+    def list_groups(self, parent_name: str) -> list[str]: ...
 
     @abstractmethod
     def get_group_options(
         self,
         group_name: str,
-        results_filter: Optional[ObjectType] = ObjectType.CONFIG,
-        config_name: Optional[str] = None,
-        overrides: Optional[List[str]] = None,
-    ) -> List[str]: ...
+        results_filter: ObjectType | None = ObjectType.CONFIG,
+        config_name: str | None = None,
+        overrides: list[str] | None = None,
+    ) -> list[str]: ...
 
     @abstractmethod
     def compute_defaults_list(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode,
     ) -> Any: ...

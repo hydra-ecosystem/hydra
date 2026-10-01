@@ -1,5 +1,4 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import List, Optional
 
 from hydra import TaskFunction
 from hydra.plugins.sweeper import Sweeper
@@ -15,8 +14,8 @@ class NevergradSweeper(Sweeper):
     def __init__(
         self,
         optim: OptimConf,
-        parametrization: Optional[DictConfig] = None,
-        params: Optional[DictConfig] = None,
+        parametrization: DictConfig | None = None,
+        params: DictConfig | None = None,
     ):
         from ._impl import NevergradSweeperImpl
 
@@ -33,5 +32,5 @@ class NevergradSweeper(Sweeper):
             hydra_context=hydra_context, task_function=task_function, config=config
         )
 
-    def sweep(self, arguments: List[str]) -> None:
+    def sweep(self, arguments: list[str]) -> None:
         return self.sweeper.sweep(arguments)

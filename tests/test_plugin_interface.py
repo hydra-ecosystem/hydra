@@ -3,7 +3,7 @@ import importlib
 import sys
 import types
 import warnings
-from typing import Any, List, Sequence, Type
+from typing import Any, Sequence
 
 from omegaconf import DictConfig, OmegaConf
 from pytest import MonkeyPatch, mark, raises, warns
@@ -22,7 +22,7 @@ from hydra.utils import get_class
 # Individual plugins are responsible to test that they are discoverable.
 launchers = ["hydra._internal.core_plugins.basic_launcher.BasicLauncher"]
 sweepers = ["hydra._internal.core_plugins.basic_sweeper.BasicSweeper"]
-search_path_plugins: List[str] = []
+search_path_plugins: list[str] = []
 
 
 class PluginWithNestedTarget(Launcher):
@@ -80,7 +80,7 @@ class ExternalSweeper(Sweeper):
         (Plugin, launchers + sweepers + search_path_plugins),
     ],
 )
-def test_discover(plugin_type: Type[Plugin], expected: List[str]) -> None:
+def test_discover(plugin_type: type[Plugin], expected: list[str]) -> None:
     plugins = Plugins.instance().discover(plugin_type)
     expected_classes = [get_class(c) for c in expected]
     for ex in expected_classes:
@@ -118,7 +118,7 @@ def test_entry_point_plugin_discovery(
     class EntryPoint:
         name = "external"
 
-        def load(self) -> Type[ExternalLauncher]:
+        def load(self) -> type[ExternalLauncher]:
             return ExternalLauncher
 
     with monkeypatch.context() as patch:
@@ -136,7 +136,7 @@ def test_entry_point_plugin_discovery(
 def test_bad_entry_point_does_not_stop_discovery(
     monkeypatch: MonkeyPatch,
     hydra_restore_singletons: Any,
-    error_type: Type[Exception],
+    error_type: type[Exception],
 ) -> None:
     original_import_module = importlib.import_module
 
@@ -154,7 +154,7 @@ def test_bad_entry_point_does_not_stop_discovery(
     class ValidEntryPoint:
         name = "valid"
 
-        def load(self) -> Type[ExternalLauncher]:
+        def load(self) -> type[ExternalLauncher]:
             return ExternalLauncher
 
     with monkeypatch.context() as patch:
@@ -196,7 +196,7 @@ def test_unrelated_entry_point_does_not_hide_editable_warning(
         name = "external"
         dist = types.SimpleNamespace(name="another-plugin")
 
-        def load(self) -> Type[ExternalLauncher]:
+        def load(self) -> type[ExternalLauncher]:
             return ExternalLauncher
 
     with monkeypatch.context() as patch:

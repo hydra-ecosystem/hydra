@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import re
 from textwrap import dedent
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from omegaconf import OmegaConf
 from pytest import mark, param, raises
@@ -129,7 +129,7 @@ Plugins.instance()
 )
 def test_simple_defaults_tree_cases(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -300,7 +300,7 @@ def test_simple_defaults_tree_cases(
 )
 def test_tree_with_append_override(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -375,7 +375,7 @@ def test_tree_with_append_override(
 )
 def test_simple_group_override(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -429,7 +429,7 @@ def test_simple_group_override(
 )
 def test_misc_errors(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: Any,
 ) -> None:
     _test_defaults_tree_impl(
@@ -504,7 +504,7 @@ def test_misc_errors(
 )
 def test_defaults_tree_with_package_overrides(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -577,7 +577,7 @@ def test_defaults_tree_with_package_overrides(
 )
 def test_defaults_tree_with_package_overrides__group_override(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -726,7 +726,7 @@ def test_defaults_tree_with_package_overrides__group_override(
 )
 def test_override_option_from_defaults_list(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -793,7 +793,7 @@ def test_override_option_from_defaults_list(
 )
 def test_two_group_defaults_different_pkgs(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -879,7 +879,7 @@ def test_two_group_defaults_different_pkgs(
 )
 def test_hydra_overrides_from_primary_config(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -939,7 +939,7 @@ def test_hydra_overrides_from_primary_config(
 )
 def test_legacy_override_hydra_is_rejected(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
     hydra_restore_singletons: Any,
 ) -> None:
@@ -969,7 +969,7 @@ def test_legacy_override_hydra_is_rejected(
     ],
 )
 def test_legacy_hydra_overrides_from_primary_config_are_rejected(
-    config_name: str, overrides: List[str], expected: DefaultsTreeNode
+    config_name: str, overrides: list[str], expected: DefaultsTreeNode
 ) -> None:
     _test_defaults_tree_impl(
         config_name=config_name,
@@ -1055,7 +1055,7 @@ def test_legacy_hydra_overrides_from_primary_config_are_rejected(
 )
 def test_group_default_with_explicit_experiment(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1124,7 +1124,7 @@ def test_group_default_with_explicit_experiment(
 )
 def test_group_default_with_appended_experiment(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1169,7 +1169,7 @@ def test_group_default_with_appended_experiment(
 )
 def test_experiment_where_primary_config_has_override(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1213,7 +1213,7 @@ def test_experiment_where_primary_config_has_override(
 )
 def test_use_of_custom_subgroup_of_hydra(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
     hydra_restore_singletons: Any,
 ) -> None:
@@ -1274,7 +1274,7 @@ def test_use_of_custom_subgroup_of_hydra(
 )
 def test_experiment_include_absolute_config(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1341,7 +1341,7 @@ def test_experiment_include_absolute_config(
 )
 def test_experiment_overriding_hydra_group(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1389,7 +1389,7 @@ def test_experiment_overriding_hydra_group(
 )
 def test_experiment_overriding_global_group(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1426,7 +1426,7 @@ def test_experiment_overriding_global_group(
 )
 def test_experiment_as_primary_config(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1516,7 +1516,7 @@ def test_experiment_as_primary_config(
 )
 def test_extension_use_cases(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1599,7 +1599,7 @@ def test_extension_use_cases(
 )
 def test_name_collision(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1731,7 +1731,7 @@ def test_name_collision(
 )
 def test_with_missing(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1760,7 +1760,7 @@ def test_with_missing(
 )
 def test_with_missing_and_skip_missing_flag(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -1838,7 +1838,7 @@ def test_with_missing_and_skip_missing_flag(
 )
 def test_placeholder(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2162,7 +2162,7 @@ def test_placeholder(
 )
 def test_interpolation(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2265,7 +2265,7 @@ def test_interpolation(
 )
 def test_interpolation_after_tree_traversal(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2362,7 +2362,7 @@ def test_deferred_interpolation_applies_later_override() -> None:
 )
 def test_legacy_interpolation(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
     hydra_restore_singletons: Any,
 ) -> None:
@@ -2455,7 +2455,7 @@ def test_legacy_interpolation_in_config_path(
 )
 def test_override_nested_to_null(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2597,7 +2597,7 @@ def test_override_nested_to_null(
 )
 def test_deletion(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2641,7 +2641,7 @@ def test_deletion(
 )
 def test_delete_non_existing(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2685,7 +2685,7 @@ def test_delete_non_existing(
 )
 def test_missing_config_errors(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2805,7 +2805,7 @@ def test_missing_config_errors(
 )
 def test_override_errors(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2837,7 +2837,7 @@ def test_override_errors(
 )
 def test_load_missing_optional(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2878,7 +2878,7 @@ def test_load_missing_optional(
 )
 def test_overriding_group_file_with_global_header(
     config_name: str,
-    overrides: List[str],
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2912,8 +2912,8 @@ def test_overriding_group_file_with_global_header(
     ],
 )
 def test_none_config(
-    config_name: Optional[str],
-    overrides: List[str],
+    config_name: str | None,
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -2973,8 +2973,8 @@ def test_none_config(
     ],
 )
 def test_none_config_with_hydra(
-    config_name: Optional[str],
-    overrides: List[str],
+    config_name: str | None,
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -3032,8 +3032,8 @@ def test_none_config_with_hydra(
     ],
 )
 def test_defaults_with_overrides_only(
-    config_name: Optional[str],
-    overrides: List[str],
+    config_name: str | None,
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -3087,8 +3087,8 @@ def test_defaults_with_overrides_only(
     ],
 )
 def test_group_with_keyword_names(
-    config_name: Optional[str],
-    overrides: List[str],
+    config_name: str | None,
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -3175,10 +3175,10 @@ def test_group_with_keyword_names(
     ],
 )
 def test_choices(
-    config_name: Optional[str],
-    overrides: List[str],
+    config_name: str | None,
+    overrides: list[str],
     expected: DefaultsTreeNode,
-    expected_choices: Dict[str, str],
+    expected_choices: dict[str, str],
 ) -> None:
     res = _test_defaults_tree_impl(
         config_name=config_name,
@@ -3223,8 +3223,8 @@ def test_choices(
     ],
 )
 def test_package_header_keywords_are_literal(
-    config_name: Optional[str],
-    overrides: List[str],
+    config_name: str | None,
+    overrides: list[str],
     package_header: str,
     expected: DefaultsTreeNode,
     hydra_restore_singletons: Any,
@@ -3470,8 +3470,8 @@ def test_package_header_keywords_are_literal(
     ],
 )
 def test_select_multi(
-    config_name: Optional[str],
-    overrides: List[str],
+    config_name: str | None,
+    overrides: list[str],
     with_hydra: bool,
     expected: DefaultsTreeNode,
 ) -> None:
@@ -3576,8 +3576,8 @@ def test_select_multi(
     ],
 )
 def test_select_multi_pkg(
-    config_name: Optional[str],
-    overrides: List[str],
+    config_name: str | None,
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(
@@ -3619,8 +3619,8 @@ def test_select_multi_pkg(
     ],
 )
 def test_nested_override_errors(
-    config_name: Optional[str],
-    overrides: List[str],
+    config_name: str | None,
+    overrides: list[str],
     expected: DefaultsTreeNode,
 ) -> None:
     _test_defaults_tree_impl(

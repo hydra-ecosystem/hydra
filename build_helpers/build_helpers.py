@@ -9,7 +9,6 @@ import subprocess
 from functools import partial
 from os.path import abspath, basename, dirname, exists, isdir, join
 from pathlib import Path
-from typing import List, Optional
 
 from setuptools import Command
 from setuptools.command import build_py, develop, sdist
@@ -26,7 +25,7 @@ def find_version(*file_paths: str) -> str:
     raise RuntimeError("Unable to find version string.")
 
 
-def matches(patterns: List[str], string: str) -> bool:
+def matches(patterns: list[str], string: str) -> bool:
     string = string.replace("\\", "/")
     for pattern in patterns:
         if re.match(pattern, string):
@@ -37,11 +36,11 @@ def matches(patterns: List[str], string: str) -> bool:
 def find_(
     root: str,
     rbase: str,
-    include_files: List[str],
-    include_dirs: List[str],
-    excludes: List[str],
-    scan_exclude: List[str],
-) -> List[str]:
+    include_files: list[str],
+    include_dirs: list[str],
+    excludes: list[str],
+    scan_exclude: list[str],
+) -> list[str]:
     files = []
     scan_root = os.path.join(root, rbase)
     with os.scandir(scan_root) as it:
@@ -73,11 +72,11 @@ def find_(
 
 def find(
     root: str,
-    include_files: List[str],
-    include_dirs: List[str],
-    excludes: List[str],
-    scan_exclude: Optional[List[str]] = None,
-) -> List[str]:
+    include_files: list[str],
+    include_dirs: list[str],
+    excludes: list[str],
+    scan_exclude: list[str] | None = None,
+) -> list[str]:
     if scan_exclude is None:
         scan_exclude = []
     return find_(
@@ -97,7 +96,7 @@ class CleanCommand(Command):  # type: ignore
 
     description = "Cleans out generated and junk files we don't want in the repo"
     dry_run: bool
-    user_options: List[str] = []
+    user_options: list[str] = []
 
     def run(self) -> None:
         files = find(
@@ -176,7 +175,7 @@ class ANTLRCommand(Command):  # type: ignore
     """Generate parsers using ANTLR."""
 
     description = "Run ANTLR"
-    user_options: List[str] = []
+    user_options: list[str] = []
 
     def run(self) -> None:
         """Run command."""

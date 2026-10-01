@@ -5,7 +5,7 @@ import string
 import sys
 from argparse import ArgumentParser
 from collections import defaultdict
-from typing import Any, Callable, DefaultDict, List, Optional, Sequence, Type, Union
+from typing import Any, Callable, Sequence
 
 from omegaconf import (
     MISSING,
@@ -46,7 +46,7 @@ from .callbacks import Callbacks
 from .config_loader_impl import ConfigLoaderImpl
 from .utils import create_automatic_config_search_path
 
-log: Optional[logging.Logger] = None
+log: logging.Logger | None = None
 
 
 def _resolve_node_interpolations(cfg: Any) -> None:
@@ -85,10 +85,10 @@ def _resolve_for_cfg_output(cfg: Container) -> None:
 class Hydra:
     @classmethod
     def create_main_hydra_file_or_module(
-        cls: Type["Hydra"],
-        calling_file: Optional[str],
-        calling_module: Optional[str],
-        config_path: Optional[str],
+        cls: type["Hydra"],
+        calling_file: str | None,
+        calling_module: str | None,
+        config_path: str | None,
         job_name: str,
     ) -> "Hydra":
         config_search_path = create_automatic_config_search_path(
@@ -125,9 +125,9 @@ class Hydra:
 
     def get_mode(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
-    ) -> Optional[RunMode]:
+        config_name: str | None,
+        overrides: list[str],
+    ) -> RunMode | None:
         mode = self.config_loader.get_mode(config_name, overrides)
         if mode is None:
             return None
@@ -141,9 +141,9 @@ class Hydra:
 
     def run(
         self,
-        config_name: Optional[str],
+        config_name: str | None,
         task_function: TaskFunction,
-        overrides: List[str],
+        overrides: list[str],
         with_log_configuration: bool = True,
     ) -> JobReturn:
         cfg = self.compose_config(
@@ -195,9 +195,9 @@ class Hydra:
 
     def multirun(
         self,
-        config_name: Optional[str],
+        config_name: str | None,
         task_function: TaskFunction,
-        overrides: List[str],
+        overrides: list[str],
         with_log_configuration: bool = True,
     ) -> Any:
         cfg = self.compose_config(
@@ -268,10 +268,10 @@ class Hydra:
 
     def show_cfg(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         cfg_type: str,
-        package: Optional[str],
+        package: str | None,
         resolve: bool = False,
     ) -> None:
         cfg = self.compose_config(
@@ -306,8 +306,8 @@ class Hydra:
     @staticmethod
     def get_shell_to_plugin_map(
         config_loader: ConfigLoader,
-    ) -> DefaultDict[str, List[CompletionPlugin]]:
-        shell_to_plugin: DefaultDict[str, List[CompletionPlugin]] = defaultdict(list)
+    ) -> defaultdict[str, list[CompletionPlugin]]:
+        shell_to_plugin: defaultdict[str, list[CompletionPlugin]] = defaultdict(list)
         for clazz in Plugins.instance().discover(CompletionPlugin):
             assert issubclass(clazz, CompletionPlugin)
             plugin = clazz(config_loader)
@@ -320,9 +320,7 @@ class Hydra:
 
         return shell_to_plugin
 
-    def shell_completion(
-        self, config_name: Optional[str], overrides: List[str]
-    ) -> None:
+    def shell_completion(self, config_name: str | None, overrides: list[str]) -> None:
         subcommands = ["install", "uninstall", "query"]
         arguments = OmegaConf.from_dotlist(overrides)
         num_commands = sum(1 for key in subcommands if key in arguments)
@@ -366,7 +364,7 @@ class Hydra:
     def list_all_config_groups(self, parent: str = "") -> Sequence[str]:
         from hydra.core.object_type import ObjectType
 
-        groups: List[str] = []
+        groups: list[str] = []
         for group in self.config_loader.list_groups(parent):
             if parent == "":
                 group_name = group
@@ -421,7 +419,7 @@ class Hydra:
         return help_text
 
     def hydra_help(
-        self, config_name: Optional[str], args_parser: ArgumentParser, args: Any
+        self, config_name: str | None, args_parser: ArgumentParser, args: Any
     ) -> None:
         cfg = self.compose_config(
             config_name=None,
@@ -435,7 +433,7 @@ class Hydra:
         print(help_text)
 
     def app_help(
-        self, config_name: Optional[str], args_parser: ArgumentParser, args: Any
+        self, config_name: str | None, args_parser: ArgumentParser, args: Any
     ) -> None:
         # Help can show available choices without selecting mandatory defaults.
         cfg = self.compose_config(
@@ -493,8 +491,8 @@ class Hydra:
 
     def _print_search_path(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode = RunMode.RUN,
         skip_missing_defaults: bool = False,
     ) -> None:
@@ -502,7 +500,7 @@ class Hydra:
         log.debug("")
         self._log_header(header="Config search path", filler="*")
 
-        box: List[List[str]] = [["Provider", "Search path"]]
+        box: list[list[str]] = [["Provider", "Search path"]]
 
         cfg = self.compose_config(
             config_name=config_name,
@@ -546,7 +544,7 @@ class Hydra:
         sorted_items = sorted(filtered, key=lambda x: x[1], reverse=True)
 
         top_n = max(len(sorted_items), top_n)
-        box: List[List[str]] = [["Module", "Sec"]]
+        box: list[list[str]] = [["Module", "Sec"]]
 
         for item in sorted_items[0:top_n]:
             box.append([item[0], f"{item[1]:.3f}"])
@@ -572,8 +570,8 @@ class Hydra:
 
     def _print_config_info(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode = RunMode.RUN,
         skip_missing_defaults: bool = False,
     ) -> None:
@@ -614,8 +612,8 @@ class Hydra:
 
     def _print_defaults_list(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode = RunMode.RUN,
         skip_missing_defaults: bool = False,
     ) -> None:
@@ -626,7 +624,7 @@ class Hydra:
             run_mode=RunMode.MULTIRUN if skip_missing_defaults else run_mode,
         )
 
-        box: List[List[str]] = [
+        box: list[list[str]] = [
             [
                 "Config path",
                 "Package",
@@ -669,8 +667,8 @@ class Hydra:
 
     def _print_debug_info(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode = RunMode.RUN,
         skip_missing_defaults: bool = False,
     ) -> None:
@@ -682,8 +680,8 @@ class Hydra:
 
     def compose_config(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode,
         with_log_configuration: bool = False,
         from_shell: bool = True,
@@ -742,8 +740,8 @@ class Hydra:
 
     def _print_plugins_info(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode = RunMode.RUN,
     ) -> None:
         self._print_plugins()
@@ -751,8 +749,8 @@ class Hydra:
 
     def _print_all_info(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode = RunMode.RUN,
         skip_missing_defaults: bool = False,
     ) -> None:
@@ -764,7 +762,7 @@ class Hydra:
 
     def _print_defaults_tree_impl(
         self,
-        tree: Union[DefaultsTreeNode, InputDefault],
+        tree: DefaultsTreeNode | InputDefault,
         indent: int = 0,
     ) -> None:
         assert log is not None
@@ -797,8 +795,8 @@ class Hydra:
 
     def _print_defaults_tree(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode = RunMode.RUN,
         skip_missing_defaults: bool = False,
     ) -> None:
@@ -815,8 +813,8 @@ class Hydra:
     def show_info(
         self,
         info: str,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode = RunMode.RUN,
     ) -> None:
         options = {

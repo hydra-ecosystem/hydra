@@ -4,7 +4,7 @@
 
 import re
 from textwrap import dedent
-from typing import Any, Tuple
+from typing import Any
 
 from . import __version__
 from ._internal.deprecation_warning import deprecation_warning
@@ -37,7 +37,7 @@ class VersionBase(metaclass=Singleton):
         return Singleton.instance(VersionBase, *args, **kwargs)  # type: ignore
 
 
-def _parse_version(ver: str) -> Tuple[int, int]:
+def _parse_version(ver: str) -> tuple[int, int]:
     if not isinstance(ver, str):
         raise TypeError(f"Expected version string, got {type(ver).__name__}")
 

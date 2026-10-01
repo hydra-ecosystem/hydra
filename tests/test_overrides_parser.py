@@ -14,7 +14,7 @@ from pytest import MonkeyPatch, mark, param, raises, warns
 
 from hydra._internal.grammar import grammar_functions
 from hydra._internal.grammar.functions import Functions
-from hydra._internal.grammar.utils import escape_special_characters
+from hydra._internal.grammar.utils import escape_special_characters, is_type_matching
 from hydra.core.override_parser.overrides_parser import (
     OverridesParser,
     create_functions,
@@ -50,6 +50,16 @@ EXTEND_LIST_DEPRECATION_WARNING = (
     "extend_list(...) is deprecated and will be removed in Hydra 1.5. "
     "See https://github.com/hydra-ecosystem/hydra/issues/3200"
 )
+
+
+@mark.parametrize(
+    "type_", [Union[int, List[str], Dict[str, str]], int | list[str] | dict[str, str]]
+)
+@mark.parametrize(
+    "value,expected", [(1, True), ([], True), ({}, True), ("x", False), (None, False)]
+)
+def test_is_type_matching_union(value: Any, type_: Any, expected: bool) -> None:
+    assert is_type_matching(value, type_) == expected
 
 
 def parse_rule(value: str, rule_name: str) -> Any:
@@ -1287,7 +1297,7 @@ def test_override_value_method(override: str, expected: str) -> None:
     ],
 )
 def test_float_range(
-    start: float, stop: float, step: float, expected: List[float]
+    start: float, stop: float, step: float, expected: list[float]
 ) -> None:
     res = list(FloatRange(start, stop, step))
     assert len(res) == len(expected)
@@ -1515,39 +1525,35 @@ def test_sweep_shuffle(value: str, expected: str) -> None:
 
 @dataclass
 class CastResults:
-    json_str: Union[
-        str,
-        Sweep,
-        RaisesContext[HydraException],
-    ]
-    int: Union[
-        int,
-        List[Union[int, List[int]]],
-        Dict[str, Any],
-        Sweep,
-        RaisesContext[HydraException],
-    ]
-    float: Union[
-        float,
-        List[Union[float, List[float]]],
-        Dict[str, Any],
-        Sweep,
-        RaisesContext[HydraException],
-    ]
-    bool: Union[
-        bool,
-        List[Union[bool, List[bool]]],
-        Dict[str, Any],
-        Sweep,
-        RaisesContext[HydraException],
-    ]
-    str: Union[
-        str,
-        List[Union[str, List[str]]],
-        Dict[str, Any],
-        Sweep,
-        RaisesContext[HydraException],
-    ]
+    json_str: str | Sweep | RaisesContext[HydraException]
+    int: (
+        int
+        | list[int | list[int]]
+        | dict[str, Any]
+        | Sweep
+        | RaisesContext[HydraException]
+    )
+    float: (
+        float
+        | list[float | list[float]]
+        | dict[str, Any]
+        | Sweep
+        | RaisesContext[HydraException]
+    )
+    bool: (
+        bool
+        | list[bool | list[bool]]
+        | dict[str, Any]
+        | Sweep
+        | RaisesContext[HydraException]
+    )
+    str: (
+        str
+        | list[str | list[str]]
+        | dict[str, Any]
+        | Sweep
+        | RaisesContext[HydraException]
+    )
 
     @staticmethod
     def error(msg: builtins.str) -> Any:
@@ -2022,7 +2028,7 @@ def test_cast_conversions(value: Any, expected_value: Any) -> None:
     ],
 )
 def test_cast_preserves_sweep_metadata(
-    expression: str, expected: List[Any], monkeypatch: MonkeyPatch
+    expression: str, expected: list[Any], monkeypatch: MonkeyPatch
 ) -> None:
     monkeypatch.setattr("hydra.core.override_parser.types.shuffle", list.reverse)
     override = parser.parse_override(f"key={expression}")
@@ -2055,7 +2061,7 @@ class F:
         return f"{type(value).__name__}:{str(value)}"
 
     @staticmethod
-    def foo2(x: Union[int, str], y: Union[int, str]) -> str:
+    def foo2(x: int | str, y: int | str) -> str:
         return f"{type(x).__name__}:{str(x)},{type(y).__name__}:{str(y)}"
 
     @staticmethod
@@ -2071,7 +2077,7 @@ class F:
         return sum(args, 0)
 
     @staticmethod
-    def sort(*args: int, reverse: bool = False) -> List[int]:
+    def sort(*args: int, reverse: bool = False) -> list[int]:
         if reverse:
             return list(reversed(sorted(args)))
         else:
@@ -2282,7 +2288,7 @@ def test_glob(value: str, expected: Any) -> None:
     ],
 )
 def test_glob_filter(
-    include: List[str], exclude: List[str], expected: List[str]
+    include: list[str], exclude: list[str], expected: list[str]
 ) -> None:
     strings = ["the", "quick", "brown", "fox", "jumped", "under", "the", "lazy", "dog"]
     assert Glob(include=include, exclude=exclude).filter(strings) == expected
@@ -2396,8 +2402,8 @@ def test_whitespaces(
 )
 def test_sweep_iterators(
     value: str,
-    expected_sweep_string_list: List[str],
-    expected_sweep_encoded_list: List[Any],
+    expected_sweep_string_list: list[str],
+    expected_sweep_encoded_list: list[Any],
 ) -> None:
     ret = parser.parse_override(value)
     actual_sweep_string_list = [x for x in ret.sweep_string_iterator()]

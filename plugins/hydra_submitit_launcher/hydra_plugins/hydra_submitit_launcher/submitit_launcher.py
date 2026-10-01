@@ -2,7 +2,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Sequence
 
 from hydra.core.singleton import Singleton
 from hydra.core.utils import JobReturn, filter_overrides, run_job, setup_globals
@@ -25,10 +25,10 @@ class BaseSubmititLauncher(Launcher):
                 v = OmegaConf.to_container(v, resolve=True)
             self.params[k] = v
 
-        self.config: Optional[DictConfig] = None
-        self.task_function: Optional[TaskFunction] = None
-        self.sweep_configs: Optional[TaskFunction] = None
-        self.hydra_context: Optional[HydraContext] = None
+        self.config: DictConfig | None = None
+        self.task_function: TaskFunction | None = None
+        self.sweep_configs: TaskFunction | None = None
+        self.hydra_context: HydraContext | None = None
 
     def setup(
         self,
@@ -43,11 +43,11 @@ class BaseSubmititLauncher(Launcher):
 
     def __call__(
         self,
-        sweep_overrides: List[str],
+        sweep_overrides: list[str],
         job_dir_key: str,
         job_num: int,
         job_id: str,
-        singleton_state: Dict[type, Singleton],
+        singleton_state: dict[type, Singleton],
     ) -> JobReturn:
         # lazy import to ensure plugin discovery remains fast
         import submitit
@@ -126,7 +126,7 @@ class BaseSubmititLauncher(Launcher):
             mode = int(str(self.config.hydra.sweep.mode), 8)
             os.chmod(sweep_dir, mode=mode)
 
-        job_params: List[Any] = []
+        job_params: list[Any] = []
         for idx, overrides in enumerate(job_overrides):
             idx = initial_job_idx + idx
             lst = " ".join(filter_overrides(overrides))

@@ -23,7 +23,7 @@ import time
 from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence
+from typing import Any, Iterable, Sequence
 
 from omegaconf import DictConfig, OmegaConf
 
@@ -40,8 +40,8 @@ from hydra.types import HydraContext, TaskFunction
 @dataclass
 class BasicSweeperConf:
     _target_: str = "hydra._internal.core_plugins.basic_sweeper.BasicSweeper"
-    max_batch_size: Optional[int] = None
-    params: Optional[Dict[str, str]] = None
+    max_batch_size: int | None = None
+    params: dict[str, str] | None = None
 
 
 ConfigStore.instance().store(
@@ -58,7 +58,7 @@ class BasicSweeper(Sweeper):
     """
 
     def __init__(
-        self, max_batch_size: Optional[int], params: Optional[Dict[str, str]] = None
+        self, max_batch_size: int | None, params: dict[str, str] | None = None
     ) -> None:
         """
         Instantiates
@@ -67,14 +67,14 @@ class BasicSweeper(Sweeper):
 
         if params is None:
             params = {}
-        self.overrides: Optional[Sequence[Sequence[Sequence[str]]]] = None
+        self.overrides: Sequence[Sequence[Sequence[str]]] | None = None
         self.batch_index = 0
         self.max_batch_size = max_batch_size
         self.params = params
 
-        self.hydra_context: Optional[HydraContext] = None
-        self.config: Optional[DictConfig] = None
-        self.launcher: Optional[Launcher] = None
+        self.hydra_context: HydraContext | None = None
+        self.config: DictConfig | None = None
+        self.launcher: Launcher | None = None
 
     def setup(
         self,
@@ -96,8 +96,8 @@ class BasicSweeper(Sweeper):
 
     @staticmethod
     def split_overrides_to_chunks(
-        lst: List[List[str]], n: Optional[int]
-    ) -> Iterable[List[List[str]]]:
+        lst: list[list[str]], n: int | None
+    ) -> Iterable[list[list[str]]]:
         if n is None or n == -1:
             n = len(lst)
         assert n > 0
@@ -106,8 +106,8 @@ class BasicSweeper(Sweeper):
 
     @staticmethod
     def split_arguments(
-        overrides: List[Override], max_batch_size: Optional[int]
-    ) -> List[List[List[str]]]:
+        overrides: list[Override], max_batch_size: int | None
+    ) -> list[list[list[str]]]:
         lists = []
         final_overrides = OrderedDict()
         for override in overrides:
@@ -139,13 +139,13 @@ class BasicSweeper(Sweeper):
             )
             return [x for x in chunks_iter]
 
-    def _parse_config(self) -> List[str]:
+    def _parse_config(self) -> list[str]:
         params_conf = []
         for k, v in self.params.items():
             params_conf.append(f"{k}={v}")
         return params_conf
 
-    def sweep(self, arguments: List[str]) -> Any:
+    def sweep(self, arguments: list[str]) -> Any:
         assert self.config is not None
         assert self.launcher is not None
         assert self.hydra_context is not None
@@ -157,7 +157,7 @@ class BasicSweeper(Sweeper):
         overrides = parser.parse_overrides(params_conf)
 
         self.overrides = self.split_arguments(overrides, self.max_batch_size)
-        returns: List[Sequence[JobReturn]] = []
+        returns: list[Sequence[JobReturn]] = []
 
         # Save sweep run config in top level sweep working directory
         sweep_dir = Path(self.config.hydra.sweep.dir)

@@ -4,7 +4,7 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from types import TracebackType
-from typing import Any, Optional
+from typing import Any
 
 from omegaconf import MISSING
 
@@ -78,7 +78,7 @@ def my_app(cfg: AppConfig) -> Any:
         def hook(
             error_type: type[BaseException],
             error: BaseException,
-            tb: Optional[TracebackType],
+            tb: TracebackType | None,
         ) -> None:
             print(f"hook: {error_type.__name__}", file=sys.stderr)
             while tb is not None:

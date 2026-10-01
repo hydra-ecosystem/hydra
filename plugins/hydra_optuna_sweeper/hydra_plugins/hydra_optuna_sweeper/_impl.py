@@ -5,13 +5,9 @@ import sys
 from typing import (
     Any,
     Callable,
-    Dict,
-    List,
     Literal,
     MutableSequence,
-    Optional,
     Sequence,
-    Tuple,
     cast,
 )
 
@@ -45,7 +41,7 @@ log = logging.getLogger(__name__)
 
 
 def create_nsgaii_sampler(
-    mutation: Optional[Any] = None, **kwargs: Any
+    mutation: Any | None = None, **kwargs: Any
 ) -> optuna.samplers.NSGAIISampler:
     # Optuna v5 adds mutation; omit it when unset for v4 compatibility.
     if mutation is not None:
@@ -54,8 +50,8 @@ def create_nsgaii_sampler(
 
 
 def create_nsgaiii_sampler(
-    reference_points: Optional[List[List[float]]] = None,
-    mutation: Optional[Any] = None,
+    reference_points: list[list[float]] | None = None,
+    mutation: Any | None = None,
     **kwargs: Any,
 ) -> optuna.samplers.NSGAIIISampler:
     if (points := reference_points) is not None:
@@ -71,7 +67,7 @@ def create_optuna_distribution_from_override(override: Override) -> Any:
         return override.get_value_element_as_str()
 
     value = override.value()
-    choices: List[CategoricalChoiceType] = []
+    choices: list[CategoricalChoiceType] = []
     if override.is_choice_sweep():
         assert isinstance(value, ChoiceSweep)
         for x in override.sweep_iterator(transformer=Transformer.encode):
@@ -121,8 +117,8 @@ def create_optuna_distribution_from_override(override: Override) -> Any:
 
 
 def create_params_from_overrides(
-    arguments: List[str],
-) -> Tuple[Dict[str, BaseDistribution], Dict[str, Any], List[str]]:
+    arguments: list[str],
+) -> tuple[dict[str, BaseDistribution], dict[str, Any], list[str]]:
     parser = OverridesParser.create()
     parsed = parser.parse_overrides(arguments)
     search_space_distributions = dict()
@@ -148,13 +144,13 @@ class OptunaSweeperImpl(Sweeper):
         self,
         sampler: Any,
         direction: Any,
-        storage: Optional[Any],
-        study_name: Optional[str],
+        storage: Any | None,
+        study_name: str | None,
         n_trials: int,
         n_jobs: int,
         max_failure_rate: float,
-        custom_search_space: Optional[str],
-        params: Optional[DictConfig],
+        custom_search_space: str | None,
+        params: DictConfig | None,
     ) -> None:
         self.sampler = sampler
         self.direction = direction
@@ -165,9 +161,9 @@ class OptunaSweeperImpl(Sweeper):
         self.max_failure_rate = max_failure_rate
         assert self.max_failure_rate >= 0.0
         assert self.max_failure_rate <= 1.0
-        self.custom_search_space_extender: Optional[
-            Callable[[DictConfig, Trial], None]
-        ] = None
+        self.custom_search_space_extender: (
+            Callable[[DictConfig, Trial], None] | None
+        ) = None
         if custom_search_space:
             self.custom_search_space_extender = instantiate(
                 {
@@ -197,7 +193,7 @@ class OptunaSweeperImpl(Sweeper):
         )
         self.sweep_dir = config.hydra.sweep.dir
 
-    def _get_directions(self) -> List[str]:
+    def _get_directions(self) -> list[str]:
         if isinstance(self.direction, MutableSequence):
             return [d.name if isinstance(d, Direction) else d for d in self.direction]
         elif isinstance(self.direction, str):
@@ -206,10 +202,10 @@ class OptunaSweeperImpl(Sweeper):
 
     def _configure_trials(
         self,
-        trials: List[Trial],
-        search_space_distributions: Dict[str, BaseDistribution],
-        fixed_params: Dict[str, Any],
-        fixed_overrides: List[str],
+        trials: list[Trial],
+        search_space_distributions: dict[str, BaseDistribution],
+        fixed_params: dict[str, Any],
+        fixed_overrides: list[str],
     ) -> Sequence[Sequence[str]]:
         overrides = []
         for trial in trials:
@@ -238,7 +234,7 @@ class OptunaSweeperImpl(Sweeper):
             )
         return overrides
 
-    def _parse_sweeper_params_config(self) -> List[str]:
+    def _parse_sweeper_params_config(self) -> list[str]:
         if not self.params:
             return []
 
@@ -262,7 +258,7 @@ class OptunaSweeperImpl(Sweeper):
         else:
             raise ValueError("GridSampler only supports discrete distributions.")
 
-    def sweep(self, arguments: List[str]) -> None:
+    def sweep(self, arguments: list[str]) -> None:
         assert self.config is not None
         assert self.launcher is not None
         assert self.hydra_context is not None
@@ -311,7 +307,7 @@ class OptunaSweeperImpl(Sweeper):
             study_name=self.study_name,
             storage=self.storage,
             sampler=self.sampler,
-            directions=cast(List[Literal["minimize", "maximize"]], directions),
+            directions=cast(list[Literal["minimize", "maximize"]], directions),
             load_if_exists=True,
         )
         log.info(f"Study name: {study.study_name}")
@@ -334,7 +330,7 @@ class OptunaSweeperImpl(Sweeper):
             self.job_idx += len(returns)
             failures = []
             for trial, ret in zip(trials, returns):
-                values: Optional[List[float]] = None
+                values: list[float] | None = None
                 state: optuna.trial.TrialState = optuna.trial.TrialState.COMPLETE
                 try:
                     if len(directions) == 1:
@@ -388,7 +384,7 @@ class OptunaSweeperImpl(Sweeper):
 
             n_trials_to_go -= batch_size
 
-        results_to_serialize: Dict[str, Any]
+        results_to_serialize: dict[str, Any]
         if len(directions) < 2:
             best_trial = study.best_trial
             results_to_serialize = {

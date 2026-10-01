@@ -1,7 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from pathlib import Path
 from textwrap import dedent
-from typing import List
 
 from pytest import mark, param
 
@@ -21,7 +20,7 @@ chdir_hydra_root()
         (["db=postgresql"], "PostgreSQL connecting to localhost"),
     ],
 )
-def test_instantiate_object(tmpdir: Path, overrides: List[str], output: str) -> None:
+def test_instantiate_object(tmpdir: Path, overrides: list[str], output: str) -> None:
     cmd = [
         "examples/instantiate/object/my_app.py",
         f'hydra.run.dir="{tmpdir}"',
@@ -42,7 +41,7 @@ def test_instantiate_object(tmpdir: Path, overrides: List[str], output: str) -> 
     ],
 )
 def test_instantiate_object_recursive(
-    tmpdir: Path, overrides: List[str], output: str
+    tmpdir: Path, overrides: list[str], output: str
 ) -> None:
     cmd = [
         "examples/instantiate/object_recursive/my_app.py",
@@ -70,7 +69,7 @@ def test_instantiate_object_partial(tmpdir: Path) -> None:
         (["db=postgresql"], "PostgreSQL connecting to localhost"),
     ],
 )
-def test_instantiate_schema(tmpdir: Path, overrides: List[str], output: str) -> None:
+def test_instantiate_schema(tmpdir: Path, overrides: list[str], output: str) -> None:
     cmd = [
         "examples/instantiate/schema/my_app.py",
         f'hydra.run.dir="{str(tmpdir)}"',
@@ -96,7 +95,7 @@ def test_instantiate_schema(tmpdir: Path, overrides: List[str], output: str) -> 
     ],
 )
 def test_instantiate_schema_recursive(
-    tmpdir: Path, overrides: List[str], expected: str
+    tmpdir: Path, overrides: list[str], expected: str
 ) -> None:
     cmd = [
         "examples/instantiate/schema_recursive/my_app.py",
@@ -133,7 +132,7 @@ def test_instantiate_schema_recursive(
     ],
 )
 def test_instantiate_docs_example(
-    tmpdir: Path, overrides: List[str], expected: str
+    tmpdir: Path, overrides: list[str], expected: str
 ) -> None:
     cmd = [
         "examples/instantiate/docs_example/my_app.py",

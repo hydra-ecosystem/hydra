@@ -9,7 +9,7 @@ from pathlib import Path
 
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from textwrap import dedent
-from typing import Any, Dict, List, Optional, Set, Type, cast, get_type_hints
+from typing import Any, cast, get_type_hints
 
 import hydra
 from jinja2 import Environment, PackageLoader, Template
@@ -44,7 +44,7 @@ jinja_env = Environment(  # nosec B701
     keep_trailing_newline=True,
     trim_blocks=True,
 )
-cast(Dict[str, Any], jinja_env.tests)["empty"] = lambda x: x == inspect.Signature.empty
+cast(dict[str, Any], jinja_env.tests)["empty"] = lambda x: x == inspect.Signature.empty
 
 
 def init_config(conf_dir: str) -> None:
@@ -78,18 +78,18 @@ def save(cfg: ConfigenConf, module: str, code: str) -> None:
 class Parameter:
     name: str
     type_str: str
-    default: Optional[str]
+    default: str | None
 
 
 @dataclass
 class ClassInfo:
     module: str
     name: str
-    parameters: List[Parameter]
+    parameters: list[Parameter]
     target: str
 
 
-def is_incompatible(type_: Type[Any]) -> bool:
+def is_incompatible(type_: type[Any]) -> bool:
     opt = _resolve_optional(type_)
     # Unions are not supported (Except Optional)
     if not opt[0] and is_union_annotation(type_):
@@ -130,8 +130,8 @@ def is_incompatible(type_: Type[Any]) -> bool:
     return True
 
 
-def get_default_flags(module: ModuleConf) -> List[Parameter]:
-    def_flags: List[Parameter] = []
+def get_default_flags(module: ModuleConf) -> list[Parameter]:
+    def_flags: list[Parameter] = []
 
     if module.default_flags._convert_ is not None:
         def_flags.append(
@@ -155,9 +155,9 @@ def get_default_flags(module: ModuleConf) -> List[Parameter]:
 
 
 def generate_module(cfg: ConfigenConf, module: ModuleConf) -> str:
-    classes_map: Dict[str, ClassInfo] = {}
-    imports: Set[Any] = set()
-    string_imports: Set[str] = set()
+    classes_map: dict[str, ClassInfo] = {}
+    imports: set[Any] = set()
+    string_imports: set[str] = set()
 
     default_flags = get_default_flags(module)
 
@@ -166,7 +166,7 @@ def generate_module(cfg: ConfigenConf, module: ModuleConf) -> str:
         cls = hydra.utils.get_class(full_name)
         sig = inspect.signature(cls)
         resolved_hints = get_type_hints(cls.__init__)  # type: ignore
-        params: List[Parameter] = []
+        params: list[Parameter] = []
         params = params + default_flags
 
         for name, p in sig.parameters.items():

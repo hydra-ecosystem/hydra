@@ -2,7 +2,7 @@
 import math
 import os
 from pathlib import Path
-from typing import Any, List, Tuple
+from typing import Any
 
 from hydra.core.plugins import Plugins
 from hydra.plugins.sweeper import Sweeper
@@ -45,7 +45,7 @@ pytestmark = [mark.filterwarnings(warning_filter) for warning_filter in WARNING_
 PYTHON_WARNING_FILTERS = [f"-W{warning_filter}" for warning_filter in WARNING_FILTERS]
 
 
-def run_ax_python_script(cmd: List[str]) -> Tuple[str, str]:
+def run_ax_python_script(cmd: list[str]) -> tuple[str, str]:
     return run_python_script(PYTHON_WARNING_FILTERS + cmd)
 
 
@@ -73,7 +73,7 @@ def quadratic(cfg: DictConfig) -> Any:
         (6, [[1, 2, 3, 4, 5]]),
     ],
 )
-def test_chunk_method_for_valid_inputs(n: int, expected: List[List[int]]) -> None:
+def test_chunk_method_for_valid_inputs(n: int, expected: list[list[int]]) -> None:
     from hydra_plugins.hydra_ax_sweeper._core import CoreAxSweeper
 
     chunk_func = CoreAxSweeper.chunks
@@ -357,7 +357,7 @@ def test_ax_logging_from_hydra_app(tmpdir: Path) -> None:
         ["polynomial.y=1", "polynomial.x=range(2,4)"],
     ],
 )
-def test_search_space_exhausted_exception(tmpdir: Path, cmd_args: List[str]) -> None:
+def test_search_space_exhausted_exception(tmpdir: Path, cmd_args: list[str]) -> None:
     cmd = [
         "tests/apps/polynomial.py",
         "-m",
@@ -375,7 +375,7 @@ def test_search_space_exhausted_exception(tmpdir: Path, cmd_args: List[str]) -> 
         ["polynomial.y=1", "polynomial.x=range(2,4)"],
     ],
 )
-def test_search_space_with_constraint_metric(tmpdir: Path, cmd_args: List[str]) -> None:
+def test_search_space_with_constraint_metric(tmpdir: Path, cmd_args: list[str]) -> None:
     # test that outcome_constraints experiment parameter `outcome_constraints`
     # works correctly, and that the ax_sweeper supports outputting a dictionary
     # from the evaluation function so that multiple metrics can be supported.

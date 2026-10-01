@@ -1,12 +1,12 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 
 from functools import wraps
-from typing import Callable, List, ParamSpec, TypeVar
+from typing import Callable, ParamSpec, TypeVar
 
 P = ParamSpec("P")
 R = TypeVar("R")
 
-data: List[str] = []
+data: list[str] = []
 
 
 def outer_decorator(arg1: str) -> Callable[[Callable[P, R]], Callable[P, R]]:

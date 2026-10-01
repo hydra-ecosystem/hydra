@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import builtins
 import importlib
 import warnings
-from typing import List, Optional
 
 from hydra.core.config_store import ConfigStore
 from hydra.core.object_type import ObjectType
@@ -49,8 +49,10 @@ class StructuredConfigSource(ConfigSource):
         type_ = ConfigStore.instance().get_type(filename)
         return type_ == ObjectType.CONFIG
 
-    def list(self, config_path: str, results_filter: Optional[ObjectType]) -> List[str]:
-        ret: List[str] = []
+    def list(
+        self, config_path: str, results_filter: ObjectType | None
+    ) -> builtins.list[str]:
+        ret: list[str] = []
         files = ConfigStore.instance().list(config_path)
 
         for file in files:

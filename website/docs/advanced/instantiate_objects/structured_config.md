@@ -52,7 +52,7 @@ class PostGreSQLConfig(DBConfig):
 
 @dataclass
 class Config:
-    defaults: List[Any] = field(default_factory=lambda: [{"db": "mysql"}])
+    defaults: list[Any] = field(default_factory=lambda: [{"db": "mysql"}])
     db: DBConfig = MISSING
 
 

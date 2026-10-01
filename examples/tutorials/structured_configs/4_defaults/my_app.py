@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass, field
-from typing import Any, List
+from typing import Any
 
 from omegaconf import MISSING, OmegaConf  # Do not confuse with dataclass.MISSING
 
@@ -36,7 +36,7 @@ defaults = [
 @dataclass
 class Config:
     # this is unfortunately verbose due to @dataclass limitations
-    defaults: List[Any] = field(default_factory=lambda: defaults)
+    defaults: list[Any] = field(default_factory=lambda: defaults)
 
     # Hydra will populate this field based on the defaults list
     db: Any = MISSING

@@ -5,7 +5,6 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import List
 from urllib.request import urlopen
 
 import cloudpickle  # type: ignore
@@ -69,7 +68,7 @@ def launch_jobs(temp_dir: str) -> None:
     _dump_job_return(result, temp_dir)
 
 
-def _dump_job_return(result: List[JobReturn], tmp_dir: str) -> None:
+def _dump_job_return(result: list[JobReturn], tmp_dir: str) -> None:
     path = os.path.join(tmp_dir, JOB_RETURN_PICKLE)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "wb") as f:

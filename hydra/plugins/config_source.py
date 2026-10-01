@@ -1,8 +1,8 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import builtins
 import re
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 from omegaconf import Container
 
@@ -17,8 +17,8 @@ class ConfigResult:
     provider: str
     path: str
     config: Container
-    header: Dict[str, Optional[str]]
-    defaults_list: Optional[List[InputDefault]] = None
+    header: dict[str, str | None]
+    defaults_list: list[InputDefault] | None = None
     is_schema_source: bool = False
 
 
@@ -65,7 +65,7 @@ class ConfigSource(Plugin):
         ...
 
     @abstractmethod
-    def list(self, config_path: str, results_filter: Optional[ObjectType]) -> List[str]:
+    def list(self, config_path: str, results_filter: ObjectType | None) -> builtins.list[str]:
         """
         List items under the specified config path
         :param config_path: config path to list items in, examples: "", "foo", "foo/bar"
@@ -82,10 +82,10 @@ class ConfigSource(Plugin):
 
     def _list_add_result(
         self,
-        files: List[str],
+        files: builtins.list[str],
         file_path: str,
         file_name: str,
-        results_filter: Optional[ObjectType],
+        results_filter: ObjectType | None,
     ) -> None:
         filtered = ["__pycache__", "__init__.py"]
         is_group = self.is_group(file_path)
@@ -124,8 +124,8 @@ class ConfigSource(Plugin):
         return filename
 
     @staticmethod
-    def _get_header_dict(config_text: str) -> Dict[str, Optional[str]]:
-        res: Dict[str, Optional[str]] = {}
+    def _get_header_dict(config_text: str) -> dict[str, str | None]:
+        res: dict[str, str | None] = {}
         for line in config_text.splitlines():
             line = line.strip()
             if len(line) == 0:

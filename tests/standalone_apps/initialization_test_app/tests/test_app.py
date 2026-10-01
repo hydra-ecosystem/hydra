@@ -1,7 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import subprocess
 import sys
-from typing import List
 
 from pytest import mark, param
 
@@ -20,5 +19,5 @@ from pytest import mark, param
         ),
     ],
 )
-def test_initialization_full_app_installed(run_cmd: List[str]) -> None:
+def test_initialization_full_app_installed(run_cmd: list[str]) -> None:
     subprocess.check_call(run_cmd)

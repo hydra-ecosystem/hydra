@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import copy
 import os
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 from hydra import version
 from hydra._internal.hydra import Hydra
@@ -50,10 +50,10 @@ class initialize:
 
     def __init__(
         self,
-        config_path: Optional[str] = None,
-        job_name: Optional[str] = None,
+        config_path: str | None = None,
+        job_name: str | None = None,
         caller_stack_depth: int = 1,
-        version_base: Optional[str] = version._UNSPECIFIED_,
+        version_base: str | None = version._UNSPECIFIED_,
     ) -> None:
         self._gh_backup = get_gh_backup()
 
@@ -95,7 +95,7 @@ class initialize_config_module:
         self,
         config_module: str,
         job_name: str = "app",
-        version_base: Optional[str] = version._UNSPECIFIED_,
+        version_base: str | None = version._UNSPECIFIED_,
     ):
         self._gh_backup = get_gh_backup()
 
@@ -130,7 +130,7 @@ class initialize_config_dir:
         self,
         config_dir: str,
         job_name: str = "app",
-        version_base: Optional[str] = version._UNSPECIFIED_,
+        version_base: str | None = version._UNSPECIFIED_,
     ) -> None:
         self._gh_backup = get_gh_backup()
 

@@ -5,7 +5,7 @@ import os
 import sys
 import warnings
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 from unittest.mock import patch, sentinel
 
 import numpy
@@ -51,7 +51,7 @@ SQLALCHEMY_UTC_WARNING_FILTER = (
 OPTUNA_EXPERIMENTAL_WARNING_FILTER = "-W default:NSGAIIISampler is experimental"
 
 
-def run_optuna_script(cmd: List[str]) -> None:
+def run_optuna_script(cmd: list[str]) -> None:
     run_python_script(
         [
             SQLALCHEMY_UTC_WARNING_FILTER,
@@ -344,7 +344,7 @@ def test_optuna_multi_objective_example(
                 assert not _dominates(trial_x, trial_y)
 
 
-def _dominates(values_x: List[float], values_y: List[float]) -> bool:
+def _dominates(values_x: list[float], values_y: list[float]) -> bool:
     return all(x <= y for x, y in zip(values_x, values_y)) and any(
         x < y for x, y in zip(values_x, values_y)
     )
@@ -444,7 +444,7 @@ def test_rejected_result_marks_trial_failed(
 ) -> None:
     storage = "sqlite:///" + os.path.join(str(tmpdir), "test.db")
     study_name = "test-rejected-result"
-    calls: List[DictConfig] = []
+    calls: list[DictConfig] = []
 
     def task_function(cfg: DictConfig) -> Any:
         calls.append(cfg)

@@ -8,7 +8,7 @@ import traceback
 import warnings
 from os.path import dirname, join, normpath, realpath
 from types import TracebackType
-from typing import Any, List, Optional, Sequence, Tuple
+from typing import Any, Sequence
 
 from omegaconf.errors import OmegaConfBaseException
 
@@ -32,7 +32,7 @@ from hydra.types import RunMode, TaskFunction
 log = logging.getLogger(__name__)
 
 
-def _get_module_name_override() -> Optional[str]:
+def _get_module_name_override() -> str | None:
     module_envs = ["HYDRA_MAIN_MODULE", "FB_PAR_MAIN_MODULE", "FB_XAR_MAIN_MODULE"]
     for module_env in module_envs:
         if module_env in os.environ:
@@ -42,7 +42,7 @@ def _get_module_name_override() -> Optional[str]:
 
 def detect_calling_file_or_module_from_task_function(
     task_function: Any,
-) -> Tuple[Optional[str], Optional[str]]:
+) -> tuple[str | None, str | None]:
     # if function is decorated, unwrap it
     while hasattr(task_function, "__wrapped__"):
         task_function = task_function.__wrapped__
@@ -52,8 +52,8 @@ def detect_calling_file_or_module_from_task_function(
     if override is not None:
         mdl = override
 
-    calling_file: Optional[str]
-    calling_module: Optional[str]
+    calling_file: str | None
+    calling_module: str | None
     if mdl not in (None, "__main__"):
         calling_file = None
         calling_module = mdl
@@ -69,7 +69,7 @@ def detect_calling_file_or_module_from_task_function(
 
 def detect_calling_file_or_module_from_stack_frame(
     stack_depth: int,
-) -> Tuple[Optional[str], Optional[str]]:
+) -> tuple[str | None, str | None]:
     stack = inspect.stack()
     frame = stack[stack_depth]
     if is_notebook() and "_dh" in frame[0].f_globals:
@@ -105,7 +105,7 @@ def is_notebook() -> bool:
         return False
 
 
-def detect_task_name(calling_file: Optional[str], calling_module: Optional[str]) -> str:
+def detect_task_name(calling_file: str | None, calling_module: str | None) -> str:
     if calling_file is not None:
         target_file = os.path.basename(calling_file)
         task_name = get_valid_filename(os.path.splitext(target_file)[0])
@@ -122,10 +122,10 @@ def detect_task_name(calling_file: Optional[str], calling_module: Optional[str])
 
 
 def compute_search_path_dir(
-    calling_file: Optional[str],
-    calling_module: Optional[str],
-    config_path: Optional[str],
-) -> Optional[str]:
+    calling_file: str | None,
+    calling_module: str | None,
+    config_path: str | None,
+) -> str | None:
     if config_path is not None:
         if os.path.isabs(config_path):
             return config_path
@@ -188,15 +188,15 @@ def is_under_debugger() -> bool:
 
 
 def create_automatic_config_search_path(
-    calling_file: Optional[str],
-    calling_module: Optional[str],
-    config_path: Optional[str],
+    calling_file: str | None,
+    calling_module: str | None,
+    config_path: str | None,
 ) -> ConfigSearchPath:
     search_path_dir = compute_search_path_dir(calling_file, calling_module, config_path)
     return create_config_search_path(search_path_dir)
 
 
-def create_config_search_path(search_path_dir: Optional[str]) -> ConfigSearchPath:
+def create_config_search_path(search_path_dir: str | None) -> ConfigSearchPath:
     sources = [] if search_path_dir is None else [search_path_dir]
     return create_config_search_path_from_sources(sources)
 
@@ -226,14 +226,14 @@ def _is_env_set(name: str) -> bool:
     return name in os.environ and os.environ[name] == "1"
 
 
-def _build_traceback(frames: List[TracebackType]) -> Optional[TracebackType]:
-    result: Optional[TracebackType] = None
+def _build_traceback(frames: list[TracebackType]) -> TracebackType | None:
+    result: TracebackType | None = None
     for frame in reversed(frames):
         result = TracebackType(result, frame.tb_frame, frame.tb_lasti, frame.tb_lineno)
     return result
 
 
-def _traceback_module(tb: TracebackType, hydra_root: Optional[str] = None) -> str:
+def _traceback_module(tb: TracebackType, hydra_root: str | None = None) -> str:
     frame = tb.tb_frame
     module = frame.f_globals.get("__name__")
     if isinstance(module, str):
@@ -274,8 +274,8 @@ def _hidden_hydra_frame() -> TracebackType:
 
 
 def _job_traceback(
-    tb: Optional[TracebackType],
-) -> Optional[Tuple[TracebackType, str]]:
+    tb: TracebackType | None,
+) -> tuple[TracebackType, str] | None:
     # The traceback before run_job belongs to Hydra's startup machinery.
     # The next frame is the application's entry point when a job was called.
     while tb is not None:
@@ -306,8 +306,8 @@ def _job_traceback(
 
 
 def _filter_hydra_frames(
-    tb: Optional[TracebackType], hydra_root: str
-) -> Optional[TracebackType]:
+    tb: TracebackType | None, hydra_root: str
+) -> TracebackType | None:
     frames = []
     hidden = False
     while tb is not None:
@@ -359,7 +359,7 @@ def _report_job_traceback(
     saved_args = []
     saved_import_messages = []
     try:
-        pending: List[BaseException] = [ex]
+        pending: list[BaseException] = [ex]
         seen = set()
         while pending:
             current = pending.pop()
@@ -442,8 +442,8 @@ def _run_hydra(
     args: argparse.Namespace,
     args_parser: argparse.ArgumentParser,
     task_function: TaskFunction,
-    config_path: Optional[str],
-    config_name: Optional[str],
+    config_path: str | None,
+    config_name: str | None,
     caller_stack_depth: int = 2,
 ) -> None:
     from hydra.core.global_hydra import GlobalHydra
@@ -567,11 +567,11 @@ def _run_hydra(
 def _run_app(
     run: bool,
     multirun: bool,
-    mode: Optional[RunMode],
+    mode: RunMode | None,
     hydra: Any,
-    config_name: Optional[str],
+    config_name: str | None,
     task_function: TaskFunction,
-    overrides: List[str],
+    overrides: list[str],
 ) -> None:
     if mode is None:
         if run:
@@ -621,7 +621,7 @@ def _get_completion_help() -> str:
     from hydra.plugins.completion_plugin import CompletionPlugin
 
     completion_plugins = Plugins.instance().discover(CompletionPlugin)
-    completion_info: List[str] = []
+    completion_info: list[str] = []
     for plugin_cls in completion_plugins:
         assert issubclass(plugin_cls, CompletionPlugin)
         for cmd in ["install", "uninstall"]:
@@ -754,15 +754,15 @@ def get_args_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def get_args(args: Optional[Sequence[str]] = None) -> Any:
+def get_args(args: Sequence[str] | None = None) -> Any:
     return get_args_parser().parse_intermixed_args(args=args)
 
 
-def get_column_widths(matrix: List[List[str]]) -> List[int]:
+def get_column_widths(matrix: list[list[str]]) -> list[int]:
     num_cols = 0
     for row in matrix:
         num_cols = max(num_cols, len(row))
-    widths: List[int] = [0] * num_cols
+    widths: list[int] = [0] * num_cols
     for row in matrix:
         for idx, col in enumerate(row):
             widths[idx] = max(widths[idx], len(col))

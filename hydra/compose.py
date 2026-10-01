@@ -1,5 +1,4 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import List, Optional
 
 from omegaconf import DictConfig, open_dict
 
@@ -8,8 +7,8 @@ from hydra.types import RunMode
 
 
 def compose(
-    config_name: Optional[str] = None,
-    overrides: Optional[List[str]] = None,
+    config_name: str | None = None,
+    overrides: list[str] | None = None,
     return_hydra_config: bool = False,
 ) -> DictConfig:
     """

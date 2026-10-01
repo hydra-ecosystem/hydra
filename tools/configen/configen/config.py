@@ -1,6 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass, field
-from typing import List, Optional
 
 from hydra.core.config_store import ConfigStore
 from hydra.utils import ConvertMode
@@ -9,14 +8,14 @@ from omegaconf import MISSING
 
 @dataclass
 class Flags:
-    _convert_: Optional[ConvertMode] = None
-    _recursive_: Optional[bool] = None
+    _convert_: ConvertMode | None = None
+    _recursive_: bool | None = None
 
 
 @dataclass
 class ModuleConf:
     name: str = MISSING
-    classes: List[str] = MISSING
+    classes: list[str] = MISSING
     default_flags: Flags = field(default_factory=Flags)
 
 
@@ -27,7 +26,7 @@ class ConfigenConf:
 
     module_path_pattern: str = MISSING
 
-    modules: List[ModuleConf] = MISSING
+    modules: list[ModuleConf] = MISSING
 
     # Generated file header
     header: str = MISSING
@@ -35,7 +34,7 @@ class ConfigenConf:
 
 @dataclass
 class Config:
-    init_config_dir: Optional[str] = None
+    init_config_dir: str | None = None
     configen: ConfigenConf = field(default_factory=ConfigenConf)
 
 

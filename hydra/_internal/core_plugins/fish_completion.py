@@ -2,7 +2,6 @@
 import logging
 import os
 import sys
-from typing import List, Optional, Tuple
 
 from hydra.plugins.completion_plugin import CompletionPlugin
 
@@ -48,7 +47,7 @@ end
     def provides() -> str:
         return "fish"
 
-    def query(self, config_name: Optional[str]) -> None:
+    def query(self, config_name: str | None) -> None:
         line = os.environ["COMP_LINE"]
         line = self.strip_python_or_app_name(line)
         print("\n".join(self._query(config_name=config_name, line=line)))
@@ -59,7 +58,7 @@ end
         return f"{{}} -sc {command}=fish | source"
 
     @staticmethod
-    def _get_exec() -> List[Tuple[str, str]]:
+    def _get_exec() -> list[tuple[str, str]]:
         # Running as an installed app (setuptools entry point)
         output = []
         # User scenario 1: python script.py

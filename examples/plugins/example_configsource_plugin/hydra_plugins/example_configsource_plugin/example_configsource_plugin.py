@@ -1,5 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import Any, Dict, List, Optional
+import builtins
+from typing import Any
 
 from hydra.core.object_type import ObjectType
 from hydra.plugins.config_source import ConfigLoadError, ConfigResult, ConfigSource
@@ -9,7 +10,7 @@ from omegaconf import OmegaConf
 class ConfigSourceExample(ConfigSource):
     def __init__(self, provider: str, path: str):
         super().__init__(provider=provider, path=path)
-        self.headers: Dict[str, Dict[str, str]] = {
+        self.headers: dict[str, dict[str, str]] = {
             "package_test/explicit.yaml": {"package": "a.b"},
             "package_test/global.yaml": {"package": "_global_"},
             "package_test/group.yaml": {"package": "_group_"},
@@ -21,7 +22,7 @@ class ConfigSourceExample(ConfigSource):
             "configs_with_defaults_list/global_package.yaml": {"package": "_global_"},
             "configs_with_defaults_list/group_package.yaml": {"package": "_group_"},
         }
-        self.configs: Dict[str, Dict[str, Any]] = {
+        self.configs: dict[str, dict[str, Any]] = {
             "primary_config.yaml": {"primary": True},
             "primary_config_with_non_global_package.yaml": {"primary": True},
             "config_without_group.yaml": {"group": False},
@@ -55,14 +56,14 @@ class ConfigSourceExample(ConfigSource):
         return "example"
 
     def load_config(
-        self, config_path: str, package_override: Optional[str] = None
+        self, config_path: str, package_override: str | None = None
     ) -> ConfigResult:
         name = self._normalize_file_name(config_path)
 
         if name not in self.configs:
             raise ConfigLoadError("Config not found : " + config_path)
 
-        res_header: Dict[str, Optional[str]] = {"package": None}
+        res_header: dict[str, str | None] = {"package": None}
         if name in self.headers:
             header = self.headers[name]
             res_header["package"] = header["package"] if "package" in header else None
@@ -104,15 +105,17 @@ class ConfigSourceExample(ConfigSource):
         configs = set([x for x in base] + [f"{x}.yaml" for x in base])
         return config_path in configs
 
-    def list(self, config_path: str, results_filter: Optional[ObjectType]) -> List[str]:
-        groups: Dict[str, List[str]] = {
+    def list(
+        self, config_path: str, results_filter: ObjectType | None
+    ) -> builtins.list[str]:
+        groups: dict[str, list[str]] = {
             "": ["dataset", "level1", "optimizer"],
             "dataset": [],
             "optimizer": [],
             "level1": ["level2"],
             "level1/level2": [],
         }
-        configs: Dict[str, List[str]] = {
+        configs: dict[str, list[str]] = {
             "": ["config_without_group", "dataset"],
             "dataset": ["cifar10", "imagenet"],
             "optimizer": ["adam", "nesterov"],

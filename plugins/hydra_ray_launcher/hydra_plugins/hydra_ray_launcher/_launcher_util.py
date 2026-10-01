@@ -3,7 +3,7 @@ import logging
 import os
 from contextlib import contextmanager
 from subprocess import PIPE, Popen
-from typing import Any, Dict, Generator, List, Tuple, cast
+from typing import Any, Generator, cast
 
 import ray
 from hydra.core.hydra_config import HydraConfig
@@ -32,7 +32,7 @@ def start_ray(init_cfg: DictConfig) -> None:
         log.info(f"Initializing ray with config: {init_cfg}")
         if init_cfg:
             ray.init(
-                **cast(Dict[str, Any], OmegaConf.to_container(init_cfg, resolve=True))
+                **cast(dict[str, Any], OmegaConf.to_container(init_cfg, resolve=True))
             )
         else:
             ray.init()
@@ -44,7 +44,7 @@ def _run_job(
     hydra_context: HydraContext,
     sweep_config: DictConfig,
     task_function: TaskFunction,
-    singleton_state: Dict[Any, Any],
+    singleton_state: dict[Any, Any],
 ) -> JobReturn:
     setup_globals()
     Singleton.set_state(singleton_state)
@@ -67,7 +67,7 @@ def launch_job_on_ray(
 ) -> Any:
     if ray_remote:
         run_job_ray = ray.remote(
-            **cast(Dict[str, Any], OmegaConf.to_container(ray_remote, resolve=True))
+            **cast(dict[str, Any], OmegaConf.to_container(ray_remote, resolve=True))
         )(_run_job)
     else:
         run_job_ray = ray.remote(_run_job)
@@ -81,7 +81,7 @@ def launch_job_on_ray(
     return ret
 
 
-def _run_command(args: Any) -> Tuple[str, str]:
+def _run_command(args: Any) -> tuple[str, str]:
     with Popen(args=args, stdout=PIPE, stderr=PIPE) as proc:
         log.info(f"Running command: {' '.join(args)}")
         out, err = proc.communicate()
@@ -92,7 +92,7 @@ def _run_command(args: Any) -> Tuple[str, str]:
 
 
 @contextmanager
-def ray_tmp_dir(config: Dict[Any, Any], run_env: str) -> Generator[Any, None, None]:
+def ray_tmp_dir(config: dict[Any, Any], run_env: str) -> Generator[Any, None, None]:
     out = sdk.run_on_cluster(
         config, run_env=run_env, cmd="echo $(mktemp -d)", with_output=True
     ).decode()
@@ -122,9 +122,9 @@ def _get_pem(config: Any) -> Any:
 
 
 def rsync(
-    config: Dict[Any, Any],
-    include: List[str],
-    exclude: List[str],
+    config: dict[Any, Any],
+    include: list[str],
+    exclude: list[str],
     source: str,
     target: str,
     up: bool = True,

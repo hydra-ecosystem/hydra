@@ -2,7 +2,7 @@
 import re
 from dataclasses import dataclass, field
 from textwrap import dedent
-from typing import List, Optional, Pattern, Union
+from typing import Optional, Pattern, Union
 
 from omegaconf import AnyNode, DictConfig
 
@@ -14,13 +14,13 @@ _legacy_interpolation_pattern: Pattern[str] = re.compile(r"\${defaults\.\d+\.")
 
 @dataclass
 class ResultDefault:
-    config_path: Optional[str] = None
-    parent: Optional[str] = None
-    package: Optional[str] = None
+    config_path: str | None = None
+    parent: str | None = None
+    package: str | None = None
     is_self: bool = False
     primary: bool = field(default=False, compare=False)
 
-    override_key: Optional[str] = field(default=None, compare=False)
+    override_key: str | None = field(default=None, compare=False)
 
     def __repr__(self) -> str:
         attrs = []
@@ -43,17 +43,17 @@ class ResultDefault:
 
 @dataclass
 class InputDefault:
-    package: Optional[str] = None
-    parent_base_dir: Optional[str] = field(default=None, compare=False, repr=False)
-    parent_package: Optional[str] = field(default=None, compare=False, repr=False)
-    package_header: Optional[str] = field(default=None, compare=False)
+    package: str | None = None
+    parent_base_dir: str | None = field(default=None, compare=False, repr=False)
+    parent_package: str | None = field(default=None, compare=False, repr=False)
+    package_header: str | None = field(default=None, compare=False)
     primary: bool = field(default=False, compare=False)
 
     def is_self(self) -> bool:
         raise NotImplementedError()
 
     def update_parent(
-        self, parent_base_dir: Optional[str], parent_package: Optional[str]
+        self, parent_base_dir: str | None, parent_package: str | None
     ) -> None:
         assert self.parent_package is None or self.parent_package == parent_package
         assert self.parent_base_dir is None or self.parent_base_dir == parent_base_dir
@@ -82,16 +82,16 @@ class InputDefault:
     def _relative_group_path(self) -> str:
         raise NotImplementedError()
 
-    def get_name(self) -> Optional[str]:
+    def get_name(self) -> str | None:
         raise NotImplementedError()
 
-    def _get_attributes(self) -> List[str]:
+    def _get_attributes(self) -> list[str]:
         raise NotImplementedError()
 
-    def _get_flags(self) -> List[str]:
+    def _get_flags(self) -> list[str]:
         raise NotImplementedError()
 
-    def _get_parent_package(self) -> Optional[str]:
+    def _get_parent_package(self) -> str | None:
         ret = self.__dict__["parent_package"]
         assert ret is None or isinstance(ret, str)
         return ret
@@ -105,7 +105,7 @@ class InputDefault:
         else:
             return False
 
-    def set_package_header(self, package_header: Optional[str]) -> None:
+    def set_package_header(self, package_header: str | None) -> None:
         assert self.__dict__["package_header"] is None
 
         if package_header is None:
@@ -121,12 +121,12 @@ class InputDefault:
 
         self.__dict__["package_header"] = package_header
 
-    def get_package_header(self) -> Optional[str]:
+    def get_package_header(self) -> str | None:
         ret = self.__dict__["package_header"]
         assert ret is None or isinstance(ret, str)
         return ret
 
-    def get_package(self, default_to_package_header: bool = True) -> Optional[str]:
+    def get_package(self, default_to_package_header: bool = True) -> str | None:
         if self.__dict__["package"] is None and default_to_package_header:
             ret = self.__dict__["package_header"]
         else:
@@ -136,9 +136,9 @@ class InputDefault:
 
     def _get_final_package(
         self,
-        parent_package: Optional[str],
-        package: Optional[str],
-        name: Optional[str],
+        parent_package: str | None,
+        package: str | None,
+        name: str | None,
     ) -> str:
         assert parent_package is not None
 
@@ -205,7 +205,7 @@ class InputDefault:
         raise NotImplementedError()
 
     def _resolve_interpolation_impl(
-        self, known_choices: DictConfig, val: Optional[str]
+        self, known_choices: DictConfig, val: str | None
     ) -> str:
         assert val is not None
 
@@ -282,10 +282,10 @@ class VirtualRoot(InputDefault):
     def is_missing(self) -> bool:
         return False
 
-    def _get_attributes(self) -> List[str]:
+    def _get_attributes(self) -> list[str]:
         raise NotImplementedError()
 
-    def _get_flags(self) -> List[str]:
+    def _get_flags(self) -> list[str]:
         raise NotImplementedError()
 
     def __repr__(self) -> str:
@@ -303,9 +303,9 @@ class VirtualRoot(InputDefault):
 
 @dataclass(repr=False)
 class ConfigDefault(InputDefault):
-    path: Optional[str] = None
+    path: str | None = None
     optional: bool = False
-    deleted: Optional[bool] = None
+    deleted: bool | None = None
 
     def __post_init__(self) -> None:
         if self.is_self() and self.package is not None:
@@ -347,7 +347,7 @@ class ConfigDefault(InputDefault):
         else:
             return group
 
-    def get_name(self) -> Optional[str]:
+    def get_name(self) -> str | None:
         assert self.path is not None
         idx = self.path.rfind("/")
         if idx == -1:
@@ -393,10 +393,10 @@ class ConfigDefault(InputDefault):
         else:
             return path[0:idx]
 
-    def _get_attributes(self) -> List[str]:
+    def _get_attributes(self) -> list[str]:
         return ["path", "package", "deleted"]
 
-    def _get_flags(self) -> List[str]:
+    def _get_flags(self) -> list[str]:
         return ["optional"]
 
     def is_interpolation(self) -> bool:
@@ -428,20 +428,20 @@ class ConfigDefault(InputDefault):
 @dataclass(repr=False)
 class GroupDefault(InputDefault):
     # config group name if present
-    group: Optional[str] = None
+    group: str | None = None
     # config file name
-    value: Optional[Union[str, List[str]]] = None
+    value: str | list[str] | None = None
     optional: bool = False
 
     override: bool = False
-    deleted: Optional[bool] = None
+    deleted: bool | None = None
 
     config_name_overridden: bool = field(default=False, compare=False, repr=False)
     # True if this item was added using +foo=bar from the external overrides
     external_append: bool = field(default=False, compare=False, repr=False)
 
     normalized_shorthand: bool = field(default=False, compare=False, repr=False)
-    original_group: Optional[str] = field(default=None, compare=False, repr=False)
+    original_group: str | None = field(default=None, compare=False, repr=False)
 
     def __post_init__(self) -> None:
         assert self.group is not None and self.group != ""
@@ -485,11 +485,11 @@ class GroupDefault(InputDefault):
     def is_options(self) -> bool:
         return isinstance(self.value, list)
 
-    def get_name(self) -> Optional[str]:
+    def get_name(self) -> str | None:
         assert self.value is None or isinstance(self.value, str)
         return self.value
 
-    def get_options(self) -> List[str]:
+    def get_options(self) -> list[str]:
         assert isinstance(self.value, list)
         return self.value
 
@@ -508,10 +508,10 @@ class GroupDefault(InputDefault):
         else:
             return self.group
 
-    def _get_attributes(self) -> List[str]:
+    def _get_attributes(self) -> list[str]:
         return ["group", "value", "package", "deleted"]
 
-    def _get_flags(self) -> List[str]:
+    def _get_flags(self) -> list[str]:
         return ["optional", "override"]
 
     def is_interpolation(self) -> bool:
@@ -574,7 +574,7 @@ See http://hydra.cc/docs/1.1/upgrades/1.0_to_1.1/defaults_list_interpolation for
 @dataclass
 class DefaultsTreeNode:
     node: InputDefault
-    children: Optional[List[Union["DefaultsTreeNode", InputDefault]]] = None
+    children: list[Union["DefaultsTreeNode", InputDefault]] | None = None
 
     parent: Optional["DefaultsTreeNode"] = field(
         default=None,
@@ -582,7 +582,7 @@ class DefaultsTreeNode:
         compare=False,
     )
 
-    def parent_node(self) -> Optional[InputDefault]:
+    def parent_node(self) -> InputDefault | None:
         if self.parent is None:
             return None
         else:

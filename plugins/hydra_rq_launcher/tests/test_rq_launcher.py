@@ -1,7 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from base64 import b64encode
 from pickle import UnpicklingError
-from typing import List
 
 import pytest
 from hydra.core.plugins import Plugins
@@ -58,7 +57,7 @@ class TestRQLauncherIntegration(IntegrationTestSuite):
 @mark.filterwarnings("ignore::DeprecationWarning")
 @mark.parametrize("params_overrides", [[], ["hydra.launcher.redis.ssl=true"]])
 def test_example_app(
-    hydra_sweep_runner: TSweepRunner, params_overrides: List[str]
+    hydra_sweep_runner: TSweepRunner, params_overrides: list[str]
 ) -> None:
     with hydra_sweep_runner(
         calling_file="example/my_app.py",
@@ -111,7 +110,7 @@ def test_unserializable_rq_result_stream_error() -> None:
             assert field == "result"
             return None
 
-        def xrevrange(self, key: str, start: str, end: str, count: int) -> List[object]:
+        def xrevrange(self, key: str, start: str, end: str, count: int) -> list[object]:
             assert key == "rq:results:123"
             assert start == "+"
             assert end == "-"

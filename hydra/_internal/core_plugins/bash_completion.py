@@ -2,7 +2,6 @@
 import logging
 import os
 import sys
-from typing import Optional
 
 from hydra.plugins.completion_plugin import CompletionPlugin
 
@@ -75,7 +74,7 @@ COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_bash_co
     def provides() -> str:
         return "bash"
 
-    def query(self, config_name: Optional[str]) -> None:
+    def query(self, config_name: str | None) -> None:
         line = os.environ["COMP_LINE"]
         # key = os.environ["COMP_POINT "] if "COMP_POINT " in os.environ else len(line)
 

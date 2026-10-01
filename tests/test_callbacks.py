@@ -8,7 +8,7 @@ import sys
 import warnings
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, List
+from typing import Any
 
 from omegaconf import OmegaConf, open_dict, read_write
 from pytest import mark, param, raises, warns
@@ -213,7 +213,7 @@ def test_callback_control_flow_exception_propagates() -> None:
 def test_app_with_callbacks(
     tmpdir: Path,
     app_path: str,
-    args: List[str],
+    args: list[str],
     expected: str,
 ) -> None:
     cmd = [
@@ -354,7 +354,7 @@ def test_log_job_return_callback_config_warns_only_once() -> None:
     ],
 )
 def test_experimental_rerun(
-    tmpdir: Path, warning_msg: str, overrides: List[str]
+    tmpdir: Path, warning_msg: str, overrides: list[str]
 ) -> None:
     app_path = "tests/test_apps/app_with_pickle_job_info_callback/my_app.py"
 

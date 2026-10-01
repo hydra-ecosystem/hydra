@@ -8,7 +8,7 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator, List, Optional, Tuple, Union
+from typing import Iterator
 
 import nox
 from nox import Session
@@ -89,7 +89,7 @@ class Plugin:
     source_dir: str
     dir_name: str
     setup_py: str
-    classifiers: List[str]
+    classifiers: list[str]
 
 
 def get_current_os() -> str:
@@ -129,7 +129,7 @@ def log_installed_package_version(session: Session, package_name: str) -> None:
             session.log(f"Installed {package_name} version: {line}")
 
 
-def install_hydra(session: Session, cmd: List[str]) -> None:
+def install_hydra(session: Session, cmd: list[str]) -> None:
     # needed for build
     session.install("read-version", silent=SILENT)
     # clean install hydra
@@ -145,8 +145,8 @@ def install_hydra(session: Session, cmd: List[str]) -> None:
 
 def install_selected_plugins(
     session: Session,
-    install_cmd: List[str],
-    selected_plugins: List[Plugin],
+    install_cmd: list[str],
+    selected_plugins: list[Plugin],
 ) -> None:
     for plugin in selected_plugins:
         install_plugin(session, install_cmd, plugin)
@@ -154,7 +154,7 @@ def install_selected_plugins(
     session.run("python", "-c", "from hydra import main", silent=SILENT)
 
 
-def install_plugin(session: Session, install_cmd: List[str], plugin: Plugin) -> None:
+def install_plugin(session: Session, install_cmd: list[str], plugin: Plugin) -> None:
     install_plugin_test_requirements(session, plugin)
     cmd = install_cmd + [plugin.abspath]
     session.run(*cmd, silent=SILENT)
@@ -170,7 +170,7 @@ def install_plugin_test_requirements(session: Session, plugin: Plugin) -> None:
         session.install("-r", str(requirements), silent=SILENT)
 
 
-def pytest_args(*args: str) -> List[str]:
+def pytest_args(*args: str) -> list[str]:
     ret = ["pytest"]
     ret.extend(args)
     return ret
@@ -183,18 +183,18 @@ def run_pytest(session: Session, directory: str = ".", *args: str) -> None:
     session.run(*pytest_cmd, silent=False)
 
 
-def get_setup_python_versions(classifiers: List[str]) -> List[str]:
+def get_setup_python_versions(classifiers: list[str]) -> list[str]:
     pythons = filter(lambda line: "Programming Language :: Python" in line, classifiers)
     return [p[len("Programming Language :: Python :: ") :] for p in pythons]
 
 
-def session_python_as_tuple(session: Session) -> Tuple[int, int]:
+def session_python_as_tuple(session: Session) -> tuple[int, int]:
     major_str, minor_str = session.python.split(".")
     major, minor = int(major_str), int(minor_str)
     return major, minor
 
 
-def get_plugin_os_names(classifiers: List[str]) -> List[str]:
+def get_plugin_os_names(classifiers: list[str]) -> list[str]:
     oses = list(filter(lambda line: "Operating System" in line, classifiers))
     if len(oses) == 0:
         # No Os is specified so all oses are supported
@@ -207,7 +207,7 @@ def get_plugin_os_names(classifiers: List[str]) -> List[str]:
 
 
 @functools.lru_cache()
-def list_plugins(directory: str) -> List[Plugin]:
+def list_plugins(directory: str) -> list[Plugin]:
     blacklist = [".ruff_cache", "examples", "ruff.toml"]
     _plugin_directories = [
         x
@@ -230,11 +230,11 @@ def list_plugins(directory: str) -> List[Plugin]:
             [sys.executable, "-m", "pip", "install", "--no-cache-dir", *missing_deps],
         )
 
-    plugins: List[Plugin] = []
+    plugins: list[Plugin] = []
     for dir_name in _plugin_directories:
         abspath = os.path.join(BASE, directory, dir_name)
         setup_py = os.path.join(abspath, "setup.py")
-        name_and_classifiers: List[str] = subprocess.check_output(
+        name_and_classifiers: list[str] = subprocess.check_output(
             [sys.executable, setup_py, "--name", "--classifiers"],
             text=True,
         ).splitlines()
@@ -261,11 +261,11 @@ def list_plugins(directory: str) -> List[Plugin]:
     return plugins
 
 
-def select_plugins_under_directory(session: Session, directory: str) -> List[Plugin]:
+def select_plugins_under_directory(session: Session, directory: str) -> list[Plugin]:
     """
     Select all plugins under the current directory that should be tested in this session.
     """
-    plugins_under_directory: List[Plugin] = list_plugins(directory)
+    plugins_under_directory: list[Plugin] = list_plugins(directory)
     selected_plugins = [
         plugin
         for plugin in plugins_under_directory
@@ -320,9 +320,7 @@ def install_dev_deps(session: Session) -> None:
     session.run("pip", "install", "-r", "requirements/dev.txt", silent=SILENT)
 
 
-def _ruff_format_cmd(
-    *paths: str, extend_exclude: Optional[List[str]] = None
-) -> List[str]:
+def _ruff_format_cmd(*paths: str, extend_exclude: list[str] | None = None) -> list[str]:
     ruff = ["ruff", "format", *(paths or ["."])]
     if extend_exclude is not None:
         for exclude in extend_exclude:
@@ -336,9 +334,7 @@ def _is_github_actions() -> bool:
     return os.environ.get("GITHUB_ACTIONS") == "true"
 
 
-def _ruff_lint_cmd(
-    *paths: str, extend_exclude: Optional[List[str]] = None
-) -> List[str]:
+def _ruff_lint_cmd(*paths: str, extend_exclude: list[str] | None = None) -> list[str]:
     ruff = ["ruff", "check", *(paths or ["."])]
     if extend_exclude is not None:
         for exclude in extend_exclude:
@@ -350,14 +346,14 @@ def _ruff_lint_cmd(
     return ruff
 
 
-def _yamllint_cmd(*paths: str) -> List[str]:
+def _yamllint_cmd(*paths: str) -> list[str]:
     yamllint = ["yamllint", "--strict", *(paths or ["."])]
     if _is_github_actions():
         yamllint += ["--format", "github"]
     return yamllint
 
 
-def _bandit_cmd(*paths: str) -> List[str]:
+def _bandit_cmd(*paths: str) -> list[str]:
     bandit = [
         "bandit",
         "--exclude",
@@ -377,9 +373,9 @@ def _bandit_cmd(*paths: str) -> List[str]:
 
 
 def _pyrefly_cmd(
-    python_version: Optional[str] = "3.11",
-    extra_search_paths: Optional[List[str]] = None,
-) -> List[str]:
+    python_version: str | None = "3.11",
+    extra_search_paths: list[str] | None = None,
+) -> list[str]:
     pyrefly = [
         "pyrefly",
         "check",
@@ -402,7 +398,7 @@ def _pyrefly_cmd(
 
 
 LINT_PLUGINS = list_plugins("plugins") + list_plugins("examples/plugins")
-LINT_TARGETS: List[Union[str, Plugin]] = ["core"] + LINT_PLUGINS
+LINT_TARGETS: list[str | Plugin] = ["core"] + LINT_PLUGINS
 LINT_TARGET_IDS = [
     target if isinstance(target, str) else target.name for target in LINT_TARGETS
 ]
@@ -410,7 +406,7 @@ LINT_TARGET_IDS = [
 
 @nox.session(python=LINT_PYTHON_VERSIONS, name="lint")  # type: ignore
 @nox.parametrize("target", LINT_TARGETS, ids=LINT_TARGET_IDS)  # type: ignore
-def lint(session: Session, target: Union[str, Plugin]) -> None:
+def lint(session: Session, target: str | Plugin) -> None:
     if target == "core":
         lint_core_impl(session)
         return
@@ -569,9 +565,9 @@ def test_tools(session: Session) -> None:
     session.chdir(BASE)
 
 
-def _get_standalone_apps_dirs() -> List[Union[str, Path]]:
+def _get_standalone_apps_dirs() -> list[str | Path]:
     standalone_apps_dir = Path(f"{BASE}/tests/standalone_apps")
-    apps: List[Union[str, Path]] = [
+    apps: list[str | Path] = [
         standalone_apps_dir / subdir for subdir in os.listdir(standalone_apps_dir)
     ]
     apps.append(f"{BASE}/examples/advanced/hydra_app_example")
@@ -656,7 +652,7 @@ def test_plugins(session: Session, plugin: Plugin) -> None:
         )
 
 
-def test_selected_plugins(session: Session, selected_plugins: List[Plugin]) -> None:
+def test_selected_plugins(session: Session, selected_plugins: list[Plugin]) -> None:
     # Run tests for all installed plugins
     for plugin in selected_plugins:
         session.chdir(plugin.abspath)

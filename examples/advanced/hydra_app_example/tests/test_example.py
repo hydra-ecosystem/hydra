@@ -1,6 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import unittest
-from typing import List
 
 from pytest import mark
 
@@ -56,7 +55,7 @@ class TestWithUnittest(unittest.TestCase):
         (["app.user=test_user", "app.num1=-1001", "app.num2=1000"], -1),
     ],
 )
-def test_user_logic(overrides: List[str], expected: int) -> None:
+def test_user_logic(overrides: list[str], expected: int) -> None:
     with initialize_config_module(config_module="hydra_app.conf"):
         cfg = compose(config_name="config", overrides=overrides)
         assert hydra_app.main.add(cfg.app, "num1", "num2") == expected

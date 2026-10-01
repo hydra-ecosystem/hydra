@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import logging
-from typing import Any, Mapping, Optional
+from typing import Any, Mapping
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ class EarlyStopper:
         self.max_epochs_without_improvement = max_epochs_without_improvement
         self.epsilon = epsilon
         self.minimize = minimize
-        self.current_best_value: Optional[float] = None
+        self.current_best_value: float | None = None
         self.current_epochs_without_improvement = 0
 
     def should_stop(

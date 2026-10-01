@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import copy
 from pathlib import Path
-from typing import Callable, Generator, List, Optional
+from typing import Callable, Generator
 
 from pytest import fixture
 
@@ -23,25 +23,25 @@ def hydra_restore_singletons() -> Generator[None, None, None]:
 @fixture(scope="function")
 def hydra_sweep_runner() -> Callable[
     [
-        Optional[str],
-        Optional[str],
-        Optional[TaskFunction],
-        Optional[str],
-        Optional[str],
-        Optional[List[str]],
-        Optional[Path],
+        str | None,
+        str | None,
+        TaskFunction | None,
+        str | None,
+        str | None,
+        list[str] | None,
+        Path | None,
         bool,
     ],
     SweepTaskFunction,
 ]:
     def _(
-        calling_file: Optional[str],
-        calling_module: Optional[str],
-        task_function: Optional[TaskFunction],
-        config_path: Optional[str],
-        config_name: Optional[str],
-        overrides: Optional[List[str]],
-        temp_dir: Optional[Path] = None,
+        calling_file: str | None,
+        calling_module: str | None,
+        task_function: TaskFunction | None,
+        config_path: str | None,
+        config_name: str | None,
+        overrides: list[str] | None,
+        temp_dir: Path | None = None,
         configure_logging: bool = False,
     ) -> SweepTaskFunction:
         sweep = SweepTaskFunction()
@@ -61,21 +61,21 @@ def hydra_sweep_runner() -> Callable[
 @fixture(scope="function")
 def hydra_task_runner() -> Callable[
     [
-        Optional[str],
-        Optional[str],
-        Optional[str],
-        Optional[str],
-        Optional[List[str]],
+        str | None,
+        str | None,
+        str | None,
+        str | None,
+        list[str] | None,
         bool,
     ],
     TaskTestFunction,
 ]:
     def _(
-        calling_file: Optional[str],
-        calling_module: Optional[str],
-        config_path: Optional[str],
-        config_name: Optional[str],
-        overrides: Optional[List[str]] = None,
+        calling_file: str | None,
+        calling_module: str | None,
+        config_path: str | None,
+        config_name: str | None,
+        overrides: list[str] | None = None,
         configure_logging: bool = False,
     ) -> TaskTestFunction:
         task = TaskTestFunction()

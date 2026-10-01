@@ -2,7 +2,7 @@
 import copy
 import re
 import zipfile
-from typing import Any, List
+from typing import Any
 
 from pytest import mark, param, raises
 
@@ -168,7 +168,7 @@ class TestConfigRepository:
         hydra_restore_singletons: Any,
         path: str,
         config_path: str,
-        expected: List[InputDefault],
+        expected: list[InputDefault],
     ) -> None:
         Plugins.instance()
         config_search_path = create_config_search_path(path)

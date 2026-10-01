@@ -20,7 +20,7 @@ import weakref
 from dataclasses import InitVar, dataclass, field
 from functools import partial
 from textwrap import dedent
-from typing import Any, Callable, Dict, List, Optional, Tuple, cast
+from typing import Any, Callable, cast
 from unittest.mock import NonCallableMock
 
 import attr
@@ -555,7 +555,7 @@ def register_test_resolver(name: str, value: Any) -> Any:
 def test_class_instantiate(
     instantiate_func: Any,
     config: Any,
-    passthrough: Dict[str, Any],
+    passthrough: dict[str, Any],
     expected: Any,
     recursive: bool,
 ) -> Any:
@@ -1020,7 +1020,7 @@ def test_callsite_override_materializes_none_root(instantiate_func: Any) -> None
 def test_interpolation_accessing_parent(
     instantiate_func: Any,
     input_conf: Any,
-    passthrough: Dict[str, Any],
+    passthrough: dict[str, Any],
     expected: Any,
     convert_to_list: bool,
 ) -> Any:
@@ -1992,7 +1992,7 @@ def test_regression_2350_dict_override_replaces_configured_dict(
     @dataclass
     class Config:
         _target_: str = "tests.instantiate.ArgsClass"
-        value: Dict[str, int] = field(default_factory=lambda: {"configured": 10})
+        value: dict[str, int] = field(default_factory=lambda: {"configured": 10})
 
     result = instantiate_func(
         Config,
@@ -2103,7 +2103,7 @@ def test_dict_override_merges_interpolated_configured_target(
     ],
 )
 def test_dict_override_merge_is_independent_of_callsite_argument_order(
-    instantiate_func: Any, overrides: Dict[str, Any]
+    instantiate_func: Any, overrides: dict[str, Any]
 ) -> None:
     result = instantiate_func(
         {
@@ -2207,7 +2207,7 @@ def test_dict_override_merges_structured_config_fields(
         derived: int = "${.count}"  # type: ignore[assignment]
         label: str = "configured"
         child: Child = field(default_factory=Child)
-        tags: Dict[str, str] = field(
+        tags: dict[str, str] = field(
             default_factory=lambda: {"env": "prod", "team": "ml"}
         )
 
@@ -2366,7 +2366,7 @@ def test_dict_override_materializes_structured_config_with_allow_objects(
     @dataclass
     class Config:
         _target_: str = "tests.instantiate.ArgsClass"
-        value: Optional[Value] = None
+        value: Value | None = None
 
     result = instantiate_func(Config, value={})
 
@@ -2391,7 +2391,7 @@ def test_dict_override_materialized_structured_config_resolves_outside_subtree(
     class Config:
         _target_: str = "tests.instantiate.ArgsClass"
         template: int = 20
-        value: Optional[Value] = configured_value
+        value: Value | None = configured_value
 
     result = instantiate_func(Config, value={"count": 30})
 
@@ -2421,7 +2421,7 @@ def test_dict_override_merges_target_nested_in_structured_config(
 ) -> None:
     @dataclass
     class Value:
-        child: Dict[str, Any] = field(
+        child: dict[str, Any] = field(
             default_factory=lambda: {
                 "_target_": "tests.instantiate.Tree",
                 "value": 10,
@@ -2934,7 +2934,7 @@ def test_instantiate_with_callable_target_keyword(
 def test_recursive_instantiation(
     instantiate_func: Any,
     config: Any,
-    passthrough: Dict[str, Any],
+    passthrough: dict[str, Any],
     expected: Any,
 ) -> None:
     obj = instantiate_func(config, **passthrough)
@@ -3136,7 +3136,7 @@ def test_recursive_instantiation(
 def test_partial_instantiate(
     instantiate_func: Any,
     config: Any,
-    passthrough: Dict[str, Any],
+    passthrough: dict[str, Any],
     expected: Any,
 ) -> None:
     obj = instantiate_func(config, **passthrough)
@@ -3980,7 +3980,7 @@ def test_process_environment_functions_are_permanently_blocked(name: str) -> Non
     ],
 )
 def test_os_environ_mutation_is_permanently_blocked(
-    monkeypatch: MonkeyPatch, method_name: str, args: List[Any]
+    monkeypatch: MonkeyPatch, method_name: str, args: list[Any]
 ) -> None:
     data = {b"EXISTING": b"value"}
     environ = cast(Any, os._Environ)(  # type: ignore[attr-defined]
@@ -4005,7 +4005,7 @@ def test_os_environ_mutation_is_permanently_blocked(
 def test_os_environ_call_wrapper_mutation_is_blocked(
     monkeypatch: MonkeyPatch,
 ) -> None:
-    data: Dict[bytes, bytes] = {}
+    data: dict[bytes, bytes] = {}
     environ = cast(Any, os._Environ)(  # type: ignore[attr-defined]
         data, os.fsencode, os.fsdecode, os.fsencode, os.fsdecode
     )
@@ -4028,7 +4028,7 @@ def test_os_environ_call_wrapper_mutation_is_blocked(
 def test_os_environ_keyword_receiver_mutation_is_blocked(
     monkeypatch: MonkeyPatch, as_partial: bool
 ) -> None:
-    data: Dict[bytes, bytes] = {}
+    data: dict[bytes, bytes] = {}
     environ = cast(Any, os._Environ)(  # type: ignore[attr-defined]
         data, os.fsencode, os.fsdecode, os.fsencode, os.fsdecode
     )
@@ -4069,7 +4069,7 @@ def test_os_environ_keyword_receiver_mutation_is_blocked(
     ],
 )
 def test_os_environ_indirect_mutation_is_blocked(
-    target: Callable[..., Any], args: Tuple[Any, ...]
+    target: Callable[..., Any], args: tuple[Any, ...]
 ) -> None:
     with raises(InstantiationException, match="cannot modify the process environment"):
         execution_policy._authorize_target_invocation(target, args, {}, "", None)
@@ -4203,7 +4203,7 @@ def test_config_cannot_return_live_frame_or_code() -> None:
         tb = error.__traceback__
     assert tb is not None
 
-    results: List[Any] = [frame, module_function.__code__, tb]
+    results: list[Any] = [frame, module_function.__code__, tb]
     if type(frame.f_locals) is not dict:
         results.append(frame.f_locals)
 
@@ -4308,7 +4308,7 @@ def test_unsafe_disable_bypasses_policy_integrity(monkeypatch: MonkeyPatch) -> N
     ],
 )
 def test_config_cannot_mutate_existing_function_code(
-    target: Any, args: List[Any]
+    target: Any, args: list[Any]
 ) -> None:
     original = module_function.__code__
     config = OmegaConf.create(
@@ -4616,7 +4616,7 @@ def test_one_argument_iter_target_is_allowed() -> None:
 
 
 def test_two_argument_iter_callback_is_blocked_in_legacy_mode() -> None:
-    calls: List[str] = []
+    calls: list[str] = []
 
     def callback() -> int:
         calls.append("called")
@@ -4633,7 +4633,7 @@ def test_two_argument_iter_callback_is_blocked_in_legacy_mode() -> None:
 
 
 def test_two_argument_iter_callback_cannot_be_whitelisted() -> None:
-    calls: List[str] = []
+    calls: list[str] = []
 
     def callback() -> int:
         calls.append("called")
@@ -4647,7 +4647,7 @@ def test_two_argument_iter_callback_cannot_be_whitelisted() -> None:
 
 
 def test_partial_call_target_reauthorizes_effective_callable() -> None:
-    calls: List[str] = []
+    calls: list[str] = []
 
     def callback() -> None:
         calls.append("called")
@@ -4699,7 +4699,7 @@ def test_generic_call_slots_are_not_permanently_blocked() -> None:
 
 
 def test_property_get_target_cannot_be_whitelisted() -> None:
-    calls: List[str] = []
+    calls: list[str] = []
 
     class Receiver:
         pass
@@ -5214,9 +5214,9 @@ def test_legacy_operator_error_does_not_recommend_execution_whitelist() -> None:
 )
 def test_execution_whitelist_rejects_getattribute_before_descriptor_access(
     target: str,
-    receiver: Dict[str, Any],
+    receiver: dict[str, Any],
     marker_owner: Any,
-    execution_whitelist: List[str],
+    execution_whitelist: list[str],
 ) -> None:
     marker_owner.descriptor_accessed = False
     cfg = {"_target_": target, "_args_": [receiver, "payload"]}
@@ -5283,7 +5283,7 @@ def test_execution_whitelist_rejects_getattr_before_descriptor_access() -> None:
     ],
 )
 def test_execution_whitelist_rejects_attribute_dispatch_before_descriptor_access(
-    target: str, canonical_target: str, args: List[Any], marker: str
+    target: str, canonical_target: str, args: list[Any], marker: str
 ) -> None:
     probe_target = "tests.instantiate.test_instantiate.GetattrDescriptorProbe"
     setattr(GetattrDescriptorProbe, marker, False)
@@ -5318,7 +5318,7 @@ def test_execution_whitelist_rejects_attribute_dispatch_before_descriptor_access
     ],
 )
 def test_execution_whitelist_rejects_item_dispatch_before_receiver_access(
-    target: str, args: List[Any], marker: str
+    target: str, args: list[Any], marker: str
 ) -> None:
     probe_target = "tests.instantiate.test_instantiate.ItemOperationProbe"
     setattr(ItemOperationProbe, marker, False)
@@ -5883,7 +5883,7 @@ def test_partial_type_reauthorizes_runtime_arguments() -> None:
 
 
 def test_resolved_partial_target_cannot_bypass_dynamic_type_guard() -> None:
-    initialized_subclasses: List[type] = []
+    initialized_subclasses: list[type] = []
 
     class Base:
         def __init_subclass__(cls) -> None:
@@ -5919,7 +5919,7 @@ def test_resolved_partial_target_cannot_bypass_mock_parameter_guard() -> None:
     reason="functools.Placeholder requires Python 3.14",
 )
 def test_resolved_partial_target_substitutes_placeholder_before_guard() -> None:
-    initialized_subclasses: List[type] = []
+    initialized_subclasses: list[type] = []
 
     class Base:
         def __init_subclass__(cls) -> None:
@@ -5994,7 +5994,7 @@ def test_non_callable_mock_allows_one_positional_spec() -> None:
     ],
 )
 def test_non_callable_mock_cannot_configure_callable_children(
-    unsafe_kwargs: Dict[str, Any],
+    unsafe_kwargs: dict[str, Any],
 ) -> None:
     target = "unittest.mock.NonCallableMock"
     cfg = {"_target_": target, **unsafe_kwargs}
@@ -6308,7 +6308,7 @@ def test_unsafe_disable_execution_checks_allows_all_targets(
 )
 def test_convert_params_override(
     instantiate_func: Any,
-    primitive: Optional[bool],
+    primitive: bool | None,
     expected_primitive: bool,
     input_: Any,
     expected: Any,
@@ -6549,7 +6549,7 @@ def test_convert_and_recursive_node(
     ],
 )
 def test_instantiate_convert_dataclasses(
-    instantiate_func: Any, config: Any, expected: Tuple[Any, Any, Any, Any]
+    instantiate_func: Any, config: Any, expected: tuple[Any, Any, Any, Any]
 ) -> None:
     """Instantiate on nested dataclass + dataclass."""
     modes = [ConvertMode.NONE, ConvertMode.PARTIAL, ConvertMode.OBJECT, ConvertMode.ALL]
@@ -6838,12 +6838,12 @@ def test_nested_dataclass_with_partial_convert(instantiate_func: Any) -> None:
 
 
 class DictValues:
-    def __init__(self, d: Dict[str, User]):
+    def __init__(self, d: dict[str, User]):
         self.d = d
 
 
 class ListValues:
-    def __init__(self, d: List[User]):
+    def __init__(self, d: list[User]):
         self.d = d
 
 
@@ -6851,7 +6851,7 @@ def test_dict_with_structured_config(instantiate_func: Any) -> None:
     @dataclass
     class DictValuesConf:
         _target_: str = "tests.instantiate.test_instantiate.DictValues"
-        d: Dict[str, User] = MISSING
+        d: dict[str, User] = MISSING
 
     schema = OmegaConf.structured(DictValuesConf)
     cfg = OmegaConf.merge(schema, {"d": {"007": {"name": "Bond", "age": 7}}})
@@ -6872,7 +6872,7 @@ def test_list_with_structured_config(instantiate_func: Any) -> None:
     @dataclass
     class ListValuesConf:
         _target_: str = "tests.instantiate.test_instantiate.ListValues"
-        d: List[User] = MISSING
+        d: list[User] = MISSING
 
     schema = OmegaConf.structured(ListValuesConf)
     cfg = OmegaConf.merge(schema, {"d": [{"name": "Bond", "age": 7}]})
@@ -6894,7 +6894,7 @@ def test_list_as_none(instantiate_func: Any) -> None:
     @dataclass
     class ListValuesConf:
         _target_: str = "tests.instantiate.test_instantiate.ListValues"
-        d: Optional[List[User]] = None
+        d: list[User] | None = None
 
     cfg = OmegaConf.structured(ListValuesConf)
     obj = instantiate_func(config=cfg)
@@ -6905,7 +6905,7 @@ def test_dict_as_none(instantiate_func: Any) -> None:
     @dataclass
     class DictValuesConf:
         _target_: str = "tests.instantiate.test_instantiate.DictValues"
-        d: Optional[Dict[str, User]] = None
+        d: dict[str, User] | None = None
 
     cfg = OmegaConf.structured(DictValuesConf)
     obj = instantiate_func(config=cfg)
@@ -7398,7 +7398,7 @@ def test_pydoc_family_is_blacklisted(target: str) -> None:
         {"_target_": "trace.Trace"},
     ],
 )
-def test_blacklist_prefix_exceptions_are_allowed(cfg: Dict[str, Any]) -> None:
+def test_blacklist_prefix_exceptions_are_allowed(cfg: dict[str, Any]) -> None:
     with warns(UserWarning, match="with no\n_execution_whitelist_"):
         result = _instantiate2.instantiate(cfg)
     assert result is not None

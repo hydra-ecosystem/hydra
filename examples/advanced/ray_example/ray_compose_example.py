@@ -1,6 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import time
-from typing import List, Tuple
 
 import ray
 from omegaconf import DictConfig, OmegaConf
@@ -9,7 +8,7 @@ import hydra
 
 
 @ray.remote  # type: ignore
-def train(overrides: List[str], cfg: DictConfig) -> Tuple[List[str], float]:
+def train(overrides: list[str], cfg: DictConfig) -> tuple[list[str], float]:
     print(OmegaConf.to_yaml(cfg))
     time.sleep(5)
     return overrides, 0.9

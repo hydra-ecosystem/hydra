@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import builtins
 import os
-from typing import List, Optional
 
 from omegaconf import OmegaConf
 
@@ -48,8 +48,10 @@ class FileConfigSource(ConfigSource):
         full_path = os.path.realpath(os.path.join(self.path, config_path))
         return os.path.isfile(full_path)
 
-    def list(self, config_path: str, results_filter: Optional[ObjectType]) -> List[str]:
-        files: List[str] = []
+    def list(
+        self, config_path: str, results_filter: ObjectType | None
+    ) -> builtins.list[str]:
+        files: list[str] = []
         full_path = os.path.realpath(os.path.join(self.path, config_path))
         for file in os.listdir(full_path):
             file_path = os.path.join(config_path, file)

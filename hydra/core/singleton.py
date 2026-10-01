@@ -1,12 +1,12 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from copy import deepcopy
-from typing import Any, Dict
+from typing import Any
 
 from omegaconf.basecontainer import BaseContainer
 
 
 class Singleton(type):
-    _instances: Dict[type, "Singleton"] = {}
+    _instances: dict[type, "Singleton"] = {}
 
     def __call__(cls, *args: Any, **kwargs: Any) -> Any:
         if cls not in cls._instances:

@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from textwrap import dedent
 from types import TracebackType
-from typing import Any, NoReturn, Optional
+from typing import Any, NoReturn
 from unittest.mock import patch
 
 from omegaconf import DictConfig, OmegaConf
@@ -182,7 +182,7 @@ def test_to_hydra_override_value_str_roundtrip(
     ],
 )
 def test_deprecation_warning(
-    monkeypatch: Any, env_setting: Optional[str], expected_error: bool
+    monkeypatch: Any, env_setting: str | None, expected_error: bool
 ) -> None:
     msg = "Feature FooBar is deprecated"
     if env_setting is not None:
@@ -364,7 +364,7 @@ class TestRunAndReport:
         def hook(
             error_type: type[BaseException],
             exception: BaseException,
-            tb: Optional[TracebackType],
+            tb: TracebackType | None,
         ) -> None:
             assert error_type is InstantiationException
             assert exception is error
@@ -551,9 +551,7 @@ class TestRunAndReport:
 
     def test_overridden_with_traceback_is_not_called(self) -> None:
         class RejectingTraceback(InstantiationException):
-            def with_traceback(
-                self, tb: Optional[TracebackType]
-            ) -> "RejectingTraceback":
+            def with_traceback(self, tb: TracebackType | None) -> "RejectingTraceback":
                 raise AssertionError("custom with_traceback called")
 
         root = Path(__file__).resolve().parent.parent
@@ -574,7 +572,7 @@ class TestRunAndReport:
         def hook(
             error_type: type[BaseException],
             exception: BaseException,
-            tb: Optional[TracebackType],
+            tb: TracebackType | None,
         ) -> None:
             assert error_type is RejectingTraceback
             assert exception is error
@@ -630,7 +628,7 @@ class TestRunAndReport:
         def hook(
             error_type: type[BaseException],
             exception: BaseException,
-            tb: Optional[TracebackType],
+            tb: TracebackType | None,
         ) -> None:
             assert error_type is InstantiationException
             assert exception.__cause__ is cause
@@ -755,7 +753,7 @@ class TestRunAndReport:
         assert exception_type is type(exception)
 
         frames = []
-        current_tb: Optional[TracebackType] = tb
+        current_tb: TracebackType | None = tb
         while current_tb is not None:
             frames.append(current_tb.tb_frame.f_code.co_name)
             current_tb = current_tb.tb_next

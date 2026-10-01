@@ -1,6 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from pathlib import Path
-from typing import Optional, Type
 from unittest.mock import MagicMock, patch
 
 import submitit
@@ -26,7 +25,7 @@ pytestmark = mark.filterwarnings("ignore:pkg_resources is deprecated as an API:W
 @mark.parametrize(
     "cls", [submitit_launcher.LocalLauncher, submitit_launcher.SlurmLauncher]
 )
-def test_discovery(cls: Type[Launcher]) -> None:
+def test_discovery(cls: type[Launcher]) -> None:
     # Tests that this plugin can be discovered via the plugins subsystem when looking for Launchers
     assert cls.__name__ in [x.__name__ for x in Plugins.instance().discover(Launcher)]
 
@@ -59,7 +58,7 @@ class TestSubmititLauncherIntegration(IntegrationTestSuite):
 
 
 @mark.parametrize("python", [None, "/opt/venv/bin/python"])
-def test_slurm_python_parameter(tmp_path: Path, python: Optional[str]) -> None:
+def test_slurm_python_parameter(tmp_path: Path, python: str | None) -> None:
     executor = MagicMock()
     executor.map_array.return_value = []
     auto_executor = MagicMock(return_value=executor)
@@ -96,7 +95,7 @@ def test_slurm_python_parameter(tmp_path: Path, python: Optional[str]) -> None:
 
 @mark.parametrize("tasks_per_node", [1, None])
 def test_slurm_tasks_per_node_is_optional_with_compatible_default(
-    tmp_path: Path, tasks_per_node: Optional[int]
+    tmp_path: Path, tasks_per_node: int | None
 ) -> None:
     assert SlurmQueueConf().tasks_per_node == 1
 
