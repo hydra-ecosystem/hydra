@@ -37,8 +37,55 @@ from hydra.errors import (
 )
 from hydra.test_utils.test_utils import (
     assert_multiline_regex_search,
-    assert_regex_match,
+    integration_test,
 )
+
+
+@mark.parametrize(
+    "pattern,string,matches",
+    [
+        (r"\Afoo\n?bar\Z", "foobar", True),
+        (r"\Afoo\n?bar\Z", "foo\nbar", True),
+        (r"\Afoo\n?bar\Z", "foo\r\nbar", True),
+        ("foo\r\nbar", "foo\nbar", True),
+        (r"^foo$", "before\nfoo\nafter", True),
+        (r"\Afoo\nbar\Z", "foo\nbaz", False),
+        (r"\Afoo\nbar\Z", "before\nfoo\nbar", False),
+    ],
+)
+def test_assert_multiline_regex_search(
+    pattern: str, string: str, matches: bool
+) -> None:
+    if matches:
+        assert_multiline_regex_search(pattern, string)
+    else:
+        with raises(AssertionError, match="Regex pattern did not match"):
+            assert_multiline_regex_search(pattern, string)
+
+
+@mark.parametrize(
+    "pattern,output",
+    [("(?i)foo", "FOO"), ("(?x)f o o", "foo")],
+)
+def test_integration_test_supports_leading_regex_flags(
+    tmpdir: Path, pattern: str, output: str
+) -> None:
+    integration_test(
+        tmpdir=tmpdir,
+        task_config={},
+        overrides=[],
+        prints=repr(output),
+        expected_outputs=pattern,
+    )
+
+    with raises(AssertionError, match="Regex pattern did not match"):
+        integration_test(
+            tmpdir=tmpdir,
+            task_config={},
+            overrides=[],
+            prints=repr("wrong output"),
+            expected_outputs=pattern,
+        )
 
 
 def test_get_original_cwd(hydra_restore_singletons: Any) -> None:
@@ -770,4 +817,6 @@ class TestRunAndReport:
                 run_and_report(demo_func)
         mock_stderr.seek(0)
         stderr_output = mock_stderr.read()
-        assert_regex_match(expected_traceback_regex, stderr_output)
+        assert_multiline_regex_search(
+            r"\A" + expected_traceback_regex.strip() + r"\Z", stderr_output.strip()
+        )

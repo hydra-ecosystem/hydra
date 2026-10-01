@@ -31,7 +31,6 @@ from hydra.test_utils.test_utils import (
     TSweepRunner,
     TTaskRunner,
     assert_multiline_regex_search,
-    assert_regex_match,
     assert_text_same,
     chdir_hydra_root,
     integration_test,
@@ -1197,7 +1196,7 @@ def test_local_run_workdir(
         task_config=cfg,
         overrides=overrides,
         prints="os.getcwd()",
-        expected_outputs=str(expected_dir1),
+        expected_outputs=re.escape(str(expected_dir1)),
     )
 
 
@@ -2293,7 +2292,7 @@ def test_hydra_resolver_in_output_dir(tmpdir: Path, multirun: bool) -> None:
             False,
             True,
             dedent("""
-                .*: UserWarning:
+                .*: UserWarning: ?
                 \tRunning Hydra app with --multirun, overriding with `hydra.mode=MULTIRUN`.
                 .*
                 """),
@@ -2325,31 +2324,31 @@ def test_hydra_mode(
     if error:
         expected = normalize_newlines(expected_output)
         ret = run_with_error(cmd)
-        assert_regex_match(
-            from_line=expected,
+        assert_text_same(
+            from_line=expected.strip(),
             to_line=ret,
             from_name="Expected output",
             to_name="Actual output",
         )
     elif warning:
         out, err = run_python_script(cmd, allow_warnings=True)
-        assert_regex_match(
-            from_line=expected_output,
+        assert_text_same(
+            from_line=expected_output.strip(),
             to_line=out,
             from_name="Expected output",
             to_name="Actual output",
         )
         assert warning_msg is not None
-        assert_regex_match(
-            from_line=warning_msg,
-            to_line=err,
+        assert_multiline_regex_search(
+            pattern=r"\A" + warning_msg.strip() + r"\Z",
+            string=err,
             from_name="Expected error",
             to_name="Actual error",
         )
     else:
         out, _ = run_python_script(cmd)
-        assert_regex_match(
-            from_line=expected_output,
+        assert_text_same(
+            from_line=expected_output.strip(),
             to_line=out,
             from_name="Expected output",
             to_name="Actual output",
@@ -2522,8 +2521,8 @@ def test_hydra_runtime_choice_1882(tmpdir: Path) -> None:
                 nesterov""")
 
     out, _ = run_python_script(cmd)
-    assert_regex_match(
-        from_line=expected_output,
+    assert_text_same(
+        from_line=expected_output.strip(),
         to_line=out,
         from_name="Expected output",
         to_name="Actual output",

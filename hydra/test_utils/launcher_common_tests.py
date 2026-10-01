@@ -672,7 +672,7 @@ class IntegrationTestSuite:
             task_config=cfg,
             overrides=overrides + ["hydra.job.chdir=True"],
             prints="os.getcwd()",
-            expected_outputs=expected_outputs,
+            expected_outputs=re.escape(expected_outputs),
             generate_custom_cmd=self.generate_custom_cmd(),
         )
 
@@ -690,7 +690,9 @@ class IntegrationTestSuite:
             task_config=cfg,
             overrides=overrides,
             prints="hydra.utils.get_original_cwd()",
-            expected_outputs=os.path.realpath(str(self.get_test_scratch_dir(tmpdir))),
+            expected_outputs=re.escape(
+                os.path.realpath(str(self.get_test_scratch_dir(tmpdir)))
+            ),
             generate_custom_cmd=self.generate_custom_cmd(),
         )
 
@@ -716,7 +718,7 @@ class IntegrationTestSuite:
             task_config=cfg,
             overrides=overrides,
             prints="hydra.utils.to_absolute_path('/foo/bar')",
-            expected_outputs=path,
+            expected_outputs=re.escape(path),
             generate_custom_cmd=self.generate_custom_cmd(),
         )
         test_app_dir = self.get_test_app_working_dir()
@@ -731,6 +733,6 @@ class IntegrationTestSuite:
             task_config=cfg,
             overrides=overrides,
             prints=["hydra.utils.to_absolute_path('foo/bar')", "os.getcwd()"],
-            expected_outputs=outputs,
+            expected_outputs=[re.escape(output) for output in outputs],
             generate_custom_cmd=self.generate_custom_cmd(),
         )
