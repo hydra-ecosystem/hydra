@@ -1,52 +1,52 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T19:42:57Z",
+  "generated_at": "2026-10-01T19:56:45Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 55,
+    "open_total": 54,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 1.8
+        "percentage": 1.9
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 48,
-        "percentage": 87.3
+        "percentage": 88.9
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 3.6
+        "percentage": 3.7
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 1.8
+        "percentage": 1.9
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
-        "count": 1,
-        "percentage": 1.8
+        "count": 0,
+        "percentage": 0.0
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 3.6
+        "percentage": 3.7
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,29 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 84
+        "count": 85
       }
     ]
   },
   "issues": [
-    {
-      "number": 3486,
-      "title": "Modernize type annotations for Python 3.10+",
-      "category": "Refactor",
-      "category_emoji": "🔧",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3501,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3501"
-        }
-      ],
-      "created": "2026-09-28",
-      "updated": "2026-09-28",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3486"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2335,9 +2317,34 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 3486,
+      "title": "Modernize type annotations for Python 3.10+",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3501,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3501"
+        }
+      ],
+      "created": "2026-09-28",
+      "updated": "2026-09-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3486"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-01T19:56:45Z",
+      "kind": "closed",
+      "issue": 3486,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3486",
+      "title": "Modernize type annotations for Python 3.10+"
+    },
     {
       "ts": "2026-10-01T17:18:56Z",
       "kind": "pr",
@@ -3964,13 +3971,6 @@
       "issue": 2786,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2786",
       "title": "Hydra + Submitit Help"
-    },
-    {
-      "ts": "2026-08-23T21:53:36Z",
-      "kind": "closed",
-      "issue": 3402,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3402",
-      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior"
     }
   ]
 }

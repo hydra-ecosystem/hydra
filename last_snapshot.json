@@ -80,12 +80,13 @@
     "3456": "2026-09-25",
     "3457": "2026-09-22",
     "3458": "2026-09-22",
+    "3486": "2026-10-01",
     "3491": "2026-10-01",
     "385": "2026-09-05",
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-01T19:42:57Z",
+  "generated_at": "2026-10-01T19:56:45Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -635,18 +636,6 @@
       "status": "not started",
       "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4",
       "updated_at": "2026-09-26T19:34:26Z"
-    },
-    "3486": {
-      "category": "Refactor",
-      "created_at": "2026-09-28T22:03:40Z",
-      "labels": [],
-      "pr_numbers": [
-        "3501"
-      ],
-      "state": "OPEN",
-      "status": "in progress",
-      "title": "Modernize type annotations for Python 3.10+",
-      "updated_at": "2026-09-28T22:06:10Z"
     },
     "3490": {
       "category": "Enhancement",
@@ -1807,6 +1796,18 @@
       "status": "done",
       "title": "[Bug] What is the correct way to use optuna-sweeper with joblib-sweeper?",
       "updated_at": "2026-09-22T09:11:11Z"
+    },
+    "3486": {
+      "category": "Refactor",
+      "created_at": "2026-09-28T22:03:40Z",
+      "labels": [],
+      "pr_numbers": [
+        "3501"
+      ],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Modernize type annotations for Python 3.10+",
+      "updated_at": "2026-09-28T22:06:10Z"
     },
     "3491": {
       "category": "Enhancement",
