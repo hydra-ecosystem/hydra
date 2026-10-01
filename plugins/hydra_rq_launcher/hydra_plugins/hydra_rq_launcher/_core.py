@@ -6,7 +6,7 @@ from base64 import b64decode
 from binascii import Error as BinasciiError
 from pathlib import Path
 from pickle import UnpicklingError
-from typing import Any, Dict, List, Optional, Sequence, cast
+from typing import Any, Sequence, cast
 
 from fakeredis import FakeStrictRedis  # type: ignore
 from hydra.core.hydra_config import HydraConfig
@@ -42,7 +42,7 @@ def execute_job(
     hydra_context: HydraContext,
     sweep_config: DictConfig,
     task_function: TaskFunction,
-    singleton_state: Dict[Any, Any],
+    singleton_state: dict[Any, Any],
 ) -> JobReturn:
     setup_globals()
     Singleton.set_state(singleton_state)
@@ -112,7 +112,7 @@ def launch(
     )
 
     # Enqueue jobs
-    jobs: List[Any] = []
+    jobs: list[Any] = []
     singleton_state = Singleton.get_state()
     log.info(
         f"RQ Launcher is enqueuing {len(job_overrides)} job(s) in queue : {rq_cfg.queue}"
@@ -127,7 +127,7 @@ def launch(
         description = " ".join(filter_overrides(overrides))
 
         enqueue_keywords = cast(
-            Dict[str, Any], OmegaConf.to_container(rq_cfg.enqueue, resolve=True)
+            dict[str, Any], OmegaConf.to_container(rq_cfg.enqueue, resolve=True)
         )
         assert isinstance(enqueue_keywords, dict)
         if enqueue_keywords["job_timeout"] is None:
@@ -177,7 +177,7 @@ def launch(
         else:
             time.sleep(rq_cfg.wait_polling)
 
-    runs: List[JobReturn] = []
+    runs: list[JobReturn] = []
     for job in jobs:
         runs.append(_get_job_result(job))
 
@@ -243,13 +243,13 @@ def _matches_unserializable_return_value(value: Any) -> bool:
     return False
 
 
-def _get_latest_result_payload(job: Any) -> Optional[Dict[Any, Any]]:
+def _get_latest_result_payload(job: Any) -> dict[Any, Any] | None:
     response = job.connection.xrevrange(
         Result.get_key(_get_job_id(job)), "+", "-", count=1
     )
     if not response:
         return None
-    return cast(Dict[Any, Any], response[0][1])
+    return cast(dict[Any, Any], response[0][1])
 
 
 def _get_job_id(job: Any) -> str:

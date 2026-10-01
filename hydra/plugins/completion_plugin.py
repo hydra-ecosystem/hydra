@@ -18,7 +18,7 @@ from omegaconf import (
     OmegaConf,
     ListConfig,
 )
-from typing import Any, List, Optional, Tuple, cast
+from typing import Any, cast
 
 from hydra.core.config_loader import ConfigLoader
 from hydra.core.object_type import ObjectType
@@ -45,7 +45,7 @@ class CompletionPlugin(Plugin):
         ...
 
     @abstractmethod
-    def query(self, config_name: Optional[str]) -> None: ...
+    def query(self, config_name: str | None) -> None: ...
 
     @staticmethod
     @abstractmethod
@@ -57,7 +57,7 @@ class CompletionPlugin(Plugin):
         ...
 
     @staticmethod
-    def _get_filename(filename: str) -> Tuple[Optional[str], Optional[str]]:
+    def _get_filename(filename: str) -> tuple[str | None, str | None]:
         last = filename.rfind("=")
         if last != -1:
             key_eq = filename[0 : last + 1]
@@ -75,7 +75,7 @@ class CompletionPlugin(Plugin):
         return None, None
 
     @staticmethod
-    def complete_files(word: str) -> List[str]:
+    def complete_files(word: str) -> list[str]:
         if os.path.isdir(word):
             dirname = word
             files = os.listdir(word)
@@ -94,7 +94,7 @@ class CompletionPlugin(Plugin):
         return ret
 
     @staticmethod
-    def _get_matches(config: Container, word: str) -> List[str]:
+    def _get_matches(config: Container, word: str) -> list[str]:
         def str_rep(in_key: Any, in_value: Any) -> str:
             if OmegaConf.is_config(in_value):
                 return f"{in_key}."
@@ -104,7 +104,7 @@ class CompletionPlugin(Plugin):
         if config is None:
             return []
         elif OmegaConf.is_config(config):
-            matches: List[str] = []
+            matches: list[str] = []
             if word.endswith(".") or word.endswith("="):
                 exact_key = word[0:-1]
                 try:
@@ -157,8 +157,8 @@ class CompletionPlugin(Plugin):
         return matches
 
     def _query_config_groups(
-        self, word: str, config_name: Optional[str], words: List[str]
-    ) -> Tuple[List[str], bool]:
+        self, word: str, config_name: str | None, words: list[str]
+    ) -> tuple[list[str], bool]:
         is_addition = word.startswith("+")
         is_deletion = word.startswith("~")
         if is_addition or is_deletion:
@@ -184,7 +184,7 @@ class CompletionPlugin(Plugin):
             config_name=config_name,
             overrides=words,
         )
-        matched_groups: List[str] = []
+        matched_groups: list[str] = []
         if results_filter == ObjectType.CONFIG:
             for match in all_matched_groups:
                 name = f"{parent_group}={match}" if parent_group != "" else match
@@ -216,7 +216,7 @@ class CompletionPlugin(Plugin):
         matched_groups = [f"{prefix}{group}" for group in matched_groups]
         return matched_groups, exact_match
 
-    def _query(self, config_name: Optional[str], line: str) -> List[str]:
+    def _query(self, config_name: str | None, line: str) -> list[str]:
         from .._internal.utils import get_args
 
         new_word = len(line) == 0 or line[-1] == " "
@@ -237,7 +237,7 @@ class CompletionPlugin(Plugin):
             matched_groups, exact_match = self._query_config_groups(
                 word, config_name=config_name, words=words
             )
-            config_matches: List[str] = []
+            config_matches: list[str] = []
             if not exact_match:
                 run_mode = RunMode.MULTIRUN if parsed_args.multirun else RunMode.RUN
                 config_matches = []
@@ -295,7 +295,7 @@ class DefaultCompletionPlugin(CompletionPlugin):
     def provides() -> str:
         raise NotImplementedError
 
-    def query(self, config_name: Optional[str]) -> None:
+    def query(self, config_name: str | None) -> None:
         raise NotImplementedError
 
     @staticmethod

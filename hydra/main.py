@@ -4,7 +4,7 @@ import functools
 import pickle
 import warnings
 from pathlib import Path
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable
 
 from omegaconf import DictConfig, open_dict, read_write
 
@@ -19,7 +19,7 @@ from .core.utils import _flush_loggers, configure_log
 from .types import TaskFunction
 
 
-def _get_rerun_conf(file_path: str, overrides: List[str]) -> DictConfig:
+def _get_rerun_conf(file_path: str, overrides: list[str]) -> DictConfig:
     msg = "Experimental rerun CLI option, other command line args are ignored."
     warnings.warn(msg, UserWarning)
     file = Path(file_path)
@@ -43,9 +43,9 @@ def _get_rerun_conf(file_path: str, overrides: List[str]) -> DictConfig:
 
 
 def main(
-    config_path: Optional[str] = None,
-    config_name: Optional[str] = None,
-    version_base: Optional[str] = version._UNSPECIFIED_,
+    config_path: str | None = None,
+    config_name: str | None = None,
+    version_base: str | None = version._UNSPECIFIED_,
     execution_whitelist: ExecutionWhitelist = None,
 ) -> Callable[[TaskFunction], Any]:
     """
@@ -64,7 +64,7 @@ def main(
 
     def main_decorator(task_function: TaskFunction) -> Callable[[], None]:
         @functools.wraps(task_function)
-        def decorated_main(cfg_passthrough: Optional[DictConfig] = None) -> Any:
+        def decorated_main(cfg_passthrough: DictConfig | None = None) -> Any:
             with execution_whitelist_context(execution_whitelist):
                 if cfg_passthrough is not None:
                     return task_function(cfg_passthrough)

@@ -1,7 +1,8 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import builtins
 import copy
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from omegaconf import DictConfig, OmegaConf
 
@@ -21,8 +22,8 @@ class ConfigStoreWithProvider:
         self,
         name: str,
         node: Any,
-        group: Optional[str] = None,
-        package: Optional[str] = None,
+        group: str | None = None,
+        package: str | None = None,
     ) -> None:
         ConfigStore.instance().store(
             group=group, name=name, node=node, package=package, provider=self.provider
@@ -35,9 +36,9 @@ class ConfigStoreWithProvider:
 class ConfigNode:
     name: str
     node: DictConfig
-    group: Optional[str]
-    package: Optional[str]
-    provider: Optional[str]
+    group: str | None
+    package: str | None
+    provider: str | None
 
 
 class ConfigStore(metaclass=Singleton):
@@ -45,7 +46,7 @@ class ConfigStore(metaclass=Singleton):
     def instance(*args: Any, **kwargs: Any) -> "ConfigStore":
         return Singleton.instance(ConfigStore, *args, **kwargs)  # type: ignore
 
-    repo: Dict[str, Any]
+    repo: dict[str, Any]
 
     def __init__(self) -> None:
         self.repo = {}
@@ -54,9 +55,9 @@ class ConfigStore(metaclass=Singleton):
         self,
         name: str,
         node: Any,
-        group: Optional[str] = None,
-        package: Optional[str] = None,
-        provider: Optional[str] = None,
+        group: str | None = None,
+        package: str | None = None,
+        provider: str | None = None,
     ) -> None:
         """
         Stores a config node into the repository
@@ -132,7 +133,7 @@ class ConfigStore(metaclass=Singleton):
         else:
             return ObjectType.CONFIG
 
-    def list(self, path: str) -> List[str]:
+    def list(self, path: str) -> builtins.list[str]:
         d = self._open(path)
         if d is None:
             raise OSError(f"Path not found {path}")

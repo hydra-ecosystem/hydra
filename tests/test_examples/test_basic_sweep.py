@@ -1,7 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from pathlib import Path
 from textwrap import dedent
-from typing import List
 
 from pytest import mark
 
@@ -56,7 +55,7 @@ chdir_hydra_root()
 )
 def test_basic_sweep_example(
     tmpdir: Path,
-    args: List[str],
+    args: list[str],
     expected: str,
 ) -> None:
     app_path = "examples/tutorials/basic/running_your_hydra_app/5_basic_sweep/my_app.py"

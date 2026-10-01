@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, NoReturn, Optional
+from typing import Any, NoReturn
 
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
@@ -34,7 +34,7 @@ class GridSamplerConfig(SamplerConfig):
     _target_: str = "optuna.samplers.GridSampler"
     # search_space will be populated at run time based on hydra.sweeper.params
     _partial_: bool = True
-    seed: Optional[int] = None
+    seed: int | None = None
 
 
 @dataclass
@@ -44,19 +44,19 @@ class TPESamplerConfig(SamplerConfig):
     """
 
     _target_: str = "optuna.samplers.TPESampler"
-    seed: Optional[int] = None
+    seed: int | None = None
 
-    consider_prior: Optional[bool] = None
-    prior_weight: Optional[float] = None
-    consider_magic_clip: Optional[bool] = None
-    consider_endpoints: Optional[bool] = None
+    consider_prior: bool | None = None
+    prior_weight: float | None = None
+    consider_magic_clip: bool | None = None
+    consider_endpoints: bool | None = None
     n_startup_trials: int = 10
     n_ei_candidates: int = 24
     multivariate: bool = False
     group: bool = False
-    warn_independent_sampling: Optional[bool] = None
+    warn_independent_sampling: bool | None = None
     constant_liar: bool = False
-    constraints_func: Optional[Any] = None
+    constraints_func: Any | None = None
 
 
 @dataclass
@@ -66,7 +66,7 @@ class RandomSamplerConfig(SamplerConfig):
     """
 
     _target_: str = "optuna.samplers.RandomSampler"
-    seed: Optional[int] = None
+    seed: int | None = None
 
 
 @dataclass
@@ -76,21 +76,21 @@ class CmaEsSamplerConfig(SamplerConfig):
     """
 
     _target_: str = "optuna.samplers.CmaEsSampler"
-    seed: Optional[int] = None
+    seed: int | None = None
 
-    x0: Optional[Dict[str, Any]] = None
-    sigma0: Optional[float] = None
+    x0: dict[str, Any] | None = None
+    sigma0: float | None = None
     n_startup_trials: int = 1
-    independent_sampler: Optional[Any] = None
+    independent_sampler: Any | None = None
     warn_independent_sampling: bool = True
     consider_pruned_trials: bool = False
-    restart_strategy: Optional[Any] = None
-    popsize: Optional[int] = None
+    restart_strategy: Any | None = None
+    popsize: int | None = None
     inc_popsize: int = -1
     use_separable_cma: bool = False
     with_margin: bool = False
     lr_adapt: bool = False
-    source_trials: Optional[Any] = None
+    source_trials: Any | None = None
 
 
 @dataclass
@@ -100,15 +100,15 @@ class NSGAIISamplerConfig(SamplerConfig):
     """
 
     _target_: str = "hydra_plugins.hydra_optuna_sweeper._impl.create_nsgaii_sampler"
-    seed: Optional[int] = None
+    seed: int | None = None
 
     population_size: int = 50
-    mutation_prob: Optional[float] = None
-    mutation: Optional[Any] = None
-    crossover: Optional[Any] = None
+    mutation_prob: float | None = None
+    mutation: Any | None = None
+    crossover: Any | None = None
     crossover_prob: float = 0.9
     swapping_prob: float = 0.5
-    constraints_func: Optional[Any] = None
+    constraints_func: Any | None = None
 
 
 @dataclass
@@ -118,16 +118,16 @@ class NSGAIIISamplerConfig(SamplerConfig):
     """
 
     _target_: str = "hydra_plugins.hydra_optuna_sweeper._impl.create_nsgaiii_sampler"
-    seed: Optional[int] = None
+    seed: int | None = None
 
     population_size: int = 50
-    mutation_prob: Optional[float] = None
-    mutation: Optional[Any] = None
-    crossover: Optional[Any] = None
+    mutation_prob: float | None = None
+    mutation: Any | None = None
+    crossover: Any | None = None
     crossover_prob: float = 0.9
     swapping_prob: float = 0.5
-    constraints_func: Optional[Any] = None
-    reference_points: Optional[List[List[float]]] = None
+    constraints_func: Any | None = None
+    reference_points: list[list[float]] | None = None
     dividing_parameter: int = 3
 
 
@@ -143,12 +143,12 @@ class GPSamplerConfig(SamplerConfig):
     """
 
     _target_: str = "optuna.samplers.GPSampler"
-    seed: Optional[int] = None
+    seed: int | None = None
 
-    independent_sampler: Optional[Any] = None
+    independent_sampler: Any | None = None
     n_startup_trials: int = 10
     deterministic_objective: bool = False
-    constraints_func: Optional[Any] = None
+    constraints_func: Any | None = None
     warn_independent_sampling: bool = True
 
 
@@ -159,11 +159,11 @@ class QMCSamplerConfig(SamplerConfig):
     """
 
     _target_: str = "optuna.samplers.QMCSampler"
-    seed: Optional[int] = None
+    seed: int | None = None
 
     qmc_type: str = "sobol"
     scramble: bool = False
-    independent_sampler: Optional[Any] = None
+    independent_sampler: Any | None = None
     warn_asynchronous_seeding: bool = True
     warn_independent_sampling: bool = True
 
@@ -174,7 +174,7 @@ defaults = [{"sampler": "tpe"}]
 @dataclass
 class OptunaSweeperConf:
     _target_: str = "hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper"
-    defaults: List[Any] = field(default_factory=lambda: defaults)
+    defaults: list[Any] = field(default_factory=lambda: defaults)
 
     # Sampling algorithm
     # Please refer to the reference for further details
@@ -189,10 +189,10 @@ class OptunaSweeperConf:
     # For example, you can use SQLite if you set 'sqlite:///example.db'
     # Please refer to the reference for further details
     # https://optuna.readthedocs.io/en/stable/reference/storages.html
-    storage: Optional[Any] = None
+    storage: Any | None = None
 
     # Name of study to persist optimization results
-    study_name: Optional[str] = None
+    study_name: str | None = None
 
     # Total number of function evaluations
     n_trials: int = 20
@@ -203,13 +203,13 @@ class OptunaSweeperConf:
     # Maximum authorized failure rate for a batch of parameters
     max_failure_rate: float = 0.0
 
-    params: Optional[Dict[str, str]] = None
+    params: dict[str, str] | None = None
 
     # Allow custom trial configuration via Python methods.
     # If given, `custom_search_space` should be a an instantiate-style dotpath targeting
     # a callable with signature Callable[[DictConfig, optuna.trial.Trial], None].
     # https://optuna.readthedocs.io/en/stable/tutorial/10_key_features/002_configurations.html
-    custom_search_space: Optional[str] = None
+    custom_search_space: str | None = None
 
 
 ConfigStore.instance().store(

@@ -5,7 +5,6 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
 
 from packaging import version
 from pytest import mark, param, skip
@@ -147,7 +146,7 @@ def test_bash_completion_does_not_execute_python_option_as_script(
     assert not (tmp_path / "executed").exists()
 
 
-base_completion_list: List[str] = [
+base_completion_list: list[str] = [
     "dict.",
     "dict_prefix=",
     "group=",
@@ -259,7 +258,7 @@ base_completion_list: List[str] = [
 )
 class TestRunCompletion:
     def test_completion_plugin(
-        self, line_prefix: str, num_tabs: int, line: str, expected: List[str]
+        self, line_prefix: str, num_tabs: int, line: str, expected: list[str]
     ) -> None:
         config_loader = create_config_loader()
         bc = DefaultCompletionPlugin(config_loader)
@@ -288,7 +287,7 @@ class TestRunCompletion:
     ],
 )
 @mark.parametrize("shell", ["bash", "fish", "zsh"])
-def test_shell_integration(shell: str, line: str, expected: List[str]) -> None:
+def test_shell_integration(shell: str, line: str, expected: list[str]) -> None:
     if shell == "fish" and not is_fish_supported():
         skip("fish is not installed or its version is unsupported")
     if shell == "zsh" and not is_zsh_supported():
@@ -401,7 +400,7 @@ def test_shell_tilde_completion(shell: str) -> None:
     ],
 )
 class TestMultirunCompletion:
-    def test_completion_plugin_multirun(self, line: str, expected: List[str]) -> None:
+    def test_completion_plugin_multirun(self, line: str, expected: list[str]) -> None:
         config_loader = create_config_loader()
         bc = DefaultCompletionPlugin(config_loader)
         ret = bc._query(config_name="config.yaml", line="--multirun " + line)
@@ -416,7 +415,7 @@ class TestMultirunCompletion:
         ("-c all ", base_completion_list),
     ],
 )
-def test_with_flags(line: str, expected: List[str]) -> None:
+def test_with_flags(line: str, expected: list[str]) -> None:
     config_loader = create_config_loader()
     bc = DefaultCompletionPlugin(config_loader)
     ret = bc._query(config_name="config.yaml", line=line)
@@ -436,7 +435,7 @@ def test_with_flags(line: str, expected: List[str]) -> None:
         ("group=dict toys.", ["toys.andy=", "toys.list.", "toys.slinky="]),
     ],
 )
-def test_missing_default_value(line: str, expected: List[str]) -> None:
+def test_missing_default_value(line: str, expected: list[str]) -> None:
     config_loader = create_config_loader()
     bc = DefaultCompletionPlugin(config_loader)
     ret = bc._query(config_name="missing_default", line=line)
@@ -469,7 +468,7 @@ def test_missing_default_value(line: str, expected: List[str]) -> None:
         ),
     ],
 )
-def test_searchpath_addition(line: str, expected: List[str]) -> None:
+def test_searchpath_addition(line: str, expected: list[str]) -> None:
     config_loader = create_config_loader()
     bc = DefaultCompletionPlugin(config_loader)
     ret = bc._query(config_name="additional_searchpath", line=line)
@@ -491,14 +490,14 @@ def test_searchpath_addition(line: str, expected: List[str]) -> None:
 )
 def test_file_completion(
     tmpdir: Path,
-    files: List[str],
+    files: list[str],
     line_prefix: str,
     key_eq: str,
     fname_prefix: str,
-    expected: List[str],
+    expected: list[str],
     relative: bool,
 ) -> None:
-    def create_files(in_files: List[str]) -> None:
+    def create_files(in_files: list[str]) -> None:
         for f in in_files:
             path = Path(f)
             dirname = path.parent

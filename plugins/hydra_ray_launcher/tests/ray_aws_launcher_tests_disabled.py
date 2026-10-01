@@ -13,7 +13,7 @@ import sys
 import tempfile
 from importlib.metadata import version as metadata_version
 from pathlib import Path
-from typing import Any, Dict, Generator, Optional
+from typing import Any, Generator
 
 import boto3  # type: ignore
 from botocore.exceptions import (  # type: ignore
@@ -170,7 +170,7 @@ def build_core_wheel(tmp_wheel_dir: str) -> str:
 
 def upload_and_install_wheels(
     tmp_wheel_dir: str,
-    connect_config: Dict[Any, Any],
+    connect_config: dict[Any, Any],
     core_wheel: str,
     plugin_wheel: str,
 ) -> None:
@@ -202,7 +202,7 @@ def parse_python_minor_version(version: str) -> str:
     return version[:micro_start]
 
 
-def validate_lib_version(connect_config: Dict[Any, Any]) -> None:
+def validate_lib_version(connect_config: dict[Any, Any]) -> None:
     # a few lib versions that we care about
     libs = ["ray", "cloudpickle", "pickle5"]
     for lib in libs:
@@ -344,7 +344,7 @@ class TestRayAWSLauncherIntegration(IntegrationTestSuite):
     Run this launcher through the integration test suite.
     """
 
-    def get_test_app_working_dir(self) -> Optional[Path]:
+    def get_test_app_working_dir(self) -> Path | None:
         """
         By default test applications working dir is tmpdir, override this method if that's not the case.
         This could be helpful when the tests kick off applications on remote machines.

@@ -92,8 +92,8 @@ if __name__ == "__main__":
 
 ```python title="Compose API"
 def compose(
-    config_name: Optional[str] = None,
-    overrides: List[str] = [],
+    config_name: str | None = None,
+    overrides: list[str] = [],
     return_hydra_config: bool = False,
 ) -> DictConfig:
     """
@@ -107,10 +107,10 @@ def compose(
 
 ```python title="Initialization with a filesystem path"
 def initialize(
-    config_path: Optional[str] = None,
-    job_name: Optional[str] = None,
+    config_path: str | None = None,
+    job_name: str | None = None,
     caller_stack_depth: int = 1,
-    version_base: Optional[str] = ...,
+    version_base: str | None = ...,
 ) -> None:
     """
     Initializes Hydra and add the config_path to the config search path.
@@ -133,7 +133,7 @@ def initialize(
 def initialize_config_module(
     config_module: str,
     job_name: str = "app",
-    version_base: Optional[str] = ...,
+    version_base: str | None = ...,
 ) -> None:
     """
     Initializes Hydra and adds the config_module to the config search path.
@@ -146,7 +146,7 @@ def initialize_config_module(
 def initialize_config_dir(
     config_dir: str,
     job_name: str = "app",
-    version_base: Optional[str] = ...,
+    version_base: str | None = ...,
 ) -> None:
     """
     Initializes Hydra and adds an absolute config directory to the config search path.

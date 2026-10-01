@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import re
-from typing import Any, List, Sequence, Union
+from typing import Any, Sequence
 from unittest.mock import Mock
 
 from omegaconf import DictConfig, OmegaConf
@@ -33,7 +33,7 @@ class IncompatibleSweeper(Sweeper):
     ) -> None:
         pass
 
-    def sweep(self, arguments: List[str]) -> Any:
+    def sweep(self, arguments: list[str]) -> Any:
         pass
 
 
@@ -63,7 +63,7 @@ class IncompatibleLauncher(Launcher):
     ],
 )
 def test_setup_plugins(
-    monkeypatch: Any, plugin: Union[Launcher, Sweeper], config: DictConfig
+    monkeypatch: Any, plugin: Launcher | Sweeper, config: DictConfig
 ) -> None:
     task_function = Mock(spec=TaskFunction)
     config_loader = ConfigLoaderImpl(config_search_path=create_config_search_path(None))

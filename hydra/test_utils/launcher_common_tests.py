@@ -8,7 +8,7 @@ import os
 import re
 import traceback
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Set
+from typing import Any, Callable
 
 from omegaconf import DictConfig, OmegaConf
 from pytest import mark, param, raises
@@ -24,7 +24,7 @@ from hydra.test_utils.test_utils import (
 
 @mark.usefixtures("hydra_restore_singletons")
 class LauncherTestSuite:
-    def get_task_function(self) -> Optional[Callable[[Any], Any]]:
+    def get_task_function(self) -> Callable[[Any], Any] | None:
         def task_func(_: DictConfig) -> Any:
             return 100
 
@@ -34,7 +34,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         sweep_1_job(
@@ -48,7 +48,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         sweep_2_jobs(
@@ -62,7 +62,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         def task_func(_: DictConfig) -> None:
@@ -110,7 +110,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         with raises(
@@ -139,7 +139,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         sweep_1_job(
@@ -153,7 +153,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         # Ideally this would be KeyError, This can't be more specific because some launcher plugins
@@ -170,7 +170,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         sweep_two_config_groups(
@@ -184,7 +184,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         base_overrides = ["hydra/launcher=" + launcher_name, "group1=file1,file2"]
@@ -212,7 +212,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         """
@@ -262,7 +262,7 @@ class LauncherTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         overrides1 = ["hydra/launcher=" + launcher_name] + overrides
@@ -297,7 +297,7 @@ class BatchedSweeperTestSuite:
         self,
         hydra_sweep_runner: TSweepRunner,
         launcher_name: str,
-        overrides: List[str],
+        overrides: list[str],
         tmpdir: Path,
     ) -> None:
         job_overrides = ["group1=file1,file2", "bar=100,200,300"]
@@ -331,7 +331,7 @@ class BatchedSweeperTestSuite:
             {"foo": 20, "bar": 300},
         ]
 
-        dirs: Set[str] = set()
+        dirs: set[str] = set()
         with sweep:
             temp_dir = sweep.temp_dir
             assert temp_dir is not None
@@ -359,8 +359,8 @@ class BatchedSweeperTestSuite:
 
 def sweep_1_job(
     hydra_sweep_runner: TSweepRunner,
-    overrides: List[str],
-    task_function: Optional[TaskFunction],
+    overrides: list[str],
+    task_function: TaskFunction | None,
     temp_dir: Path,
 ) -> None:
     """
@@ -392,8 +392,8 @@ def sweep_1_job(
 
 def sweep_2_jobs(
     hydra_sweep_runner: TSweepRunner,
-    overrides: List[str],
-    task_function: Optional[TaskFunction],
+    overrides: list[str],
+    task_function: TaskFunction | None,
     temp_dir: Path,
 ) -> None:
     """
@@ -444,8 +444,8 @@ def sweep_2_jobs(
 
 def sweep_two_config_groups(
     hydra_sweep_runner: TSweepRunner,
-    overrides: List[str],
-    task_function: Optional[TaskFunction],
+    overrides: list[str],
+    task_function: TaskFunction | None,
     temp_dir: Path,
 ) -> None:
     """
@@ -479,7 +479,7 @@ def sweep_two_config_groups(
 
 @mark.usefixtures("hydra_restore_singletons")
 class IntegrationTestSuite:
-    def get_test_app_working_dir(self) -> Optional[Path]:
+    def get_test_app_working_dir(self) -> Path | None:
         """
         By default test applications working dir is tmpdir, override this method if that's not the case.
         This could be helpful when the tests kick off applications on remote machines.
@@ -493,13 +493,13 @@ class IntegrationTestSuite:
         """
         return tmpdir
 
-    def generate_custom_cmd(self) -> Callable[..., List[str]]:
+    def generate_custom_cmd(self) -> Callable[..., list[str]]:
         """
         By default this does nothing, but it allows custom execution commands.
         Useful if the tests are not kicked off by python
         """
 
-        def fun(cmd: List[str], filename: str) -> List[str]:
+        def fun(cmd: list[str], filename: str) -> list[str]:
             """
             param cmd: old python commands in list of strings
             param filename: file name to be executed as main hydra module
@@ -540,11 +540,11 @@ class IntegrationTestSuite:
         self,
         tmpdir: Path,
         task_config: DictConfig,
-        overrides: List[str],
+        overrides: list[str],
         filename: str,
         expected_name: str,
         task_launcher_cfg: DictConfig,
-        extra_flags: List[str],
+        extra_flags: list[str],
     ) -> None:
         overrides = extra_flags + overrides
         task_launcher_cfg = OmegaConf.create(task_launcher_cfg or {})
@@ -650,10 +650,10 @@ class IntegrationTestSuite:
         self,
         tmpdir: Path,
         task_config: str,
-        overrides: List[str],
+        overrides: list[str],
         expected_dir: str,
         task_launcher_cfg: DictConfig,
-        extra_flags: List[str],
+        extra_flags: list[str],
     ) -> None:
         overrides = extra_flags + overrides
         task_launcher_cfg = OmegaConf.create(task_launcher_cfg or {})
@@ -677,7 +677,7 @@ class IntegrationTestSuite:
         )
 
     def test_get_orig_dir_multirun(
-        self, tmpdir: Path, task_launcher_cfg: DictConfig, extra_flags: List[str]
+        self, tmpdir: Path, task_launcher_cfg: DictConfig, extra_flags: list[str]
     ) -> None:
         overrides = extra_flags
         task_launcher_cfg = OmegaConf.create(task_launcher_cfg or {})
@@ -697,7 +697,7 @@ class IntegrationTestSuite:
         )
 
     def test_to_absolute_path_multirun(
-        self, tmpdir: Path, task_launcher_cfg: DictConfig, extra_flags: List[str]
+        self, tmpdir: Path, task_launcher_cfg: DictConfig, extra_flags: list[str]
     ) -> None:
         expected_dir = "cli_dir/cli_dir_0"
         overrides = extra_flags + [

@@ -1,5 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import Any, List, Optional
+from typing import Any
 
 from hydra._internal.config_repository import ConfigRepository, IConfigRepository
 from hydra._internal.config_search_path_impl import ConfigSearchPathImpl
@@ -21,12 +21,12 @@ def create_repo() -> IConfigRepository:
 
 
 def _test_defaults_tree_impl(
-    config_name: Optional[str],
-    input_overrides: List[str],
+    config_name: str | None,
+    input_overrides: list[str],
     expected: Any,
     prepend_hydra: bool = False,
     skip_missing: bool = False,
-) -> Optional[DefaultsList]:
+) -> DefaultsList | None:
     parser = OverridesParser.create()
     repo = create_repo()
     root = _create_root(config_name=config_name, with_hydra=prepend_hydra)

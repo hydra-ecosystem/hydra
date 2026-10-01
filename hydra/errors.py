@@ -1,5 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import Optional, Sequence
+from typing import Sequence
 
 
 class HydraException(Exception): ...
@@ -29,8 +29,8 @@ class MissingConfigException(IOError, ConfigCompositionException):
     def __init__(
         self,
         message: str,
-        missing_cfg_file: Optional[str] = None,
-        options: Optional[Sequence[str]] = None,
+        missing_cfg_file: str | None = None,
+        options: Sequence[str] | None = None,
     ) -> None:
         super().__init__(message)
         self.missing_cfg_file = missing_cfg_file

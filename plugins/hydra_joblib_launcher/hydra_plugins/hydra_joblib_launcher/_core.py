@@ -2,7 +2,7 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Tuple, cast
+from typing import Any, Sequence, cast
 
 from hydra.core.hydra_config import HydraConfig
 from hydra.core.singleton import Singleton
@@ -69,7 +69,7 @@ def execute_job(
 
 def _get_multiprocessing_task_function(
     task_function: TaskFunction,
-) -> Tuple[TaskFunction, int]:
+) -> tuple[TaskFunction, int]:
     module_name = getattr(task_function, "__module__", None)
     task_name = getattr(task_function, "__name__", None)
     if module_name is None or task_name is None:
@@ -95,7 +95,7 @@ def _get_multiprocessing_task_function(
     return cast(TaskFunction, module_task_function), unwrap_depth
 
 
-def process_joblib_cfg(joblib_cfg: Dict[str, Any]) -> None:
+def process_joblib_cfg(joblib_cfg: dict[str, Any]) -> None:
     backend = joblib_cfg.get("backend") or "loky"
     if backend not in SUPPORTED_BACKENDS:
         raise ValueError(
@@ -238,7 +238,7 @@ def launch(
         with parallel_backend(backend, **backend_cfg):
             runs = Parallel(**parallel_cfg)(calls)
 
-    assert isinstance(runs, List)
+    assert isinstance(runs, list)
     for run in runs:
         assert isinstance(run, JobReturn)
     return runs

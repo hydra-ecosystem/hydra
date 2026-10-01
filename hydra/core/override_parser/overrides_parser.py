@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import sys
-from typing import Any, List, Optional
+from typing import Any
 
 from omegaconf.vendor.antlr4.error.Errors import (
     LexerNoViableAltException,
@@ -39,13 +39,11 @@ class OverridesParser:
     functions: Functions
 
     @classmethod
-    def create(cls, config_loader: Optional[ConfigLoader] = None) -> "OverridesParser":
+    def create(cls, config_loader: ConfigLoader | None = None) -> "OverridesParser":
         functions = create_functions()
         return cls(functions=functions, config_loader=config_loader)
 
-    def __init__(
-        self, functions: Functions, config_loader: Optional[ConfigLoader] = None
-    ):
+    def __init__(self, functions: Functions, config_loader: ConfigLoader | None = None):
         self.functions = functions
         self.config_loader = config_loader
 
@@ -77,8 +75,8 @@ class OverridesParser:
         assert isinstance(ret, Override)
         return ret
 
-    def parse_overrides(self, overrides: List[str]) -> List[Override]:
-        ret: List[Override] = []
+    def parse_overrides(self, overrides: list[str]) -> list[Override]:
+        ret: list[Override] = []
         for idx, override in enumerate(overrides):
             try:
                 parsed = self.parse_rule(override, "override")

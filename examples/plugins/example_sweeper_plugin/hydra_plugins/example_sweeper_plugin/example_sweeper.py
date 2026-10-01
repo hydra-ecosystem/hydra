@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import itertools
 import logging
 from pathlib import Path
-from typing import Any, Iterable, List, Optional, Sequence
+from typing import Any, Iterable, Sequence
 
 from hydra.types import HydraContext
 from hydra.core.config_store import ConfigStore
@@ -32,7 +32,7 @@ class LauncherConfig:
         "hydra_plugins.example_sweeper_plugin.example_sweeper.ExampleSweeper"
     )
     # max number of jobs to run in the same batch.
-    max_batch_size: Optional[int] = None
+    max_batch_size: int | None = None
     foo: int = 10
     bar: str = "abcde"
 
@@ -43,9 +43,9 @@ ConfigStore.instance().store(group="hydra/sweeper", name="example", node=Launche
 class ExampleSweeper(Sweeper):
     def __init__(self, max_batch_size: int, foo: str, bar: str):
         self.max_batch_size = max_batch_size
-        self.config: Optional[DictConfig] = None
-        self.launcher: Optional[Launcher] = None
-        self.hydra_context: Optional[HydraContext] = None
+        self.config: DictConfig | None = None
+        self.launcher: Launcher | None = None
+        self.hydra_context: HydraContext | None = None
         self.job_results = None
         self.foo = foo
         self.bar = bar
@@ -63,7 +63,7 @@ class ExampleSweeper(Sweeper):
         )
         self.hydra_context = hydra_context
 
-    def sweep(self, arguments: List[str]) -> Any:
+    def sweep(self, arguments: list[str]) -> Any:
         assert self.config is not None
         assert self.launcher is not None
         log.info(f"ExampleSweeper (foo={self.foo}, bar={self.bar}) sweeping")
@@ -103,7 +103,7 @@ class ExampleSweeper(Sweeper):
         # This is required to ensure that working that the job gets a unique job id
         # (which in turn can be used for other things, like the working directory)
         def chunks(
-            lst: Sequence[Sequence[str]], n: Optional[int]
+            lst: Sequence[Sequence[str]], n: int | None
         ) -> Iterable[Sequence[Sequence[str]]]:
             """
             Split input to chunks of up to n items each

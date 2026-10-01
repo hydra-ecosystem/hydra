@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass
-from typing import Any, List
+from typing import Any
 
 from omegaconf import MISSING, DictConfig, OmegaConf
 
@@ -25,7 +25,7 @@ class MySQLConfig(DBConfig):
 
 @dataclass
 class Config:
-    defaults: List[Any] = MISSING
+    defaults: list[Any] = MISSING
     db: DBConfig = MISSING
 
 

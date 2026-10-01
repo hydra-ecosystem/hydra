@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import hydra
 import requests  # type: ignore[import-untyped]
@@ -61,14 +60,14 @@ class Package:
 class Config:
     dry_run: bool = False
     action: Action = Action.check
-    packages: Dict[str, Package] = MISSING
-    build_targets: Tuple[str, ...] = ("--sdist", "--wheel")
+    packages: dict[str, Package] = MISSING
+    build_targets: tuple[str, ...] = ("--sdist", "--wheel")
     build_dir: str = "build"
     build_policy: BuildPolicy = BuildPolicy.unpublished
     clean_build_dir: bool = False
     repository: Repository = Repository.pypi
     require_artifacts: bool = False
-    version: Optional[str] = None
+    version: str | None = None
     publish: bool = False
     workflow_ref: str = "main"
     commit: str = ""
@@ -79,7 +78,7 @@ ConfigStore.instance().store(name="config_schema", node=Config)
 
 
 @lru_cache()
-def get_metadata(repository: Repository, package_name: str) -> Optional[DictConfig]:
+def get_metadata(repository: Repository, package_name: str) -> DictConfig | None:
     host = {
         Repository.pypi: "pypi.org",
         Repository.testpypi: "test.pypi.org",
@@ -95,10 +94,10 @@ def get_metadata(repository: Repository, package_name: str) -> Optional[DictConf
     return ret
 
 
-def get_latest_release(metadata: Optional[DictConfig]) -> Optional[Version]:
+def get_latest_release(metadata: DictConfig | None) -> Version | None:
     if metadata is None:
         return None
-    ret: List[Version] = []
+    ret: list[Version] = []
     for ver, files in metadata.releases.items():
         for file in files:
             if file.packagetype == "bdist_wheel" and file.yanked is not True:
@@ -109,7 +108,7 @@ def get_latest_release(metadata: Optional[DictConfig]) -> Optional[Version]:
     return sorted(ret)[-1]
 
 
-def is_version_published(metadata: Optional[DictConfig], version: Version) -> bool:
+def is_version_published(metadata: DictConfig | None, version: Version) -> bool:
     if metadata is None:
         return False
     for ver in metadata.releases:
@@ -122,7 +121,7 @@ def is_version_published(metadata: Optional[DictConfig], version: Version) -> bo
 class PackageInfo:
     name: str
     local_version: Version
-    latest_version: Optional[Version]
+    latest_version: Version | None
     local_version_published: bool
 
 
@@ -137,7 +136,7 @@ class DevReleasePackageInfo:
     name: str
     local_version: Version
     target_version: Version
-    latest_version: Optional[Version]
+    latest_version: Version | None
     target_version_published: bool
 
 
@@ -199,7 +198,7 @@ def validate_local_version(info: LocalPackageInfo, expected_version: Version) ->
         )
 
 
-def format_latest_version(version: Optional[Version]) -> str:
+def format_latest_version(version: Version | None) -> str:
     if version is None:
         return "<not published>"
     return str(version)
@@ -210,7 +209,7 @@ def validate_dev_version(version: Version) -> None:
         raise ValueError(f"Dev releases require a .devN version; got {version}")
 
 
-def filter_packages(packages: Dict[str, Package], only: str) -> Dict[str, Package]:
+def filter_packages(packages: dict[str, Package], only: str) -> dict[str, Package]:
     names = [name.strip() for name in only.split(",") if name.strip()]
     if not names:
         return packages
@@ -229,10 +228,10 @@ def filter_packages(packages: Dict[str, Package], only: str) -> Dict[str, Packag
 
 def collect_dev_release_package_info(
     repository: Repository,
-    packages: Dict[str, Package],
+    packages: dict[str, Package],
     hydra_root: str,
     target_version: Version,
-) -> List[DevReleasePackageInfo]:
+) -> list[DevReleasePackageInfo]:
     ret = []
     for package in packages.values():
         pkg_path = os.path.normpath(os.path.join(hydra_root, package.path))
@@ -252,7 +251,7 @@ def collect_dev_release_package_info(
     return ret
 
 
-def format_dev_release_package_table(infos: List[DevReleasePackageInfo]) -> str:
+def format_dev_release_package_table(infos: list[DevReleasePackageInfo]) -> str:
     rows = [
         (
             "Package",
@@ -285,7 +284,7 @@ def format_dev_release_package_table(infos: List[DevReleasePackageInfo]) -> str:
     return "\n".join(lines)
 
 
-def fail_if_any_target_version_published(infos: List[DevReleasePackageInfo]) -> None:
+def fail_if_any_target_version_published(infos: list[DevReleasePackageInfo]) -> None:
     published = [info.name for info in infos if info.target_version_published]
     if published:
         packages = ", ".join(sorted(published))
@@ -346,7 +345,7 @@ def _next_version(version: str) -> str:
 
 
 def bump_version_in_file(
-    cfg: Config, name: str, ver_file: Path, target_version: Optional[str] = None
+    cfg: Config, name: str, ver_file: Path, target_version: str | None = None
 ) -> None:
     loaded = ver_file.read_text("utf-8")
     # https://regex101.com/r/DoxaSI/1
@@ -370,7 +369,7 @@ def bump_version(
     cfg: Config,
     package: Package,
     hydra_root: str,
-    target_version: Optional[str] = None,
+    target_version: str | None = None,
 ) -> None:
     if package.version_type == VersionType.SETUP:
         ver_file = Path(hydra_root) / package.path / "setup.py"
@@ -388,7 +387,7 @@ def set_package_versions(cfg: Config, hydra_root: str, target_version: str) -> N
 
 
 def validate_package_versions(
-    packages: Dict[str, Package], hydra_root: str, expected_version: Version
+    packages: dict[str, Package], hydra_root: str, expected_version: Version
 ) -> None:
     for package in packages.values():
         pkg_path = os.path.normpath(os.path.join(hydra_root, package.path))
@@ -398,7 +397,7 @@ def validate_package_versions(
 
 
 def _run_checked(
-    cmd: List[str], cwd: Optional[str] = None, stdin: Optional[str] = None
+    cmd: list[str], cwd: str | None = None, stdin: str | None = None
 ) -> str:
     log.info("Running: %s", " ".join(cmd))
     result = subprocess.run(
@@ -549,7 +548,7 @@ def ensure_clean_worktree(hydra_root: str, vcs: str) -> None:
         )
 
 
-def _single_line(cmd: List[str], cwd: str) -> str:
+def _single_line(cmd: list[str], cwd: str) -> str:
     value = _run_checked(cmd, cwd=cwd).strip()
     if not value:
         raise ValueError(f"Command did not produce output: {' '.join(cmd)}")

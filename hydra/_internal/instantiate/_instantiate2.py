@@ -11,13 +11,8 @@ from typing import (
     Any,
     Callable,
     ContextManager,
-    Dict,
     Iterator,
-    List,
-    Optional,
     Sequence,
-    Tuple,
-    Union,
     cast,
 )
 
@@ -59,10 +54,11 @@ from hydra._internal.utils import _locate
 from hydra.errors import InstantiationException
 from hydra.types import ConvertMode
 
-ConfigOverlay = Union[Dict[str, Any], DictConfig]
-DeferredCallContext = Optional[
-    Callable[[_DeferredTarget, Tuple[Any, ...], Dict[str, Any]], ContextManager[None]]
-]
+ConfigOverlay = dict[str, Any] | DictConfig
+DeferredCallContext = (
+    Callable[[_DeferredTarget, tuple[Any, ...], dict[str, Any]], ContextManager[None]]
+    | None
+)
 _INSTANTIATE_OVERRIDE_RESOLVER = "hydra.instantiate_override"
 _INSTANTIATE_OVERRIDE_STORAGE = "_hydra_instantiate_overrides"
 
@@ -95,9 +91,9 @@ def _is_target(x: Any) -> bool:
 def _read_only_config_tree(*configs: Node) -> Iterator[None]:
     context_roots = {id(config._get_root()) for config in configs}
     nodes = []
-    pending: List[Node] = []
+    pending: list[Node] = []
     for config in configs:
-        ancestor: Optional[Node] = config
+        ancestor: Node | None = config
         while ancestor is not None:
             # Merged nodes can retain a parent only as interpolation context and
             # may therefore not be owned by the next ancestor.
@@ -148,8 +144,8 @@ def _read_only_config_tree(*configs: Node) -> Iterator[None]:
 
 
 class _ReadOnlyDeferredTargetContext:
-    def __init__(self, config: Optional[Node]) -> None:
-        self._config_refs: List[weakref.ReferenceType[Node]] = []
+    def __init__(self, config: Node | None) -> None:
+        self._config_refs: list[weakref.ReferenceType[Node]] = []
         while config is not None:
             self._config_refs.append(weakref.ref(config))
             config = config._get_parent()
@@ -157,13 +153,13 @@ class _ReadOnlyDeferredTargetContext:
     def __call__(
         self,
         _deferred: _DeferredTarget,
-        _args: Tuple[Any, ...],
-        _kwargs: Dict[str, Any],
+        _args: tuple[Any, ...],
+        _kwargs: dict[str, Any],
     ) -> ContextManager[None]:
         configs = [config for ref in self._config_refs if (config := ref()) is not None]
         return _read_only_config_tree(*configs) if configs else nullcontext()
 
-    def __deepcopy__(self, memo: Dict[int, Any]) -> "_ReadOnlyDeferredTargetContext":
+    def __deepcopy__(self, memo: dict[int, Any]) -> "_ReadOnlyDeferredTargetContext":
         # A deep-copied deferred target remains in this process and can retain
         # callable closures that reach the source tree, so preserve its guard.
         copied = type(self)(None)
@@ -214,7 +210,7 @@ def _warn_direct_functools_partial_target() -> None:
     )
 
 
-def _extract_pos_args(input_args: Any, kwargs: Any, full_key: str) -> Tuple[Any, Any]:
+def _extract_pos_args(input_args: Any, kwargs: Any, full_key: str) -> tuple[Any, Any]:
     config_args = kwargs.pop(_Keys.ARGS, ())
     output_args = config_args
 
@@ -231,8 +227,8 @@ def _extract_pos_args(input_args: Any, kwargs: Any, full_key: str) -> Tuple[Any,
 def _call_target(
     _target_: Callable[..., Any],
     _partial_: bool,
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
     full_key: str,
     execution_whitelist: NormalizedExecutionWhitelist,
     deferred_call_context: DeferredCallContext,
@@ -293,7 +289,7 @@ def _convert_target_to_string(t: Any) -> Any:
 
 
 def _prepare_input_container(
-    d: Union[Dict[Any, Any], List[Any], Tuple[Any, ...]],
+    d: dict[Any, Any] | list[Any] | tuple[Any, ...],
 ) -> Any:
     if isinstance(d, dict):
         result = {}
@@ -322,7 +318,7 @@ def _prepare_input_value(
     return value
 
 
-def _validate_callsite_override(value: Any, path: Tuple[Any, ...]) -> None:
+def _validate_callsite_override(value: Any, path: tuple[Any, ...]) -> None:
     if is_structured_config(value):
         return
 
@@ -351,10 +347,10 @@ def _validate_callsite_override(value: Any, path: Tuple[Any, ...]) -> None:
 
 
 def _resolve_target(
-    target: Union[str, type, Callable[..., Any]],
+    target: str | type | Callable[..., Any],
     full_key: str,
     execution_whitelist: NormalizedExecutionWhitelist = None,
-) -> Union[type, Callable[..., Any]]:
+) -> type | Callable[..., Any]:
     """Resolve target string, type or callable into type or callable."""
     if isinstance(target, str) or callable(target):
         target_name = (
@@ -470,8 +466,8 @@ def instantiate(
 
 def _instantiate_impl(
     config: Any,
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
     execution_whitelist: NormalizedExecutionWhitelist,
 ) -> Any:
     source_config_is_omegaconf = OmegaConf.is_config(config)
@@ -571,7 +567,7 @@ def _instantiate_impl(
         )
 
 
-def _convert_node(node: Any, convert: Union[ConvertMode, str]) -> Any:
+def _convert_node(node: Any, convert: ConvertMode | str) -> Any:
     if OmegaConf.is_config(node):
         if convert == ConvertMode.ALL:
             node = OmegaConf.to_container(node, resolve=True)
@@ -625,10 +621,10 @@ def _restore_nested_structured_config_objects(node: Any, value: Any) -> Any:
 
 
 def _create_sequence_result(
-    items: List[Any],
+    items: list[Any],
     *,
     is_tuple: bool,
-    convert: Union[str, ConvertMode],
+    convert: str | ConvertMode,
     parent: Any = None,
 ) -> Any:
     if convert in (ConvertMode.ALL, ConvertMode.PARTIAL, ConvertMode.OBJECT):
@@ -648,7 +644,7 @@ def _create_sequence_result(
     return result
 
 
-def _get_dict_override(value: Any) -> Optional[ConfigOverlay]:
+def _get_dict_override(value: Any) -> ConfigOverlay | None:
     if is_structured_config(value):
         return None
     if isinstance(value, dict):
@@ -658,7 +654,7 @@ def _get_dict_override(value: Any) -> Optional[ConfigOverlay]:
     return None
 
 
-def _iter_effective_keys(node: Any, overrides: Optional[ConfigOverlay]) -> List[str]:
+def _iter_effective_keys(node: Any, overrides: ConfigOverlay | None) -> list[str]:
     keys = list(node.keys())
     if overrides:
         keys.extend(key for key in overrides if key not in keys)
@@ -667,7 +663,7 @@ def _iter_effective_keys(node: Any, overrides: Optional[ConfigOverlay]) -> List[
 
 def _get_effective_control(
     node: Any,
-    overrides: Optional[ConfigOverlay],
+    overrides: ConfigOverlay | None,
     key: _Keys,
     default: Any,
 ) -> Any:
@@ -676,9 +672,7 @@ def _get_effective_control(
     return node[key] if key in node else default
 
 
-def _is_missing_parameter(
-    node: Any, overrides: Optional[ConfigOverlay], key: str
-) -> bool:
+def _is_missing_parameter(node: Any, overrides: ConfigOverlay | None, key: str) -> bool:
     if overrides is not None and key in overrides:
         return isinstance(overrides[key], str) and overrides[key] == "???"
     return OmegaConf.is_missing(node, key)
@@ -687,7 +681,7 @@ def _is_missing_parameter(
 def _instantiate_override(
     value: Any,
     *,
-    convert: Union[str, ConvertMode],
+    convert: str | ConvertMode,
     recursive: bool,
     execution_whitelist: NormalizedExecutionWhitelist,
     deferred_call_context: DeferredCallContext,
@@ -741,7 +735,7 @@ def _instantiate_override(
 
 def _get_dict_override_merge_base(
     node: Any, key: str, *, is_target_parameter: bool
-) -> Optional[ConfigOverlay]:
+) -> ConfigOverlay | None:
     """Return the configured mapping to merge with a dict override, if any."""
     configured_value = node._get_node(key, validate_access=False)
     if (
@@ -785,7 +779,7 @@ def _replace_child(parent: Any, key: Any, child: Any) -> None:
     parent.__dict__["_content"][key] = child
 
 
-def _override_mapping(value: Any) -> Optional[ConfigOverlay]:
+def _override_mapping(value: Any) -> ConfigOverlay | None:
     if OmegaConf.is_config(value) and (
         value._is_none() or value._is_missing() or value._is_interpolation()
     ):
@@ -798,8 +792,8 @@ def _create_override_node(
     *,
     source: Any,
     key: Any,
-    path: Tuple[Any, ...],
-    storage: Dict[str, Tuple[Any, Any]],
+    path: tuple[Any, ...],
+    storage: dict[str, tuple[Any, Any]],
 ) -> Any:
     mapping = _override_mapping(value)
     if mapping is not None:
@@ -854,7 +848,7 @@ def _create_override_node(
 def _apply_override_interpolations(
     node: DictConfig,
     overrides: ConfigOverlay,
-    storage: Dict[str, Tuple[Any, Any]],
+    storage: dict[str, tuple[Any, Any]],
     *,
     is_target_parameter: bool,
 ) -> None:
@@ -941,7 +935,7 @@ def _copy_config_with_override_interpolations(
         else:
             _replace_child(parent, key, copied_config)
 
-    storage: Dict[str, Tuple[Any, Any]] = dict(
+    storage: dict[str, tuple[Any, Any]] = dict(
         current.__dict__.get(_INSTANTIATE_OVERRIDE_STORAGE, {})
     )
     copied_root.__dict__[_INSTANTIATE_OVERRIDE_STORAGE] = storage
@@ -957,10 +951,10 @@ def _copy_config_with_override_interpolations(
 def _instantiate_effective_value(
     node: Any,
     key: str,
-    overrides: Optional[ConfigOverlay],
+    overrides: ConfigOverlay | None,
     *,
     is_target_parameter: bool,
-    convert: Union[str, ConvertMode],
+    convert: str | ConvertMode,
     recursive: bool,
     execution_whitelist: NormalizedExecutionWhitelist,
     deferred_call_context: DeferredCallContext,
@@ -1008,8 +1002,8 @@ def _instantiate_effective_value(
 def instantiate_node(
     node: Any,
     *args: Any,
-    overrides: Optional[ConfigOverlay] = None,
-    convert: Union[str, ConvertMode] = ConvertMode.NONE,
+    overrides: ConfigOverlay | None = None,
+    convert: str | ConvertMode = ConvertMode.NONE,
     recursive: bool = True,
     partial: bool = False,
     is_root: bool = False,

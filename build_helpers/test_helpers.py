@@ -1,7 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import os.path
 from pathlib import Path
-from typing import List
 
 from pytest import mark, param
 
@@ -96,11 +95,11 @@ from build_helpers.build_helpers import find, matches
 )
 def test_find(
     path: str,
-    include_files: List[str],
-    include_dirs: List[str],
-    excludes: List[str],
-    scan_exclude: List[str],
-    expected: List[str],
+    include_files: list[str],
+    include_dirs: list[str],
+    excludes: list[str],
+    scan_exclude: list[str],
+    expected: list[str],
 ) -> None:
     basedir = os.path.normpath(os.path.dirname(__file__))
     path = os.path.join(basedir, "test_files")
@@ -126,6 +125,6 @@ def test_find(
         (["^/foo/bar/.*"], "\\foo\\bar/blag", True),
     ],
 )
-def test_matches(patterns: List[str], query: str, expected: bool) -> None:
+def test_matches(patterns: list[str], query: str, expected: bool) -> None:
     ret = matches(patterns, query)
     assert ret == expected

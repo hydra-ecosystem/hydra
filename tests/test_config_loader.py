@@ -2,7 +2,7 @@
 import re
 from dataclasses import dataclass, field
 from textwrap import dedent
-from typing import Any, List, cast
+from typing import Any, cast
 
 from omegaconf import MISSING, DictConfig, OmegaConf, ValidationError, open_dict
 from omegaconf.errors import InterpolationResolutionError
@@ -123,7 +123,7 @@ class TestConfigLoader:
         ],
     )
     def test_override_compose_two_package_one_group(
-        self, path: str, overrides: List[str], expected: Any
+        self, path: str, overrides: list[str], expected: Any
     ) -> None:
         config_loader = ConfigLoaderImpl(
             config_search_path=create_config_search_path(f"{path}/package_tests")
@@ -854,7 +854,7 @@ def test_complex_defaults(overrides: Any, expected: Any) -> None:
     ],
 )
 def test_apply_overrides_to_config(
-    input_cfg: Any, overrides: List[str], expected: Any
+    input_cfg: Any, overrides: list[str], expected: Any
 ) -> None:
     cfg = cast(DictConfig, OmegaConf.create(input_cfg))
     OmegaConf.set_struct(cfg, True)

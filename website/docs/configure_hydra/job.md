@@ -30,12 +30,12 @@ The Structured Config is below, the latest definition is <GithubLink to="hydra/c
       num: int = MISSING
 
       # The config name used by the job
-      config_name: Optional[str] = MISSING
+      config_name: str | None = MISSING
 
       # Environment variables to set remotely
-      env_set: Dict[str, str] = field(default_factory=dict)
+      env_set: dict[str, str] = field(default_factory=dict)
       # Environment variables to copy from the launching machine
-      env_copy: List[str] = field(default_factory=list)
+      env_copy: list[str] = field(default_factory=list)
 
       # Job config
       @dataclass
@@ -45,7 +45,7 @@ The Structured Config is below, the latest definition is <GithubLink to="hydra/c
           class OverrideDirname:
               kv_sep: str = "="
               item_sep: str = ","
-              exclude_keys: List[str] = field(default_factory=list)
+              exclude_keys: list[str] = field(default_factory=list)
 
           override_dirname: OverrideDirname = field(default_factory=OverrideDirname)
 
@@ -81,7 +81,7 @@ Serial job number within this current sweep run. (0 to n-1).
 The config name used by the job, this is populated automatically to match the config name in `@hydra.main()`.
 
 ### hydra.job.env_set
-A `Dict[str, str]` that is used to set the environment variables of the running job.
+A `dict[str, str]` that is used to set the environment variables of the running job.
 Some common use cases are to automatically set environment variables that are affecting underlying libraries.
 For example, the following will disables multithreading in Intel IPP and MKL:
 ```yaml

@@ -1,6 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass
-from typing import Dict
 
 from omegaconf import MISSING
 
@@ -13,7 +12,7 @@ from hydra.core.hydra_config import HydraConfig
 class Config:
     age: int = MISSING
     name: str = MISSING
-    group: Dict[str, str] = MISSING
+    group: dict[str, str] = MISSING
 
 
 ConfigStore.instance().store(name="config_schema", node=Config)

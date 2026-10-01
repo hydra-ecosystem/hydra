@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from hydra.core.config_store import ConfigStore
 
@@ -18,7 +18,7 @@ class EarlyStopConfig:
 @dataclass
 class ExperimentConfig:
     # Experiment name
-    name: Optional[str] = None
+    name: str | None = None
 
     # Name of metric to optimize or null if you only return one metric
     objective_name: str = "objective"
@@ -27,9 +27,9 @@ class ExperimentConfig:
     minimize: bool = True
 
     # For the remaining parameters, refer the Ax documentation: https://ax.dev/api/core.html#experiment
-    parameter_constraints: Optional[List[str]] = None
-    outcome_constraints: Optional[List[str]] = None
-    status_quo: Optional[Dict[str, Any]] = None
+    parameter_constraints: list[str] | None = None
+    outcome_constraints: list[str] | None = None
+    status_quo: dict[str, Any] | None = None
 
 
 @dataclass
@@ -37,7 +37,7 @@ class ClientConfig:
     verbose_logging: bool = False
 
     # set random seed here to make Ax results reproducible
-    random_seed: Optional[int] = None
+    random_seed: int | None = None
 
 
 @dataclass
@@ -47,7 +47,7 @@ class AxConfig:
     early_stop: EarlyStopConfig = field(default_factory=EarlyStopConfig)
     experiment: ExperimentConfig = field(default_factory=ExperimentConfig)
     client: ClientConfig = field(default_factory=ClientConfig)
-    params: Dict[str, Any] = field(default_factory=dict)
+    params: dict[str, Any] = field(default_factory=dict)
     # is_noisy = True indicates measurements have unknown uncertainty
     # is_noisy = False indicates measurements have an uncertainty of zero
     is_noisy: bool = True
@@ -57,7 +57,7 @@ class AxConfig:
 class AxSweeperConf:
     _target_: str = "hydra_plugins.hydra_ax_sweeper.ax_sweeper.AxSweeper"
     # Maximum number of trials to run in parallel
-    max_batch_size: Optional[int] = None
+    max_batch_size: int | None = None
     ax_config: AxConfig = field(default_factory=AxConfig)
 
 

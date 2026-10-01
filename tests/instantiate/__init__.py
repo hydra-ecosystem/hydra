@@ -177,7 +177,7 @@ class ASubclass(AnotherClass):
 
 
 class Parameters:
-    def __init__(self, params: List[float]):
+    def __init__(self, params: list[float]):
         self.params = params
 
     def __eq__(self, other: Any) -> Any:
@@ -193,7 +193,7 @@ class Parameters:
 class Adam:
     params: Parameters
     lr: float = 0.001
-    betas: Tuple[float, ...] = (0.9, 0.999)
+    betas: tuple[float, ...] = (0.9, 0.999)
     eps: float = 1e-08
     weight_decay: int = 0
     amsgrad: bool = False
@@ -218,7 +218,7 @@ class ClassWithMissingModule:
 class AdamConf:
     _target_: str = "tests.instantiate.Adam"
     lr: float = 0.001
-    betas: Tuple[float, ...] = (0.9, 0.999)
+    betas: tuple[float, ...] = (0.9, 0.999)
     eps: float = 1e-08
     weight_decay: int = 0
     amsgrad: bool = False
@@ -233,7 +233,7 @@ class User:
 @dataclass
 class UserGroup:
     name: str = MISSING
-    users: List[User] = MISSING
+    users: list[User] = MISSING
 
 
 # RECURSIVE
@@ -264,9 +264,9 @@ class Rotation(Transform):
 
 
 class Compose:
-    transforms: List[Transform]
+    transforms: list[Transform]
 
-    def __init__(self, transforms: List[Transform]):
+    def __init__(self, transforms: list[Transform]):
         self.transforms = transforms
 
     def __eq__(self, other: Any) -> Any:
@@ -300,11 +300,11 @@ class Tree:
 
 
 class Mapping:
-    dictionary: Optional[Dict[str, "Mapping"]] = None
+    dictionary: dict[str, "Mapping"] | None = None
     value: Any = None
 
     def __init__(
-        self, value: Any = None, dictionary: Optional[Dict[str, "Mapping"]] = None
+        self, value: Any = None, dictionary: dict[str, "Mapping"] | None = None
     ) -> None:
         self.dictionary = dictionary
         self.value = value
@@ -343,7 +343,7 @@ class RotationConf(TransformConf):
 class ComposeConf:
     _target_: str = "tests.instantiate.Compose"
     _partial_: bool = False
-    transforms: List[TransformConf] = MISSING
+    transforms: list[TransformConf] = MISSING
 
 
 @dataclass
@@ -359,11 +359,11 @@ class TreeConf:
 class MappingConf:
     _target_: str = "tests.instantiate.Mapping"
     _partial_: bool = False
-    dictionary: Optional[Dict[str, "MappingConf"]] = None
+    dictionary: dict[str, "MappingConf"] | None = None
 
     def __init__(
         self,
-        dictionary: Optional[Dict[str, "MappingConf"]] = None,
+        dictionary: dict[str, "MappingConf"] | None = None,
         _partial_: bool = False,
     ):
         self.dictionary = dictionary
@@ -390,7 +390,7 @@ class SimpleClass:
         return False
 
     @property
-    def _fields(self) -> List[str]:
+    def _fields(self) -> list[str]:
         return ["a", "b"]
 
 
@@ -426,7 +426,7 @@ class NestedConf:
 
 class TargetWithInstantiateInInit:
     def __init__(
-        self, user_config: Optional[DictConfig], user: Optional[User] = None
+        self, user_config: DictConfig | None, user: User | None = None
     ) -> None:
         if user:
             self.user = user

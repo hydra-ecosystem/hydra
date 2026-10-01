@@ -35,9 +35,9 @@ override, and passes the resulting config to the function. See the
 
 ```python title="@hydra.main()"
 def main(
-    config_path: Optional[str] = None,
-    config_name: Optional[str] = None,
-    version_base: Optional[str] = ...,
+    config_path: str | None = None,
+    config_name: str | None = None,
+    version_base: str | None = ...,
     execution_whitelist: ExecutionWhitelist = None,
 ) -> Callable[[TaskFunction], Any]:
     ...

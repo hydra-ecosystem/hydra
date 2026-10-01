@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, List
+from typing import Any
 
 from omegaconf import OmegaConf
 from pytest import mark, param
@@ -62,7 +62,7 @@ def test_write_protect_config_node(tmpdir: Any) -> None:
     ],
 )
 def test_extending_configs(
-    monkeypatch: Any, tmpdir: Path, overrides: List[str]
+    monkeypatch: Any, tmpdir: Path, overrides: list[str]
 ) -> None:
     monkeypatch.chdir("examples/patterns/extending_configs")
     cmd = [
@@ -103,7 +103,7 @@ def test_extending_configs(
     ],
 )
 def test_configuring_experiments(
-    monkeypatch: Any, tmpdir: Path, overrides: List[str], expected: Any
+    monkeypatch: Any, tmpdir: Path, overrides: list[str], expected: Any
 ) -> None:
     monkeypatch.chdir("examples/patterns/configuring_experiments")
     cmd = [
@@ -149,7 +149,7 @@ def test_configuring_experiments(
     ],
 )
 def test_multi_select(
-    monkeypatch: Any, tmpdir: Path, overrides: List[str], expected: Any
+    monkeypatch: Any, tmpdir: Path, overrides: list[str], expected: Any
 ) -> None:
     monkeypatch.chdir("examples/patterns/multi-select")
     cmd = [

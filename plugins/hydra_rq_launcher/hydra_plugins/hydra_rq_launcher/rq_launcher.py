@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import logging
-from typing import Any, Optional, Sequence, cast
+from typing import Any, Sequence, cast
 
 from hydra.core.utils import JobReturn
 from hydra.plugins.launcher import Launcher
@@ -19,9 +19,9 @@ class RQLauncher(Launcher):
         Launches jobs using RQ (Redis Queue). For details, refer to:
         https://python-rq.org
         """
-        self.config: Optional[DictConfig] = None
-        self.task_function: Optional[TaskFunction] = None
-        self.hydra_context: Optional[HydraContext] = None
+        self.config: DictConfig | None = None
+        self.task_function: TaskFunction | None = None
+        self.hydra_context: HydraContext | None = None
 
         self.rq = OmegaConf.structured(RQLauncherConf(**params))
 

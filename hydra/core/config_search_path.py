@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import MutableSequence, Optional, Union
+from typing import MutableSequence
 
 
 class SearchPathElement:
@@ -22,8 +22,8 @@ class SearchPathQuery:
     Used in append and prepend API
     """
 
-    provider: Optional[str] = None
-    path: Optional[str] = None
+    provider: str | None = None
+    path: str | None = None
 
 
 class ConfigSearchPath(ABC):
@@ -32,7 +32,7 @@ class ConfigSearchPath(ABC):
 
     @abstractmethod
     def append(
-        self, provider: str, path: str, anchor: Optional[SearchPathQuery] = None
+        self, provider: str, path: str, anchor: SearchPathQuery | None = None
     ) -> None:
         """
         Appends to the search path.
@@ -51,7 +51,7 @@ class ConfigSearchPath(ABC):
         self,
         provider: str,
         path: str,
-        anchor: Optional[Union[SearchPathQuery, str]] = None,
+        anchor: SearchPathQuery | str | None = None,
     ) -> None:
         """
         Prepends to the search path.

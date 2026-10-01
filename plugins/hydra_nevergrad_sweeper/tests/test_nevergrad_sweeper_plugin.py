@@ -2,7 +2,7 @@
 import sys
 import warnings
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import nevergrad as ng
 from hydra.core.override_parser.overrides_parser import OverridesParser
@@ -212,8 +212,8 @@ def test_failure_rate(max_failure_rate: float, tmpdir: Path) -> None:
 
 def create_sweeper(
     *,
-    parametrization: Optional[DictConfig] = None,
-    params: Optional[DictConfig] = None,
+    parametrization: DictConfig | None = None,
+    params: DictConfig | None = None,
 ) -> NevergradSweeperImpl:
     return NevergradSweeperImpl(
         optim=OptimConf(),

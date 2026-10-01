@@ -1,8 +1,9 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import builtins
 import os
 import zipfile
 from importlib import resources
-from typing import Any, List, Optional
+from typing import Any
 
 from omegaconf import OmegaConf
 
@@ -82,8 +83,10 @@ class ImportlibResourcesConfigSource(ConfigSource):
         assert isinstance(ret, bool)
         return ret
 
-    def list(self, config_path: str, results_filter: Optional[ObjectType]) -> List[str]:
-        files: List[str] = []
+    def list(
+        self, config_path: str, results_filter: ObjectType | None
+    ) -> builtins.list[str]:
+        files: list[str] = []
         for file in resources.files(self.path).joinpath(config_path).iterdir():
             fname = file.name
             fpath = os.path.join(config_path, fname)

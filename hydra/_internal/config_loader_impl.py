@@ -4,7 +4,7 @@ import os
 import sys
 import warnings
 from textwrap import dedent
-from typing import Any, List, MutableSequence, Optional, Tuple, Union
+from typing import Any, MutableSequence
 
 from omegaconf import (
     Container,
@@ -51,9 +51,9 @@ class ConfigLoaderImpl(ConfigLoader):
     ) -> None:
         self.config_search_path = config_search_path
         self.repository = ConfigRepository(config_search_path=config_search_path)
-        self._active_repository: Optional[IConfigRepository] = None
+        self._active_repository: IConfigRepository | None = None
 
-    def get_mode(self, config_name: Optional[str], overrides: List[str]) -> Any:
+    def get_mode(self, config_name: str | None, overrides: list[str]) -> Any:
         mode: Any = None
         mode_override_found = False
         parsed_overrides = OverridesParser.create().parse_overrides(overrides)
@@ -89,7 +89,7 @@ class ConfigLoaderImpl(ConfigLoader):
 
         return self._get_primary_mode(config_name)
 
-    def _get_primary_mode(self, config_name: Optional[str]) -> Any:
+    def _get_primary_mode(self, config_name: str | None) -> Any:
         if config_name is None:
             return None
 
@@ -118,7 +118,7 @@ class ConfigLoaderImpl(ConfigLoader):
 
     @staticmethod
     def validate_sweep_overrides_legal(
-        overrides: List[Override],
+        overrides: list[Override],
         run_mode: RunMode,
         from_shell: bool,
     ) -> None:
@@ -152,7 +152,7 @@ class ConfigLoaderImpl(ConfigLoader):
                     assert False
 
     def _missing_config_error(
-        self, config_name: Optional[str], msg: str, with_search_path: bool
+        self, config_name: str | None, msg: str, with_search_path: bool
     ) -> None:
         def add_search_path() -> str:
             descs = []
@@ -199,8 +199,8 @@ class ConfigLoaderImpl(ConfigLoader):
 
     def load_configuration(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode,
         from_shell: bool = True,
         validate_sweep_overrides: bool = True,
@@ -218,8 +218,8 @@ class ConfigLoaderImpl(ConfigLoader):
 
     def _load_configuration_with_active_repository(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode,
         from_shell: bool = True,
         validate_sweep_overrides: bool = True,
@@ -236,8 +236,8 @@ class ConfigLoaderImpl(ConfigLoader):
 
     def _load_configuration(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode,
         from_shell: bool,
         validate_sweep_overrides: bool,
@@ -259,8 +259,8 @@ class ConfigLoaderImpl(ConfigLoader):
 
     def _process_config_searchpath(
         self,
-        config_name: Optional[str],
-        parsed_overrides: List[Override],
+        config_name: str | None,
+        parsed_overrides: list[Override],
         repo: CachingConfigRepository,
     ) -> None:
         if config_name is not None:
@@ -330,8 +330,8 @@ class ConfigLoaderImpl(ConfigLoader):
                 )
 
     def _parse_overrides_and_create_caching_repo(
-        self, config_name: Optional[str], overrides: List[str]
-    ) -> Tuple[List[Override], CachingConfigRepository]:
+        self, config_name: str | None, overrides: list[str]
+    ) -> tuple[list[Override], CachingConfigRepository]:
         parser = OverridesParser.create()
         parsed_overrides = parser.parse_overrides(overrides=overrides)
         caching_repo = CachingConfigRepository(self.repository)
@@ -340,8 +340,8 @@ class ConfigLoaderImpl(ConfigLoader):
 
     def _load_configuration_impl(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode,
         from_shell: bool = True,
         validate_sweep_overrides: bool = True,
@@ -415,7 +415,7 @@ class ConfigLoaderImpl(ConfigLoader):
         return cfg
 
     def load_sweep_config(
-        self, master_config: DictConfig, sweep_overrides: List[str]
+        self, master_config: DictConfig, sweep_overrides: list[str]
     ) -> DictConfig:
         # Recreate the config for this sweep instance with the appropriate overrides
         overrides = OmegaConf.to_container(master_config.hydra.overrides.hydra)
@@ -472,7 +472,7 @@ class ConfigLoaderImpl(ConfigLoader):
         return self.config_search_path
 
     @staticmethod
-    def _apply_overrides_to_config(overrides: List[Override], cfg: DictConfig) -> None:
+    def _apply_overrides_to_config(overrides: list[Override], cfg: DictConfig) -> None:
         for override in overrides:
             if override.package is not None:
                 raise ConfigCompositionException(
@@ -537,7 +537,7 @@ class ConfigLoaderImpl(ConfigLoader):
                         if last_dot == -1:
                             del cfg[key]
                         else:
-                            node_key: Union[str, int] = key[last_dot + 1 :]
+                            node_key: str | int = key[last_dot + 1 :]
                             if isinstance(parent, ListConfig):
                                 node_key = int(node_key)
                             del parent[node_key]
@@ -611,7 +611,7 @@ class ConfigLoaderImpl(ConfigLoader):
 
     @staticmethod
     def _embed_result_config(
-        ret: ConfigResult, package_override: Optional[str]
+        ret: ConfigResult, package_override: str | None
     ) -> ConfigResult:
         package = ret.header["package"]
         if package_override is not None:
@@ -625,7 +625,7 @@ class ConfigLoaderImpl(ConfigLoader):
 
         return ret
 
-    def list_groups(self, parent_name: str) -> List[str]:
+    def list_groups(self, parent_name: str) -> list[str]:
         return self.get_group_options(
             group_name=parent_name, results_filter=ObjectType.GROUP
         )
@@ -633,10 +633,10 @@ class ConfigLoaderImpl(ConfigLoader):
     def get_group_options(
         self,
         group_name: str,
-        results_filter: Optional[ObjectType] = ObjectType.CONFIG,
-        config_name: Optional[str] = None,
-        overrides: Optional[List[str]] = None,
-    ) -> List[str]:
+        results_filter: ObjectType | None = ObjectType.CONFIG,
+        config_name: str | None = None,
+        overrides: list[str] | None = None,
+    ) -> list[str]:
         if (
             config_name is None
             and overrides is None
@@ -652,7 +652,7 @@ class ConfigLoaderImpl(ConfigLoader):
 
     def _compose_config_from_defaults_list(
         self,
-        defaults: List[ResultDefault],
+        defaults: list[ResultDefault],
         repo: IConfigRepository,
     ) -> DictConfig:
         cfg = OmegaConf.create()
@@ -684,15 +684,15 @@ class ConfigLoaderImpl(ConfigLoader):
 
         return cfg
 
-    def get_sources(self) -> List[ConfigSource]:
+    def get_sources(self) -> list[ConfigSource]:
         if self._active_repository is not None:
             return self._active_repository.get_sources()
         return self.repository.get_sources()
 
     def compute_defaults_list(
         self,
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode,
     ) -> DefaultsList:
         parsed_overrides, caching_repo = self._parse_overrides_and_create_caching_repo(

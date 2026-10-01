@@ -2,7 +2,6 @@
 import copy
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
 
 from omegaconf import (
     Container,
@@ -28,7 +27,7 @@ class IConfigRepository(ABC):
     def get_schema_source(self) -> ConfigSource: ...
 
     @abstractmethod
-    def load_config(self, config_path: str) -> Optional[ConfigResult]: ...
+    def load_config(self, config_path: str) -> ConfigResult | None: ...
 
     @abstractmethod
     def group_exists(self, config_path: str) -> bool: ...
@@ -38,11 +37,11 @@ class IConfigRepository(ABC):
 
     @abstractmethod
     def get_group_options(
-        self, group_name: str, results_filter: Optional[ObjectType] = ObjectType.CONFIG
-    ) -> List[str]: ...
+        self, group_name: str, results_filter: ObjectType | None = ObjectType.CONFIG
+    ) -> list[str]: ...
 
     @abstractmethod
-    def get_sources(self) -> List[ConfigSource]: ...
+    def get_sources(self) -> list[ConfigSource]: ...
 
     @abstractmethod
     def initialize_sources(self, config_search_path: ConfigSearchPath) -> None: ...
@@ -52,7 +51,7 @@ class ConfigRepository(IConfigRepository):
     _KNOWN_DEFAULTS_LIST_KEYWORDS = ("optional", "override")
 
     config_search_path: ConfigSearchPath
-    sources: List[ConfigSource]
+    sources: list[ConfigSource]
 
     def __init__(self, config_search_path: ConfigSearchPath) -> None:
         self.initialize_sources(config_search_path)
@@ -75,7 +74,7 @@ class ConfigRepository(IConfigRepository):
         ), "schema config source must be last"
         return source
 
-    def load_config(self, config_path: str) -> Optional[ConfigResult]:
+    def load_config(self, config_path: str) -> ConfigResult | None:
         source = self._find_object_source(
             config_path=config_path, object_type=ObjectType.CONFIG
         )
@@ -101,9 +100,9 @@ class ConfigRepository(IConfigRepository):
         return self._find_object_source(config_path, ObjectType.CONFIG) is not None
 
     def get_group_options(
-        self, group_name: str, results_filter: Optional[ObjectType] = ObjectType.CONFIG
-    ) -> List[str]:
-        options: List[str] = []
+        self, group_name: str, results_filter: ObjectType | None = ObjectType.CONFIG
+    ) -> list[str]:
+        options: list[str] = []
         for source in self.sources:
             if source.is_group(config_path=group_name):
                 options.extend(
@@ -111,12 +110,12 @@ class ConfigRepository(IConfigRepository):
                 )
         return sorted(list(set(options)))
 
-    def get_sources(self) -> List[ConfigSource]:
+    def get_sources(self) -> list[ConfigSource]:
         return self.sources
 
     def _find_object_source(
-        self, config_path: str, object_type: Optional[ObjectType]
-    ) -> Optional[ConfigSource]:
+        self, config_path: str, object_type: ObjectType | None
+    ) -> ConfigSource | None:
         found_source = None
         for source in self.sources:
             if object_type == ObjectType.CONFIG:
@@ -142,7 +141,7 @@ class ConfigRepository(IConfigRepository):
     def _split_group(
         self,
         group_with_package: str,
-    ) -> Tuple[str, Optional[str], Optional[str]]:
+    ) -> tuple[str, str | None, str | None]:
         idx = group_with_package.find("@")
         if idx == -1:
             # group
@@ -167,8 +166,8 @@ class ConfigRepository(IConfigRepository):
         self,
         config_path: str,
         defaults: ListConfig,
-    ) -> List[InputDefault]:
-        res: List[InputDefault] = []
+    ) -> list[InputDefault]:
+        res: list[InputDefault] = []
         for item in defaults._iter_ex(resolve=False):
             default: InputDefault
             if isinstance(item, DictConfig):
@@ -311,7 +310,7 @@ class CachingConfigRepository(IConfigRepository):
     def __init__(self, delegate: IConfigRepository):
         # copy the underlying repository to avoid mutating it with initialize_sources()
         self.delegate = copy.deepcopy(delegate)
-        self.cache: Dict[str, Optional[ConfigResult]] = {}
+        self.cache: dict[str, ConfigResult | None] = {}
 
     def get_schema_source(self) -> ConfigSource:
         return self.delegate.get_schema_source()
@@ -322,7 +321,7 @@ class CachingConfigRepository(IConfigRepository):
         # For the use case this is used, the only thing in the cache is the primary config
         # and we want to keep it even though we re-initialized the sources.
 
-    def load_config(self, config_path: str) -> Optional[ConfigResult]:
+    def load_config(self, config_path: str) -> ConfigResult | None:
         cache_key = f"config_path={config_path}"
         if cache_key in self.cache:
             return self.cache[cache_key]
@@ -338,11 +337,11 @@ class CachingConfigRepository(IConfigRepository):
         return self.delegate.config_exists(config_path=config_path)
 
     def get_group_options(
-        self, group_name: str, results_filter: Optional[ObjectType] = ObjectType.CONFIG
-    ) -> List[str]:
+        self, group_name: str, results_filter: ObjectType | None = ObjectType.CONFIG
+    ) -> list[str]:
         return self.delegate.get_group_options(
             group_name=group_name, results_filter=results_filter
         )
 
-    def get_sources(self) -> List[ConfigSource]:
+    def get_sources(self) -> list[ConfigSource]:
         return self.delegate.get_sources()

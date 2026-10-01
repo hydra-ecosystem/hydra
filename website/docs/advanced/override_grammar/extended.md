@@ -49,7 +49,7 @@ different pair of numbers from `0`, `1` and `2`.
 ### Choice sweep
 ```python title="Signature"
 def choice(
-    *args: Union[str, int, float, bool, Dict[Any, Any], List[Any], ChoiceSweep]
+    *args: str | int | float | bool | dict[Any, Any] | list[Any] | ChoiceSweep
 ) -> ChoiceSweep:
     """
     A choice sweep over the specified values
@@ -64,7 +64,7 @@ db=choice(mysql,postgresql)  # choice
 ### Glob choice sweep
 ```python title="Signature"
 def glob(
-    include: Union[List[str], str], exclude: Optional[Union[List[str], str]] = None
+    include: list[str] | str, exclude: list[str] | str | None = None
 ) -> Glob:
     """
     A glob selects from all options in the config group.
@@ -86,7 +86,7 @@ Unlike Python, Hydra's range can be used with both integer and floating-point nu
 In both cases, the range represents a discrete list of values.
 ```python title="Signature"
 def range(
-    start: Union[int, float], stop: Optional[Union[int, float]] = None, step: Union[int, float] = 1
+    start: int | float, stop: int | float | None = None, step: int | float = 1
 ) -> RangeSweep:
     """
     Range is defines a sweeep over a range of integer or floating-point values.
@@ -110,7 +110,7 @@ An interval sweep represents all the floating point value between two values.
 This is used by optimizing sweepers like Ax and Nevergrad. The basic sweeper does not support interval.
 
 ```python title="Signature"
-def interval(start: Union[int, float], end: Union[int, float]) -> IntervalSweep:
+def interval(start: int | float, end: int | float) -> IntervalSweep:
     """
     A continuous interval between two floating point values.
     value=interval(x,y) is interpreted as x <= value < y
@@ -124,7 +124,7 @@ interval(1,5)      # 1.0 <= x < 5.0, auto-cast to floats
 ### Tag
 With tags you can add arbitrary metadata to a sweep. The metadata can be used by advanced sweepers.
 ```python title="Signature"
-def tag(*args: Union[str, Union[Sweep]], sweep: Optional[Sweep] = None) -> Sweep:
+def tag(*args: str | Sweep, sweep: Sweep | None = None) -> Sweep:
     """
     Tags the sweep with a list of string tags.
     """
@@ -139,9 +139,9 @@ tag(foo,bar,interval(0,1))      # 1.0 <= x < 1.0, tags=[foo,bar]
 ### sort
 ```python title="Signature"
 def sort(
-    *args: Union[ElementType, ChoiceSweep, RangeSweep],
-    sweep: Optional[Union[ChoiceSweep, RangeSweep]] = None,
-    list: Optional[List[Any]] = None,
+    *args: ElementType | ChoiceSweep | RangeSweep,
+    sweep: ChoiceSweep | RangeSweep | None = None,
+    list: list[Any] | None = None,
     reverse: bool = False,
 ) -> Any:
     """
@@ -171,10 +171,10 @@ sort(1)                             # 1
 ### shuffle
 ```python title="Signature"
 def shuffle(
-    *args: Union[ElementType, ChoiceSweep, RangeSweep],
-    sweep: Optional[Union[ChoiceSweep, RangeSweep]] = None,
-    list: Optional[List[Any]] = None,
-) -> Union[List[Any], ChoiceSweep, RangeSweep]:
+    *args: ElementType | ChoiceSweep | RangeSweep,
+    sweep: ChoiceSweep | RangeSweep | None = None,
+    list: list[Any] | None = None,
+) -> list[Any] | ChoiceSweep | RangeSweep:
     """
     Shuffle input list or sweep (does not support interval)
     """

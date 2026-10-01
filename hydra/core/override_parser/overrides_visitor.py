@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import sys
 import warnings
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, cast
 
 from omegaconf.vendor.antlr4 import (  # type: ignore[attr-defined]
     ParserRuleContext,
@@ -76,13 +76,13 @@ class HydraOverrideVisitor(OverrideParserVisitor):
 
     def visitPrimitive(
         self, ctx: OverrideParser.PrimitiveContext
-    ) -> Optional[Union[QuotedString, int, bool, float, str]]:
+    ) -> QuotedString | int | bool | float | str | None:
         return self._createPrimitive(ctx)
 
     def visitListContainer(
         self, ctx: OverrideParser.ListContainerContext
-    ) -> List[ParsedElementType]:
-        ret: List[ParsedElementType] = []
+    ) -> list[ParsedElementType]:
+        ret: list[ParsedElementType] = []
 
         idx = 0
         while True:
@@ -96,7 +96,7 @@ class HydraOverrideVisitor(OverrideParserVisitor):
 
     def visitDictContainer(
         self, ctx: OverrideParser.DictContainerContext
-    ) -> Dict[str, ParsedElementType]:
+    ) -> dict[str, ParsedElementType]:
         assert self.is_matching_terminal(ctx.getChild(0), OverrideLexer.BRACE_OPEN)
         return dict(
             self.visitDictKeyValuePair(ctx.getChild(i))
@@ -108,7 +108,7 @@ class HydraOverrideVisitor(OverrideParserVisitor):
 
     def visitDictKeyValuePair(
         self, ctx: OverrideParser.DictKeyValuePairContext
-    ) -> Tuple[str, ParsedElementType]:
+    ) -> tuple[str, ParsedElementType]:
         children = ctx.getChildren()
         item = next(children)
         assert isinstance(item, OverrideParser.DictKeyContext)
@@ -134,7 +134,7 @@ class HydraOverrideVisitor(OverrideParserVisitor):
 
     def visitValue(
         self, ctx: OverrideParser.ValueContext
-    ) -> Union[ChoiceSweep, RangeSweep, IntervalSweep, ParsedElementType]:
+    ) -> ChoiceSweep | RangeSweep | IntervalSweep | ParsedElementType:
         if ctx.element():  # type: ignore[no-untyped-call]
             return self.visitElement(ctx.element())  # type: ignore[no-untyped-call]
         elif ctx.simpleChoiceSweep() is not None:  # type: ignore[no-untyped-call]
@@ -163,7 +163,7 @@ class HydraOverrideVisitor(OverrideParserVisitor):
             key_node = first_node
 
         key = self.visitKey(key_node)
-        value: Union[ChoiceSweep, RangeSweep, IntervalSweep, ParsedElementType]
+        value: ChoiceSweep | RangeSweep | IntervalSweep | ParsedElementType
         eq_node = next(children)
         if (
             override_type == OverrideType.DEL
@@ -265,8 +265,8 @@ class HydraOverrideVisitor(OverrideParserVisitor):
     def _createPrimitive(
         self,
         ctx: ParserRuleContext,  # type: ignore[valid-type]
-    ) -> Optional[Union[QuotedString, int, bool, float, str]]:
-        ret: Optional[Union[int, bool, float, str]]
+    ) -> QuotedString | int | bool | float | str | None:
+        ret: int | bool | float | str | None
         first_idx = 0
         last_idx = ctx.getChildCount()  # type: ignore[attr-defined]
         # skip first if whitespace
@@ -282,7 +282,7 @@ class HydraOverrideVisitor(OverrideParserVisitor):
         num = last_idx - first_idx
         if num > 1:
             # Concatenate, while un-escaping as needed.
-            tokens: List[str] = []
+            tokens: list[str] = []
             for i, n in enumerate(ctx.getChildren()):  # type: ignore[attr-defined]
                 assert isinstance(n, TerminalNodeImpl)
                 symbol_text = cast(str, n.symbol.text)

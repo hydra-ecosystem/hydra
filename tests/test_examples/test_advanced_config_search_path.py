@@ -1,7 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import re
 from pathlib import Path
-from typing import List, Optional
 
 from omegaconf import OmegaConf
 from pytest import mark
@@ -32,7 +31,7 @@ chdir_hydra_root()
     ],
 )
 def test_config_search_path(
-    args: List[str], expected: str, tmpdir: Path, error: Optional[str]
+    args: list[str], expected: str, tmpdir: Path, error: str | None
 ) -> None:
     cmd = [
         "examples/advanced/config_search_path/my_app.py",

@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from importlib import import_module
 from importlib.metadata import version
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from hydra.core.config_store import ConfigStore
 from omegaconf import OmegaConf
@@ -12,8 +12,8 @@ from omegaconf import OmegaConf
 
 @dataclass
 class RayConf:
-    init: Dict[str, Any] = field(default_factory=lambda: {"address": None})
-    remote: Dict[str, Any] = field(default_factory=dict)
+    init: dict[str, Any] = field(default_factory=lambda: {"address": None})
+    remote: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -22,7 +22,7 @@ class RayLauncherConf:
     ray: RayConf = field(default_factory=RayConf)
 
 
-def _pkg_version(mdl_name: str) -> Optional[str]:
+def _pkg_version(mdl_name: str) -> str | None:
     mdl = import_module(mdl_name)
     ret = getattr(mdl, "__version__")
     assert ret is None or isinstance(ret, str)
@@ -137,7 +137,7 @@ class RayDockerConf:
     # if no cached version is present.
     pull_before_run: bool = True
     # Extra options to pass into "docker run"
-    run_options: List[str] = field(default_factory=list)
+    run_options: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -146,7 +146,7 @@ class RayProviderConf:
     region: str = "us-west-2"
     availability_zone: str = "us-west-2a,us-west-2b"
     cache_stopped_nodes: bool = False
-    key_pair: Dict[str, str] = field(
+    key_pair: dict[str, str] = field(
         default_factory=lambda: {"key_name": "hydra-${oc.env:USER,user}"}
     )
 
@@ -166,13 +166,13 @@ class RsyncConf:
     Read RayAWSConf for more details.
     """
 
-    source_dir: Optional[str] = None
-    target_dir: Optional[str] = None
-    include: List[str] = field(default_factory=list)
-    exclude: List[str] = field(default_factory=list)
+    source_dir: str | None = None
+    target_dir: str | None = None
+    include: list[str] = field(default_factory=list)
+    exclude: list[str] = field(default_factory=list)
 
 
-def _pip_pkgs_default_factory() -> Dict[str, str]:
+def _pip_pkgs_default_factory() -> dict[str, str]:
     d = {
         "omegaconf": "${ray_pkg_version:omegaconf}",
         "hydra_core": "${ray_pkg_version:hydra}",
@@ -189,9 +189,9 @@ def _pip_pkgs_default_factory() -> Dict[str, str]:
 
 @dataclass
 class EnvSetupConf:
-    pip_packages: Dict[str, str] = field(default_factory=_pip_pkgs_default_factory)
+    pip_packages: dict[str, str] = field(default_factory=_pip_pkgs_default_factory)
 
-    commands: List[str] = field(
+    commands: list[str] = field(
         default_factory=lambda: [
             "conda create -n hydra_${python_version:micro} python=${python_version:micro} -y",
             "echo 'export PATH=\"$HOME/anaconda3/envs/hydra_${python_version:micro}/bin:$PATH\"' >> ~/.bashrc",
@@ -257,7 +257,7 @@ class RayClusterConf:
 
     # For additional options, check:
     # https://github.com/ray-project/ray/blob/master/python/ray/autoscaler/aws/example-full.yaml
-    auth: Dict[str, str] = field(default_factory=lambda: {"ssh_user": "ubuntu"})
+    auth: dict[str, str] = field(default_factory=lambda: {"ssh_user": "ubuntu"})
 
     """
     Additional options in boto docs.
@@ -267,7 +267,7 @@ class RayClusterConf:
     # Tell the autoscaler the allowed node types and the resources they provide.
     # The key is the name of the node type, which is just for debugging purposes.
     # The node config specifies the launch config and physical instance type.
-    available_node_types: Dict[str, Any] = field(
+    available_node_types: dict[str, Any] = field(
         default_factory=lambda: {
             "ray.head.default": {
                 "resources": {},
@@ -293,24 +293,24 @@ class RayClusterConf:
 
     # Files or directories to copy to the head and worker nodes. The format is a
     # dictionary from REMOTE_PATH: LOCAL_PATH, e.g.
-    file_mounts: Dict[str, str] = field(default_factory=dict)
+    file_mounts: dict[str, str] = field(default_factory=dict)
 
-    initialization_commands: List[str] = field(default_factory=list)
+    initialization_commands: list[str] = field(default_factory=list)
 
     # Files or directories to copy from the head node to the worker nodes. The format is a
     # list of paths. The same path on the head node will be copied to the worker node.
     # This behavior is a subset of the file_mounts behavior. In the vast majority of cases
     # you should just use file_mounts. Only use this if you know what you're doing!
-    cluster_synced_files: List[str] = field(default_factory=list)
+    cluster_synced_files: list[str] = field(default_factory=list)
 
     # populated automatically
-    setup_commands: List[str] = field(default_factory=list)
+    setup_commands: list[str] = field(default_factory=list)
 
-    head_setup_commands: List[str] = field(default_factory=list)
+    head_setup_commands: list[str] = field(default_factory=list)
 
-    worker_setup_commands: List[str] = field(default_factory=list)
+    worker_setup_commands: list[str] = field(default_factory=list)
 
-    head_start_ray_commands: List[str] = field(
+    head_start_ray_commands: list[str] = field(
         default_factory=lambda: [
             "ray stop",
             "ulimit -n 65536;ray start --head --port=6379 --object-manager-port=8076 \
@@ -320,7 +320,7 @@ class RayClusterConf:
 
     # Custom commands that will be run on worker nodes after common setup.
     # Custom commands that will be run on worker nodes after common setup.
-    worker_start_ray_commands: List[str] = field(
+    worker_start_ray_commands: list[str] = field(
         default_factory=lambda: [
             "ray stop",
             "ulimit -n 65536; ray start --address=$RAY_HEAD_IP:6379 --object-manager-port=8076",

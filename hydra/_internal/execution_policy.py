@@ -16,16 +16,11 @@ from textwrap import dedent
 from typing import (
     Any,
     Callable,
-    Dict,
-    FrozenSet,
     Iterator,
     Mapping,
     NamedTuple,
-    Optional,
     Sequence,
     SupportsIndex,
-    Tuple,
-    Union,
     cast,
 )
 
@@ -447,37 +442,35 @@ def _get_unsafe_disable_execution_checks() -> "_UnsafeDisableExecutionChecks":
 
 
 UNSAFE_DISABLE_EXECUTION_CHECKS = _UnsafeDisableExecutionChecks()
-NormalizedExecutionWhitelist = Union[
-    Tuple[str, ...], _UnsafeDisableExecutionChecks, None
-]
+NormalizedExecutionWhitelist = tuple[str, ...] | _UnsafeDisableExecutionChecks | None
 _EXECUTION_WHITELIST_CONTEXT: ContextVar[NormalizedExecutionWhitelist] = ContextVar(
     "hydra_execution_whitelist", default=None
 )
 
 
 class _ExecutionPolicySnapshot(NamedTuple):
-    default_blacklisted_modules: FrozenSet[str]
-    callable_descriptor_binding_targets: Tuple[Tuple[type, str], ...]
-    non_callable_mock_targets: FrozenSet[str]
-    non_callable_mock_safe_parameters: FrozenSet[str]
-    uncontrolled_execution_targets: FrozenSet[str]
-    uncontrolled_execution_target_prefixes: Tuple[str, ...]
-    uncontrolled_execution_target_prefix_exceptions: FrozenSet[str]
-    legacy_compatible_non_whitelistable_targets: FrozenSet[str]
-    discovery_targets: FrozenSet[str]
-    protected_function_attributes: FrozenSet[str]
-    protected_objects: Tuple[Any, ...]
+    default_blacklisted_modules: frozenset[str]
+    callable_descriptor_binding_targets: tuple[tuple[type, str], ...]
+    non_callable_mock_targets: frozenset[str]
+    non_callable_mock_safe_parameters: frozenset[str]
+    uncontrolled_execution_targets: frozenset[str]
+    uncontrolled_execution_target_prefixes: tuple[str, ...]
+    uncontrolled_execution_target_prefix_exceptions: frozenset[str]
+    legacy_compatible_non_whitelistable_targets: frozenset[str]
+    discovery_targets: frozenset[str]
+    protected_function_attributes: frozenset[str]
+    protected_objects: tuple[Any, ...]
 
 
-_EXECUTION_POLICY_CONTEXT: ContextVar[Optional[_ExecutionPolicySnapshot]] = ContextVar(
+_EXECUTION_POLICY_CONTEXT: ContextVar[_ExecutionPolicySnapshot | None] = ContextVar(
     "hydra_execution_policy", default=None
 )
-_TRUSTED_INTERNAL_TARGET_CONTEXT: ContextVar[Optional[str]] = ContextVar(
+_TRUSTED_INTERNAL_TARGET_CONTEXT: ContextVar[str | None] = ContextVar(
     "hydra_trusted_internal_target", default=None
 )
 
 
-def _checked_frozenset(name: str, value: Any) -> FrozenSet[str]:
+def _checked_frozenset(name: str, value: Any) -> frozenset[str]:
     if type(value) is not frozenset or any(type(item) is not str for item in value):
         raise InstantiationException(
             f"Hydra execution policy integrity check failed for {name}"
@@ -599,7 +592,7 @@ def _validated_execution_policy(expected_digest: str) -> _ExecutionPolicySnapsho
 
 @contextmanager
 def _execution_policy_context(
-    policy: Optional[_ExecutionPolicySnapshot],
+    policy: _ExecutionPolicySnapshot | None,
 ) -> Iterator[None]:
     if policy is None:
         yield
@@ -616,7 +609,7 @@ def _current_execution_policy() -> _ExecutionPolicySnapshot:
     return _capture_execution_policy() if policy is None else policy
 
 
-def _get_active_execution_policy() -> Optional[_ExecutionPolicySnapshot]:
+def _get_active_execution_policy() -> _ExecutionPolicySnapshot | None:
     return _EXECUTION_POLICY_CONTEXT.get()
 
 
@@ -738,7 +731,7 @@ def _get_bound_receiver(target: Any) -> Any:
 
 def _reject_protected_callable_capability(
     target: Any,
-    args: Tuple[Any, ...],
+    args: tuple[Any, ...],
     resolved_from: str,
     full_key: str,
     execution_whitelist: NormalizedExecutionWhitelist,
@@ -773,7 +766,7 @@ def _reject_protected_callable_capability(
 
 def _reject_code_metadata_access(
     target: Callable[..., Any],
-    args: Tuple[Any, ...],
+    args: tuple[Any, ...],
     full_key: str,
     execution_whitelist: NormalizedExecutionWhitelist,
 ) -> None:
@@ -881,7 +874,7 @@ def _reject_protected_result(
 
 def _reject_code_or_policy_mutation(
     target: Callable[..., Any],
-    args: Tuple[Any, ...],
+    args: tuple[Any, ...],
     full_key: str,
     execution_whitelist: NormalizedExecutionWhitelist,
 ) -> None:
@@ -969,8 +962,8 @@ def _reject_code_or_policy_mutation(
 
 def _reject_process_environment_mutation(
     target: Callable[..., Any],
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
     full_key: str,
     execution_whitelist: NormalizedExecutionWhitelist,
 ) -> None:
@@ -1185,7 +1178,7 @@ def _combine_execution_whitelists(
     if extra is None:
         return base
     return tuple(
-        dict.fromkeys(cast(Tuple[str, ...], base) + cast(Tuple[str, ...], extra))
+        dict.fromkeys(cast(tuple[str, ...], base) + cast(tuple[str, ...], extra))
     )
 
 
@@ -1195,7 +1188,7 @@ class _ExecutionWhitelistPolicy:
     ) -> None:
         self.whitelist = whitelist
         self.reset = reset
-        self._tokens: ContextVar[Tuple[Any, ...]] = ContextVar(
+        self._tokens: ContextVar[tuple[Any, ...]] = ContextVar(
             "hydra_execution_whitelist_tokens", default=()
         )
 
@@ -1219,9 +1212,13 @@ class _ExecutionWhitelistPolicy:
         self._tokens.set(tokens[:-1])
 
 
-ExecutionWhitelist = Union[
-    str, Sequence[str], _UnsafeDisableExecutionChecks, _ExecutionWhitelistPolicy, None
-]
+ExecutionWhitelist = (
+    str
+    | Sequence[str]
+    | _UnsafeDisableExecutionChecks
+    | _ExecutionWhitelistPolicy
+    | None
+)
 
 
 def execution_whitelist(
@@ -1263,7 +1260,7 @@ def _get_active_execution_whitelist() -> NormalizedExecutionWhitelist:
 
 
 def _is_execution_whitelisted(
-    target: str, execution_whitelist: Tuple[str, ...]
+    target: str, execution_whitelist: tuple[str, ...]
 ) -> bool:
     for pattern in execution_whitelist:
         if pattern.endswith(".*"):
@@ -1292,7 +1289,7 @@ def _add_full_key_note(error: BaseException, full_key: str) -> None:
                 pass
 
 
-def _get_target_name_for_check(target: Union[str, type, Callable[..., Any]]) -> str:
+def _get_target_name_for_check(target: str | type | Callable[..., Any]) -> str:
     if isinstance(target, str):
         return target
     module = getattr(target, "__module__", None)
@@ -1577,7 +1574,7 @@ def _reject_non_whitelistable_target(
         )
 
 
-def _is_exactly_whitelisted(target: str, execution_whitelist: Tuple[str, ...]) -> bool:
+def _is_exactly_whitelisted(target: str, execution_whitelist: tuple[str, ...]) -> bool:
     """True if target matches a non-wildcard (exact) whitelist entry."""
     return any(
         not pattern.endswith(".*") and target == pattern
@@ -1603,7 +1600,7 @@ def _requires_resolved_authorization(
     if target_name.endswith(".__call__"):
         return True
     return not _is_exactly_whitelisted(
-        target_name, cast(Tuple[str, ...], execution_whitelist)
+        target_name, cast(tuple[str, ...], execution_whitelist)
     )
 
 
@@ -1636,7 +1633,7 @@ def _authorize_target_name(
                 )
             )
     elif not _is_execution_whitelisted(
-        target_name, cast(Tuple[str, ...], execution_whitelist)
+        target_name, cast(tuple[str, ...], execution_whitelist)
     ):
         raise InstantiationException(
             _with_full_key(
@@ -1648,11 +1645,11 @@ def _authorize_target_name(
 
 def _authorize_discovery_path(
     target: Callable[..., Any],
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
     full_key: str,
     execution_whitelist: NormalizedExecutionWhitelist,
-) -> Optional[str]:
+) -> str | None:
     """Authorize the dotpath consumed by a Hydra discovery helper."""
     target_name = _get_resolved_target_name_for_check(target)
     if target_name not in _current_execution_policy().discovery_targets:
@@ -1718,9 +1715,9 @@ def _authorize_callable_result(
 
 def _get_effective_target_invocation(
     target: Callable[..., Any],
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
-) -> Tuple[Callable[..., Any], Tuple[Any, ...], Dict[str, Any]]:
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+) -> tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]:
     """Return the callable and arguments an indirect invocation will use."""
     args = tuple(args)
     seen: set[int] = set()
@@ -1767,13 +1764,13 @@ def _get_effective_target_invocation(
 
 def _authorize_target_invocation(
     target: Callable[..., Any],
-    args: Tuple[Any, ...],
-    kwargs: Dict[str, Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
     full_key: str,
     execution_whitelist: NormalizedExecutionWhitelist,
     *,
     allow_incomplete_partial: bool = False,
-) -> Tuple[Callable[..., Any], Tuple[Any, ...], Dict[str, Any]]:
+) -> tuple[Callable[..., Any], tuple[Any, ...], dict[str, Any]]:
     """Reject argument-sensitive construction surfaces before invoking them."""
     original_target = target
     target, args, kwargs = _get_effective_target_invocation(target, args, kwargs)
@@ -1865,10 +1862,10 @@ class _DeferredTarget(functools.partial):  # type: ignore[type-arg]
     _hydra_resolved_from: str
     _hydra_full_key: str
     _hydra_execution_whitelist: NormalizedExecutionWhitelist
-    _hydra_execution_policy: Optional[_ExecutionPolicySnapshot] = None
-    _hydra_call_context: Optional[
-        Callable[["_DeferredTarget", Tuple[Any, ...], Dict[str, Any]], Any]
-    ] = None
+    _hydra_execution_policy: _ExecutionPolicySnapshot | None = None
+    _hydra_call_context: (
+        Callable[["_DeferredTarget", tuple[Any, ...], dict[str, Any]], Any] | None
+    ) = None
 
     def __copy__(self) -> "_DeferredTarget":
         copied = type(self)(
@@ -1879,7 +1876,7 @@ class _DeferredTarget(functools.partial):  # type: ignore[type-arg]
         copied.__dict__.update(self.__dict__)
         return copied
 
-    def __deepcopy__(self, memo: Dict[int, Any]) -> "_DeferredTarget":
+    def __deepcopy__(self, memo: dict[int, Any]) -> "_DeferredTarget":
         copied = type(self)(cast(Callable[..., Any], self.func))
         memo[id(self)] = copied
         attributes = dict(self.__dict__)
@@ -1897,10 +1894,10 @@ class _DeferredTarget(functools.partial):  # type: ignore[type-arg]
         )
         return copied
 
-    def __reduce__(self) -> Union[str, Tuple[Any, ...]]:
+    def __reduce__(self) -> str | tuple[Any, ...]:
         raise TypeError("Hydra _partial_ factories cannot be pickled before invocation")
 
-    def __reduce_ex__(self, _protocol: SupportsIndex, /) -> Union[str, Tuple[Any, ...]]:
+    def __reduce_ex__(self, _protocol: SupportsIndex, /) -> str | tuple[Any, ...]:
         return self.__reduce__()
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
@@ -1951,10 +1948,9 @@ def _mediate_target_result(
     full_key: str,
     execution_whitelist: NormalizedExecutionWhitelist,
     *,
-    discovery_path: Optional[str] = None,
-    call_context: Optional[
-        Callable[[_DeferredTarget, Tuple[Any, ...], Dict[str, Any]], Any]
-    ] = None,
+    discovery_path: str | None = None,
+    call_context: Callable[[_DeferredTarget, tuple[Any, ...], dict[str, Any]], Any]
+    | None = None,
 ) -> Any:
     """Authorize callable results and keep deferred partial results mediated."""
     guard_returned_partial = (

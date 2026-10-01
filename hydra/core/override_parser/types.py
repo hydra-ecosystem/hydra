@@ -1,11 +1,12 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import builtins
 import decimal
 import fnmatch
 from copy import copy
 from dataclasses import dataclass, field
 from enum import Enum
 from random import shuffle
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Union, cast
+from typing import Any, Callable, Iterator, cast
 
 from omegaconf import OmegaConf
 from omegaconf._utils import is_structured_config
@@ -72,23 +73,23 @@ class QuotedString:
 
 @dataclass
 class Sweep:
-    tags: Set[str] = field(default_factory=set)
+    tags: set[str] = field(default_factory=set)
 
 
 @dataclass
 class ChoiceSweep(Sweep):
     # simple form: a,b,c
     # explicit form: choices(a,b,c)
-    list: List["ParsedElementType"] = field(default_factory=list)
+    list: builtins.list["ParsedElementType"] = field(default_factory=list)
     simple_form: bool = False
     shuffle: bool = False
 
 
 @dataclass
 class FloatRange:
-    start: Union[decimal.Decimal, float, int]
-    stop: Union[decimal.Decimal, float, int]
-    step: Union[decimal.Decimal, float, int]
+    start: decimal.Decimal | float | int
+    stop: decimal.Decimal | float | int
+    step: decimal.Decimal | float | int
     _idx: int = field(default=0, init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
@@ -128,13 +129,13 @@ class RangeSweep(Sweep):
     Discrete range of numbers
     """
 
-    start: Optional[Union[int, float, decimal.Decimal]] = None
-    stop: Optional[Union[int, float, decimal.Decimal]] = None
-    step: Union[int, float, decimal.Decimal] = 1
+    start: int | float | decimal.Decimal | None = None
+    stop: int | float | decimal.Decimal | None = None
+    step: int | float | decimal.Decimal = 1
 
     shuffle: bool = False
 
-    def range(self) -> Union[range, FloatRange]:
+    def range(self) -> range | FloatRange:
         assert self.start is not None
         assert self.stop is not None
 
@@ -153,8 +154,8 @@ class RangeSweep(Sweep):
 
 @dataclass
 class IntervalSweep(Sweep):
-    start: Optional[float] = None
-    end: Optional[float] = None
+    start: float | None = None
+    end: float | None = None
 
     def __eq__(self, other: Any) -> Any:
         if isinstance(other, IntervalSweep):
@@ -176,8 +177,8 @@ class IntervalSweep(Sweep):
 
 # Ideally we would use List[ElementType] and Dict[str, ElementType] but Python does not seem
 # to support recursive type definitions.
-ElementType = Union[str, int, float, bool, List[Any], Dict[str, Any]]
-ParsedElementType = Optional[Union[ElementType, QuotedString]]
+ElementType = str | int | float | bool | list[Any] | dict[str, Any]
+ParsedElementType = ElementType | QuotedString | None
 TransformerType = Callable[[ParsedElementType], Any]
 
 
@@ -202,16 +203,16 @@ class ValueType(Enum):
 class Key:
     # the config-group or config dot-path
     key_or_group: str
-    package: Optional[str] = None
+    package: str | None = None
 
 
 @dataclass
 class Glob:
-    include: List[str] = field(default_factory=list)
-    exclude: List[str] = field(default_factory=list)
+    include: list[str] = field(default_factory=list)
+    exclude: list[str] = field(default_factory=list)
 
-    def filter(self, names: List[str]) -> List[str]:
-        def match(s: str, globs: List[str]) -> bool:
+    def filter(self, names: list[str]) -> list[str]:
+        def match(s: str, globs: list[str]) -> bool:
             for g in globs:
                 if fnmatch.fnmatch(s, g):
                     return True
@@ -227,7 +228,7 @@ class Glob:
 
 @dataclass
 class ListExtensionOverrideValue:
-    values: List["ParsedElementType"]
+    values: list["ParsedElementType"]
 
 
 class Transformer:
@@ -257,19 +258,19 @@ class Override:
     key_or_group: str
 
     # The type of the value, None if there is no value
-    value_type: Optional[ValueType]
+    value_type: ValueType | None
 
     # The parsed value (component after the =).
-    _value: Union[ParsedElementType, ChoiceSweep, RangeSweep, IntervalSweep]
+    _value: ParsedElementType | ChoiceSweep | RangeSweep | IntervalSweep
 
     # Optional qualifying package
-    package: Optional[str] = None
+    package: str | None = None
 
     # Input line used to construct this
-    input_line: Optional[str] = None
+    input_line: str | None = None
 
     # Configs repo
-    config_loader: Optional[ConfigLoader] = None
+    config_loader: ConfigLoader | None = None
 
     def is_delete(self) -> bool:
         """
@@ -296,12 +297,12 @@ class Override:
         return self.type == OverrideType.EXTEND_LIST
 
     @staticmethod
-    def _convert_value(value: ParsedElementType) -> Optional[ElementType]:
+    def _convert_value(value: ParsedElementType) -> ElementType | None:
         if isinstance(value, list):
             return [Override._convert_value(x) for x in value]
         elif isinstance(value, dict):
             return cast(
-                Dict[str, Any],
+                dict[str, Any],
                 {
                     # We ignore potential type mismatch here so as to let OmegaConf
                     # raise an explicit error in case of invalid type.
@@ -316,7 +317,7 @@ class Override:
 
     def value(
         self,
-    ) -> Optional[Union[ElementType, ChoiceSweep, RangeSweep, IntervalSweep]]:
+    ) -> ElementType | ChoiceSweep | RangeSweep | IntervalSweep | None:
         """
         :return: the value. replaces Quoted strings by regular strings
         """

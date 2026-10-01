@@ -18,13 +18,7 @@ from textwrap import dedent
 from types import FrameType, FunctionType, TracebackType
 from typing import (
     Any,
-    Dict,
-    List,
-    Optional,
     Sequence,
-    Set,
-    Tuple,
-    Union,
     cast,
 )
 
@@ -49,12 +43,12 @@ def simple_stdout_log_config(level: int = logging.INFO) -> None:
 
 def configure_log(
     log_config: DictConfig,
-    verbose_config: Union[bool, str, Sequence[str]] = False,
+    verbose_config: bool | str | Sequence[str] = False,
     execution_whitelist: Any = None,
 ) -> None:
     assert isinstance(verbose_config, (bool, str)) or OmegaConf.is_list(verbose_config)
     if log_config is not None:
-        conf: Dict[str, Any] = OmegaConf.to_container(  # type: ignore
+        conf: dict[str, Any] = OmegaConf.to_container(  # type: ignore
             log_config, resolve=True
         )
         if conf["root"] is not None:
@@ -120,7 +114,7 @@ def run_job(
     task_function: TaskFunction,
     config: DictConfig,
     job_dir_key: str,
-    job_subdir_key: Optional[str],
+    job_subdir_key: str | None,
     hydra_context: HydraContext,
     configure_logging: bool = True,
 ) -> "JobReturn":
@@ -142,7 +136,7 @@ def _run_job(
     task_function: TaskFunction,
     config: DictConfig,
     job_dir_key: str,
-    job_subdir_key: Optional[str],
+    job_subdir_key: str | None,
     hydra_context: HydraContext,
     configure_logging: bool = True,
 ) -> "JobReturn":
@@ -217,7 +211,7 @@ def _run_job(
         ret.task_name = JobRuntime.instance().get("name")
         job_started = False
         control_flow_exception_active = False
-        handoff_error: Optional[BaseException] = None
+        handoff_error: BaseException | None = None
         try:
             try:
                 with env_override(hydra_cfg.hydra.job.env_set):
@@ -296,12 +290,12 @@ def get_valid_filename(s: str) -> str:
 class OverrideDirnameOptions:
     kv_sep: str = "="
     item_sep: str = ","
-    exclude_keys: List[str] = field(default_factory=list)
-    element_resolver: Optional[str] = None
+    exclude_keys: list[str] = field(default_factory=list)
+    element_resolver: str | None = None
 
 
 def _get_override_dirname_options(
-    options: Optional[Union[Dict[str, Any], DictConfig]], hydra_conf: DictConfig
+    options: dict[str, Any] | DictConfig | None, hydra_conf: DictConfig
 ) -> OverrideDirnameOptions:
     if options is None:
         old = hydra_conf.job.config.override_dirname
@@ -320,7 +314,7 @@ def _get_override_dirname_options(
         )
 
     if isinstance(options, DictConfig):
-        options = cast(Dict[str, Any], OmegaConf.to_container(options, resolve=True))
+        options = cast(dict[str, Any], OmegaConf.to_container(options, resolve=True))
 
     if not isinstance(options, dict):
         raise TypeError("hydra_override_dirname options must be a dictionary")
@@ -367,7 +361,7 @@ def _resolve_override_dirname_item(item: str, root: DictConfig) -> str:
 
 
 def hydra_override_dirname(
-    options: Optional[Union[Dict[str, Any], DictConfig]] = None,
+    options: dict[str, Any] | DictConfig | None = None,
     *,
     _root_: DictConfig,
     _parent_: DictConfig,
@@ -477,22 +471,22 @@ class _SyntheticTraceback(Exception):
 
 
 _TRACEBACK_STUB = compile("raise _SyntheticTraceback", "<remote traceback>", "exec")
-_SerializedTraceback = List[Tuple[str, str, int]]
-_SerializedExceptionChain = List[Tuple[str, "_SerializedExceptionNode"]]
-_SerializedExceptionNode = Tuple[
+_SerializedTraceback = list[tuple[str, str, int]]
+_SerializedExceptionChain = list[tuple[str, "_SerializedExceptionNode"]]
+_SerializedExceptionNode = tuple[
     str,
     str,
     str,
     bool,
     _SerializedTraceback,
     _SerializedExceptionChain,
-    List["_SerializedExceptionNode"],
-    List[str],
+    list["_SerializedExceptionNode"],
+    list[str],
 ]
-_SerializedExceptionGroup = List[_SerializedExceptionNode]
+_SerializedExceptionGroup = list[_SerializedExceptionNode]
 
 
-def _serialize_traceback(tb: Optional[TracebackType]) -> _SerializedTraceback:
+def _serialize_traceback(tb: TracebackType | None) -> _SerializedTraceback:
     result = []
     while tb is not None:
         code = tb.tb_frame.f_code
@@ -508,7 +502,7 @@ def _safe_exception_message(error: BaseException) -> str:
         return "<exception message unavailable>"
 
 
-def _exception_notes(error: BaseException) -> List[str]:
+def _exception_notes(error: BaseException) -> list[str]:
     try:
         notes = getattr(error, "__notes__", ())
     except BaseException:
@@ -517,7 +511,7 @@ def _exception_notes(error: BaseException) -> List[str]:
 
 
 def _serialize_exception_chain(
-    error: BaseException, ancestors: Optional[Set[int]] = None
+    error: BaseException, ancestors: set[int] | None = None
 ) -> _SerializedExceptionChain:
     seen = set() if ancestors is None else set(ancestors)
     seen.add(id(error))
@@ -580,9 +574,7 @@ def _exception_payload_matches(
     )
 
 
-def _has_non_string_notes(
-    error: BaseException, seen: Optional[Set[int]] = None
-) -> bool:
+def _has_non_string_notes(error: BaseException, seen: set[int] | None = None) -> bool:
     if seen is None:
         seen = set()
     if id(error) in seen:
@@ -605,7 +597,7 @@ def _has_non_string_notes(
 
 
 def _serialize_exception_node(
-    error: BaseException, ancestors: Optional[Set[int]] = None
+    error: BaseException, ancestors: set[int] | None = None
 ) -> _SerializedExceptionNode:
     seen = set() if ancestors is None else set(ancestors)
     seen.add(id(error))
@@ -630,7 +622,7 @@ def _serialize_exception_node(
 
 def _serialize_exception_group(
     error: BaseException,
-) -> Optional[_SerializedExceptionGroup]:
+) -> _SerializedExceptionGroup | None:
     members = _exception_group_members(error)
     if not members:
         return None
@@ -656,9 +648,9 @@ def _create_synthetic_frame(filename: str, name: str, lineno: int) -> FrameType:
 
 
 def _deserialize_traceback(
-    serialized: Sequence[Tuple[str, str, int]],
-) -> Optional[TracebackType]:
-    result: Optional[TracebackType] = None
+    serialized: Sequence[tuple[str, str, int]],
+) -> TracebackType | None:
+    result: TracebackType | None = None
     for filename, name, lineno in reversed(serialized):
         frame = _create_synthetic_frame(filename, name, lineno)
         result = TracebackType(result, frame, -1, lineno)
@@ -667,7 +659,7 @@ def _deserialize_traceback(
 
 def _deserialize_exception_chain(
     serialized: _SerializedExceptionChain,
-) -> Optional[Tuple[str, BaseException]]:
+) -> tuple[str, BaseException] | None:
     if not serialized:
         return None
     relation, node = serialized[0]
@@ -712,7 +704,7 @@ def _deserialize_exception_node(serialized: _SerializedExceptionNode) -> BaseExc
     _restore_exception_notes(error, notes)
     if chain:
         relation, chained = cast(
-            Tuple[str, BaseException], _deserialize_exception_chain(chain)
+            tuple[str, BaseException], _deserialize_exception_chain(chain)
         )
         if relation == "cause":
             error.__cause__ = chained
@@ -729,7 +721,7 @@ def _restore_exception_node(
     _restore_exception_notes(error, extra[0] if extra else [])
     if remote_chain:
         relation, chained = cast(
-            Tuple[str, BaseException], _deserialize_exception_chain(remote_chain)
+            tuple[str, BaseException], _deserialize_exception_chain(remote_chain)
         )
         if relation == "cause":
             error.__cause__ = chained
@@ -744,24 +736,24 @@ def _restore_exception_node(
 
 @dataclass
 class JobReturn:
-    overrides: Optional[Sequence[str]] = None
-    cfg: Optional[DictConfig] = None
-    hydra_cfg: Optional[DictConfig] = None
-    working_dir: Optional[str] = None
-    task_name: Optional[str] = None
+    overrides: Sequence[str] | None = None
+    cfg: DictConfig | None = None
+    hydra_cfg: DictConfig | None = None
+    working_dir: str | None = None
+    task_name: str | None = None
     status: JobStatus = JobStatus.UNKNOWN
     _return_value: Any = None
-    _remote_traceback: Optional[_SerializedTraceback] = field(
+    _remote_traceback: _SerializedTraceback | None = field(
         default=None, repr=False, compare=False
     )
-    _remote_exception_chain: Optional[_SerializedExceptionChain] = field(
+    _remote_exception_chain: _SerializedExceptionChain | None = field(
         default=None, repr=False, compare=False
     )
-    _remote_exception_group: Optional[_SerializedExceptionGroup] = field(
+    _remote_exception_group: _SerializedExceptionGroup | None = field(
         default=None, repr=False, compare=False
     )
 
-    def __getstate__(self) -> Dict[str, Any]:
+    def __getstate__(self) -> dict[str, Any]:
         state = self.__dict__.copy()
         error = self._return_value
         if self.status is JobStatus.FAILED and isinstance(error, BaseException):
@@ -795,7 +787,7 @@ class JobReturn:
             state["_return_value"] = fallback
         return state
 
-    def __setstate__(self, state: Dict[str, Any]) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         serialized_error = state.pop("_return_value_pickle", None)
         self.__dict__.update(state)
         if serialized_error is not None:
@@ -821,7 +813,7 @@ class JobReturn:
             ):
                 if self._remote_exception_chain:
                     relation, chained = cast(
-                        Tuple[str, BaseException],
+                        tuple[str, BaseException],
                         _deserialize_exception_chain(self._remote_exception_chain),
                     )
                     if relation == "cause":
@@ -858,7 +850,7 @@ def _set_job_return_handoff(error: BaseException, job_return: JobReturn) -> None
         pass
 
 
-def _take_job_return_handoff(error: BaseException) -> Optional[JobReturn]:
+def _take_job_return_handoff(error: BaseException) -> JobReturn | None:
     try:
         handoff = object.__getattribute__(error, "__dict__").pop(
             _JOB_RETURN_HANDOFF_KEY, None
@@ -891,7 +883,7 @@ class JobRuntime(metaclass=Singleton):
         self.conf[key] = value
 
 
-def validate_config_path(config_path: Optional[str]) -> None:
+def validate_config_path(config_path: str | None) -> None:
     if config_path is not None:
         split_file = splitext(config_path)
         if split_file[1] in (".yaml", ".yml"):
@@ -903,7 +895,7 @@ def validate_config_path(config_path: Optional[str]) -> None:
 
 
 @contextmanager
-def env_override(env: Dict[str, str]) -> Any:
+def env_override(env: dict[str, str]) -> Any:
     """Temporarily set environment variables inside the context manager and
     fully restore previous environment afterwards
     """

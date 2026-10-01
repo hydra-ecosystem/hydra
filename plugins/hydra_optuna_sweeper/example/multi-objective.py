@@ -1,12 +1,11 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import Tuple
 
 import hydra
 from omegaconf import DictConfig
 
 
 @hydra.main(config_path="multi-objective-conf", config_name="config")
-def binh_and_korn(cfg: DictConfig) -> Tuple[float, float]:
+def binh_and_korn(cfg: DictConfig) -> tuple[float, float]:
     x: float = cfg.x
     y: float = cfg.y
 

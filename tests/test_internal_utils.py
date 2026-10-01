@@ -1,5 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from omegaconf import DictConfig, OmegaConf
 from pytest import mark, param, raises
@@ -48,8 +48,8 @@ def test_get_class_name(config: DictConfig, expected: Any) -> None:
 )
 def test_detect_calling_file_or_module_from_task_function(
     task_function: Callable[..., None],
-    expected_file: Optional[str],
-    expected_module: Optional[str],
+    expected_file: str | None,
+    expected_module: str | None,
 ) -> None:
     file, module = utils.detect_calling_file_or_module_from_task_function(task_function)
     assert file == expected_file

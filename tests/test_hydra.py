@@ -8,7 +8,7 @@ import warnings
 from logging import getLogger
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, List, Optional, Set, cast
+from typing import Any, cast
 from unittest.mock import Mock, patch
 
 from omegaconf import DictConfig, OmegaConf
@@ -79,7 +79,7 @@ def test_hydra_main_omitted_version_base(hydra_restore_singletons: Any) -> None:
 
 @mark.parametrize("version_base", [None, "1.3", "1.4"])
 def test_hydra_main_explicit_version_base_is_deprecated(
-    hydra_restore_singletons: Any, version_base: Optional[str]
+    hydra_restore_singletons: Any, version_base: str | None
 ) -> None:
     with warns(
         Hydra15MigrationWarning,
@@ -477,7 +477,7 @@ def test_module_env_override(tmpdir: Path, env_name: str) -> None:
     "flag,expected_keys",
     [("--cfg=all", ["db", "hydra"]), ("--cfg=hydra", ["hydra"]), ("--cfg=job", ["db"])],
 )
-def test_cfg(tmpdir: Path, flag: str, resolve: bool, expected_keys: List[str]) -> None:
+def test_cfg(tmpdir: Path, flag: str, resolve: bool, expected_keys: list[str]) -> None:
     cmd = [
         "examples/tutorials/basic/your_first_hydra_app/5_defaults/my_app.py",
         f'hydra.run.dir="{str(tmpdir)}"',
@@ -530,7 +530,7 @@ def test_cfg(tmpdir: Path, flag: str, resolve: bool, expected_keys: List[str]) -
     ],
 )
 def test_cfg_with_package(
-    tmpdir: Path, flags: List[str], resolve: bool, expected: str
+    tmpdir: Path, flags: list[str], resolve: bool, expected: str
 ) -> None:
     cmd = [
         "examples/tutorials/basic/your_first_hydra_app/5_defaults/my_app.py",
@@ -582,7 +582,7 @@ def test_cfg_with_package(
     ],
 )
 def test_cfg_resolve_interpolation(
-    tmpdir: Path, script: str, resolve: bool, flags: List[str], expected: str
+    tmpdir: Path, script: str, resolve: bool, flags: list[str], expected: str
 ) -> None:
     cmd = [
         script,
@@ -696,7 +696,7 @@ def test_class_task_error_shows_application_traceback(tmp_path: Path) -> None:
     "other_flag",
     [None, "--run", "--multirun", "--info", "--shell-completion", "--hydra-help"],
 )
-def test_resolve_flag_errmsg(tmpdir: Path, other_flag: Optional[str]) -> None:
+def test_resolve_flag_errmsg(tmpdir: Path, other_flag: str | None) -> None:
     cmd = [
         "examples/tutorials/basic/your_first_hydra_app/3_using_config/my_app.py",
         f'hydra.run.dir="{str(tmpdir)}"',
@@ -725,7 +725,7 @@ def test_multirun_with_free_override(
     hydra_sweep_runner: TSweepRunner,
     calling_file: str,
     calling_module: str,
-    overrides: List[str],
+    overrides: list[str],
 ) -> None:
     sweep = hydra_sweep_runner(
         calling_file=calling_file,
@@ -996,7 +996,7 @@ for details.
     ],
 )
 def test_help(
-    tmpdir: Path, script: str, flags: List[str], overrides: List[str], expected: Any
+    tmpdir: Path, script: str, flags: list[str], overrides: list[str], expected: Any
 ) -> None:
     cmd = [script, f'hydra.run.dir="{str(tmpdir)}"', "hydra.job.chdir=True"]
     cmd.extend(overrides)
@@ -1034,8 +1034,8 @@ def test_help_preserves_custom_config_loader_signature(
     hydra_restore_singletons: Any,
 ) -> None:
     def legacy_load_configuration(
-        config_name: Optional[str],
-        overrides: List[str],
+        config_name: str | None,
+        overrides: list[str],
         run_mode: RunMode,
         from_shell: bool = True,
         validate_sweep_overrides: bool = True,
@@ -1112,7 +1112,7 @@ def test_shell_completion_help(tmpdir: Path) -> None:
         ),
     ],
 )
-def test_searchpath_config(tmpdir: Path, overrides: List[str], expected: str) -> None:
+def test_searchpath_config(tmpdir: Path, overrides: list[str], expected: str) -> None:
     cmd = ["examples/advanced/config_search_path/my_app.py"]
     cmd.extend(overrides)
     cmd.extend([f'hydra.run.dir="{str(tmpdir)}"', "hydra.job.chdir=True"])
@@ -1186,7 +1186,7 @@ def test_sys_exit(tmpdir: Path) -> None:
     ],
 )
 def test_local_run_workdir(
-    tmpdir: Path, task_config: DictConfig, overrides: List[str], expected_dir: str
+    tmpdir: Path, task_config: DictConfig, overrides: list[str], expected_dir: str
 ) -> None:
     cfg = OmegaConf.create(task_config)
     assert isinstance(cfg, DictConfig)
@@ -1306,8 +1306,8 @@ def test_hydra_env_set_with_override(tmpdir: Path) -> None:
 def test_override_with_invalid_group_choice(
     hydra_restore_singletons: Any,
     hydra_task_runner: TTaskRunner,
-    calling_file: Optional[str],
-    calling_module: Optional[str],
+    calling_file: str | None,
+    calling_module: str | None,
     override: str,
 ) -> None:
     msg = dedent(f"""\
@@ -1377,8 +1377,8 @@ def test_hydra_output_dir(
     hydra_task_runner: TTaskRunner,
     calling_file: str,
     calling_module: str,
-    overrides: List[str],
-    expected_files: Set[str],
+    overrides: list[str],
+    expected_files: set[str],
 ) -> None:
     with hydra_task_runner(
         calling_file=calling_file,
@@ -1408,7 +1408,7 @@ def test_hydra_output_dir(
     ],
 )
 def test_module_run(
-    tmpdir: Any, directory: str, file: str, module: str, error: Optional[str]
+    tmpdir: Any, directory: str, file: str, module: str, error: str | None
 ) -> None:
     cmd = [
         directory + "/" + file,
@@ -1461,7 +1461,7 @@ def test_module_run(
     ],
 )
 def test_multirun_structured_conflict(
-    tmpdir: Any, overrides: List[str], error: bool, expected: Any
+    tmpdir: Any, overrides: list[str], error: bool, expected: Any
 ) -> None:
     cmd = [
         "tests/test_apps/multirun_structured_conflict/my_app.py",
@@ -1535,7 +1535,7 @@ class TestVariousRuns:
         ],
     )
     def test_run_with_missing_default(
-        self, cmd_base: List[str], tmpdir: Any, sweep: bool
+        self, cmd_base: list[str], tmpdir: Any, sweep: bool
     ) -> None:
         cmd = cmd_base + [
             "hydra.sweep.dir=" + str(tmpdir),
@@ -1554,7 +1554,7 @@ Available options:
         assert re.search(re.escape(expected), ret) is not None
 
     def test_command_line_interpolations_evaluated_lazily(
-        self, cmd_base: List[str], tmpdir: Any
+        self, cmd_base: list[str], tmpdir: Any
     ) -> None:
         cmd = cmd_base + [
             "hydra.sweep.dir=" + str(tmpdir),
@@ -1572,7 +1572,7 @@ bar: 20"""
         assert normalize_newlines(ret) == normalize_newlines(expected)
 
     def test_multirun_config_overrides_evaluated_lazily(
-        self, cmd_base: List[str], tmpdir: Any
+        self, cmd_base: list[str], tmpdir: Any
     ) -> None:
         cmd = cmd_base + [
             "hydra.sweep.dir=" + str(tmpdir),
@@ -1589,7 +1589,7 @@ bar: 20"""
         ret, _err = run_python_script(cmd)
         assert normalize_newlines(ret) == normalize_newlines(expected)
 
-    def test_multirun_defaults_override(self, cmd_base: List[str], tmpdir: Any) -> None:
+    def test_multirun_defaults_override(self, cmd_base: list[str], tmpdir: Any) -> None:
         cmd = cmd_base + [
             "hydra.sweep.dir=" + str(tmpdir),
             "hydra.job.chdir=True",
@@ -1606,7 +1606,7 @@ bar: 100"""
         ret, _err = run_python_script(cmd)
         assert normalize_newlines(ret) == normalize_newlines(expected)
 
-    def test_run_pass_list(self, cmd_base: List[str], tmpdir: Any) -> None:
+    def test_run_pass_list(self, cmd_base: list[str], tmpdir: Any) -> None:
         cmd = cmd_base + [
             "hydra.sweep.dir=" + str(tmpdir),
             "hydra.job.chdir=True",
@@ -1687,7 +1687,7 @@ def test_hydra_to_job_config_interpolation(tmpdir: Any) -> Any:
     ],
 )
 def test_config_dir_argument(
-    monkeypatch: Any, tmpdir: Path, overrides: List[str], expected: DictConfig
+    monkeypatch: Any, tmpdir: Path, overrides: list[str], expected: DictConfig
 ) -> None:
     monkeypatch.chdir("tests/test_apps/user-config-dir")
     cmd = [
@@ -2030,7 +2030,7 @@ def test_app_with_unicode_config(tmpdir: Path) -> None:
     ],
 )
 def test_frozen_primary_config(
-    tmpdir: Path, overrides: List[str], expected: str
+    tmpdir: Path, overrides: list[str], expected: str
 ) -> None:
     cmd = [
         "examples/patterns/write_protect_config_node/frozen.py",
@@ -2088,7 +2088,7 @@ def test_hydra_deprecation_warning(
         (True, ["0/my_app.log", "0/.hydra/config.yaml", "multirun.yaml"]),
     ],
 )
-def test_disable_chdir(tmpdir: Path, multirun: bool, expected: List[str]) -> None:
+def test_disable_chdir(tmpdir: Path, multirun: bool, expected: list[str]) -> None:
     cmd = [
         "examples/tutorials/basic/running_your_hydra_app/3_working_directory/my_app.py",
         f'hydra.run.dir="{tmpdir}"',
@@ -2302,11 +2302,11 @@ def test_hydra_resolver_in_output_dir(tmpdir: Path, multirun: bool) -> None:
 )
 def test_hydra_mode(
     tmpdir: Path,
-    overrides: List[str],
+    overrides: list[str],
     expected_output: str,
     error: bool,
     warning: bool,
-    warning_msg: Optional[str],
+    warning_msg: str | None,
 ) -> None:
     cmd = [
         "tests/test_apps/app_print_hydra_mode/my_app.py",
@@ -2380,8 +2380,8 @@ def test_hydra_mode(
 def test_hydra_mode_discovery_does_not_compose(
     hydra_restore_singletons: Any,
     config_name: str,
-    overrides: List[str],
-    expected: Optional[RunMode],
+    overrides: list[str],
+    expected: RunMode | None,
 ) -> None:
     hydra = Hydra.create_main_hydra_file_or_module(
         calling_file="tests/test_apps/app_print_hydra_mode/my_app.py",
@@ -2530,11 +2530,11 @@ def test_hydra_runtime_choice_1882(tmpdir: Path) -> None:
 
 
 RESOLVED: dict[str, Any] = {}
-CALLBACK_EVENTS: List[str] = []
-CALLBACK_JOB_RETURNS: List[Any] = []
-CALLBACK_SERIALIZED_JOB_RETURNS: List[Any] = []
-CALLBACK_JOB_RETURN_HANDOFFS: List[bool] = []
-CALLBACK_SERIALIZATION_ERRORS: List[BaseException] = []
+CALLBACK_EVENTS: list[str] = []
+CALLBACK_JOB_RETURNS: list[Any] = []
+CALLBACK_SERIALIZED_JOB_RETURNS: list[Any] = []
+CALLBACK_JOB_RETURN_HANDOFFS: list[bool] = []
+CALLBACK_SERIALIZATION_ERRORS: list[BaseException] = []
 
 
 class ControllerProbe(Callback):

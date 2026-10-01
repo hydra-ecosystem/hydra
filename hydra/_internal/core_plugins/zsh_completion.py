@@ -1,6 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import logging
-from typing import Optional
 
 from hydra.core.config_loader import ConfigLoader
 from hydra.plugins.completion_plugin import CompletionPlugin
@@ -25,7 +24,7 @@ class ZshCompletion(CompletionPlugin):
     def provides() -> str:
         return "zsh"
 
-    def query(self, config_name: Optional[str]) -> None:
+    def query(self, config_name: str | None) -> None:
         self.delegate.query(config_name)
 
     @staticmethod

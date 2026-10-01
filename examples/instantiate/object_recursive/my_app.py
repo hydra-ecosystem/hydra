@@ -1,5 +1,4 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import List
 
 from omegaconf import DictConfig
 
@@ -20,7 +19,7 @@ class Wheel:
 
 
 class Car:
-    def __init__(self, driver: Driver, wheels: List[Wheel]):
+    def __init__(self, driver: Driver, wheels: list[Wheel]):
         self.driver = driver
         self.wheels = wheels
 

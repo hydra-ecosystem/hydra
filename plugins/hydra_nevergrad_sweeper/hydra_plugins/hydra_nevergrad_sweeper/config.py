@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional
+from typing import Any
 
 from hydra.core.config_store import ConfigStore
 
@@ -12,19 +12,19 @@ class ScalarConfigSpec:
     """
 
     # lower bound if any
-    lower: Optional[float] = None
+    lower: float | None = None
 
     # upper bound if any
-    upper: Optional[float] = None
+    upper: float | None = None
 
     # initial value
     # default to the middle point if completely bounded
-    init: Optional[float] = None
+    init: float | None = None
 
     # step size for an update
     # defaults to 1 if unbounded
     # or 1/6 of the range if completely bounded
-    step: Optional[float] = None
+    step: float | None = None
 
     # cast to integer
     integer: bool = False
@@ -60,7 +60,7 @@ class OptimConf:
     maximize: bool = False
 
     # optimization seed, for reproducibility
-    seed: Optional[int] = None
+    seed: int | None = None
 
     # maximum authorized failure rate for a batch of parameters
     max_failure_rate: float = 0.0
@@ -76,10 +76,10 @@ class NevergradSweeperConf:
     optim: OptimConf = field(default_factory=OptimConf)
 
     # Deprecated search-space configuration.
-    parametrization: Optional[Dict[str, Any]] = None
+    parametrization: dict[str, Any] | None = None
 
     # Search-space configuration using Hydra's override grammar.
-    params: Optional[Dict[str, Any]] = None
+    params: dict[str, Any] | None = None
 
 
 ConfigStore.instance().store(

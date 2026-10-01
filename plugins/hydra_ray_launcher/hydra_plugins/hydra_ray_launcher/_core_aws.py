@@ -3,7 +3,7 @@ import logging
 import os
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Sequence, Union, cast
+from typing import Any, Sequence, cast
 
 import cloudpickle  # type: ignore
 from hydra.core.singleton import Singleton
@@ -31,7 +31,7 @@ except ModuleNotFoundError as e:
 log = logging.getLogger(__name__)
 
 
-def _get_abs_code_dir(code_dir: Union[str, Path]) -> str:
+def _get_abs_code_dir(code_dir: str | Path) -> str:
     code_dir = str(code_dir)
     if code_dir:
         if os.path.isabs(code_dir):
@@ -88,7 +88,7 @@ def launch(
             execution_whitelist=execution_whitelist,
         )
     logging_config = cast(
-        Dict[str, Any],
+        dict[str, Any],
         OmegaConf.to_container(launcher.logging, resolve=True, enum_to_str=True),
     )
     sdk.configure_logging(**logging_config)
@@ -134,7 +134,7 @@ def launch_jobs(
     config = OmegaConf.to_container(ray_cluster, resolve=True, enum_to_str=True)
     sdk.create_or_update_cluster(
         config,
-        **cast(Dict[str, Any], launcher.create_update_cluster),
+        **cast(dict[str, Any], launcher.create_update_cluster),
     )
     with tempfile.TemporaryDirectory() as local_tmp_download_dir:
         assert isinstance(config, dict)
@@ -190,7 +190,7 @@ def launch_jobs(
                 or sync_down_cfg.include
                 or sync_down_cfg.exclude
             ):
-                sync_down_source_dir: Union[str, Path] = (
+                sync_down_source_dir: str | Path = (
                     sync_down_cfg.source_dir if sync_down_cfg.source_dir else sweep_dir
                 )
                 target_dir = (
@@ -219,7 +219,7 @@ def launch_jobs(
                 log.info("Deleted the cluster (provider.cache_stopped_nodes=false)")
             sdk.teardown_cluster(
                 config,
-                **cast(Dict[str, Any], launcher.teardown_cluster),
+                **cast(dict[str, Any], launcher.teardown_cluster),
             )
         else:
             log.warning(
@@ -228,7 +228,7 @@ def launch_jobs(
 
         with open(os.path.join(local_tmp_download_dir, JOB_RETURN_PICKLE), "rb") as f:
             job_returns = pickle.load(f)  # nosec
-            assert isinstance(job_returns, List)
+            assert isinstance(job_returns, list)
             for run in job_returns:
                 assert isinstance(run, JobReturn)
             return job_returns

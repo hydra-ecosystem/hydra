@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import logging
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Sequence
 
 from hydra.types import HydraContext
 from hydra.core.config_store import ConfigStore
@@ -47,9 +47,9 @@ ConfigStore.instance().store(
 
 class ExampleLauncher(Launcher):
     def __init__(self, foo: str, bar: str) -> None:
-        self.config: Optional[DictConfig] = None
-        self.task_function: Optional[TaskFunction] = None
-        self.hydra_context: Optional[HydraContext] = None
+        self.config: DictConfig | None = None
+        self.task_function: TaskFunction | None = None
+        self.hydra_context: HydraContext | None = None
 
         # foo and var are coming from the the plugin's configuration
         self.foo = foo
