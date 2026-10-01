@@ -905,3 +905,4 @@
 {"ts": "2026-09-30T21:00:34Z", "kind": "new", "issue": 3491, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491", "title": "Harden callback lifecycle guarantees"}
 {"ts": "2026-10-01T01:52:36Z", "kind": "status", "issue": 3491, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491", "title": "Harden callback lifecycle guarantees", "detail": "not started → in progress", "pr": {"number": 3492, "url": "https://github.com/hydra-ecosystem/hydra/pull/3492"}}
 {"ts": "2026-10-01T01:52:36Z", "kind": "pr", "issue": 3491, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491", "title": "Harden callback lifecycle guarantees", "detail": "linked #3492"}
+{"ts": "2026-10-01T06:23:53Z", "kind": "closed", "issue": 3491, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491", "title": "Harden callback lifecycle guarantees"}

@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T02:55:46Z",
+  "generated_at": "2026-10-01T06:23:53Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 63,
+    "open_total": 62,
     "by_category": [
       {
         "category": "Bug",
@@ -14,8 +14,8 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 52,
-        "percentage": 82.5
+        "count": 51,
+        "percentage": 82.3
       },
       {
         "category": "Documentation",
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,31 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 75
+        "count": 76
       }
     ]
   },
   "issues": [
-    {
-      "number": 3491,
-      "title": "Harden callback lifecycle guarantees",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3492,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3492"
-        }
-      ],
-      "created": "2026-09-30",
-      "updated": "2026-09-30",
-      "labels": [
-        "callbacks"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2304,9 +2284,36 @@
         "bug"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3458"
+    },
+    {
+      "number": 3491,
+      "title": "Harden callback lifecycle guarantees",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3492,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3492"
+        }
+      ],
+      "created": "2026-09-30",
+      "updated": "2026-09-30",
+      "labels": [
+        "callbacks"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-01T06:23:53Z",
+      "kind": "closed",
+      "issue": 3491,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491",
+      "title": "Harden callback lifecycle guarantees"
+    },
     {
       "ts": "2026-10-01T01:52:36Z",
       "kind": "pr",
@@ -3917,18 +3924,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364",
       "title": "Make Compose API initialization contexts nestable and self-contained",
       "detail": "linked #3399"
-    },
-    {
-      "ts": "2026-08-22T07:14:50Z",
-      "kind": "status",
-      "issue": 3364,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364",
-      "title": "Make Compose API initialization contexts nestable and self-contained",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3399,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3399"
-      }
     }
   ]
 }
