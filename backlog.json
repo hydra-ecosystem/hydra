@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T12:44:44Z",
+  "generated_at": "2026-10-01T13:04:45Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 56,
+    "open_total": 55,
     "by_category": [
       {
         "category": "Bug",
@@ -15,7 +15,7 @@
         "category": "Enhancement",
         "emoji": "✨",
         "count": 48,
-        "percentage": 85.7
+        "percentage": 87.3
       },
       {
         "category": "Documentation",
@@ -32,8 +32,8 @@
       {
         "category": "Refactor",
         "emoji": "🔧",
-        "count": 2,
-        "percentage": 3.6
+        "count": 1,
+        "percentage": 1.8
       },
       {
         "category": "Build",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 54
+        "count": 53
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 83
+        "count": 84
       }
     ]
   },
@@ -646,21 +646,6 @@
         "instantiate_api"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3203"
-    },
-    {
-      "number": 3221,
-      "title": "Clean up deprecations older than Hydra 1.2",
-      "category": "Refactor",
-      "category_emoji": "🔧",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-06-20",
-      "updated": "2026-06-25",
-      "labels": [
-        "maintenance"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3221"
     },
     {
       "number": 3224,
@@ -1373,6 +1358,26 @@
         "triage"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2810"
+    },
+    {
+      "number": 2814,
+      "title": "[Feature Request] Allow setting use_srun from submitit launcher",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3500,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3500"
+        }
+      ],
+      "created": "2023-12-06",
+      "updated": "2026-09-05",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2814"
     },
     {
       "number": 2824,
@@ -2312,27 +2317,29 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
     },
     {
-      "number": 2814,
-      "title": "[Feature Request] Allow setting use_srun from submitit launcher",
-      "category": "Enhancement",
-      "category_emoji": "✨",
+      "number": 3221,
+      "title": "Clean up deprecations older than Hydra 1.2",
+      "category": "Refactor",
+      "category_emoji": "🔧",
       "status": "done",
       "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3500,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3500"
-        }
-      ],
-      "created": "2023-12-06",
-      "updated": "2026-09-05",
+      "prs": [],
+      "created": "2026-06-20",
+      "updated": "2026-06-25",
       "labels": [
-        "enhancement"
+        "maintenance"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2814"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3221"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-01T13:04:45Z",
+      "kind": "closed",
+      "issue": 3221,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3221",
+      "title": "Clean up deprecations older than Hydra 1.2"
+    },
     {
       "ts": "2026-10-01T12:44:44Z",
       "kind": "closed",
@@ -3953,13 +3960,6 @@
       "issue": 3406,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin"
-    },
-    {
-      "ts": "2026-08-23T21:28:32Z",
-      "kind": "new",
-      "issue": 3405,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3405",
-      "title": "Reject optional and override on the same Defaults List entry"
     }
   ]
 }
