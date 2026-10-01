@@ -2,6 +2,7 @@
 import copy
 import os
 import pickle
+import re
 import subprocess
 import sys
 import warnings
@@ -18,7 +19,7 @@ from hydra.errors import Hydra15MigrationWarning
 from hydra.experimental.callback import Callback
 from hydra.experimental.callbacks import LogJobReturnCallback
 from hydra.test_utils.test_utils import (
-    assert_regex_match,
+    assert_multiline_regex_search,
     chdir_hydra_root,
     run_python_script,
 )
@@ -146,14 +147,16 @@ def test_callback_control_flow_exception_propagates() -> None:
         param(
             "tests/test_apps/app_with_callbacks/custom_callback/my_app.py",
             [],
-            dedent("""\
+            re.escape(
+                dedent("""\
                 [HYDRA] Init custom_callback
                 [HYDRA] custom_callback on_run_start
                 [JOB] custom_callback on_job_start
                 [JOB] foo: bar
 
                 [JOB] custom_callback on_job_end
-                [JOB] custom_callback on_run_end"""),
+                [JOB] custom_callback on_run_end""")
+            ),
             id="custom_callback",
         ),
         param(
@@ -162,7 +165,8 @@ def test_callback_control_flow_exception_propagates() -> None:
                 "foo=bar",
                 "-m",
             ],
-            dedent("""\
+            re.escape(
+                dedent("""\
                 [HYDRA] Init custom_callback
                 [HYDRA] custom_callback on_multirun_start
                 [HYDRA] Launching 1 jobs locally
@@ -171,7 +175,8 @@ def test_callback_control_flow_exception_propagates() -> None:
                 [JOB] foo: bar
 
                 [JOB] custom_callback on_job_end
-                [HYDRA] custom_callback on_multirun_end"""),
+                [HYDRA] custom_callback on_multirun_end""")
+            ),
             id="custom_callback_multirun",
         ),
         param(
@@ -180,7 +185,8 @@ def test_callback_control_flow_exception_propagates() -> None:
                 "--config-name",
                 "config_with_two_callbacks",
             ],
-            dedent("""\
+            re.escape(
+                dedent("""\
                 [HYDRA] Init callback_1
                 [HYDRA] Init callback_2
                 [HYDRA] callback_1 on_run_start
@@ -192,7 +198,8 @@ def test_callback_control_flow_exception_propagates() -> None:
                 [JOB] callback_2 on_job_end
                 [JOB] callback_1 on_job_end
                 [JOB] callback_2 on_run_end
-                [JOB] callback_1 on_run_end"""),
+                [JOB] callback_1 on_run_end""")
+            ),
             id="two_custom_callbacks",
         ),
         param(
@@ -219,9 +226,9 @@ def test_app_with_callbacks(
     cmd.extend(args)
     result, _err = run_python_script(cmd)
 
-    assert_regex_match(
-        from_line=expected,
-        to_line=result,
+    assert_multiline_regex_search(
+        pattern=r"\A" + expected + r"\Z",
+        string=result,
         from_name="Expected output",
         to_name="Actual output",
     )

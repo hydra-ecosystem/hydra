@@ -331,7 +331,9 @@ if __name__ == "__main__":
                 f"Unexpected number of output lines from {task_file}, output lines:\n\n{file_str}"
             )
             for idx in range(len(output)):
-                assert_regex_match(expected_outputs[idx], output[idx])
+                assert_multiline_regex_search(
+                    r"\A(?:" + expected_outputs[idx] + ")", output[idx]
+                )
         # some tests are parsing the file output for more specialized testing.
         return file_str
     finally:
@@ -426,39 +428,13 @@ def assert_text_same(
         assert False, "Mismatch between expected and actual text"
 
 
-def assert_regex_match(
-    from_line: str, to_line: str, from_name: str = "Expected", to_name: str = "Actual"
-) -> None:
-    """Check that the lines of `from_line` (which can be a regex expression)
-    matches the corresponding lines of `to_line` string.
-
-    In case the regex match fails, we display the diff as if `from_line` was a regular string.
-    """
-    normalized_from_line = [x for x in normalize_newlines(from_line).split("\n") if x]
-    normalized_to_line = [x for x in normalize_newlines(to_line).split("\n") if x]
-    if len(normalized_from_line) != len(normalized_to_line):
-        assert_text_same(
-            from_line=from_line,
-            to_line=to_line,
-            from_name=from_name,
-            to_name=to_name,
-        )
-    for line1, line2 in zip(normalized_from_line, normalized_to_line):
-        if line1 != line2 and re.match(line1, line2) is None:
-            assert_text_same(
-                from_line=from_line,
-                to_line=to_line,
-                from_name=from_name,
-                to_name=to_name,
-            )
-
-
 def assert_multiline_regex_search(
     pattern: str, string: str, from_name: str = "Expected", to_name: str = "Actual"
 ) -> None:
-    """Check that `pattern` (which can be a regex expression)
-    matches the corresponding lines of `string` string.
-    In case the regex match fails, we display the diff as if `pattern` was a regular string.
+    """Search with a multiline regex after normalizing newlines.
+
+    Use anchors to require a full-string match. On failure, print the pattern
+    and the actual string.
     """
     pattern = normalize_newlines(pattern)
     string = normalize_newlines(string)
