@@ -25,9 +25,12 @@ class Callbacks:
             try:
                 getattr(c, function_name)(**kwargs)
             except Exception as e:
-                warnings.warn(
-                    f"Callback {type(c).__name__}.{function_name} raised {type(e).__name__}: {e}"
-                )
+                try:
+                    warnings.warn(
+                        f"Callback {type(c).__name__}.{function_name} raised {type(e).__name__}: {e}"
+                    )
+                except BaseException:
+                    pass
 
     def on_run_start(self, config: DictConfig, **kwargs: Any) -> None:
         self._notify(function_name="on_run_start", config=config, **kwargs)

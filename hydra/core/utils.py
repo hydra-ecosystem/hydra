@@ -16,7 +16,17 @@ from os.path import splitext
 from pathlib import Path
 from textwrap import dedent
 from types import FrameType, FunctionType, TracebackType
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union, cast
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+    cast,
+)
 
 from omegaconf import DictConfig, OmegaConf, open_dict, read_write
 
@@ -204,38 +214,71 @@ def _run_job(
             _save_config(hydra_cfg, "hydra.yaml", hydra_output)
             _save_config(config.hydra.overrides.task, "overrides.yaml", hydra_output)
 
-        interrupt: Optional[KeyboardInterrupt] = None
-        with env_override(hydra_cfg.hydra.job.env_set):
-            callbacks.on_job_start(config=config, task_function=task_function)
-            try:
-                ret.return_value = task_function(task_cfg)
-                ret.status = JobStatus.COMPLETED
-            except Exception as e:
-                _log_job_error_to_file()
-                ret.return_value = e
-                ret._remote_traceback = _serialize_traceback(e.__traceback__)
-                ret._remote_exception_chain = _serialize_exception_chain(e)
-                ret._remote_exception_group = _serialize_exception_group(e)
-                ret.status = JobStatus.FAILED
-            except KeyboardInterrupt as e:
-                # record the interrupt like any other failure so callbacks see
-                # it, but re-raise after finalization so it still propagates
-                # (multirun relies on it to stop the remaining jobs)
-                ret.return_value = e
-                ret.status = JobStatus.FAILED
-                interrupt = e
-
         ret.task_name = JobRuntime.instance().get("name")
-
-        _flush_loggers()
-
-        callbacks.on_job_end(config=config, job_return=ret)
-
-        if interrupt is not None:
-            # expose the populated JobReturn to callers (Hydra.run) so
-            # on_run_end can receive the real job metadata after the re-raise
-            setattr(interrupt, "job_return", ret)
-            raise interrupt
+        job_started = False
+        control_flow_exception_active = False
+        handoff_error: Optional[BaseException] = None
+        try:
+            try:
+                with env_override(hydra_cfg.hydra.job.env_set):
+                    # Set this before dispatch so a BaseException raised by a start
+                    # hook still gets the matching end-hook dispatch.
+                    job_started = True
+                    callbacks.on_job_start(config=config, task_function=task_function)
+                    try:
+                        ret.return_value = task_function(task_cfg)
+                        ret.status = JobStatus.COMPLETED
+                    except Exception as e:
+                        ret.return_value = e
+                        ret.status = JobStatus.FAILED
+                        try:
+                            ret._remote_traceback = _serialize_traceback(
+                                e.__traceback__
+                            )
+                            ret._remote_exception_chain = _serialize_exception_chain(e)
+                            ret._remote_exception_group = _serialize_exception_group(e)
+                        except Exception:
+                            pass
+                        try:
+                            _log_job_error_to_file()
+                        except Exception:
+                            pass
+            except BaseException as e:
+                # Control-flow exceptions must still propagate, but first give the
+                # paired end hooks the failed JobReturn.
+                control_flow_exception_active = True
+                ret.return_value = e
+                ret.status = JobStatus.FAILED
+                handoff_error = e
+                raise
+            finally:
+                try:
+                    _flush_loggers()
+                except BaseException as e:
+                    if not control_flow_exception_active and not (
+                        ret.status is JobStatus.FAILED
+                        and isinstance(ret._return_value, Exception)
+                        and isinstance(e, Exception)
+                    ):
+                        if ret.status is not JobStatus.FAILED:
+                            ret.return_value = e
+                            ret.status = JobStatus.FAILED
+                        handoff_error = e
+                        raise
+                finally:
+                    if job_started:
+                        try:
+                            callbacks.on_job_end(config=config, job_return=ret)
+                        except BaseException:
+                            # A callback failure replaces any earlier exception, so
+                            # it must not receive that exception's JobReturn handoff.
+                            handoff_error = None
+                            raise
+        except BaseException as e:
+            # Attach the private handoff only after job-end observers have seen ret.
+            if e is handoff_error:
+                _set_job_return_handoff(e, ret)
+            raise
 
         return ret
     finally:
@@ -798,6 +841,38 @@ class JobReturn:
     @return_value.setter
     def return_value(self, value: Any) -> None:
         self._return_value = value
+
+
+_JOB_RETURN_HANDOFF_KEY = "_hydra_job_return_handoff"
+_JOB_RETURN_HANDOFF_SENTINEL = object()
+
+
+def _set_job_return_handoff(error: BaseException, job_return: JobReturn) -> None:
+    try:
+        attributes = object.__getattribute__(error, "__dict__")
+        attributes[_JOB_RETURN_HANDOFF_KEY] = (
+            _JOB_RETURN_HANDOFF_SENTINEL,
+            job_return,
+        )
+    except BaseException:
+        pass
+
+
+def _take_job_return_handoff(error: BaseException) -> Optional[JobReturn]:
+    try:
+        handoff = object.__getattribute__(error, "__dict__").pop(
+            _JOB_RETURN_HANDOFF_KEY, None
+        )
+    except BaseException:
+        return None
+    if (
+        isinstance(handoff, tuple)
+        and len(handoff) == 2
+        and handoff[0] is _JOB_RETURN_HANDOFF_SENTINEL
+        and isinstance(handoff[1], JobReturn)
+    ):
+        return handoff[1]
+    return None
 
 
 class JobRuntime(metaclass=Singleton):

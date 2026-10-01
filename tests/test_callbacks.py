@@ -10,11 +10,12 @@ from textwrap import dedent
 from typing import Any, List
 
 from omegaconf import OmegaConf, open_dict, read_write
-from pytest import mark, param, warns
+from pytest import mark, param, raises, warns
 
 from hydra._internal.callbacks import Callbacks
 from hydra.core.utils import JobReturn, JobStatus
 from hydra.errors import Hydra15MigrationWarning
+from hydra.experimental.callback import Callback
 from hydra.experimental.callbacks import LogJobReturnCallback
 from hydra.test_utils.test_utils import (
     assert_regex_match,
@@ -23,6 +24,120 @@ from hydra.test_utils.test_utils import (
 )
 
 chdir_hydra_root()
+
+
+def test_callback_exception_warns_and_dispatch_continues() -> None:
+    events = []
+
+    class RecordingCallback(Callback):
+        def on_job_end(self, config: Any, job_return: JobReturn, **kwargs: Any) -> None:
+            events.append("recording")
+
+    class FailingCallback(Callback):
+        def on_job_end(self, config: Any, job_return: JobReturn, **kwargs: Any) -> None:
+            events.append("failing")
+            raise RuntimeError("callback failed")
+
+    callbacks = Callbacks()
+    # End hooks run in reverse order, so the failing callback runs first.
+    callbacks.callbacks = [RecordingCallback(), FailingCallback()]
+    task_error = ValueError("task failed")
+    job_return = JobReturn(status=JobStatus.FAILED, _return_value=task_error)
+
+    with warns(UserWarning, match="FailingCallback.on_job_end raised RuntimeError"):
+        callbacks.on_job_end(config=OmegaConf.create({}), job_return=job_return)
+
+    assert events == ["failing", "recording"]
+    assert job_return.status is JobStatus.FAILED
+    with raises(ValueError, match="task failed") as exc_info:
+        _ = job_return.return_value
+    assert exc_info.value is task_error
+
+
+def test_callback_exception_is_nonfatal_with_warnings_as_errors() -> None:
+    events = []
+
+    class RecordingCallback(Callback):
+        def on_run_start(self, config: Any, **kwargs: Any) -> None:
+            events.append("recording")
+
+    class FailingCallback(Callback):
+        def on_run_start(self, config: Any, **kwargs: Any) -> None:
+            events.append("failing")
+            raise RuntimeError("callback failed")
+
+    callbacks = Callbacks()
+    callbacks.callbacks = [FailingCallback(), RecordingCallback()]
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", UserWarning)
+        callbacks.on_run_start(config=OmegaConf.create({}))
+
+    assert events == ["failing", "recording"]
+
+
+def test_callback_exception_is_nonfatal_when_warning_formatting_fails() -> None:
+    events = []
+
+    class UnprintableError(RuntimeError):
+        def __str__(self) -> str:
+            raise ValueError("could not format callback error")
+
+    class RecordingCallback(Callback):
+        def on_run_start(self, config: Any, **kwargs: Any) -> None:
+            events.append("recording")
+
+    class FailingCallback(Callback):
+        def on_run_start(self, config: Any, **kwargs: Any) -> None:
+            events.append("failing")
+            raise UnprintableError()
+
+    callbacks = Callbacks()
+    callbacks.callbacks = [FailingCallback(), RecordingCallback()]
+
+    callbacks.on_run_start(config=OmegaConf.create({}))
+
+    assert events == ["failing", "recording"]
+
+
+def test_callback_exception_is_nonfatal_when_warning_formatting_raises_system_exit() -> (
+    None
+):
+    events = []
+
+    class UnprintableError(RuntimeError):
+        def __str__(self) -> str:
+            raise SystemExit(2)
+
+    class RecordingCallback(Callback):
+        def on_run_start(self, config: Any, **kwargs: Any) -> None:
+            events.append("recording")
+
+    class FailingCallback(Callback):
+        def on_run_start(self, config: Any, **kwargs: Any) -> None:
+            events.append("failing")
+            raise UnprintableError()
+
+    callbacks = Callbacks()
+    callbacks.callbacks = [FailingCallback(), RecordingCallback()]
+
+    callbacks.on_run_start(config=OmegaConf.create({}))
+
+    assert events == ["failing", "recording"]
+
+
+def test_callback_control_flow_exception_propagates() -> None:
+    class ExitingCallback(Callback):
+        def on_run_start(self, config: Any, **kwargs: Any) -> None:
+            raise SystemExit(3)
+
+    callbacks = Callbacks()
+    callbacks.callbacks = [ExitingCallback()]
+
+    with raises(SystemExit) as exc_info:
+        callbacks.on_run_start(config=OmegaConf.create({}))
+
+    assert exc_info.value.code == 3
 
 
 @mark.parametrize(
