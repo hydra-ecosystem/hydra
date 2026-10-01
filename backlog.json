@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T07:24:49Z",
+  "generated_at": "2026-10-01T08:28:36Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 58,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 56
+        "count": 55
       },
       {
         "status": "done",
@@ -71,6 +71,28 @@
     ]
   },
   "issues": [
+    {
+      "number": 1749,
+      "title": "tests: Use multiline regex search instead of assert_regex_match",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3499,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3499"
+        }
+      ],
+      "created": "2021-08-02",
+      "updated": "2026-07-19",
+      "labels": [
+        "maintenance",
+        "tests",
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1749"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -340,23 +362,6 @@
         "internal"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1547"
-    },
-    {
-      "number": 1749,
-      "title": "tests: Use multiline regex search instead of assert_regex_match",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2021-08-02",
-      "updated": "2026-07-19",
-      "labels": [
-        "maintenance",
-        "tests",
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1749"
     },
     {
       "number": 1869,
@@ -2324,6 +2329,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-01T08:28:36Z",
+      "kind": "pr",
+      "issue": 1749,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1749",
+      "title": "tests: Use multiline regex search instead of assert_regex_match",
+      "detail": "linked #3499"
+    },
+    {
+      "ts": "2026-10-01T08:28:36Z",
+      "kind": "status",
+      "issue": 1749,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1749",
+      "title": "tests: Use multiline regex search instead of assert_regex_match",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3499,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3499"
+      }
+    },
+    {
       "ts": "2026-10-01T07:23:34Z",
       "kind": "closed",
       "issue": 3220,
@@ -3924,20 +3949,6 @@
       "issue": 2775,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2775",
       "title": "[Feature Request] Problem with Overwriting dict config of existing configuration"
-    },
-    {
-      "ts": "2026-08-23T20:10:07Z",
-      "kind": "closed",
-      "issue": 2770,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2770",
-      "title": "Experiment Tracker with Hydra"
-    },
-    {
-      "ts": "2026-08-23T19:46:59Z",
-      "kind": "closed",
-      "issue": 2767,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2767",
-      "title": "[Feature Request] Allow optional and override keywords to work together."
     }
   ]
 }

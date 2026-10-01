@@ -82,7 +82,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-01T07:24:49Z",
+  "generated_at": "2026-10-01T08:28:36Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -162,9 +162,11 @@
         "priority_low",
         "tests"
       ],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3499"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "in progress",
       "title": "tests: Use multiline regex search instead of assert_regex_match",
       "updated_at": "2026-07-19T11:33:00Z"
     },
