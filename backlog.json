@@ -1,6 +1,6 @@
 {
-  "generated_on": "2026-09-30",
-  "generated_at": "2026-09-30T21:00:34Z",
+  "generated_on": "2026-10-01",
+  "generated_at": "2026-10-01T01:52:36Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 63,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 61
+        "count": 60
       },
       {
         "status": "done",
@@ -71,6 +71,26 @@
     ]
   },
   "issues": [
+    {
+      "number": 3491,
+      "title": "Harden callback lifecycle guarantees",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3492,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3492"
+        }
+      ],
+      "created": "2026-09-30",
+      "updated": "2026-09-30",
+      "labels": [
+        "callbacks"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -1050,21 +1070,6 @@
       "updated": "2026-09-30",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3490"
-    },
-    {
-      "number": 3491,
-      "title": "Harden callback lifecycle guarantees",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-09-30",
-      "updated": "2026-09-30",
-      "labels": [
-        "callbacks"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
     },
     {
       "number": 385,
@@ -2302,6 +2307,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-01T01:52:36Z",
+      "kind": "pr",
+      "issue": 3491,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491",
+      "title": "Harden callback lifecycle guarantees",
+      "detail": "linked #3492"
+    },
+    {
+      "ts": "2026-10-01T01:52:36Z",
+      "kind": "status",
+      "issue": 3491,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491",
+      "title": "Harden callback lifecycle guarantees",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3492,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3492"
+      }
+    },
     {
       "ts": "2026-09-30T21:00:34Z",
       "kind": "new",
@@ -3904,20 +3929,6 @@
         "number": 3399,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3399"
       }
-    },
-    {
-      "ts": "2026-08-15T07:12:57Z",
-      "kind": "closed",
-      "issue": 3398,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3398",
-      "title": "password"
-    },
-    {
-      "ts": "2026-08-15T07:12:57Z",
-      "kind": "closed",
-      "issue": 3397,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3397",
-      "title": "password"
     }
   ]
 }
