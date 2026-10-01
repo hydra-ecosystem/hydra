@@ -906,3 +906,7 @@
 {"ts": "2026-10-01T01:52:36Z", "kind": "status", "issue": 3491, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491", "title": "Harden callback lifecycle guarantees", "detail": "not started → in progress", "pr": {"number": 3492, "url": "https://github.com/hydra-ecosystem/hydra/pull/3492"}}
 {"ts": "2026-10-01T01:52:36Z", "kind": "pr", "issue": 3491, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491", "title": "Harden callback lifecycle guarantees", "detail": "linked #3492"}
 {"ts": "2026-10-01T06:23:53Z", "kind": "closed", "issue": 3491, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3491", "title": "Harden callback lifecycle guarantees"}
+{"ts": "2026-10-01T06:35:44Z", "kind": "closed", "issue": 1885, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1885", "title": "follow up with shell testing for #1842"}
+{"ts": "2026-10-01T06:35:44Z", "kind": "closed", "issue": 3324, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3324", "title": "Align bundled plugin dependencies with Hydra release lines"}
+{"ts": "2026-10-01T06:35:44Z", "kind": "closed", "issue": 3361, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3361", "title": "Show user frames in default instantiation error tracebacks"}
+{"ts": "2026-10-01T06:35:44Z", "kind": "closed", "issue": 3406, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406", "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin"}

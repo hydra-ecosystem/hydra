@@ -1,45 +1,45 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T06:23:53Z",
+  "generated_at": "2026-10-01T06:35:44Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 62,
+    "open_total": 58,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 2,
-        "percentage": 3.2
+        "count": 1,
+        "percentage": 1.7
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 51,
-        "percentage": 82.3
+        "count": 50,
+        "percentage": 86.2
       },
       {
         "category": "Documentation",
         "emoji": "📄",
-        "count": 3,
-        "percentage": 4.8
+        "count": 2,
+        "percentage": 3.4
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 1.6
+        "percentage": 1.7
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 2,
-        "percentage": 3.2
+        "percentage": 3.4
       },
       {
         "category": "Build",
         "emoji": "🏗️",
-        "count": 3,
-        "percentage": 4.8
+        "count": 2,
+        "percentage": 3.4
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 60
+        "count": 56
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 76
+        "count": 80
       }
     ]
   },
@@ -372,21 +372,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1869"
-    },
-    {
-      "number": 1885,
-      "title": "follow up with shell testing for #1842",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2021-11-11",
-      "updated": "2026-09-27",
-      "labels": [
-        "tests"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1885"
     },
     {
       "number": 1890,
@@ -851,23 +836,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3321"
     },
     {
-      "number": 3324,
-      "title": "Align bundled plugin dependencies with Hydra release lines",
-      "category": "Build",
-      "category_emoji": "🏗️",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-07-28",
-      "updated": "2026-07-28",
-      "labels": [
-        "maintenance",
-        "plugin",
-        "dependencies"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3324"
-    },
-    {
       "number": 3326,
       "title": "Add a Reploy launcher for immutable, reproducible job execution",
       "category": "Enhancement",
@@ -901,19 +869,6 @@
         "needs decision"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3328"
-    },
-    {
-      "number": 3361,
-      "title": "Show user frames in default instantiation error tracebacks",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-08",
-      "updated": "2026-09-17",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3361"
     },
     {
       "number": 3364,
@@ -955,21 +910,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3404"
-    },
-    {
-      "number": 3406,
-      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-23",
-      "updated": "2026-08-23",
-      "labels": [
-        "documentation"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3406"
     },
     {
       "number": 3438,
@@ -2304,9 +2244,97 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 1885,
+      "title": "follow up with shell testing for #1842",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2021-11-11",
+      "updated": "2026-09-27",
+      "labels": [
+        "tests"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1885"
+    },
+    {
+      "number": 3324,
+      "title": "Align bundled plugin dependencies with Hydra release lines",
+      "category": "Build",
+      "category_emoji": "🏗️",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-07-28",
+      "updated": "2026-07-28",
+      "labels": [
+        "dependencies",
+        "maintenance",
+        "plugin"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3324"
+    },
+    {
+      "number": 3361,
+      "title": "Show user frames in default instantiation error tracebacks",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-08",
+      "updated": "2026-09-17",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3361"
+    },
+    {
+      "number": 3406,
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "documentation"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3406"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-01T06:35:44Z",
+      "kind": "closed",
+      "issue": 3406,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin"
+    },
+    {
+      "ts": "2026-10-01T06:35:44Z",
+      "kind": "closed",
+      "issue": 3361,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3361",
+      "title": "Show user frames in default instantiation error tracebacks"
+    },
+    {
+      "ts": "2026-10-01T06:35:44Z",
+      "kind": "closed",
+      "issue": 3324,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3324",
+      "title": "Align bundled plugin dependencies with Hydra release lines"
+    },
+    {
+      "ts": "2026-10-01T06:35:44Z",
+      "kind": "closed",
+      "issue": 1885,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1885",
+      "title": "follow up with shell testing for #1842"
+    },
     {
       "ts": "2026-10-01T06:23:53Z",
       "kind": "closed",
@@ -3894,36 +3922,6 @@
       "issue": 2762,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2762",
       "title": "New Release Version?"
-    },
-    {
-      "ts": "2026-08-23T18:02:13Z",
-      "kind": "label",
-      "issue": 3400,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3400",
-      "title": "[Bug] dev8 deprecation warning about internal usage?",
-      "detail": "added \"awaiting_response\""
-    },
-    {
-      "ts": "2026-08-23T17:44:53Z",
-      "kind": "new",
-      "issue": 3401,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3401",
-      "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5"
-    },
-    {
-      "ts": "2026-08-23T16:36:15Z",
-      "kind": "new",
-      "issue": 3400,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3400",
-      "title": "[Bug] dev8 deprecation warning about internal usage?"
-    },
-    {
-      "ts": "2026-08-22T07:14:50Z",
-      "kind": "pr",
-      "issue": 3364,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364",
-      "title": "Make Compose API initialization contexts nestable and self-contained",
-      "detail": "linked #3399"
     }
   ]
 }
