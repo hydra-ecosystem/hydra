@@ -27,6 +27,7 @@ from hydra.core.utils import (
     JobReturn,
     JobRuntime,
     JobStatus,
+    _take_job_return_handoff,
     configure_log,
     run_job,
     setup_globals,
@@ -161,9 +162,9 @@ class Hydra:
             )
 
         callbacks = Callbacks(cfg)
-        callbacks.on_run_start(config=cfg, config_name=config_name)
-
+        ret = JobReturn()
         try:
+            callbacks.on_run_start(config=cfg, config_name=config_name)
             ret = run_job(
                 hydra_context=HydraContext(
                     config_loader=self.config_loader,
@@ -176,20 +177,16 @@ class Hydra:
                 job_subdir_key=None,
                 configure_logging=with_log_configuration,
             )
-        except KeyboardInterrupt as e:
-            # run_job attaches its populated JobReturn to the interrupt before
-            # re-raising; fall back to a minimal one if the interrupt happened
-            # before the job ran (e.g. during on_job_start)
-            job_return = getattr(e, "job_return", None)
-            if not isinstance(job_return, JobReturn):
-                job_return = JobReturn()
-                job_return.status = JobStatus.FAILED
-                job_return.return_value = e
-            callbacks.on_run_end(
-                config=cfg, config_name=config_name, job_return=job_return
-            )
+        except BaseException as e:
+            handed_off = _take_job_return_handoff(e)
+            if handed_off is not None:
+                ret = handed_off
+            else:
+                ret.status = JobStatus.FAILED
+                ret.return_value = e
             raise
-        callbacks.on_run_end(config=cfg, config_name=config_name, job_return=ret)
+        finally:
+            callbacks.on_run_end(config=cfg, config_name=config_name, job_return=ret)
 
         # access the result to trigger an exception in case the job failed.
         _ = ret.return_value
@@ -226,24 +223,25 @@ class Hydra:
         HydraConfig.instance().set_config(cfg)
         try:
             callbacks = Callbacks(cfg)
-            callbacks.on_multirun_start(config=cfg, config_name=config_name)
+            try:
+                callbacks.on_multirun_start(config=cfg, config_name=config_name)
 
-            sweeper = Plugins.instance().instantiate_sweeper(
-                config=cfg,
-                hydra_context=HydraContext(
-                    config_loader=self.config_loader,
-                    callbacks=callbacks,
-                    execution_whitelist=_get_active_execution_whitelist(),
-                ),
-                task_function=task_function,
-            )
-            task_overrides = OmegaConf.to_container(
-                cfg.hydra.overrides.task, resolve=False
-            )
-            assert isinstance(task_overrides, list)
-            ret = sweeper.sweep(arguments=task_overrides)
-            callbacks.on_multirun_end(config=cfg, config_name=config_name)
-            return ret
+                sweeper = Plugins.instance().instantiate_sweeper(
+                    config=cfg,
+                    hydra_context=HydraContext(
+                        config_loader=self.config_loader,
+                        callbacks=callbacks,
+                        execution_whitelist=_get_active_execution_whitelist(),
+                    ),
+                    task_function=task_function,
+                )
+                task_overrides = OmegaConf.to_container(
+                    cfg.hydra.overrides.task, resolve=False
+                )
+                assert isinstance(task_overrides, list)
+                return sweeper.sweep(arguments=task_overrides)
+            finally:
+                callbacks.on_multirun_end(config=cfg, config_name=config_name)
         finally:
             HydraConfig.instance().cfg = orig_hydra_cfg
 

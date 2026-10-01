@@ -1,0 +1,1 @@
+Call paired callback end hooks when jobs or sweeps exit with errors.

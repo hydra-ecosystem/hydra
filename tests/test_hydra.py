@@ -1,5 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import os
+import pickle
 import re
 import subprocess
 import sys
@@ -15,8 +16,10 @@ from pytest import mark, param, raises, warns
 
 from hydra import MissingConfigException, __version__, main, version
 from hydra._internal.hydra import Hydra
+from hydra.core import utils as core_utils
 from hydra.core.config_loader import ConfigLoader
 from hydra.core.hydra_config import HydraConfig
+from hydra.core.plugins import Plugins
 from hydra.errors import (
     ConfigCompositionException,
     Hydra14MigrationWarning,
@@ -2528,6 +2531,11 @@ def test_hydra_runtime_choice_1882(tmpdir: Path) -> None:
 
 
 RESOLVED: dict[str, Any] = {}
+CALLBACK_EVENTS: List[str] = []
+CALLBACK_JOB_RETURNS: List[Any] = []
+CALLBACK_SERIALIZED_JOB_RETURNS: List[Any] = []
+CALLBACK_JOB_RETURN_HANDOFFS: List[bool] = []
+CALLBACK_SERIALIZATION_ERRORS: List[BaseException] = []
 
 
 class ControllerProbe(Callback):
@@ -2538,6 +2546,423 @@ class ControllerProbe(Callback):
 class RaisingCallback(Callback):
     def __init__(self) -> None:
         raise RuntimeError("boom")
+
+
+class LifecycleCallback(Callback):
+    def on_run_start(self, config: DictConfig, **kwargs: Any) -> None:
+        CALLBACK_EVENTS.append("run_start")
+
+    def on_run_end(self, config: DictConfig, **kwargs: Any) -> None:
+        job_return = kwargs["job_return"]
+        CALLBACK_JOB_RETURNS.append(job_return)
+        CALLBACK_EVENTS.append(
+            f"run_end:{job_return.status.name}:"
+            f"{type(job_return._return_value).__name__}"
+        )
+
+    def on_multirun_start(self, config: DictConfig, **kwargs: Any) -> None:
+        CALLBACK_EVENTS.append("multirun_start")
+
+    def on_multirun_end(self, config: DictConfig, **kwargs: Any) -> None:
+        CALLBACK_EVENTS.append("multirun_end")
+
+    def on_job_start(self, config: DictConfig, **kwargs: Any) -> None:
+        CALLBACK_EVENTS.append("job_start")
+
+    def on_job_end(self, config: DictConfig, job_return: Any, **kwargs: Any) -> None:
+        CALLBACK_JOB_RETURNS.append(job_return)
+        CALLBACK_EVENTS.append(
+            f"job_end:{job_return.status.name}:"
+            f"{type(job_return._return_value).__name__}"
+        )
+
+
+class SerializingLifecycleCallback(LifecycleCallback):
+    def on_job_end(self, config: DictConfig, job_return: Any, **kwargs: Any) -> None:
+        error = job_return._return_value
+        CALLBACK_JOB_RETURN_HANDOFFS.append(
+            core_utils._JOB_RETURN_HANDOFF_KEY in error.__dict__
+        )
+        try:
+            CALLBACK_SERIALIZED_JOB_RETURNS.append(
+                pickle.loads(pickle.dumps(job_return))  # nosec B301: trusted test data
+            )
+        except BaseException as e:
+            CALLBACK_SERIALIZATION_ERRORS.append(e)
+        super().on_job_end(config=config, job_return=job_return, **kwargs)
+
+
+class StartExitLifecycleCallback(LifecycleCallback):
+    def on_run_start(self, config: DictConfig, **kwargs: Any) -> None:
+        super().on_run_start(config, **kwargs)
+        raise SystemExit(3)
+
+    def on_multirun_start(self, config: DictConfig, **kwargs: Any) -> None:
+        super().on_multirun_start(config, **kwargs)
+        raise SystemExit(3)
+
+
+def test_run_end_callback_runs_when_run_start_exits(
+    hydra_restore_singletons: Any,
+    hydra_task_runner: TTaskRunner,
+) -> None:
+    CALLBACK_EVENTS.clear()
+
+    with raises(SystemExit) as exc_info:
+        with (
+            execution_whitelist("tests.test_hydra.StartExitLifecycleCallback"),
+            hydra_task_runner(
+                calling_file="tests/test_apps/simple_app/my_app.py",
+                calling_module=None,
+                config_path=None,
+                config_name=None,
+                overrides=[
+                    "+hydra.callbacks.lifecycle._target_="
+                    "tests.test_hydra.StartExitLifecycleCallback"
+                ],
+            ),
+        ):
+            pass
+
+    assert exc_info.value.code == 3
+    assert CALLBACK_EVENTS == ["run_start", "run_end:FAILED:SystemExit"]
+
+
+def test_run_end_callback_runs_when_run_job_raises(
+    hydra_restore_singletons: Any,
+    hydra_task_runner: TTaskRunner,
+    monkeypatch: Any,
+) -> None:
+    CALLBACK_EVENTS.clear()
+
+    class UntrustedJobReturnError(RuntimeError):
+        @property
+        def job_return(self) -> Any:
+            raise AssertionError("Hydra must not inspect exception.job_return")
+
+    failure = UntrustedJobReturnError("job setup failed")
+
+    def fail_run_job(**kwargs: Any) -> None:
+        raise failure
+
+    monkeypatch.setattr("hydra._internal.hydra.run_job", fail_run_job)
+
+    with raises(UntrustedJobReturnError) as exc_info:
+        with (
+            execution_whitelist("tests.test_hydra.LifecycleCallback"),
+            hydra_task_runner(
+                calling_file="tests/test_apps/simple_app/my_app.py",
+                calling_module=None,
+                config_path=None,
+                config_name=None,
+                overrides=[
+                    "+hydra.callbacks.lifecycle._target_="
+                    "tests.test_hydra.LifecycleCallback"
+                ],
+            ),
+        ):
+            pass
+
+    assert exc_info.value is failure
+    assert CALLBACK_EVENTS == [
+        "run_start",
+        "run_end:FAILED:UntrustedJobReturnError",
+    ]
+
+
+def test_run_end_receives_job_return_handed_off_by_run_job(
+    hydra_restore_singletons: Any,
+    hydra_task_runner: TTaskRunner,
+    monkeypatch: Any,
+) -> None:
+    CALLBACK_EVENTS.clear()
+    CALLBACK_JOB_RETURNS.clear()
+    CALLBACK_SERIALIZED_JOB_RETURNS.clear()
+    CALLBACK_JOB_RETURN_HANDOFFS.clear()
+    CALLBACK_SERIALIZATION_ERRORS.clear()
+
+    def exit_task(_: Any, __: DictConfig) -> None:
+        raise SystemExit(3)
+
+    monkeypatch.setattr(
+        "hydra.test_utils.test_utils.TaskTestFunction.__call__", exit_task
+    )
+
+    with raises(SystemExit) as exc_info:
+        with (
+            execution_whitelist("tests.test_hydra.SerializingLifecycleCallback"),
+            hydra_task_runner(
+                calling_file="tests/test_apps/simple_app/my_app.py",
+                calling_module=None,
+                config_path=None,
+                config_name=None,
+                overrides=[
+                    "+hydra.callbacks.lifecycle._target_="
+                    "tests.test_hydra.SerializingLifecycleCallback"
+                ],
+            ),
+        ):
+            pass
+
+    assert exc_info.value.code == 3
+    assert CALLBACK_EVENTS == [
+        "run_start",
+        "job_start",
+        "job_end:FAILED:SystemExit",
+        "run_end:FAILED:SystemExit",
+    ]
+    assert CALLBACK_JOB_RETURN_HANDOFFS == [False]
+    assert CALLBACK_SERIALIZATION_ERRORS == []
+    assert len(CALLBACK_SERIALIZED_JOB_RETURNS) == 1
+    assert (
+        core_utils._JOB_RETURN_HANDOFF_KEY
+        not in CALLBACK_SERIALIZED_JOB_RETURNS[0]._return_value.__dict__
+    )
+    assert len(CALLBACK_JOB_RETURNS) == 2
+    job_return = CALLBACK_JOB_RETURNS[0]
+    assert CALLBACK_JOB_RETURNS[1] is job_return
+    assert job_return.status.name == "FAILED"
+    assert job_return._return_value is exc_info.value
+
+
+def test_run_end_receives_job_return_for_flush_system_exit(
+    hydra_restore_singletons: Any,
+    hydra_task_runner: TTaskRunner,
+    monkeypatch: Any,
+) -> None:
+    CALLBACK_EVENTS.clear()
+    CALLBACK_JOB_RETURNS.clear()
+
+    flush_error = SystemExit(3)
+
+    def complete_task(_: Any, __: DictConfig) -> str:
+        return "completed"
+
+    def fail_flushing() -> None:
+        raise flush_error
+
+    monkeypatch.setattr(
+        "hydra.test_utils.test_utils.TaskTestFunction.__call__", complete_task
+    )
+    monkeypatch.setattr("hydra.core.utils._flush_loggers", fail_flushing)
+
+    with raises(SystemExit) as exc_info:
+        with (
+            execution_whitelist("tests.test_hydra.LifecycleCallback"),
+            hydra_task_runner(
+                calling_file="tests/test_apps/simple_app/my_app.py",
+                calling_module=None,
+                config_path=None,
+                config_name=None,
+                overrides=[
+                    "+hydra.callbacks.lifecycle._target_="
+                    "tests.test_hydra.LifecycleCallback"
+                ],
+            ),
+        ):
+            pass
+
+    assert exc_info.value is flush_error
+    assert CALLBACK_EVENTS == [
+        "run_start",
+        "job_start",
+        "job_end:FAILED:SystemExit",
+        "run_end:FAILED:SystemExit",
+    ]
+    assert len(CALLBACK_JOB_RETURNS) == 2
+    job_return = CALLBACK_JOB_RETURNS[0]
+    assert CALLBACK_JOB_RETURNS[1] is job_return
+    assert job_return.status.name == "FAILED"
+    assert job_return._return_value is flush_error
+
+
+def test_run_end_receives_task_failure_for_flush_system_exit(
+    hydra_restore_singletons: Any,
+    hydra_task_runner: TTaskRunner,
+    monkeypatch: Any,
+) -> None:
+    CALLBACK_EVENTS.clear()
+    CALLBACK_JOB_RETURNS.clear()
+
+    task_error = RuntimeError("task failure")
+    flush_error = SystemExit(3)
+
+    def fail_task(_: Any, __: DictConfig) -> None:
+        raise task_error
+
+    def fail_flushing() -> None:
+        raise flush_error
+
+    monkeypatch.setattr(
+        "hydra.test_utils.test_utils.TaskTestFunction.__call__", fail_task
+    )
+    monkeypatch.setattr("hydra.core.utils._flush_loggers", fail_flushing)
+
+    with raises(SystemExit) as exc_info:
+        with (
+            execution_whitelist("tests.test_hydra.LifecycleCallback"),
+            hydra_task_runner(
+                calling_file="tests/test_apps/simple_app/my_app.py",
+                calling_module=None,
+                config_path=None,
+                config_name=None,
+                overrides=[
+                    "+hydra.callbacks.lifecycle._target_="
+                    "tests.test_hydra.LifecycleCallback"
+                ],
+            ),
+        ):
+            pass
+
+    assert exc_info.value is flush_error
+    assert CALLBACK_EVENTS == [
+        "run_start",
+        "job_start",
+        "job_end:FAILED:RuntimeError",
+        "run_end:FAILED:RuntimeError",
+    ]
+    assert len(CALLBACK_JOB_RETURNS) == 2
+    job_return = CALLBACK_JOB_RETURNS[0]
+    assert CALLBACK_JOB_RETURNS[1] is job_return
+    assert job_return.status.name == "FAILED"
+    assert job_return._return_value is task_error
+
+
+def test_multirun_end_callback_runs_when_multirun_start_exits(
+    hydra_restore_singletons: Any,
+    hydra_sweep_runner: TSweepRunner,
+    tmpdir: Path,
+) -> None:
+    CALLBACK_EVENTS.clear()
+
+    with raises(SystemExit) as exc_info:
+        with (
+            execution_whitelist("tests.test_hydra.StartExitLifecycleCallback"),
+            hydra_sweep_runner(
+                calling_file="tests/test_apps/simple_app/my_app.py",
+                calling_module=None,
+                config_path=None,
+                config_name=None,
+                task_function=None,
+                overrides=[
+                    "+hydra.callbacks.lifecycle._target_="
+                    "tests.test_hydra.StartExitLifecycleCallback"
+                ],
+                temp_dir=tmpdir,
+            ),
+        ):
+            pass
+
+    assert exc_info.value.code == 3
+    assert CALLBACK_EVENTS == ["multirun_start", "multirun_end"]
+
+
+def test_multirun_end_callback_runs_when_sweeper_initialization_raises(
+    hydra_restore_singletons: Any,
+    hydra_sweep_runner: TSweepRunner,
+    monkeypatch: Any,
+    tmpdir: Path,
+) -> None:
+    CALLBACK_EVENTS.clear()
+
+    def fail_sweeper_initialization(*args: Any, **kwargs: Any) -> None:
+        raise RuntimeError("sweeper setup failed")
+
+    monkeypatch.setattr(Plugins, "instantiate_sweeper", fail_sweeper_initialization)
+
+    with raises(RuntimeError, match="sweeper setup failed"):
+        with (
+            execution_whitelist("tests.test_hydra.LifecycleCallback"),
+            hydra_sweep_runner(
+                calling_file="tests/test_apps/simple_app/my_app.py",
+                calling_module=None,
+                config_path=None,
+                config_name=None,
+                task_function=None,
+                overrides=[
+                    "+hydra.callbacks.lifecycle._target_="
+                    "tests.test_hydra.LifecycleCallback"
+                ],
+                temp_dir=tmpdir,
+            ),
+        ):
+            pass
+
+    assert CALLBACK_EVENTS == ["multirun_start", "multirun_end"]
+
+
+def test_multirun_end_callback_runs_when_sweeper_execution_raises(
+    hydra_restore_singletons: Any,
+    hydra_sweep_runner: TSweepRunner,
+    monkeypatch: Any,
+    tmpdir: Path,
+) -> None:
+    CALLBACK_EVENTS.clear()
+
+    class FailingSweeper:
+        def sweep(self, arguments: Any) -> None:
+            raise RuntimeError("sweeper failed")
+
+    def instantiate_failing_sweeper(*args: Any, **kwargs: Any) -> FailingSweeper:
+        return FailingSweeper()
+
+    monkeypatch.setattr(Plugins, "instantiate_sweeper", instantiate_failing_sweeper)
+
+    with raises(RuntimeError, match="sweeper failed"):
+        with (
+            execution_whitelist("tests.test_hydra.LifecycleCallback"),
+            hydra_sweep_runner(
+                calling_file="tests/test_apps/simple_app/my_app.py",
+                calling_module=None,
+                config_path=None,
+                config_name=None,
+                task_function=None,
+                overrides=[
+                    "+hydra.callbacks.lifecycle._target_="
+                    "tests.test_hydra.LifecycleCallback"
+                ],
+                temp_dir=tmpdir,
+            ),
+        ):
+            pass
+
+    assert CALLBACK_EVENTS == ["multirun_start", "multirun_end"]
+
+
+def test_multirun_end_callback_runs_when_job_raises_system_exit(
+    hydra_restore_singletons: Any,
+    hydra_sweep_runner: TSweepRunner,
+    tmpdir: Path,
+) -> None:
+    CALLBACK_EVENTS.clear()
+
+    def exit_task(_: DictConfig) -> None:
+        raise SystemExit(3)
+
+    with raises(SystemExit):
+        with (
+            execution_whitelist("tests.test_hydra.LifecycleCallback"),
+            hydra_sweep_runner(
+                calling_file="tests/test_apps/simple_app/my_app.py",
+                calling_module=None,
+                config_path=None,
+                config_name=None,
+                task_function=exit_task,
+                overrides=[
+                    "+hydra.callbacks.lifecycle._target_="
+                    "tests.test_hydra.LifecycleCallback"
+                ],
+                temp_dir=tmpdir,
+            ),
+        ):
+            pass
+
+    assert CALLBACK_EVENTS == [
+        "multirun_start",
+        "job_start",
+        "job_end:FAILED:SystemExit",
+        "multirun_end",
+    ]
 
 
 def test_controller_resolution_and_restore(

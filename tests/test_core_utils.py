@@ -741,3 +741,268 @@ def test_run_job_handles_unprintable_chained_exception(
     )
     assert "BrokenCause: <exception message unavailable>" in formatted
     assert "ValueError: task failure" in formatted
+
+
+def test_run_job_preserves_task_exception_when_error_logging_fails(
+    hydra_restore_singletons: Any, tmp_path: Any, monkeypatch: Any
+) -> None:
+    task_error = RuntimeError("task failure")
+
+    def fail_logging() -> None:
+        raise ValueError("error logging failed")
+
+    def fail_flushing() -> None:
+        raise ValueError("logger flushing failed")
+
+    monkeypatch.setattr(utils, "_log_job_error_to_file", fail_logging)
+    monkeypatch.setattr(utils, "_flush_loggers", fail_flushing)
+
+    def task_function(_: Any) -> None:
+        raise task_error
+
+    class RecordingCallbacks:
+        def on_job_start(self, **kwargs: Any) -> None:
+            pass
+
+        def on_job_end(self, **kwargs: Any) -> None:
+            pass
+
+    config_loader = ConfigLoaderImpl(
+        config_search_path=create_config_search_path("pkg://hydra.test_utils.configs")
+    )
+    cfg = config_loader.load_configuration(
+        config_name="compose",
+        run_mode=RunMode.RUN,
+        overrides=[f"hydra.run.dir={tmp_path}", "hydra.output_subdir=null"],
+    )
+    result = utils.run_job(
+        task_function=task_function,
+        config=cfg,
+        job_dir_key="hydra.run.dir",
+        job_subdir_key=None,
+        hydra_context=HydraContext(
+            config_loader=config_loader,
+            callbacks=cast(Any, RecordingCallbacks()),
+        ),
+        configure_logging=False,
+    )
+
+    assert result.status is utils.JobStatus.FAILED
+    assert result._return_value is task_error
+    assert result._remote_traceback
+    assert result._remote_exception_chain == []
+    with raises(RuntimeError, match="task failure") as exc_info:
+        result.return_value
+    assert exc_info.value is task_error
+    assert any(
+        frame.name == "task_function"
+        for frame in traceback.extract_tb(task_error.__traceback__)
+    )
+
+
+def test_run_job_calls_job_end_on_system_exit(
+    hydra_restore_singletons: Any, tmp_path: Any, monkeypatch: Any
+) -> None:
+    events = []
+    completed = []
+
+    class RecordingCallbacks:
+        def on_job_start(self, **kwargs: Any) -> None:
+            events.append("start")
+
+        def on_job_end(self, **kwargs: Any) -> None:
+            events.append("end")
+            completed.append(kwargs["job_return"])
+
+    def task_function(_: Any) -> None:
+        raise SystemExit(3)
+
+    config_loader = ConfigLoaderImpl(
+        config_search_path=create_config_search_path("pkg://hydra.test_utils.configs")
+    )
+    cfg = config_loader.load_configuration(
+        config_name="compose",
+        run_mode=RunMode.RUN,
+        overrides=[f"hydra.run.dir={tmp_path}", "hydra.output_subdir=null"],
+    )
+
+    def fail_flushing() -> None:
+        raise ValueError("logger flushing failed")
+
+    monkeypatch.setattr(utils, "_flush_loggers", fail_flushing)
+    with raises(SystemExit) as exc_info:
+        utils.run_job(
+            task_function=task_function,
+            config=cfg,
+            job_dir_key="hydra.run.dir",
+            job_subdir_key=None,
+            hydra_context=HydraContext(
+                config_loader=config_loader,
+                callbacks=cast(Any, RecordingCallbacks()),
+            ),
+            configure_logging=False,
+        )
+
+    assert events == ["start", "end"]
+    assert len(completed) == 1
+    job_return = completed[0]
+    assert job_return.status is utils.JobStatus.FAILED
+    assert job_return._return_value is exc_info.value
+    assert utils._take_job_return_handoff(exc_info.value) is job_return
+    assert not hasattr(exc_info.value, "job_return")
+    assert (
+        sum(
+            frame.name == "_run_job"
+            for frame in traceback.extract_tb(exc_info.value.__traceback__)
+        )
+        == 1
+    )
+
+
+def test_run_job_does_not_handoff_job_return_when_job_end_exits(
+    hydra_restore_singletons: Any, tmp_path: Any
+) -> None:
+    job_end_error = SystemExit(3)
+    completed = []
+
+    class ExitingCallbacks:
+        def on_job_start(self, **kwargs: Any) -> None:
+            pass
+
+        def on_job_end(self, **kwargs: Any) -> None:
+            completed.append(kwargs["job_return"])
+            raise job_end_error
+
+    config_loader = ConfigLoaderImpl(
+        config_search_path=create_config_search_path("pkg://hydra.test_utils.configs")
+    )
+    cfg = config_loader.load_configuration(
+        config_name="compose",
+        run_mode=RunMode.RUN,
+        overrides=[f"hydra.run.dir={tmp_path}", "hydra.output_subdir=null"],
+    )
+
+    with raises(SystemExit) as exc_info:
+        utils.run_job(
+            task_function=lambda _: "completed",
+            config=cfg,
+            job_dir_key="hydra.run.dir",
+            job_subdir_key=None,
+            hydra_context=HydraContext(
+                config_loader=config_loader,
+                callbacks=cast(Any, ExitingCallbacks()),
+            ),
+            configure_logging=False,
+        )
+
+    assert exc_info.value is job_end_error
+    assert len(completed) == 1
+    assert completed[0].status is utils.JobStatus.COMPLETED
+    assert utils._take_job_return_handoff(job_end_error) is None
+
+
+def test_run_job_propagates_flush_system_exit_after_task_exception(
+    hydra_restore_singletons: Any, tmp_path: Any, monkeypatch: Any
+) -> None:
+    task_error = RuntimeError("task failure")
+    flush_error = SystemExit(3)
+    events = []
+    completed = []
+
+    class RecordingCallbacks:
+        def on_job_start(self, **kwargs: Any) -> None:
+            events.append("start")
+
+        def on_job_end(self, **kwargs: Any) -> None:
+            events.append("end")
+            completed.append(kwargs["job_return"])
+
+    def task_function(_: Any) -> None:
+        raise task_error
+
+    def fail_flushing() -> None:
+        raise flush_error
+
+    monkeypatch.setattr(utils, "_flush_loggers", fail_flushing)
+    config_loader = ConfigLoaderImpl(
+        config_search_path=create_config_search_path("pkg://hydra.test_utils.configs")
+    )
+    cfg = config_loader.load_configuration(
+        config_name="compose",
+        run_mode=RunMode.RUN,
+        overrides=[f"hydra.run.dir={tmp_path}", "hydra.output_subdir=null"],
+    )
+
+    with raises(SystemExit) as exc_info:
+        utils.run_job(
+            task_function=task_function,
+            config=cfg,
+            job_dir_key="hydra.run.dir",
+            job_subdir_key=None,
+            hydra_context=HydraContext(
+                config_loader=config_loader,
+                callbacks=cast(Any, RecordingCallbacks()),
+            ),
+            configure_logging=False,
+        )
+
+    assert exc_info.value is flush_error
+    assert events == ["start", "end"]
+    assert len(completed) == 1
+    job_return = completed[0]
+    assert job_return.status is utils.JobStatus.FAILED
+    assert job_return._return_value is task_error
+    assert utils._take_job_return_handoff(flush_error) is job_return
+
+
+def test_run_job_preserves_task_keyboard_interrupt_when_flush_exits(
+    hydra_restore_singletons: Any, tmp_path: Any, monkeypatch: Any
+) -> None:
+    task_error = KeyboardInterrupt("task interrupted")
+    job_returns = []
+
+    def task_function(_: Any) -> None:
+        raise task_error
+
+    class RecordingCallbacks:
+        def on_job_start(self, **kwargs: Any) -> None:
+            pass
+
+        def on_job_end(self, **kwargs: Any) -> None:
+            job_returns.append(kwargs["job_return"])
+
+    def fail_flushing() -> None:
+        raise SystemExit(3)
+
+    monkeypatch.setattr(utils, "_flush_loggers", fail_flushing)
+    config_loader = ConfigLoaderImpl(
+        config_search_path=create_config_search_path("pkg://hydra.test_utils.configs")
+    )
+    cfg = config_loader.load_configuration(
+        config_name="compose",
+        run_mode=RunMode.RUN,
+        overrides=[f"hydra.run.dir={tmp_path}", "hydra.output_subdir=null"],
+    )
+
+    with raises(KeyboardInterrupt) as exc_info:
+        utils.run_job(
+            task_function=task_function,
+            config=cfg,
+            job_dir_key="hydra.run.dir",
+            job_subdir_key=None,
+            hydra_context=HydraContext(
+                config_loader=config_loader,
+                callbacks=cast(Any, RecordingCallbacks()),
+            ),
+            configure_logging=False,
+        )
+
+    assert exc_info.value is task_error
+    assert len(job_returns) == 1
+    job_return = job_returns[0]
+    assert job_return.status is utils.JobStatus.FAILED
+    assert job_return._return_value is task_error
+    assert utils._take_job_return_handoff(task_error) is job_return
+    frames = traceback.extract_tb(task_error.__traceback__)
+    assert any(frame.name == "task_function" for frame in frames)
+    assert sum(frame.name == "_run_job" for frame in frames) == 1
