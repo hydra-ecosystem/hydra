@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T06:35:44Z",
+  "generated_at": "2026-10-01T07:23:34Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 58,
@@ -66,7 +66,7 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 80
+        "count": 81
       }
     ]
   },
@@ -680,22 +680,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3203"
     },
     {
-      "number": 3220,
-      "title": "Consider promoting callbacks out of experimental",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-06-20",
-      "updated": "2026-07-19",
-      "labels": [
-        "maintenance",
-        "callbacks"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3220"
-    },
-    {
       "number": 3221,
       "title": "Clean up deprecations older than Hydra 1.2",
       "category": "Refactor",
@@ -992,6 +976,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3490"
     },
     {
+      "number": 3498,
+      "title": "Evaluate promoting callbacks out of experimental after Hydra 1.4",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-01",
+      "updated": "2026-10-01",
+      "labels": [
+        "maintenance",
+        "callbacks"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3498"
+    },
+    {
       "number": 385,
       "title": "Experimentation tracking support",
       "category": "Enhancement",
@@ -1094,6 +1094,21 @@
         "priority_low"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1622"
+    },
+    {
+      "number": 1885,
+      "title": "follow up with shell testing for #1842",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2021-11-11",
+      "updated": "2026-09-27",
+      "labels": [
+        "tests"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1885"
     },
     {
       "number": 2170,
@@ -1788,6 +1803,36 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3252"
     },
     {
+      "number": 3324,
+      "title": "Align bundled plugin dependencies with Hydra release lines",
+      "category": "Build",
+      "category_emoji": "🏗️",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-07-28",
+      "updated": "2026-07-28",
+      "labels": [
+        "dependencies",
+        "maintenance",
+        "plugin"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3324"
+    },
+    {
+      "number": 3361,
+      "title": "Show user frames in default instantiation error tracebacks",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-08",
+      "updated": "2026-09-17",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3361"
+    },
+    {
       "number": 3369,
       "title": "Remove redundant setup-xcode step from macOS CI",
       "category": "Refactor",
@@ -1999,6 +2044,21 @@
         "defaults list"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3405"
+    },
+    {
+      "number": 3406,
+      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "documentation"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3406"
     },
     {
       "number": 3408,
@@ -2246,67 +2306,37 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
     },
     {
-      "number": 1885,
-      "title": "follow up with shell testing for #1842",
+      "number": 3220,
+      "title": "Consider promoting callbacks out of experimental",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2021-11-11",
-      "updated": "2026-09-27",
+      "created": "2026-06-20",
+      "updated": "2026-07-19",
       "labels": [
-        "tests"
+        "callbacks",
+        "maintenance"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1885"
-    },
-    {
-      "number": 3324,
-      "title": "Align bundled plugin dependencies with Hydra release lines",
-      "category": "Build",
-      "category_emoji": "🏗️",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-07-28",
-      "updated": "2026-07-28",
-      "labels": [
-        "dependencies",
-        "maintenance",
-        "plugin"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3324"
-    },
-    {
-      "number": 3361,
-      "title": "Show user frames in default instantiation error tracebacks",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-08-08",
-      "updated": "2026-09-17",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3361"
-    },
-    {
-      "number": 3406,
-      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-08-23",
-      "updated": "2026-08-23",
-      "labels": [
-        "documentation"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3406"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3220"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-01T07:23:34Z",
+      "kind": "closed",
+      "issue": 3220,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3220",
+      "title": "Consider promoting callbacks out of experimental"
+    },
+    {
+      "ts": "2026-10-01T07:23:34Z",
+      "kind": "new",
+      "issue": 3498,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3498",
+      "title": "Evaluate promoting callbacks out of experimental after Hydra 1.4"
+    },
     {
       "ts": "2026-10-01T06:35:44Z",
       "kind": "closed",
@@ -3908,20 +3938,6 @@
       "issue": 2767,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2767",
       "title": "[Feature Request] Allow optional and override keywords to work together."
-    },
-    {
-      "ts": "2026-08-23T18:38:09Z",
-      "kind": "closed",
-      "issue": 2765,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2765",
-      "title": "[Feature Request] Loguru and Hydra "
-    },
-    {
-      "ts": "2026-08-23T18:21:58Z",
-      "kind": "closed",
-      "issue": 2762,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2762",
-      "title": "New Release Version?"
     }
   ]
 }

@@ -910,3 +910,5 @@
 {"ts": "2026-10-01T06:35:44Z", "kind": "closed", "issue": 3324, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3324", "title": "Align bundled plugin dependencies with Hydra release lines"}
 {"ts": "2026-10-01T06:35:44Z", "kind": "closed", "issue": 3361, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3361", "title": "Show user frames in default instantiation error tracebacks"}
 {"ts": "2026-10-01T06:35:44Z", "kind": "closed", "issue": 3406, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406", "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin"}
+{"ts": "2026-10-01T07:23:34Z", "kind": "new", "issue": 3498, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3498", "title": "Evaluate promoting callbacks out of experimental after Hydra 1.4"}
+{"ts": "2026-10-01T07:23:34Z", "kind": "closed", "issue": 3220, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3220", "title": "Consider promoting callbacks out of experimental"}
