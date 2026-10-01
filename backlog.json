@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T13:04:45Z",
+  "generated_at": "2026-10-01T17:18:56Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 55,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 53
+        "count": 52
       },
       {
         "status": "done",
@@ -71,6 +71,24 @@
     ]
   },
   "issues": [
+    {
+      "number": 3486,
+      "title": "Modernize type annotations for Python 3.10+",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3501,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3501"
+        }
+      ],
+      "created": "2026-09-28",
+      "updated": "2026-09-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3486"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -901,19 +919,6 @@
       "updated": "2026-09-26",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
-    },
-    {
-      "number": 3486,
-      "title": "Modernize type annotations for Python 3.10+",
-      "category": "Refactor",
-      "category_emoji": "🔧",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-09-28",
-      "updated": "2026-09-28",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3486"
     },
     {
       "number": 3490,
@@ -1781,6 +1786,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3220"
     },
     {
+      "number": 3221,
+      "title": "Clean up deprecations older than Hydra 1.2",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-06-20",
+      "updated": "2026-06-25",
+      "labels": [
+        "maintenance"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3221"
+    },
+    {
       "number": 3230,
       "title": "Add Compose API initializer for multiple config search path entries",
       "category": "Enhancement",
@@ -2315,24 +2335,29 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 3221,
-      "title": "Clean up deprecations older than Hydra 1.2",
-      "category": "Refactor",
-      "category_emoji": "🔧",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-06-20",
-      "updated": "2026-06-25",
-      "labels": [
-        "maintenance"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3221"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-01T17:18:56Z",
+      "kind": "pr",
+      "issue": 3486,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3486",
+      "title": "Modernize type annotations for Python 3.10+",
+      "detail": "linked #3501"
+    },
+    {
+      "ts": "2026-10-01T17:18:56Z",
+      "kind": "status",
+      "issue": 3486,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3486",
+      "title": "Modernize type annotations for Python 3.10+",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3501,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3501"
+      }
+    },
     {
       "ts": "2026-10-01T13:04:45Z",
       "kind": "closed",
@@ -3946,20 +3971,6 @@
       "issue": 3402,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3402",
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior"
-    },
-    {
-      "ts": "2026-08-23T21:53:36Z",
-      "kind": "closed",
-      "issue": 2782,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2782",
-      "title": "[Feature Request] Add an additional node to the defaults tree"
-    },
-    {
-      "ts": "2026-08-23T21:53:36Z",
-      "kind": "new",
-      "issue": 3406,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
-      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin"
     }
   ]
 }

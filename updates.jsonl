@@ -919,3 +919,5 @@
 {"ts": "2026-10-01T11:55:53Z", "kind": "pr", "issue": 2814, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2814", "title": "[Feature Request] Allow setting use_srun from submitit launcher", "detail": "linked #3500"}
 {"ts": "2026-10-01T12:44:44Z", "kind": "closed", "issue": 2814, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2814", "title": "[Feature Request] Allow setting use_srun from submitit launcher"}
 {"ts": "2026-10-01T13:04:45Z", "kind": "closed", "issue": 3221, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3221", "title": "Clean up deprecations older than Hydra 1.2"}
+{"ts": "2026-10-01T17:18:56Z", "kind": "status", "issue": 3486, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3486", "title": "Modernize type annotations for Python 3.10+", "detail": "not started → in progress", "pr": {"number": 3501, "url": "https://github.com/hydra-ecosystem/hydra/pull/3501"}}
+{"ts": "2026-10-01T17:18:56Z", "kind": "pr", "issue": 3486, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3486", "title": "Modernize type annotations for Python 3.10+", "detail": "linked #3501"}
