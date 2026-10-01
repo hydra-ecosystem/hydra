@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T07:23:34Z",
+  "generated_at": "2026-10-01T07:24:49Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 58,
@@ -1770,6 +1770,22 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3202"
     },
     {
+      "number": 3220,
+      "title": "Consider promoting callbacks out of experimental",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-06-20",
+      "updated": "2026-07-19",
+      "labels": [
+        "callbacks",
+        "maintenance"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3220"
+    },
+    {
       "number": 3230,
       "title": "Add Compose API initializer for multiple config search path entries",
       "category": "Enhancement",
@@ -2304,22 +2320,6 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 3220,
-      "title": "Consider promoting callbacks out of experimental",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-06-20",
-      "updated": "2026-07-19",
-      "labels": [
-        "callbacks",
-        "maintenance"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3220"
     }
   ],
   "updates": [
