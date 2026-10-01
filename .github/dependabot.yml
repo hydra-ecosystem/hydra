@@ -21,3 +21,7 @@ updates:
       - "/.github/actions/windows"
     schedule:
       interval: "monthly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
