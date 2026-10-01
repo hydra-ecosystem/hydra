@@ -64,6 +64,7 @@ The Submitit Plugin implements 2 different launchers: `submitit_slurm` to run on
   array_parallelism: 256
   setup: null
   srun_args: null
+  use_srun: true
   ```
 </details>
 <details>
@@ -91,6 +92,11 @@ python foo.py --multirun hydra/launcher=submitit_slurm hydra.launcher.timeout_mi
 ```
 Set `hydra.launcher.tasks_per_node=null` to omit `--ntasks-per-node` from the
 generated Slurm submission.
+
+Set `hydra.launcher.use_srun=false` to run Python directly in the batch script
+instead of through `srun`. The default is `true`. When disabled, Python runs
+once on the batch node, and `srun_args` is ignored; Slurm does not automatically
+launch the other requested tasks.
 
 Set `hydra.launcher.python` to use a Python executable other than the one
 running Hydra:

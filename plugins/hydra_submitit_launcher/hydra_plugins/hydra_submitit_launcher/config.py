@@ -77,6 +77,8 @@ class SlurmQueueConf(BaseQueueConf):
     setup: Optional[List[str]] = None
     # Any additional arguments that should be passed to srun
     srun_args: Optional[List[str]] = None
+    # Launch tasks through srun rather than directly in the batch script
+    use_srun: bool = True
 
 
 @dataclass
