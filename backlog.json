@@ -1,52 +1,52 @@
 {
   "generated_on": "2026-10-01",
-  "generated_at": "2026-10-01T09:47:44Z",
+  "generated_at": "2026-10-01T10:44:44Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 58,
+    "open_total": 57,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 1.7
+        "percentage": 1.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 50,
-        "percentage": 86.2
+        "count": 49,
+        "percentage": 86.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 3.4
+        "percentage": 3.5
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 1.7
+        "percentage": 1.8
       },
       {
         "category": "Refactor",
         "emoji": "🔧",
         "count": 2,
-        "percentage": 3.4
+        "percentage": 3.5
       },
       {
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 3.4
+        "percentage": 3.5
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,33 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 81
+        "count": 82
       }
     ]
   },
   "issues": [
-    {
-      "number": 1749,
-      "title": "tests: Use multiline regex search instead of assert_regex_match",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3499,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3499"
-        }
-      ],
-      "created": "2021-08-02",
-      "updated": "2026-07-19",
-      "labels": [
-        "maintenance",
-        "tests",
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1749"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2325,9 +2303,38 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 1749,
+      "title": "tests: Use multiline regex search instead of assert_regex_match",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3499,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3499"
+        }
+      ],
+      "created": "2021-08-02",
+      "updated": "2026-07-19",
+      "labels": [
+        "maintenance",
+        "priority_low",
+        "tests"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1749"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-01T10:44:44Z",
+      "kind": "closed",
+      "issue": 1749,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1749",
+      "title": "tests: Use multiline regex search instead of assert_regex_match"
+    },
     {
       "ts": "2026-10-01T08:28:36Z",
       "kind": "pr",
@@ -3942,13 +3949,6 @@
       "issue": 3402,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3402",
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin to change Hydra's behavior"
-    },
-    {
-      "ts": "2026-08-23T20:34:20Z",
-      "kind": "closed",
-      "issue": 2775,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2775",
-      "title": "[Feature Request] Problem with Overwriting dict config of existing configuration"
     }
   ]
 }

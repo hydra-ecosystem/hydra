@@ -3,6 +3,7 @@
     "1512": "2026-09-05",
     "1602": "2026-09-05",
     "1622": "2026-09-29",
+    "1749": "2026-10-01",
     "1885": "2026-10-01",
     "2170": "2026-09-25",
     "2237": "2026-09-17",
@@ -82,7 +83,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-01T09:47:44Z",
+  "generated_at": "2026-10-01T10:44:44Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -153,22 +154,6 @@
       "status": "not started",
       "title": "[Feature Request] Append to a list from command line",
       "updated_at": "2026-09-02T04:51:27Z"
-    },
-    "1749": {
-      "category": "Enhancement",
-      "created_at": "2021-08-02T23:27:54Z",
-      "labels": [
-        "maintenance",
-        "priority_low",
-        "tests"
-      ],
-      "pr_numbers": [
-        "3499"
-      ],
-      "state": "OPEN",
-      "status": "in progress",
-      "title": "tests: Use multiline regex search instead of assert_regex_match",
-      "updated_at": "2026-07-19T11:33:00Z"
     },
     "1869": {
       "category": "Enhancement",
@@ -867,6 +852,22 @@
       "status": "done",
       "title": "keyword documentation for config.yaml",
       "updated_at": "2026-07-19T16:07:54Z"
+    },
+    "1749": {
+      "category": "Enhancement",
+      "created_at": "2021-08-02T23:27:54Z",
+      "labels": [
+        "maintenance",
+        "priority_low",
+        "tests"
+      ],
+      "pr_numbers": [
+        "3499"
+      ],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "tests: Use multiline regex search instead of assert_regex_match",
+      "updated_at": "2026-07-19T11:33:00Z"
     },
     "1885": {
       "category": "Enhancement",
