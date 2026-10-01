@@ -21,6 +21,7 @@ class ConfigStore(metaclass=Singleton):
         group: Optional[str] = None,
         package: Optional[str] = None,
         provider: Optional[str] = None,
+        replace: Optional[bool] = None,
     ) -> None:
         """
         Stores a config node into the repository
@@ -33,8 +34,34 @@ class ConfigStore(metaclass=Singleton):
             Child separator is '.', for example foo.bar.baz
         :param provider: the name of the module/app providing this config.
             Helps debugging.
+        :param replace: what to do when a *different* config is already stored
+            under the same group and name. True replaces it, False raises a
+            ValueError. The default, None, replaces it and issues a UserWarning.
+            Storing a config that equals the stored one is never a clobber:
+            Hydra re-executes plugin modules on every plugin discovery pass, so
+            their module level store() calls repeat by design.
         """
     ...
+```
+
+### Overwriting a stored config
+
+Storing a config under a group and name that is already taken by a *different*
+config replaces it. Because that is easy to do by accident in an application
+that stores many configs, it also issues a `UserWarning`:
+
+```python
+cs.store(name="config", group="db", node=MySQLConfig)
+cs.store(name="config", group="db", node=PostgresSQLConfig)  # UserWarning
+```
+
+Pass `replace` to say which you meant:
+
+```python
+# Replace the stored config, no warning
+cs.store(name="config", group="db", node=PostgresSQLConfig, replace=True)
+# Refuse to replace it, raises ValueError
+cs.store(name="config", group="db", node=PostgresSQLConfig, replace=False)
 ```
 
 ### ConfigStore and YAML input configs
