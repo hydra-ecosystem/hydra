@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T16:46:20Z",
+  "generated_at": "2026-10-02T16:47:37Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 48,
@@ -1676,6 +1676,23 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3064"
     },
     {
+      "number": 3177,
+      "title": "Consider supporting newer Ax features in Ax Sweeper",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-05-15",
+      "updated": "2026-09-05",
+      "labels": [
+        "ax",
+        "help wanted",
+        "plugin"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3177"
+    },
+    {
       "number": 3202,
       "title": "Disallow parent traversal in Defaults List config groups",
       "category": "Enhancement",
@@ -2337,23 +2354,6 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 3177,
-      "title": "Consider supporting newer Ax features in Ax Sweeper",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-05-15",
-      "updated": "2026-09-05",
-      "labels": [
-        "ax",
-        "help wanted",
-        "plugin"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3177"
     }
   ],
   "updates": [
