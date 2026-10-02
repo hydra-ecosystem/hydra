@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T11:27:44Z",
+  "generated_at": "2026-10-02T11:36:09Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 53,
+    "open_total": 52,
     "by_category": [
       {
         "category": "Bug",
@@ -14,8 +14,8 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 47,
-        "percentage": 88.7
+        "count": 46,
+        "percentage": 88.5
       },
       {
         "category": "Documentation",
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 51
+        "count": 50
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 86
+        "count": 87
       }
     ]
   },
@@ -833,21 +833,6 @@
       "updated": "2026-08-11",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3375"
-    },
-    {
-      "number": 3404,
-      "title": "Rename the target whitelist API to instantiate whitelist",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-08-23",
-      "updated": "2026-08-23",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3404"
     },
     {
       "number": 3438,
@@ -2336,9 +2321,31 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 3404,
+      "title": "Rename the target whitelist API to instantiate whitelist",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3404"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-02T11:36:09Z",
+      "kind": "closed",
+      "issue": 3404,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3404",
+      "title": "Rename the target whitelist API to instantiate whitelist"
+    },
     {
       "ts": "2026-10-02T11:27:44Z",
       "kind": "label",
@@ -3966,13 +3973,6 @@
       "issue": 2797,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2797",
       "title": "Use output_subdir on multirun"
-    },
-    {
-      "ts": "2026-08-24T04:59:58Z",
-      "kind": "closed",
-      "issue": 2794,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2794",
-      "title": "Merge compose API and `@hydra.main`"
     }
   ]
 }
