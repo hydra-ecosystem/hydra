@@ -32,7 +32,7 @@ overrides:
   cross-spawn: "^7.0.5"
   dompurify: "^3.2.4"
   express: "^4.21.1"
-  fast-uri: "3.1.6"
+  fast-uri: "3.1.7"
   follow-redirects: "^1.15.6"
   http-proxy-middleware: "3.0.7"
   joi: "17.13.6"
