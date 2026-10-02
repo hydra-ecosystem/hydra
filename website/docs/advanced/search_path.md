@@ -16,7 +16,16 @@ Sources use prefixes such as `file://` and `pkg://`:
   current working directory; an absolute path is used as-is. Use `/` as the path
   separator on all operating systems.
 - `pkg://` points to an importable Python package, using `.` between package
-  names. Package directories need `__init__.py` files.
+  names. The config package must be a regular package with an initializer,
+  either `__init__.py` or a compiled extension. Include YAML configs as package
+  data in the installed distribution.
+
+A regular config package may live beneath a namespace parent, such as
+`company.product_a.conf`. Give each distribution its own config package and add
+it explicitly to the search path; a namespace package itself is not a supported
+`pkg://` config root. For Cythonized applications, keeping the config package's
+empty `__init__.py` uncompiled is the simplest packaging arrangement. Compiled
+package initializers are also supported.
 
 The application's initial config source normally precedes later additions such
 as `--config-dir` and `hydra.searchpath`. These additions can supply missing

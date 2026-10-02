@@ -137,7 +137,8 @@ def initialize_config_module(
 ) -> None:
     """
     Initializes Hydra and adds the config_module to the config search path.
-    The config module must be importable (an __init__.py must exist at its top level)
+    The config module must be an importable regular Python package.
+    Its initializer may be Python source or a compiled extension.
     :param config_module: importable module name, for example "foo.bar.conf".
     :param job_name: the value for hydra.job.name (default is 'app')
     """
