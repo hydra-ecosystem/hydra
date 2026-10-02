@@ -1,1 +1,1 @@
-Support compiled package initializers in pkg:// config sources.
+Load configs from regular Python packages without requiring __init__.py.
