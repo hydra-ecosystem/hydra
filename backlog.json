@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T21:39:22Z",
+  "generated_at": "2026-10-02T21:53:27Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 48,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 45
+        "count": 46
       },
       {
         "status": "done",
@@ -71,24 +71,6 @@
     ]
   },
   "issues": [
-    {
-      "number": 3506,
-      "title": "Retire the Ax Sweeper after Hydra 1.4",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3507,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3507"
-        }
-      ],
-      "created": "2026-10-02",
-      "updated": "2026-10-02",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -840,6 +822,19 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3498"
+    },
+    {
+      "number": 3506,
+      "title": "Retire the Ax Sweeper after Hydra 1.4",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-02",
+      "updated": "2026-10-02",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
     },
     {
       "number": 385,
@@ -2362,6 +2357,22 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-02T21:53:27Z",
+      "kind": "pr",
+      "issue": 3506,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3506",
+      "title": "Retire the Ax Sweeper after Hydra 1.4",
+      "detail": "unlinked #3507"
+    },
+    {
+      "ts": "2026-10-02T21:53:27Z",
+      "kind": "status",
+      "issue": 3506,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3506",
+      "title": "Retire the Ax Sweeper after Hydra 1.4",
+      "detail": "in progress → not started"
+    },
     {
       "ts": "2026-10-02T21:39:22Z",
       "kind": "pr",
@@ -3981,21 +3992,6 @@
       "issue": 2846,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2846",
       "title": "[Feature Request] Conditionally disable the creation of output folders via callback"
-    },
-    {
-      "ts": "2026-08-28T13:51:10Z",
-      "kind": "new",
-      "issue": 3419,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3419",
-      "title": "[Feature Request] AlbumentationsX example for nested instantiation and multirun reproducibility"
-    },
-    {
-      "ts": "2026-08-27T05:07:26Z",
-      "kind": "pr",
-      "issue": 3405,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3405",
-      "title": "Reject optional and override on the same Defaults List entry",
-      "detail": "linked #3414"
     }
   ]
 }

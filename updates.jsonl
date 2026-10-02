@@ -935,3 +935,5 @@
 {"ts": "2026-10-02T16:46:20Z", "kind": "closed", "issue": 3177, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3177", "title": "Consider supporting newer Ax features in Ax Sweeper"}
 {"ts": "2026-10-02T21:39:22Z", "kind": "status", "issue": 3506, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3506", "title": "Retire the Ax Sweeper after Hydra 1.4", "detail": "not started → in progress", "pr": {"number": 3507, "url": "https://github.com/hydra-ecosystem/hydra/pull/3507"}}
 {"ts": "2026-10-02T21:39:22Z", "kind": "pr", "issue": 3506, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3506", "title": "Retire the Ax Sweeper after Hydra 1.4", "detail": "linked #3507"}
+{"ts": "2026-10-02T21:53:27Z", "kind": "status", "issue": 3506, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3506", "title": "Retire the Ax Sweeper after Hydra 1.4", "detail": "in progress → not started"}
+{"ts": "2026-10-02T21:53:27Z", "kind": "pr", "issue": 3506, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3506", "title": "Retire the Ax Sweeper after Hydra 1.4", "detail": "unlinked #3507"}

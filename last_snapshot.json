@@ -93,7 +93,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-02T21:39:22Z",
+  "generated_at": "2026-10-02T21:53:27Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -584,13 +584,11 @@
       "category": "Enhancement",
       "created_at": "2026-10-02T16:42:01Z",
       "labels": [],
-      "pr_numbers": [
-        "3507"
-      ],
+      "pr_numbers": [],
       "state": "OPEN",
-      "status": "in progress",
+      "status": "not started",
       "title": "Retire the Ax Sweeper after Hydra 1.4",
-      "updated_at": "2026-10-02T16:42:01Z"
+      "updated_at": "2026-10-02T21:52:08Z"
     },
     "468": {
       "category": "Enhancement",
