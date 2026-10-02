@@ -14,6 +14,22 @@ import {ExampleGithubLink} from "@site/src/components/GithubLink"
 
 This plugin provides a mechanism for Hydra applications to use the [Adaptive Experimentation Platform, aka Ax](https://ax.dev/). Ax can optimize any experiment - machine learning experiments, A/B tests, and simulations.
 
+:::warning Retirement after Hydra 1.4
+
+Hydra 1.4 will include the final first-party release of the Ax Sweeper, based on
+the existing implementation. Further modernization is no longer planned. The
+plugin code will be removed in the Hydra 1.5 line, and no first-party Ax Sweeper
+releases will be published for Hydra 1.5 or later. Existing PyPI releases will
+remain available.
+
+Community members interested in maintaining the plugin in a separate repository
+are invited to comment on the [retirement issue](https://github.com/hydra-ecosystem/hydra/issues/3506).
+Hydra's documentation can link to that repository. Transferring control of the
+`hydra-ax-sweeper` PyPI package may be considered once new maintainers establish
+a reliable track record and build trust.
+
+:::
+
 ### Installation
 ```commandline
 pip install hydra-ax-sweeper --upgrade
