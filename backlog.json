@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T16:18:56Z",
+  "generated_at": "2026-10-02T16:43:22Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 50,
+    "open_total": 51,
     "by_category": [
       {
         "category": "Bug",
@@ -14,14 +14,14 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 44,
-        "percentage": 88.0
+        "count": 45,
+        "percentage": 88.2
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 4.0
+        "percentage": 3.9
       },
       {
         "category": "Question",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 4.0
+        "percentage": 3.9
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 48
+        "count": 49
       },
       {
         "status": "done",
@@ -874,6 +874,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3498"
     },
     {
+      "number": 3506,
+      "title": "Retire the Ax Sweeper after Hydra 1.4",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-02",
+      "updated": "2026-10-02",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
+    },
+    {
       "number": 385,
       "title": "Experimentation tracking support",
       "category": "Enhancement",
@@ -1056,6 +1069,26 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2237"
+    },
+    {
+      "number": 2412,
+      "title": "[Feature Request] allow to use hydra without an __init__.py",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3505,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3505"
+        }
+      ],
+      "created": "2022-10-10",
+      "updated": "2026-10-02",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2412"
     },
     {
       "number": 2664,
@@ -2321,29 +2354,16 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 2412,
-      "title": "[Feature Request] allow to use hydra without an __init__.py",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3505,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3505"
-        }
-      ],
-      "created": "2022-10-10",
-      "updated": "2026-10-02",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2412"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-02T16:43:22Z",
+      "kind": "new",
+      "issue": 3506,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3506",
+      "title": "Retire the Ax Sweeper after Hydra 1.4"
+    },
     {
       "ts": "2026-10-02T16:18:56Z",
       "kind": "closed",
@@ -3976,13 +3996,6 @@
       "issue": 3411,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
       "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets"
-    },
-    {
-      "ts": "2026-08-24T17:02:09Z",
-      "kind": "new",
-      "issue": 3410,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3410",
-      "title": "Backport instantiate aliasing fix (#3409) to 1.3.6 and release 1.4.0.dev9"
     }
   ]
 }

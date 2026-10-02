@@ -929,3 +929,4 @@
 {"ts": "2026-10-02T14:38:03Z", "kind": "status", "issue": 2412, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2412", "title": "[Feature Request] allow to use hydra without an __init__.py", "detail": "not started → in progress", "pr": {"number": 3505, "url": "https://github.com/hydra-ecosystem/hydra/pull/3505"}}
 {"ts": "2026-10-02T14:38:03Z", "kind": "pr", "issue": 2412, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2412", "title": "[Feature Request] allow to use hydra without an __init__.py", "detail": "linked #3505"}
 {"ts": "2026-10-02T16:18:56Z", "kind": "closed", "issue": 2412, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2412", "title": "[Feature Request] allow to use hydra without an __init__.py"}
+{"ts": "2026-10-02T16:43:22Z", "kind": "new", "issue": 3506, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3506", "title": "Retire the Ax Sweeper after Hydra 1.4"}
