@@ -81,12 +81,13 @@
     "3457": "2026-09-22",
     "3458": "2026-09-22",
     "3486": "2026-10-01",
+    "3490": "2026-10-02",
     "3491": "2026-10-01",
     "385": "2026-09-05",
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-02T06:21:30Z",
+  "generated_at": "2026-10-02T06:28:37Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -636,16 +637,6 @@
       "status": "not started",
       "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4",
       "updated_at": "2026-09-26T19:34:26Z"
-    },
-    "3490": {
-      "category": "Enhancement",
-      "created_at": "2026-09-30T19:01:08Z",
-      "labels": [],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "\u9080\u8bf7 hydra \u52a0\u5165 GithubStarMate\uff0c\u8ba9\u66f4\u591a\u4eba\u53d1\u73b0\u4f60\u7684\u4f5c\u54c1",
-      "updated_at": "2026-09-30T19:01:08Z"
     },
     "3498": {
       "category": "Enhancement",
@@ -1808,6 +1799,16 @@
       "status": "done",
       "title": "Modernize type annotations for Python 3.10+",
       "updated_at": "2026-09-28T22:06:10Z"
+    },
+    "3490": {
+      "category": "Enhancement",
+      "created_at": "2026-09-30T19:01:08Z",
+      "labels": [],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "\u9080\u8bf7 hydra \u52a0\u5165 GithubStarMate\uff0c\u8ba9\u66f4\u591a\u4eba\u53d1\u73b0\u4f60\u7684\u4f5c\u54c1",
+      "updated_at": "2026-09-30T19:01:08Z"
     },
     "3491": {
       "category": "Enhancement",

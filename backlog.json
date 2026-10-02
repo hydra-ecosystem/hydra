@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T06:21:30Z",
+  "generated_at": "2026-10-02T06:28:37Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 54,
+    "open_total": 53,
     "by_category": [
       {
         "category": "Bug",
@@ -14,14 +14,14 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 48,
-        "percentage": 88.9
+        "count": 47,
+        "percentage": 88.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 3.7
+        "percentage": 3.8
       },
       {
         "category": "Question",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 3.7
+        "percentage": 3.8
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 52
+        "count": 51
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 85
+        "count": 86
       }
     ]
   },
@@ -901,19 +901,6 @@
       "updated": "2026-09-26",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
-    },
-    {
-      "number": 3490,
-      "title": "邀请 hydra 加入 GithubStarMate，让更多人发现你的作品",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-09-30",
-      "updated": "2026-09-30",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3490"
     },
     {
       "number": 3498,
@@ -2335,9 +2322,29 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 3490,
+      "title": "邀请 hydra 加入 GithubStarMate，让更多人发现你的作品",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-09-30",
+      "updated": "2026-09-30",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3490"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-02T06:28:37Z",
+      "kind": "closed",
+      "issue": 3490,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3490",
+      "title": "邀请 hydra 加入 GithubStarMate，让更多人发现你的作品"
+    },
     {
       "ts": "2026-10-01T19:56:45Z",
       "kind": "closed",
@@ -3964,13 +3971,6 @@
       "issue": 2791,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2791",
       "title": "Permission issues with the outputs folder when script is run by multiple users"
-    },
-    {
-      "ts": "2026-08-24T03:56:54Z",
-      "kind": "closed",
-      "issue": 2786,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2786",
-      "title": "Hydra + Submitit Help"
     }
   ]
 }
