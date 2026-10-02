@@ -5,7 +5,7 @@ inputs:
 runs:
   using: composite
   steps:
-  - uses: conda-incubator/setup-miniconda@fc2d68f6413eb2d87b895e92f8584b5b94a10167 # v3.3.0
+  - uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb # v4.1.0
     with:
       miniconda-version: "latest"
       python-version: ${{ inputs.py_version }}
