@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T15:27:39Z",
+  "generated_at": "2026-10-02T16:18:56Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 51,
+    "open_total": 50,
     "by_category": [
       {
         "category": "Bug",
@@ -14,14 +14,14 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 45,
-        "percentage": 88.2
+        "count": 44,
+        "percentage": 88.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 3.9
+        "percentage": 4.0
       },
       {
         "category": "Question",
@@ -39,14 +39,14 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 3.9
+        "percentage": 4.0
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,31 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 88
+        "count": 89
       }
     ]
   },
   "issues": [
-    {
-      "number": 2412,
-      "title": "[Feature Request] allow to use hydra without an __init__.py",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3505,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3505"
-        }
-      ],
-      "created": "2022-10-10",
-      "updated": "2026-10-02",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2412"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2341,9 +2321,36 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 2412,
+      "title": "[Feature Request] allow to use hydra without an __init__.py",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3505,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3505"
+        }
+      ],
+      "created": "2022-10-10",
+      "updated": "2026-10-02",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2412"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-02T16:18:56Z",
+      "kind": "closed",
+      "issue": 2412,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2412",
+      "title": "[Feature Request] allow to use hydra without an __init__.py"
+    },
     {
       "ts": "2026-10-02T14:38:03Z",
       "kind": "pr",
@@ -3976,13 +3983,6 @@
       "issue": 3410,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3410",
       "title": "Backport instantiate aliasing fix (#3409) to 1.3.6 and release 1.4.0.dev9"
-    },
-    {
-      "ts": "2026-08-24T10:57:32Z",
-      "kind": "new",
-      "issue": 3408,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3408",
-      "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates"
     }
   ]
 }
