@@ -925,3 +925,4 @@
 {"ts": "2026-10-02T06:28:37Z", "kind": "closed", "issue": 3490, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3490", "title": "邀请 hydra 加入 GithubStarMate，让更多人发现你的作品"}
 {"ts": "2026-10-02T11:27:44Z", "kind": "label", "issue": 1869, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1869", "title": "Add more examples to the submitit plugin", "detail": "added \"help wanted\""}
 {"ts": "2026-10-02T11:36:09Z", "kind": "closed", "issue": 3404, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3404", "title": "Rename the target whitelist API to instantiate whitelist"}
+{"ts": "2026-10-02T11:44:39Z", "kind": "closed", "issue": 3258, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3258", "title": "Switch instantiate target filtering to an allowlist model for 1.4"}

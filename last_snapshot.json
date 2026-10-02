@@ -50,6 +50,7 @@
     "3221": "2026-10-01",
     "3230": "2026-09-28",
     "3252": "2026-09-16",
+    "3258": "2026-10-02",
     "3324": "2026-10-01",
     "3361": "2026-10-01",
     "3369": "2026-09-04",
@@ -88,7 +89,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-02T11:36:09Z",
+  "generated_at": "2026-10-02T11:44:39Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -472,19 +473,6 @@
       "status": "not started",
       "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
       "updated_at": "2026-08-10T17:35:56Z"
-    },
-    "3258": {
-      "category": "Enhancement",
-      "created_at": "2026-07-04T14:17:14Z",
-      "labels": [
-        "instantiate_api",
-        "priority_high"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "Switch instantiate target filtering to an allowlist model for 1.4",
-      "updated_at": "2026-07-04T14:17:15Z"
     },
     "3279": {
       "category": "Enhancement",
@@ -1417,6 +1405,19 @@
       "status": "done",
       "title": "Migrate Hydra plugin discovery from namespace scanning to entry points",
       "updated_at": "2026-09-05T17:57:51Z"
+    },
+    "3258": {
+      "category": "Enhancement",
+      "created_at": "2026-07-04T14:17:14Z",
+      "labels": [
+        "instantiate_api",
+        "priority_high"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Switch instantiate target filtering to an allowlist model for 1.4",
+      "updated_at": "2026-07-04T14:17:15Z"
     },
     "3324": {
       "category": "Build",

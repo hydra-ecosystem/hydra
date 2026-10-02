@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T11:36:09Z",
+  "generated_at": "2026-10-02T11:44:39Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 52,
+    "open_total": 51,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 1.9
+        "percentage": 2.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 46,
-        "percentage": 88.5
+        "count": 45,
+        "percentage": 88.2
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 3.8
+        "percentage": 3.9
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 1.9
+        "percentage": 2.0
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 3.8
+        "percentage": 3.9
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 50
+        "count": 49
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 87
+        "count": 88
       }
     ]
   },
@@ -708,22 +708,6 @@
       "updated": "2026-08-10",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
-    },
-    {
-      "number": 3258,
-      "title": "Switch instantiate target filtering to an allowlist model for 1.4",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-07-04",
-      "updated": "2026-07-04",
-      "labels": [
-        "instantiate_api",
-        "priority_high"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3258"
     },
     {
       "number": 3279,
@@ -2011,6 +1995,21 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3403"
     },
     {
+      "number": 3404,
+      "title": "Rename the target whitelist API to instantiate whitelist",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-08-23",
+      "updated": "2026-08-23",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3404"
+    },
+    {
       "number": 3405,
       "title": "Reject optional and override on the same Defaults List entry",
       "category": "Bug",
@@ -2323,22 +2322,30 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
     },
     {
-      "number": 3404,
-      "title": "Rename the target whitelist API to instantiate whitelist",
+      "number": 3258,
+      "title": "Switch instantiate target filtering to an allowlist model for 1.4",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2026-08-23",
-      "updated": "2026-08-23",
+      "created": "2026-07-04",
+      "updated": "2026-07-04",
       "labels": [
-        "enhancement"
+        "instantiate_api",
+        "priority_high"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3404"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3258"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-02T11:44:39Z",
+      "kind": "closed",
+      "issue": 3258,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3258",
+      "title": "Switch instantiate target filtering to an allowlist model for 1.4"
+    },
     {
       "ts": "2026-10-02T11:36:09Z",
       "kind": "closed",
@@ -3966,13 +3973,6 @@
       "issue": 2810,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2810",
       "title": "hydra.errors.MissingConfigException: In 'hydra/config': Could not find 'hydra/sweeper/hgemm'"
-    },
-    {
-      "ts": "2026-08-24T06:25:37Z",
-      "kind": "closed",
-      "issue": 2797,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2797",
-      "title": "Use output_subdir on multirun"
     }
   ]
 }
