@@ -87,7 +87,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-02T08:58:37Z",
+  "generated_at": "2026-10-02T11:27:44Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -163,13 +163,14 @@
       "category": "Enhancement",
       "created_at": "2021-10-28T09:37:38Z",
       "labels": [
-        "enhancement"
+        "enhancement",
+        "help wanted"
       ],
       "pr_numbers": [],
       "state": "OPEN",
       "status": "not started",
       "title": "Add more examples to the submitit plugin",
-      "updated_at": "2026-07-25T18:30:57Z"
+      "updated_at": "2026-10-02T11:26:32Z"
     },
     "1890": {
       "category": "Enhancement",

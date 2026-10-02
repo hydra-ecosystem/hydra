@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T08:58:37Z",
+  "generated_at": "2026-10-02T11:27:44Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 53,
@@ -350,9 +350,10 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2021-10-28",
-      "updated": "2026-07-25",
+      "updated": "2026-10-02",
       "labels": [
-        "enhancement"
+        "enhancement",
+        "help wanted"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1869"
     },
@@ -2339,6 +2340,14 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-02T11:27:44Z",
+      "kind": "label",
+      "issue": 1869,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1869",
+      "title": "Add more examples to the submitit plugin",
+      "detail": "added \"help wanted\""
+    },
+    {
       "ts": "2026-10-02T06:28:37Z",
       "kind": "closed",
       "issue": 3490,
@@ -3964,13 +3973,6 @@
       "issue": 2794,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2794",
       "title": "Merge compose API and `@hydra.main`"
-    },
-    {
-      "ts": "2026-08-24T04:43:39Z",
-      "kind": "closed",
-      "issue": 2791,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2791",
-      "title": "Permission issues with the outputs folder when script is run by multiple users"
     }
   ]
 }
