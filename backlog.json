@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T16:44:58Z",
+  "generated_at": "2026-10-02T16:46:20Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 49,
+    "open_total": 48,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 2.0
+        "percentage": 2.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 43,
-        "percentage": 87.8
+        "count": 42,
+        "percentage": 87.5
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 4.1
+        "percentage": 4.2
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.0
+        "percentage": 2.1
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 4.1
+        "percentage": 4.2
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 47
+        "count": 46
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 91
+        "count": 92
       }
     ]
   },
@@ -555,23 +555,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3162"
     },
     {
-      "number": 3177,
-      "title": "Consider supporting newer Ax features in Ax Sweeper",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-05-15",
-      "updated": "2026-09-05",
-      "labels": [
-        "help wanted",
-        "plugin",
-        "ax"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3177"
-    },
-    {
       "number": 3189,
       "title": "Feature request: support env files as first-class Hydra inputs",
       "category": "Enhancement",
@@ -993,6 +976,21 @@
         "tests"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1885"
+    },
+    {
+      "number": 1890,
+      "title": "HPO config standardization",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2021-11-15",
+      "updated": "2026-07-25",
+      "labels": [
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1890"
     },
     {
       "number": 2170,
@@ -1774,6 +1772,24 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3258"
     },
     {
+      "number": 3313,
+      "title": "Standardize Ax Sweeper parameters and remove the Ax upper bound",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-07-24",
+      "updated": "2026-07-24",
+      "labels": [
+        "ax",
+        "enhancement",
+        "plugin",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3313"
+    },
+    {
       "number": 3324,
       "title": "Align bundled plugin dependencies with Hydra release lines",
       "category": "Build",
@@ -2323,40 +2339,31 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
     },
     {
-      "number": 1890,
-      "title": "HPO config standardization",
+      "number": 3177,
+      "title": "Consider supporting newer Ax features in Ax Sweeper",
       "category": "Enhancement",
       "category_emoji": "✨",
       "status": "done",
       "status_emoji": "✅",
       "prs": [],
-      "created": "2021-11-15",
-      "updated": "2026-07-25",
-      "labels": [
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1890"
-    },
-    {
-      "number": 3313,
-      "title": "Standardize Ax Sweeper parameters and remove the Ax upper bound",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-07-24",
-      "updated": "2026-07-24",
+      "created": "2026-05-15",
+      "updated": "2026-09-05",
       "labels": [
         "ax",
-        "enhancement",
-        "plugin",
-        "sweep"
+        "help wanted",
+        "plugin"
       ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3313"
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3177"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-02T16:46:20Z",
+      "kind": "closed",
+      "issue": 3177,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3177",
+      "title": "Consider supporting newer Ax features in Ax Sweeper"
+    },
     {
       "ts": "2026-10-02T16:44:58Z",
       "kind": "closed",
@@ -3983,14 +3990,6 @@
       "issue": 3411,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
       "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets"
-    },
-    {
-      "ts": "2026-08-24T20:01:14Z",
-      "kind": "pr",
-      "issue": 3411,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
-      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
-      "detail": "linked #3412"
     }
   ]
 }

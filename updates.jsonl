@@ -932,3 +932,4 @@
 {"ts": "2026-10-02T16:43:22Z", "kind": "new", "issue": 3506, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3506", "title": "Retire the Ax Sweeper after Hydra 1.4"}
 {"ts": "2026-10-02T16:44:58Z", "kind": "closed", "issue": 1890, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1890", "title": "HPO config standardization"}
 {"ts": "2026-10-02T16:44:58Z", "kind": "closed", "issue": 3313, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3313", "title": "Standardize Ax Sweeper parameters and remove the Ax upper bound"}
+{"ts": "2026-10-02T16:46:20Z", "kind": "closed", "issue": 3177, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3177", "title": "Consider supporting newer Ax features in Ax Sweeper"}
