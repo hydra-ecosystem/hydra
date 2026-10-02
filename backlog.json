@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T06:28:37Z",
+  "generated_at": "2026-10-02T07:20:43Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 53,
@@ -2304,6 +2304,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3486"
     },
     {
+      "number": 3490,
+      "title": "邀请 hydra 加入 GithubStarMate，让更多人发现你的作品",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-09-30",
+      "updated": "2026-09-30",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3490"
+    },
+    {
       "number": 3491,
       "title": "Harden callback lifecycle guarantees",
       "category": "Enhancement",
@@ -2322,19 +2335,6 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 3490,
-      "title": "邀请 hydra 加入 GithubStarMate，让更多人发现你的作品",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-09-30",
-      "updated": "2026-09-30",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3490"
     }
   ],
   "updates": [
