@@ -2,7 +2,7 @@
 import builtins
 import os
 import zipfile
-from importlib import resources
+from importlib import import_module, resources
 from typing import Any
 
 from omegaconf import OmegaConf
@@ -20,6 +20,17 @@ class ImportlibResourcesConfigSource(ConfigSource):
     @staticmethod
     def scheme() -> str:
         return "pkg"
+
+    def _get_resources(self) -> Any:
+        package = import_module(self.path)
+        spec = package.__spec__
+        if (
+            spec is None
+            or spec.submodule_search_locations is None
+            or spec.origin is None
+        ):
+            raise ValueError(f"'{self.path}' is not a regular Python package")
+        return resources.files(package)
 
     def _read_config(self, res: Any) -> ConfigResult:
         try:
@@ -48,7 +59,7 @@ class ImportlibResourcesConfigSource(ConfigSource):
 
     def load_config(self, config_path: str) -> ConfigResult:
         normalized_config_path = self._normalize_file_name(config_path)
-        res = resources.files(self.path).joinpath(normalized_config_path)
+        res = self._get_resources().joinpath(normalized_config_path)
         if not (res.is_file() or res.is_dir()):
             raise ConfigLoadError(f"Config not found : {normalized_config_path}")
 
@@ -56,14 +67,14 @@ class ImportlibResourcesConfigSource(ConfigSource):
 
     def available(self) -> bool:
         try:
-            files = resources.files(self.path)
+            self._get_resources()
         except (ValueError, ModuleNotFoundError, TypeError):
             return False
-        return any(f.name == "__init__.py" and f.is_file() for f in files.iterdir())
+        return True
 
     def is_group(self, config_path: str) -> bool:
         try:
-            files = resources.files(self.path)
+            files = self._get_resources()
         except (ValueError, ModuleNotFoundError, TypeError):
             return False
 
@@ -75,7 +86,7 @@ class ImportlibResourcesConfigSource(ConfigSource):
     def is_config(self, config_path: str) -> bool:
         config_path = self._normalize_file_name(config_path)
         try:
-            files = resources.files(self.path)
+            files = self._get_resources()
         except (ValueError, ModuleNotFoundError, TypeError):
             return False
         res = files.joinpath(config_path)
@@ -87,7 +98,7 @@ class ImportlibResourcesConfigSource(ConfigSource):
         self, config_path: str, results_filter: ObjectType | None
     ) -> builtins.list[str]:
         files: list[str] = []
-        for file in resources.files(self.path).joinpath(config_path).iterdir():
+        for file in self._get_resources().joinpath(config_path).iterdir():
             fname = file.name
             fpath = os.path.join(config_path, fname)
             self._list_add_result(

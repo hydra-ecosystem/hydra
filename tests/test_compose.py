@@ -522,10 +522,10 @@ def test_initialize_config_module_ctx(hydra_restore_singletons: Any) -> None:
         assert ret.hydra.job.name == "test_job"
 
 
-def test_missing_init_py_error(hydra_restore_singletons: Any) -> None:
+def test_namespace_config_module_error(hydra_restore_singletons: Any) -> None:
     expected = (
         "Primary config module 'hydra.test_utils.configs.missing_init_py' not found."
-        "\nCheck that it's correct and contains an __init__.py file"
+        "\nCheck that it's an importable regular Python package containing configs."
     )
 
     with raises(Exception, match=re.escape(expected)):
