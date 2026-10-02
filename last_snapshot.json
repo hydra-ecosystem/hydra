@@ -89,7 +89,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-02T11:44:39Z",
+  "generated_at": "2026-10-02T14:38:03Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -218,11 +218,13 @@
       "labels": [
         "enhancement"
       ],
-      "pr_numbers": [],
+      "pr_numbers": [
+        "3505"
+      ],
       "state": "OPEN",
-      "status": "not started",
+      "status": "in progress",
       "title": "[Feature Request] allow to use hydra without an __init__.py",
-      "updated_at": "2026-07-29T07:05:40Z"
+      "updated_at": "2026-10-02T14:00:03Z"
     },
     "2453": {
       "category": "Enhancement",
