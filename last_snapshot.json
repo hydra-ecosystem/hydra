@@ -5,6 +5,7 @@
     "1622": "2026-09-29",
     "1749": "2026-10-01",
     "1885": "2026-10-01",
+    "1890": "2026-10-02",
     "2170": "2026-09-25",
     "2237": "2026-09-17",
     "2412": "2026-10-02",
@@ -52,6 +53,7 @@
     "3230": "2026-09-28",
     "3252": "2026-09-16",
     "3258": "2026-10-02",
+    "3313": "2026-10-02",
     "3324": "2026-10-01",
     "3361": "2026-10-01",
     "3369": "2026-09-04",
@@ -90,7 +92,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-02T16:43:22Z",
+  "generated_at": "2026-10-02T16:44:58Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -174,18 +176,6 @@
       "status": "not started",
       "title": "Add more examples to the submitit plugin",
       "updated_at": "2026-10-02T11:26:32Z"
-    },
-    "1890": {
-      "category": "Enhancement",
-      "created_at": "2021-11-15T15:22:36Z",
-      "labels": [
-        "priority_low"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "HPO config standardization",
-      "updated_at": "2026-07-25T03:11:31Z"
     },
     "1944": {
       "category": "Enhancement",
@@ -474,21 +464,6 @@
       "status": "not started",
       "title": "hydra.mini(): capability-based application entry point with opt-in behavior",
       "updated_at": "2026-07-16T14:18:12Z"
-    },
-    "3313": {
-      "category": "Enhancement",
-      "created_at": "2026-07-24T19:47:58Z",
-      "labels": [
-        "ax",
-        "enhancement",
-        "plugin",
-        "sweep"
-      ],
-      "pr_numbers": [],
-      "state": "OPEN",
-      "status": "not started",
-      "title": "Standardize Ax Sweeper parameters and remove the Ax upper bound",
-      "updated_at": "2026-07-24T19:47:58Z"
     },
     "3321": {
       "category": "Enhancement",
@@ -817,6 +792,18 @@
       "status": "done",
       "title": "follow up with shell testing for #1842",
       "updated_at": "2026-09-27T22:26:04Z"
+    },
+    "1890": {
+      "category": "Enhancement",
+      "created_at": "2021-11-15T15:22:36Z",
+      "labels": [
+        "priority_low"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "HPO config standardization",
+      "updated_at": "2026-07-25T03:11:31Z"
     },
     "2170": {
       "category": "Bug",
@@ -1431,6 +1418,21 @@
       "status": "done",
       "title": "Switch instantiate target filtering to an allowlist model for 1.4",
       "updated_at": "2026-07-04T14:17:15Z"
+    },
+    "3313": {
+      "category": "Enhancement",
+      "created_at": "2026-07-24T19:47:58Z",
+      "labels": [
+        "ax",
+        "enhancement",
+        "plugin",
+        "sweep"
+      ],
+      "pr_numbers": [],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Standardize Ax Sweeper parameters and remove the Ax upper bound",
+      "updated_at": "2026-07-24T19:47:58Z"
     },
     "3324": {
       "category": "Build",

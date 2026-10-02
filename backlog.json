@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-02",
-  "generated_at": "2026-10-02T16:43:22Z",
+  "generated_at": "2026-10-02T16:44:58Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 51,
+    "open_total": 49,
     "by_category": [
       {
         "category": "Bug",
@@ -14,14 +14,14 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 45,
-        "percentage": 88.2
+        "count": 43,
+        "percentage": 87.8
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 3.9
+        "percentage": 4.1
       },
       {
         "category": "Question",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 3.9
+        "percentage": 4.1
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 49
+        "count": 47
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 89
+        "count": 91
       }
     ]
   },
@@ -356,21 +356,6 @@
         "help wanted"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/1869"
-    },
-    {
-      "number": 1890,
-      "title": "HPO config standardization",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2021-11-15",
-      "updated": "2026-07-25",
-      "labels": [
-        "priority_low"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/1890"
     },
     {
       "number": 1944,
@@ -708,24 +693,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3279"
-    },
-    {
-      "number": 3313,
-      "title": "Standardize Ax Sweeper parameters and remove the Ax upper bound",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-07-24",
-      "updated": "2026-07-24",
-      "labels": [
-        "enhancement",
-        "plugin",
-        "ax",
-        "sweep"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3313"
     },
     {
       "number": 3321,
@@ -2354,9 +2321,56 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 1890,
+      "title": "HPO config standardization",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2021-11-15",
+      "updated": "2026-07-25",
+      "labels": [
+        "priority_low"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/1890"
+    },
+    {
+      "number": 3313,
+      "title": "Standardize Ax Sweeper parameters and remove the Ax upper bound",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-07-24",
+      "updated": "2026-07-24",
+      "labels": [
+        "ax",
+        "enhancement",
+        "plugin",
+        "sweep"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3313"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-02T16:44:58Z",
+      "kind": "closed",
+      "issue": 3313,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3313",
+      "title": "Standardize Ax Sweeper parameters and remove the Ax upper bound"
+    },
+    {
+      "ts": "2026-10-02T16:44:58Z",
+      "kind": "closed",
+      "issue": 1890,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1890",
+      "title": "HPO config standardization"
+    },
     {
       "ts": "2026-10-02T16:43:22Z",
       "kind": "new",
@@ -3977,25 +3991,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
       "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
       "detail": "linked #3412"
-    },
-    {
-      "ts": "2026-08-24T20:01:14Z",
-      "kind": "status",
-      "issue": 3411,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
-      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3412,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3412"
-      }
-    },
-    {
-      "ts": "2026-08-24T18:15:01Z",
-      "kind": "new",
-      "issue": 3411,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3411",
-      "title": "Harden instantiate() blacklist against direct deserialization and exec-wrapper targets"
     }
   ]
 }
