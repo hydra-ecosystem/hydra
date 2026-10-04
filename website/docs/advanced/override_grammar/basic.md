@@ -13,6 +13,8 @@ You can manipulate your configuration with overrides (via the command line or th
 
 Overrides matching a config group or a Defaults List config entry are modifying the `Defaults List`;
 The rest are manipulating the config object.
+Bracket paths always manipulate the config object, even if a config group has
+the same name.
 
 ## Basic examples
 ### Modifying the Config Object
@@ -41,7 +43,7 @@ override: (
 ) EOF;
 
 // Key:
-key : packageOrGroup (AT package)?;              // key | group@pkg
+key : packageOrGroup (AT package)? | VALUE_PATH; // key | group@pkg | items[0]
 
 packageOrGroup: package | ID (SLASH ID)+;        // db, hydra/launcher
 package: ( | ID | KEY_SPECIAL | DOT_PATH);       // db, $db, hydra.launcher, or the empty (for _global_ package)
@@ -113,6 +115,29 @@ hydra/launcher    # A config group
 group@pkg         # A config group assigned to the package pkg
 group@pkg1:pkg2   # A config group changing the package from pkg1 to pkg2
 ```
+
+#### Bracket paths
+Use bracket notation to address list elements or dictionary keys:
+```shell script
+'items[0]=x'              # Replace the first list element
+'items[-1]=x'             # Replace the last list element
+'obj[20s_labels]=x'       # Address a dictionary key starting with digits
+'items[0].labels[1]=x'    # Combine dotted and bracket segments
+'~items[-1]'             # Remove the last list element
+'+obj[20s_labels]=x'      # Add an absent dictionary key
+'++obj[20s_labels]=x'     # Add or replace a dictionary key
+'items[0]=x,y'           # Sweep over the first list element
+```
+Quote the entire override on the command line to protect brackets from shell
+expansion. Bracket paths support the same value override operators and sweeps
+as dotted paths. `+` rejects an existing scalar value; it does not append an
+indexed list element. An out-of-range list index fails, including with `++`.
+
+Bracket selectors must be nonempty and contain only letters, digits, `_`, `-`,
+or `$`. They do not support quoted keys, spaces, commas, dots, `/`, `@`, `=`,
+or escapes. Paths must begin with a regular key and contain complete bracket
+selectors. Bracket paths address values, so they cannot select config groups
+or use an `@package` suffix. Config-group and package syntax is unchanged.
 
 ### Quoted values
 Hydra supports both double quotes and single quoted values.

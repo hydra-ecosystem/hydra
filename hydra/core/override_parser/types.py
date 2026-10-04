@@ -9,7 +9,7 @@ from random import shuffle
 from typing import Any, Callable, Iterator, cast
 
 from omegaconf import OmegaConf
-from omegaconf._utils import is_structured_config
+from omegaconf._utils import is_structured_config, split_key
 
 from hydra._internal.grammar.utils import _ESC_QUOTED_STR, escape_special_characters
 from hydra.core.config_loader import ConfigLoader
@@ -204,6 +204,7 @@ class Key:
     # the config-group or config dot-path
     key_or_group: str
     package: str | None = None
+    is_value_path: bool = False
 
 
 @dataclass
@@ -271,6 +272,9 @@ class Override:
 
     # Configs repo
     config_loader: ConfigLoader | None = None
+
+    # Explicit value-path syntax cannot select a config group.
+    is_value_path: bool = False
 
     def is_delete(self) -> bool:
         """
@@ -407,6 +411,8 @@ class Override:
 
     def is_hydra_override(self) -> bool:
         kog = self.key_or_group
+        if self.is_value_path:
+            return split_key(kog)[0] == "hydra"
         return kog.startswith("hydra.") or kog.startswith("hydra/")
 
     def get_key_element(self) -> str:

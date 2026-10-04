@@ -24,6 +24,10 @@ AT: '@';
 COLON: ':';
 SLASH: '/';
 
+fragment KEY_BRACKET: '[' (CHAR | DIGIT | '_' | '-' | '$')+ ']';
+VALUE_PATH: (KEY_SPECIAL | DOT_PATH) KEY_BRACKET
+            (KEY_BRACKET | '.' (KEY_SPECIAL | INT_UNSIGNED))*;
+
 KEY_ID: ID -> type(ID);
 KEY_SPECIAL: (CHAR|'_'|'$') (CHAR|DIGIT|'_'|'-'|'$')*;  // same as ID but allowing $
 DOT_PATH: (KEY_SPECIAL | INT_UNSIGNED) ('.' (KEY_SPECIAL | INT_UNSIGNED))+;
