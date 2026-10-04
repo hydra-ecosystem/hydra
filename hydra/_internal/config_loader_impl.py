@@ -9,17 +9,18 @@ from typing import Any, MutableSequence
 from omegaconf import (
     Container,
     DictConfig,
-    ListConfig,
     OmegaConf,
     flag_override,
     open_dict,
 )
+from omegaconf._utils import _get_value, split_key
 from omegaconf.errors import (
     ConfigAttributeError,
     ConfigKeyError,
-    MissingMandatoryValue,
+    ConfigTypeError,
     OmegaConfBaseException,
 )
+from omegaconf.omegaconf import _select_one
 
 from hydra._internal.config_repository import (
     CachingConfigRepository,
@@ -33,7 +34,7 @@ from hydra.core.config_search_path import ConfigSearchPath
 from hydra.core.default_element import ConfigDefault, ResultDefault
 from hydra.core.object_type import ObjectType
 from hydra.core.override_parser.overrides_parser import OverridesParser
-from hydra.core.override_parser.types import Override, ValueType
+from hydra.core.override_parser.types import Override, OverrideType, ValueType
 from hydra.core.utils import JobRuntime
 from hydra.errors import ConfigCompositionException, MissingConfigException
 from hydra.plugins.config_source import ConfigResult, ConfigSource
@@ -63,7 +64,10 @@ class ConfigLoaderImpl(ConfigLoader):
         mode_override_found = False
         assert parsed_overrides is not None, "parsed_overrides must be provided"
         for override in parsed_overrides:
-            if override.package is not None or override.key_or_group not in {
+            key = override.key_or_group
+            if override.is_value_path and split_key(key) == ["hydra", "mode"]:
+                key = "hydra.mode"
+            if override.package is not None or key not in {
                 "hydra",
                 "hydra.mode",
             }:
@@ -75,7 +79,7 @@ class ConfigLoaderImpl(ConfigLoader):
                 )
 
             value = override.value()
-            if override.key_or_group == "hydra":
+            if key == "hydra":
                 if not isinstance(value, dict) or "mode" not in value:
                     continue
                 value = value["mode"]
@@ -289,7 +293,11 @@ class ConfigLoaderImpl(ConfigLoader):
             )
 
         def is_searchpath_override(v: Override) -> bool:
-            return v.get_key_element() == "hydra.searchpath"
+            return v.get_key_element() == "hydra.searchpath" or (
+                v.is_value_path
+                and v.type == OverrideType.CHANGE
+                and split_key(v.key_or_group) == ["hydra", "searchpath"]
+            )
 
         override = None
         for v in parsed_overrides:
@@ -499,42 +507,24 @@ class ConfigLoaderImpl(ConfigLoader):
             value = override.value()
             try:
                 if override.is_delete():
-                    config_val_not_found = object()
-                    config_val_missing = object()
-                    last_dot = key.rfind(".")
-                    parent: Container = cfg
-                    parent_missing = False
-                    if last_dot != -1:
-                        parent_key = key[0:last_dot]
-                        selected_parent = OmegaConf.select(
-                            cfg,
-                            parent_key,
-                            default=config_val_not_found,
-                            throw_on_missing=False,
-                        )
-                        if isinstance(selected_parent, Container):
-                            parent = selected_parent
-                        else:
-                            parent_missing = True
-
                     try:
-                        config_val = OmegaConf.select(
-                            cfg,
+                        parent, node_key, node = cfg._select_impl(
                             key,
-                            default=config_val_not_found,
-                            throw_on_missing=True,
+                            throw_on_missing=False,
+                            throw_on_resolution_failure=True,
                         )
-                    except MissingMandatoryValue:
-                        config_val = config_val_missing
+                    except ConfigTypeError:
+                        # A missing or scalar parent cannot contain the target.
+                        parent, node_key, node = None, None, None
 
-                    if parent_missing or config_val is config_val_not_found:
+                    if parent is None or node is None:
                         # Bandit mistakes this user-facing message for a SQL snippet.
                         raise ConfigCompositionException(
                             f"Could not delete from config. '{override.key_or_group}'"  # nosec B608
                             " does not exist."
                         )
                     config_val_for_match = (
-                        "???" if config_val is config_val_missing else config_val
+                        "???" if node._is_missing() else _get_value(node)
                     )
                     if (
                         override.value_type is not None
@@ -548,13 +538,11 @@ class ConfigLoaderImpl(ConfigLoader):
                         )
 
                     with open_dict(cfg):
-                        if last_dot == -1:
-                            del cfg[key]
-                        else:
-                            node_key: str | int = key[last_dot + 1 :]
-                            if isinstance(parent, ListConfig):
-                                node_key = int(node_key)
-                            del parent[node_key]
+                        assert node_key is not None
+                        _, delete_key = _select_one(
+                            parent, node_key, throw_on_missing=False
+                        )
+                        del parent[delete_key]
 
                 elif override.is_add():
                     if OmegaConf.select(

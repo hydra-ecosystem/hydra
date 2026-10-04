@@ -69,6 +69,9 @@ class Overrides:
         for override in overrides_list:
             if override.is_sweep_override():
                 continue
+            if override.is_value_path:
+                self.config_overrides.append(override)
+                continue
             is_group = repo.group_exists(override.key_or_group)
             is_config = repo.config_exists(override.key_or_group)
             value = override.value()
