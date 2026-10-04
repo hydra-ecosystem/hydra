@@ -15,6 +15,8 @@ from omegaconf.errors import OmegaConfBaseException
 from hydra._internal._locate import _locate as _locate_impl
 from hydra._internal.config_search_path_impl import ConfigSearchPathImpl
 from hydra.core.config_search_path import ConfigSearchPath, SearchPathQuery
+from hydra.core.override_parser.overrides_parser import OverridesParser
+from hydra.core.override_parser.types import Override
 from hydra.core.utils import (
     JobStatus,
     _create_synthetic_frame,
@@ -525,8 +527,15 @@ def _run_hydra(
         overrides = args.overrides
 
         if args.run or args.multirun:
+            parsed_overrides = run_and_report(
+                lambda: OverridesParser.create().parse_overrides(overrides)
+            )
             run_mode = run_and_report(
-                lambda: hydra.get_mode(config_name=config_name, overrides=overrides)
+                lambda: hydra.get_mode(
+                    config_name=config_name,
+                    overrides=overrides,
+                    parsed_overrides=parsed_overrides,
+                )
             )
             _run_app(
                 run=args.run,
@@ -536,6 +545,7 @@ def _run_hydra(
                 config_name=config_name,
                 task_function=task_function,
                 overrides=overrides,
+                parsed_overrides=parsed_overrides,
             )
         elif args.cfg:
             run_and_report(
@@ -572,6 +582,7 @@ def _run_app(
     config_name: str | None,
     task_function: TaskFunction,
     overrides: list[str],
+    parsed_overrides: list[Override] | None = None,
 ) -> None:
     if mode is None:
         if run:
@@ -589,12 +600,18 @@ def _run_app(
             mode = RunMode.MULTIRUN
             overrides.extend(["hydra.mode=MULTIRUN"])
 
+    if parsed_overrides is not None and len(overrides) > len(parsed_overrides):
+        parsed_overrides.extend(
+            OverridesParser.create().parse_overrides(overrides[len(parsed_overrides) :])
+        )
+
     if mode == RunMode.RUN:
         run_and_report(
             lambda: hydra.run(
                 config_name=config_name,
                 task_function=task_function,
                 overrides=overrides,
+                parsed_overrides=parsed_overrides,
             )
         )
     else:
@@ -603,6 +620,7 @@ def _run_app(
                 config_name=config_name,
                 task_function=task_function,
                 overrides=overrides,
+                parsed_overrides=parsed_overrides,
             )
         )
 
