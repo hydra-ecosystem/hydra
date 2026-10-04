@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-04",
-  "generated_at": "2026-10-04T17:51:15Z",
+  "generated_at": "2026-10-04T21:27:46Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 48,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 46
+        "count": 45
       },
       {
         "status": "done",
@@ -71,6 +71,24 @@
     ]
   },
   "issues": [
+    {
+      "number": 3250,
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3509,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3509"
+        }
+      ],
+      "created": "2026-06-30",
+      "updated": "2026-08-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -648,19 +666,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3248"
-    },
-    {
-      "number": 3250,
-      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-06-30",
-      "updated": "2026-08-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
     },
     {
       "number": 3279,
@@ -2358,6 +2363,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-04T21:27:46Z",
+      "kind": "pr",
+      "issue": 3250,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3250",
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "detail": "linked #3509"
+    },
+    {
+      "ts": "2026-10-04T21:27:46Z",
+      "kind": "status",
+      "issue": 3250,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3250",
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3509,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3509"
+      }
+    },
+    {
       "ts": "2026-10-02T21:53:27Z",
       "kind": "pr",
       "issue": 3506,
@@ -3978,20 +4003,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2851",
       "title": "[Feature Request] Concatenating parameter sweeps",
       "detail": "added \"sweep\"; removed \"triage\""
-    },
-    {
-      "ts": "2026-08-31T06:50:50Z",
-      "kind": "closed",
-      "issue": 2848,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2848",
-      "title": "[Feature Request] Add more meaningful information on hydra resolving interpolation error"
-    },
-    {
-      "ts": "2026-08-30T17:11:05Z",
-      "kind": "closed",
-      "issue": 2846,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2846",
-      "title": "[Feature Request] Conditionally disable the creation of output folders via callback"
     }
   ]
 }
