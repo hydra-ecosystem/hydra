@@ -53,7 +53,7 @@ class HydraOverrideVisitor(OverrideParserVisitor):
         return ctx.getText()  # type: ignore
 
     def visitKey(self, ctx: OverrideParser.KeyContext) -> Key:
-        # key : packageOrGroup (AT package)?
+        # key : packageOrGroup (AT package)? | VALUE_PATH
 
         nc = ctx.getChildCount()
         package = None
@@ -69,7 +69,11 @@ class HydraOverrideVisitor(OverrideParserVisitor):
         else:
             assert False
 
-        return Key(key_or_group=key, package=package)
+        return Key(
+            key_or_group=key,
+            package=package,
+            is_value_path=ctx.VALUE_PATH() is not None,
+        )
 
     def is_ws(self, c: Any) -> bool:
         return isinstance(c, TerminalNodeImpl) and c.symbol.type == OverrideLexer.WS
@@ -212,6 +216,7 @@ class HydraOverrideVisitor(OverrideParserVisitor):
             _value=value,
             value_type=value_type,
             package=key.package,
+            is_value_path=key.is_value_path,
         )
 
     def is_matching_terminal(self, node: Any, symbol_type: int) -> bool:

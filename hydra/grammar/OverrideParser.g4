@@ -15,7 +15,7 @@ override: (
 ) EOF;
 
 // Key:
-key : packageOrGroup (AT package)?;              // key | group@pkg
+key : packageOrGroup (AT package)? | VALUE_PATH; // key | group@pkg | items[0]
 
 packageOrGroup: package | ID (SLASH ID)+;        // db, hydra/launcher
 package: ( | ID | KEY_SPECIAL | DOT_PATH);       // db, $db, hydra.launcher, or the empty (for _global_ package)
