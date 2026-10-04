@@ -53,10 +53,15 @@ class ConfigLoaderImpl(ConfigLoader):
         self.repository = ConfigRepository(config_search_path=config_search_path)
         self._active_repository: IConfigRepository | None = None
 
-    def get_mode(self, config_name: str | None, overrides: list[str]) -> Any:
+    def get_mode(
+        self,
+        config_name: str | None,
+        overrides: list[str],
+        parsed_overrides: list[Override] | None = None,
+    ) -> Any:
         mode: Any = None
         mode_override_found = False
-        parsed_overrides = OverridesParser.create().parse_overrides(overrides)
+        assert parsed_overrides is not None, "parsed_overrides must be provided"
         for override in parsed_overrides:
             if override.package is not None or override.key_or_group not in {
                 "hydra",
@@ -223,6 +228,7 @@ class ConfigLoaderImpl(ConfigLoader):
         run_mode: RunMode,
         from_shell: bool = True,
         validate_sweep_overrides: bool = True,
+        parsed_overrides: list[Override] | None = None,
     ) -> DictConfig:
         return self._load_configuration(
             config_name=config_name,
@@ -232,6 +238,7 @@ class ConfigLoaderImpl(ConfigLoader):
             validate_sweep_overrides=validate_sweep_overrides,
             skip_missing_defaults=False,
             activate_config_repository=True,
+            parsed_overrides=parsed_overrides,
         )
 
     def _load_configuration(
@@ -243,6 +250,7 @@ class ConfigLoaderImpl(ConfigLoader):
         validate_sweep_overrides: bool,
         skip_missing_defaults: bool,
         activate_config_repository: bool,
+        parsed_overrides: list[Override] | None = None,
     ) -> DictConfig:
         try:
             return self._load_configuration_impl(
@@ -253,6 +261,7 @@ class ConfigLoaderImpl(ConfigLoader):
                 validate_sweep_overrides=validate_sweep_overrides,
                 skip_missing_defaults=skip_missing_defaults,
                 activate_config_repository=activate_config_repository,
+                parsed_overrides=parsed_overrides,
             )
         except OmegaConfBaseException as e:
             raise ConfigCompositionException().with_traceback(sys.exc_info()[2]) from e
@@ -330,10 +339,14 @@ class ConfigLoaderImpl(ConfigLoader):
                 )
 
     def _parse_overrides_and_create_caching_repo(
-        self, config_name: str | None, overrides: list[str]
+        self,
+        config_name: str | None,
+        overrides: list[str],
+        parsed_overrides: list[Override] | None = None,
     ) -> tuple[list[Override], CachingConfigRepository]:
-        parser = OverridesParser.create()
-        parsed_overrides = parser.parse_overrides(overrides=overrides)
+        if parsed_overrides is None:
+            parser = OverridesParser.create()
+            parsed_overrides = parser.parse_overrides(overrides=overrides)
         caching_repo = CachingConfigRepository(self.repository)
         self._process_config_searchpath(config_name, parsed_overrides, caching_repo)
         return parsed_overrides, caching_repo
@@ -347,12 +360,13 @@ class ConfigLoaderImpl(ConfigLoader):
         validate_sweep_overrides: bool = True,
         skip_missing_defaults: bool = False,
         activate_config_repository: bool = False,
+        parsed_overrides: list[Override] | None = None,
     ) -> DictConfig:
         from hydra import __version__, version
 
         self.ensure_main_config_source_available()
         parsed_overrides, caching_repo = self._parse_overrides_and_create_caching_repo(
-            config_name, overrides
+            config_name, overrides, parsed_overrides
         )
 
         if validate_sweep_overrides:
