@@ -5,7 +5,7 @@ import string
 import sys
 from argparse import ArgumentParser
 from collections import defaultdict
-from typing import Any, Callable, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Sequence
 
 from omegaconf import (
     MISSING,
@@ -45,6 +45,9 @@ from ..core.default_element import DefaultsTreeNode, InputDefault
 from .callbacks import Callbacks
 from .config_loader_impl import ConfigLoaderImpl
 from .utils import create_automatic_config_search_path
+
+if TYPE_CHECKING:
+    from hydra.core.override_parser.types import Override
 
 log: logging.Logger | None = None
 
@@ -127,8 +130,15 @@ class Hydra:
         self,
         config_name: str | None,
         overrides: list[str],
+        parsed_overrides: list["Override"] | None = None,
     ) -> RunMode | None:
-        mode = self.config_loader.get_mode(config_name, overrides)
+        if (
+            parsed_overrides is not None
+            and type(self.config_loader) is ConfigLoaderImpl
+        ):
+            mode = self.config_loader.get_mode(config_name, overrides, parsed_overrides)
+        else:
+            mode = self.config_loader.get_mode(config_name, overrides)
         if mode is None:
             return None
         if isinstance(mode, RunMode):
@@ -145,6 +155,7 @@ class Hydra:
         task_function: TaskFunction,
         overrides: list[str],
         with_log_configuration: bool = True,
+        parsed_overrides: list["Override"] | None = None,
     ) -> JobReturn:
         cfg = self.compose_config(
             config_name=config_name,
@@ -152,6 +163,7 @@ class Hydra:
             with_log_configuration=with_log_configuration,
             run_mode=RunMode.RUN,
             activate_config_repository=True,
+            parsed_overrides=parsed_overrides,
         )
         if cfg.hydra.mode is None:
             cfg.hydra.mode = RunMode.RUN
@@ -199,6 +211,7 @@ class Hydra:
         task_function: TaskFunction,
         overrides: list[str],
         with_log_configuration: bool = True,
+        parsed_overrides: list["Override"] | None = None,
     ) -> Any:
         cfg = self.compose_config(
             config_name=config_name,
@@ -206,6 +219,7 @@ class Hydra:
             with_log_configuration=with_log_configuration,
             run_mode=RunMode.MULTIRUN,
             activate_config_repository=True,
+            parsed_overrides=parsed_overrides,
         )
         if cfg.hydra.mode is None:
             cfg.hydra.mode = RunMode.MULTIRUN
@@ -688,6 +702,7 @@ class Hydra:
         validate_sweep_overrides: bool = True,
         activate_config_repository: bool = False,
         skip_missing_defaults: bool = False,
+        parsed_overrides: list["Override"] | None = None,
     ) -> DictConfig:
         """
         :param config_name:
@@ -698,6 +713,7 @@ class Hydra:
         :param validate_sweep_overrides: True if sweep overrides should be validated
         :param activate_config_repository: True to retain the effective repository on the invocation loader
         :param skip_missing_defaults: True to omit unresolved mandatory Defaults List choices
+        :param parsed_overrides: Parsed CLI overrides to reuse during composition
         :return:
         """
 
@@ -710,6 +726,7 @@ class Hydra:
                 run_mode=run_mode,
                 from_shell=from_shell,
                 validate_sweep_overrides=validate_sweep_overrides,
+                parsed_overrides=parsed_overrides,
             )
         # Preserve the existing call signature for custom config loaders.
         elif skip_missing_defaults and type(self.config_loader) is ConfigLoaderImpl:

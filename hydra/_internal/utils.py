@@ -8,7 +8,7 @@ import traceback
 import warnings
 from os.path import dirname, join, normpath, realpath
 from types import TracebackType
-from typing import Any, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 from omegaconf.errors import OmegaConfBaseException
 
@@ -28,6 +28,9 @@ from hydra.errors import (
     SearchPathException,
 )
 from hydra.types import RunMode, TaskFunction
+
+if TYPE_CHECKING:
+    from hydra.core.override_parser.types import Override
 
 log = logging.getLogger(__name__)
 
@@ -447,6 +450,7 @@ def _run_hydra(
     caller_stack_depth: int = 2,
 ) -> None:
     from hydra.core.global_hydra import GlobalHydra
+    from hydra.core.override_parser.overrides_parser import OverridesParser
 
     from .hydra import Hydra
 
@@ -525,8 +529,15 @@ def _run_hydra(
         overrides = args.overrides
 
         if args.run or args.multirun:
+            parsed_overrides = run_and_report(
+                lambda: OverridesParser.create().parse_overrides(overrides)
+            )
             run_mode = run_and_report(
-                lambda: hydra.get_mode(config_name=config_name, overrides=overrides)
+                lambda: hydra.get_mode(
+                    config_name=config_name,
+                    overrides=overrides,
+                    parsed_overrides=parsed_overrides,
+                )
             )
             _run_app(
                 run=args.run,
@@ -536,6 +547,7 @@ def _run_hydra(
                 config_name=config_name,
                 task_function=task_function,
                 overrides=overrides,
+                parsed_overrides=parsed_overrides,
             )
         elif args.cfg:
             run_and_report(
@@ -572,6 +584,7 @@ def _run_app(
     config_name: str | None,
     task_function: TaskFunction,
     overrides: list[str],
+    parsed_overrides: list["Override"] | None = None,
 ) -> None:
     if mode is None:
         if run:
@@ -589,12 +602,20 @@ def _run_app(
             mode = RunMode.MULTIRUN
             overrides.extend(["hydra.mode=MULTIRUN"])
 
+    if parsed_overrides is not None and len(overrides) > len(parsed_overrides):
+        from hydra.core.override_parser.overrides_parser import OverridesParser
+
+        parsed_overrides.extend(
+            OverridesParser.create().parse_overrides(overrides[len(parsed_overrides) :])
+        )
+
     if mode == RunMode.RUN:
         run_and_report(
             lambda: hydra.run(
                 config_name=config_name,
                 task_function=task_function,
                 overrides=overrides,
+                parsed_overrides=parsed_overrides,
             )
         )
     else:
@@ -603,6 +624,7 @@ def _run_app(
                 config_name=config_name,
                 task_function=task_function,
                 overrides=overrides,
+                parsed_overrides=parsed_overrides,
             )
         )
 
