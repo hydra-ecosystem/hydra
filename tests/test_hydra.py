@@ -5,6 +5,7 @@ import re
 import subprocess
 import sys
 import warnings
+from contextlib import nullcontext
 from logging import getLogger
 from pathlib import Path
 from textwrap import dedent
@@ -18,7 +19,10 @@ from hydra import MissingConfigException, __version__, main, version
 from hydra._internal.hydra import Hydra
 from hydra.core import utils as core_utils
 from hydra.core.config_loader import ConfigLoader
+from hydra.core.config_store import ConfigStore
 from hydra.core.hydra_config import HydraConfig
+from hydra.core.override_parser.overrides_parser import OverridesParser
+from hydra.core.override_parser.types import Override
 from hydra.core.plugins import Plugins
 from hydra.errors import (
     ConfigCompositionException,
@@ -1054,7 +1058,10 @@ def test_help_preserves_custom_config_loader_signature(
     assert cfg.value == 1
 
 
-def test_get_mode_preserves_custom_config_loader(hydra_restore_singletons: Any) -> None:
+@mark.parametrize("parsed_overrides", [None, []])
+def test_get_mode_preserves_custom_config_loader(
+    hydra_restore_singletons: Any, parsed_overrides: list[Override] | None
+) -> None:
     loader = Mock(spec=ConfigLoader)
     loader.load_configuration.return_value = OmegaConf.create(
         {"hydra": {"mode": RunMode.MULTIRUN}}
@@ -1064,7 +1071,7 @@ def test_get_mode_preserves_custom_config_loader(hydra_restore_singletons: Any) 
     )
     hydra = Hydra(task_name="test", config_loader=cast(ConfigLoader, loader))
 
-    assert hydra.get_mode("config", []) == RunMode.MULTIRUN
+    assert hydra.get_mode("config", [], parsed_overrides) == RunMode.MULTIRUN
     loader.load_configuration.assert_called_once_with(
         config_name="config",
         overrides=[],
@@ -2353,6 +2360,88 @@ def test_hydra_mode(
             from_name="Expected output",
             to_name="Actual output",
         )
+
+
+@mark.parametrize(
+    "args,primary_mode,expected_mode,expected_values,forced_mode",
+    [
+        (["x=1"], None, RunMode.RUN, [1], False),
+        (["x=1", "hydra.mode=RUN"], None, RunMode.RUN, [1], False),
+        (
+            ["x=1,2", "hydra.mode=MULTIRUN"],
+            None,
+            RunMode.MULTIRUN,
+            [1, 2],
+            False,
+        ),
+        (["--multirun", "x=1,2"], None, RunMode.MULTIRUN, [1, 2], True),
+        (
+            ["--multirun", "x=1,2", "hydra.mode=RUN"],
+            None,
+            RunMode.MULTIRUN,
+            [1, 2],
+            True,
+        ),
+        (["x=1,2"], "MULTIRUN", RunMode.MULTIRUN, [1, 2], False),
+        (
+            ["x=1,2", "hydra.mode=RUN", "hydra={mode:MULTIRUN}"],
+            None,
+            RunMode.MULTIRUN,
+            [1, 2],
+            False,
+        ),
+    ],
+)
+def test_cli_reuses_parsed_overrides(
+    hydra_restore_singletons: Any,
+    monkeypatch: Any,
+    tmp_path: Path,
+    args: list[str],
+    primary_mode: str | None,
+    expected_mode: RunMode,
+    expected_values: list[int],
+    forced_mode: bool,
+) -> None:
+    ConfigStore.instance().store(
+        name="override_reuse",
+        node={"x": 0, "hydra": {"mode": primary_mode}},
+    )
+    jobs: list[tuple[int, RunMode | None]] = []
+
+    @main(config_path=None, config_name="override_reuse")
+    def task(cfg: DictConfig) -> None:
+        hydra_cfg = HydraConfig.get()
+        jobs.append((cfg.x, hydra_cfg.mode))
+        if forced_mode:
+            assert "hydra.mode=MULTIRUN" in hydra_cfg.overrides.hydra
+
+    extra_overrides = [
+        f"hydra.run.dir={tmp_path}",
+        f"hydra.sweep.dir={tmp_path}",
+        "hydra.job.chdir=False",
+    ]
+    overrides = [arg for arg in args if arg != "--multirun"] + extra_overrides
+    monkeypatch.setattr(sys, "argv", ["app.py", *args, *extra_overrides])
+    parse_calls: list[list[str]] = []
+    original_parse = OverridesParser.parse_overrides
+
+    def record_parse(parser: OverridesParser, overrides: list[str]) -> list[Override]:
+        parse_calls.append(list(overrides))
+        return original_parse(parser, overrides)
+
+    with patch.object(
+        OverridesParser, "parse_overrides", autospec=True, side_effect=record_parse
+    ):
+        warning = (
+            warns(UserWarning, match="Running Hydra app with --multirun")
+            if "--multirun" in args and "hydra.mode=RUN" in args
+            else nullcontext()
+        )
+        with warning:
+            task()
+
+    assert jobs == [(value, expected_mode) for value in expected_values]
+    assert sum(call[: len(overrides)] == overrides for call in parse_calls) == 1
 
 
 @mark.parametrize(
