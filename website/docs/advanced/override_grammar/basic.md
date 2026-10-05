@@ -13,8 +13,8 @@ You can manipulate your configuration with overrides (via the command line or th
 
 Overrides matching a config group or a Defaults List config entry are modifying the `Defaults List`;
 The rest are manipulating the config object.
-Bracket paths always manipulate the config object, even if a config group has
-the same name.
+Bracket paths and escaped keys always manipulate the config object, even if a
+config group has the same name.
 
 ## Basic examples
 ### Modifying the Config Object
@@ -134,10 +134,33 @@ as dotted paths. `+` rejects an existing scalar value; it does not append an
 indexed list element. An out-of-range list index fails, including with `++`.
 
 Bracket selectors must be nonempty and contain only letters, digits, `_`, `-`,
-or `$`. They do not support quoted keys, spaces, commas, dots, `/`, `@`, `=`,
-or escapes. Paths must begin with a regular key and contain complete bracket
-selectors. Bracket paths address values, so they cannot select config groups
-or use an `@package` suffix. Config-group and package syntax is unchanged.
+`$`, or the escapes described below. They do not support quoted keys, spaces,
+commas, `/`, `@`, or unescaped dots, brackets, and `=`. Paths must begin with a
+regular or escaped key and contain complete bracket selectors. Bracket paths
+address values, so they cannot select config groups or use an `@package` suffix.
+Config-group and package syntax is unchanged.
+
+#### Escaped keys
+Escape `.`, `[`, `]`, and `=` with a backslash to include them literally in a
+dictionary key. An unescaped dot or bracket still separates path segments;
+an unescaped `=` separates the key from its value.
+
+```shell script
+'obj.a\.b=x'             # Set the key "a.b" inside obj
+'obj.a\[0\]=x'           # Set the key "a[0]" inside obj
+'obj.a\=b=x'             # Set the key "a=b" inside obj
+'items[0][a\.b]=x'       # Combine escaping with bracket paths
+'~obj.a\.b'              # Delete the literal key "a.b"
+'++obj.a\=b=x'           # Add or replace the literal key "a=b"
+'obj.a\.b=x,y'           # Sweep over the literal key "a.b"
+```
+
+Use single quotes around the entire override on the command line to preserve
+the backslashes. In Python, use raw strings such as `r"obj.a\.b=x"`.
+Escaped keys support the same value operators and sweeps as other paths.
+They address values and cannot select config groups or use an `@package`
+suffix. Only `\.`, `\[`, `\]`, and `\=` are supported in keys; escaping other
+characters, including commas and backslashes, is not supported.
 
 ### Quoted values
 Hydra supports both double quotes and single quoted values.

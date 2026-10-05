@@ -1,1 +1,1 @@
-Support bracket paths in config value overrides and deletions.
+Support bracket paths and escaped characters in config value override keys.
