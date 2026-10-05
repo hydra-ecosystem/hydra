@@ -3,9 +3,10 @@ updates:
   - package-ecosystem: "npm"
     directory: "/website"
     schedule:
-      interval: "monthly"
-    cooldown:
-      default-days: 10
+      interval: "yearly"
+    open-pull-requests-limit: 0
+    ignore:
+      - dependency-name: "*"
 
   - package-ecosystem: "pip"
     directory: "/"
