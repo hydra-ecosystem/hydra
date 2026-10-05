@@ -93,7 +93,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-05T10:57:21Z",
+  "generated_at": "2026-10-05T11:29:18Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -434,11 +434,9 @@
       "category": "Enhancement",
       "created_at": "2026-06-30T08:11:06Z",
       "labels": [],
-      "pr_numbers": [
-        "3509"
-      ],
+      "pr_numbers": [],
       "state": "OPEN",
-      "status": "in progress",
+      "status": "not started",
       "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
       "updated_at": "2026-08-10T17:35:56Z"
     },

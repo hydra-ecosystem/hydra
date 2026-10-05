@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-05",
-  "generated_at": "2026-10-05T10:57:21Z",
+  "generated_at": "2026-10-05T11:29:18Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 48,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 45
+        "count": 46
       },
       {
         "status": "done",
@@ -71,24 +71,6 @@
     ]
   },
   "issues": [
-    {
-      "number": 3250,
-      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3509,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3509"
-        }
-      ],
-      "created": "2026-06-30",
-      "updated": "2026-08-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -840,6 +822,19 @@
       "updated": "2026-10-02",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
+    },
+    {
+      "number": 3250,
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-06-30",
+      "updated": "2026-08-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
     },
     {
       "number": 385,
@@ -2362,6 +2357,22 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-05T11:29:18Z",
+      "kind": "pr",
+      "issue": 3250,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3250",
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "detail": "unlinked #3509"
+    },
+    {
+      "ts": "2026-10-05T11:29:18Z",
+      "kind": "status",
+      "issue": 3250,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3250",
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "detail": "in progress → not started"
+    },
     {
       "ts": "2026-10-04T21:27:46Z",
       "kind": "pr",
@@ -3988,21 +3999,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2874",
       "title": "[Help requested] Dynamic hydra launcher configuration",
       "detail": "added \"enhancement\", \"help wanted\", \"plugin\", \"ray-launcher\"; removed \"triage\""
-    },
-    {
-      "ts": "2026-08-31T08:51:47Z",
-      "kind": "closed",
-      "issue": 2864,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2864",
-      "title": "[Feature Request] Generalize PickleJobInfoCallback to support YAML and/or JSON serialization "
-    },
-    {
-      "ts": "2026-08-31T08:17:15Z",
-      "kind": "label",
-      "issue": 2851,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2851",
-      "title": "[Feature Request] Concatenating parameter sweeps",
-      "detail": "added \"sweep\"; removed \"triage\""
     }
   ]
 }
