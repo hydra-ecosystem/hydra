@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-05",
-  "generated_at": "2026-10-05T14:38:20Z",
+  "generated_at": "2026-10-05T21:45:59Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 48,
@@ -650,6 +650,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3248"
     },
     {
+      "number": 3250,
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-06-30",
+      "updated": "2026-08-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
+    },
+    {
       "number": 3279,
       "title": "hydra.mini(): capability-based application entry point with opt-in behavior",
       "category": "Enhancement",
@@ -822,19 +835,6 @@
       "updated": "2026-10-02",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
-    },
-    {
-      "number": 3250,
-      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-06-30",
-      "updated": "2026-08-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
     },
     {
       "number": 385,
