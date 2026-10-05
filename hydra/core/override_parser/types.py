@@ -480,11 +480,11 @@ class Override:
 
     def get_value_string(self) -> str:
         """
-        return the value component from the input as is (the part after the first =).
+        return the value component from the input as is (the part after the separator).
         """
         assert self.input_line is not None
-        idx = self.input_line.find("=")
-        if idx == -1:
+        idx = len(self.get_key_element())
+        if self.input_line[idx : idx + 1] != "=":
             raise ValueError(f"No value component in {self.input_line}")
         else:
             return self.input_line[idx + 1 :]

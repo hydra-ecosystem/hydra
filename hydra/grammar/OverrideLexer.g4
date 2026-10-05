@@ -24,9 +24,17 @@ AT: '@';
 COLON: ':';
 SLASH: '/';
 
-fragment KEY_BRACKET: '[' (CHAR | DIGIT | '_' | '-' | '$')+ ']';
-VALUE_PATH: (KEY_SPECIAL | DOT_PATH) KEY_BRACKET
-            (KEY_BRACKET | '.' (KEY_SPECIAL | INT_UNSIGNED))*;
+fragment KEY_ESCAPE: '\\' ('.' | '[' | ']' | '=');
+fragment KEY_CHAR: CHAR | DIGIT | '_' | '-' | '$';
+fragment KEY_ESCAPED: KEY_CHAR* KEY_ESCAPE (KEY_CHAR | KEY_ESCAPE)*;
+fragment KEY_SEGMENT: KEY_SPECIAL | INT_UNSIGNED | KEY_ESCAPED;
+fragment KEY_BRACKET: '[' (KEY_CHAR | KEY_ESCAPE)+ ']';
+VALUE_PATH:
+    (
+        (KEY_SPECIAL | DOT_PATH) KEY_BRACKET
+      | (KEY_SPECIAL | INT_UNSIGNED | DOT_PATH) '.' KEY_ESCAPED
+      | KEY_ESCAPED
+    ) (KEY_BRACKET | '.' KEY_SEGMENT)*;
 
 KEY_ID: ID -> type(ID);
 KEY_SPECIAL: (CHAR|'_'|'$') (CHAR|DIGIT|'_'|'-'|'$')*;  // same as ID but allowing $
