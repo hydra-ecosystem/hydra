@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-05",
-  "generated_at": "2026-10-05T14:03:14Z",
+  "generated_at": "2026-10-05T14:38:20Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 48,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 45
+        "count": 46
       },
       {
         "status": "done",
@@ -71,24 +71,6 @@
     ]
   },
   "issues": [
-    {
-      "number": 3250,
-      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3510,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3510"
-        }
-      ],
-      "created": "2026-06-30",
-      "updated": "2026-08-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -840,6 +822,19 @@
       "updated": "2026-10-02",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
+    },
+    {
+      "number": 3250,
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-06-30",
+      "updated": "2026-08-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
     },
     {
       "number": 385,
@@ -2362,6 +2357,22 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-05T14:38:20Z",
+      "kind": "pr",
+      "issue": 3250,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3250",
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "detail": "unlinked #3510"
+    },
+    {
+      "ts": "2026-10-05T14:38:20Z",
+      "kind": "status",
+      "issue": 3250,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3250",
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "detail": "in progress → not started"
+    },
     {
       "ts": "2026-10-05T13:30:00Z",
       "kind": "pr",
@@ -3993,21 +4004,6 @@
       "issue": 3410,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3410",
       "title": "Backport instantiate security hardening (#3409, #3411) to 1.3.6 and release 1.4.0.dev9"
-    },
-    {
-      "ts": "2026-08-31T11:34:03Z",
-      "kind": "closed",
-      "issue": 2887,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2887",
-      "title": "[Feature Request] Support relative paths in defaults keys."
-    },
-    {
-      "ts": "2026-08-31T11:02:23Z",
-      "kind": "label",
-      "issue": 2874,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2874",
-      "title": "[Help requested] Dynamic hydra launcher configuration",
-      "detail": "added \"enhancement\", \"launchers\", \"ray-launcher\", \"sweep\", \"wishlist\""
     }
   ]
 }
