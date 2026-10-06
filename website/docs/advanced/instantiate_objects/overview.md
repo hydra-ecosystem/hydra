@@ -287,6 +287,9 @@ print(opt)
 ```
 
 
+`instantiate()` accepts OmegaConf literals created from `r"\???"`; plain Python
+`"???"` call-site overrides remain invalid.
+
 ### Recursive instantiation
 Let's add a Dataset and a Trainer class. The trainer holds a Dataset and an Optimizer instances.
 ```python title="Additional classes"

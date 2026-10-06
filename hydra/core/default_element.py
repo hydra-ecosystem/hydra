@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from textwrap import dedent
 from typing import Optional, Pattern, Union
 
-from omegaconf import AnyNode, DictConfig
+from omegaconf import AnyNode, DictConfig, OmegaConf
 
 from hydra.errors import ConfigCompositionException
 
@@ -206,8 +206,12 @@ class InputDefault:
 
     def _resolve_interpolation_impl(
         self, known_choices: DictConfig, val: str | None
-    ) -> str:
+    ) -> tuple[str, str]:
+        """Resolve the path and retain its final choice's literal identity."""
         assert val is not None
+        was_missing = OmegaConf.is_missing(
+            val if "/" not in val else val.rsplit("/", 1)[-1]
+        )
 
         def replace(match: re.Match[str]) -> str:
             key = match.group(1).strip()
@@ -231,7 +235,11 @@ class InputDefault:
                 msg = f"Error resolving interpolation '{val}'"
             raise ConfigCompositionException(msg)
 
-        return ret
+        name = ret.rsplit("/", 1)[-1]
+        if not was_missing and OmegaConf.is_missing(name):
+            # Missing choices cannot resolve, so a new missing suffix is literal.
+            name = OmegaConf.create({"name": "\\" + name}).name
+        return ret, name
 
     def get_override_key(self) -> str:
         default_pkg = self.get_default_package()
@@ -306,6 +314,8 @@ class ConfigDefault(InputDefault):
     path: str | None = None
     optional: bool = False
     deleted: bool | None = None
+    # Preserve OmegaConf value identity before constructing a qualified path.
+    _name: str | None = field(default=None, compare=False, repr=False)
 
     def __post_init__(self) -> None:
         if self.is_self() and self.package is not None:
@@ -348,12 +358,13 @@ class ConfigDefault(InputDefault):
             return group
 
     def get_name(self) -> str | None:
-        assert self.path is not None
-        idx = self.path.rfind("/")
+        path = self.path if self._name is None else self._name
+        assert path is not None
+        idx = path.rfind("/")
         if idx == -1:
-            return self.path
+            return path
         else:
-            return self.path[idx + 1 :]
+            return path[idx + 1 :]
 
     def get_config_path(self) -> str:
         assert self.parent_base_dir is not None
@@ -412,11 +423,11 @@ class ConfigDefault(InputDefault):
         assert self.path is not None
         absolute = self.path.startswith("/")
         path = self.path[1:] if absolute else self.path
-        resolved = self._resolve_interpolation_impl(known_choices, path)
+        resolved, self._name = self._resolve_interpolation_impl(known_choices, path)
         self.path = f"/{resolved.lstrip('/')}" if absolute else resolved
 
     def is_missing(self) -> bool:
-        return self.get_name() == "???"
+        return OmegaConf.is_missing(self.get_name())
 
     def is_override(self) -> bool:
         return False
@@ -539,14 +550,13 @@ See http://hydra.cc/docs/1.1/upgrades/1.0_to_1.1/defaults_list_interpolation for
                 )
                 raise ConfigCompositionException(msg)
 
-            resolved = self._resolve_interpolation_impl(known_choices, name)
-            self.value = resolved
+            resolved, suffix = self._resolve_interpolation_impl(known_choices, name)
+            self.value = suffix if "/" not in resolved else resolved
 
             if isinstance(resolved, str) and "/" in resolved:
                 segments = resolved.split("/")
                 if ".." not in segments and resolved != "???" and "${" not in resolved:
                     last_slash_idx = resolved.rfind("/")
-                    suffix = resolved[last_slash_idx + 1 :]
                     prefix = resolved[:last_slash_idx]
                     self.original_group = self.group
                     self.normalized_shorthand = True
@@ -555,7 +565,7 @@ See http://hydra.cc/docs/1.1/upgrades/1.0_to_1.1/defaults_list_interpolation for
 
     def is_missing(self) -> bool:
         if self.is_name():
-            return self.get_name() == "???"
+            return OmegaConf.is_missing(self.get_name())
         else:
             return False
 
