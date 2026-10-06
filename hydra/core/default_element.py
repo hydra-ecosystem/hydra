@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from textwrap import dedent
 from typing import Optional, Pattern, Union
 
-from omegaconf import AnyNode, DictConfig
+from omegaconf import AnyNode, DictConfig, OmegaConf
 
 from hydra.errors import ConfigCompositionException
 
@@ -217,7 +217,12 @@ class InputDefault:
                     return choice
             return match.group(0)
 
-        ret = _defaults_list_interpolation_pattern.sub(replace, val)
+        match = _defaults_list_interpolation_pattern.fullmatch(val)
+        ret = (
+            replace(match)
+            if match
+            else _defaults_list_interpolation_pattern.sub(replace, val)
+        )
         if "${" in ret:
             options = [
                 x
@@ -306,6 +311,8 @@ class ConfigDefault(InputDefault):
     path: str | None = None
     optional: bool = False
     deleted: bool | None = None
+    # Preserve OmegaConf value identity before constructing a qualified path.
+    _name: str | None = field(default=None, compare=False, repr=False)
 
     def __post_init__(self) -> None:
         if self.is_self() and self.package is not None:
@@ -348,12 +355,13 @@ class ConfigDefault(InputDefault):
             return group
 
     def get_name(self) -> str | None:
-        assert self.path is not None
-        idx = self.path.rfind("/")
+        path = self.path if self._name is None else self._name
+        assert path is not None
+        idx = path.rfind("/")
         if idx == -1:
-            return self.path
+            return path
         else:
-            return self.path[idx + 1 :]
+            return path[idx + 1 :]
 
     def get_config_path(self) -> str:
         assert self.parent_base_dir is not None
@@ -413,10 +421,11 @@ class ConfigDefault(InputDefault):
         absolute = self.path.startswith("/")
         path = self.path[1:] if absolute else self.path
         resolved = self._resolve_interpolation_impl(known_choices, path)
+        self._name = resolved
         self.path = f"/{resolved.lstrip('/')}" if absolute else resolved
 
     def is_missing(self) -> bool:
-        return self.get_name() == "???"
+        return OmegaConf.is_missing(self.get_name())
 
     def is_override(self) -> bool:
         return False
@@ -555,7 +564,7 @@ See http://hydra.cc/docs/1.1/upgrades/1.0_to_1.1/defaults_list_interpolation for
 
     def is_missing(self) -> bool:
         if self.is_name():
-            return self.get_name() == "???"
+            return OmegaConf.is_missing(self.get_name())
         else:
             return False
 

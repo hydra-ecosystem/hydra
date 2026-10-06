@@ -287,6 +287,12 @@ print(opt)
 ```
 
 
+OmegaConf literals created from `r"\???"` are concrete strings and can be passed
+to `instantiate()`, including partial instantiation. Configured unescaped `???`
+values retain their missing-value behavior. A plain Python `"???"` supplied at
+the call site is still rejected; use an OmegaConf literal when that text is
+intentional.
+
 ### Recursive instantiation
 Let's add a Dataset and a Trainer class. The trainer holds a Dataset and an Optimizer instances.
 ```python title="Additional classes"

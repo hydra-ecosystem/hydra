@@ -347,7 +347,7 @@ def _check_not_missing(
     containing_config_path: str | None,
 ) -> bool:
     path = default.get_config_path()
-    if path.endswith("???"):
+    if default.is_missing():
         if skip_missing:
             return True
         if isinstance(default, GroupDefault):
@@ -718,6 +718,7 @@ def _create_defaults_tree_impl(
                     if d.is_external_append():
                         node = ConfigDefault(
                             path=f"{d.get_group_path()}/{item}",
+                            _name=item,
                             package=d.package,
                             optional=d.is_optional(),
                         )
@@ -726,6 +727,7 @@ def _create_defaults_tree_impl(
                     else:
                         node = ConfigDefault(
                             path=f"{d.group}/{item}",
+                            _name=item,
                             package=d.package,
                             optional=d.is_optional(),
                         )
