@@ -1,21 +1,21 @@
 {
   "generated_on": "2026-10-06",
-  "generated_at": "2026-10-06T14:35:26Z",
+  "generated_at": "2026-10-06T16:48:59Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 47,
+    "open_total": 46,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 2.1
+        "percentage": 2.2
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 41,
-        "percentage": 87.2
+        "count": 40,
+        "percentage": 87.0
       },
       {
         "category": "Documentation",
@@ -27,7 +27,7 @@
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.1
+        "percentage": 2.2
       },
       {
         "category": "Refactor",
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,29 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 93
+        "count": 94
       }
     ]
   },
   "issues": [
-    {
-      "number": 3480,
-      "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3512,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3512"
-        }
-      ],
-      "created": "2026-09-26",
-      "updated": "2026-09-26",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2359,9 +2341,34 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 3480,
+      "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3512,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3512"
+        }
+      ],
+      "created": "2026-09-26",
+      "updated": "2026-09-26",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-06T16:48:59Z",
+      "kind": "closed",
+      "issue": 3480,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3480",
+      "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4"
+    },
     {
       "ts": "2026-10-06T07:30:40Z",
       "kind": "pr",
@@ -4008,13 +4015,6 @@
       "issue": 2938,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2938",
       "title": "How to override the default model in main.yaml in code when testing different models"
-    },
-    {
-      "ts": "2026-08-31T12:45:04Z",
-      "kind": "closed",
-      "issue": 2898,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2898",
-      "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages"
     }
   ]
 }
