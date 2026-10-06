@@ -1,0 +1,5 @@
+defaults:
+  - config
+  - _self_
+
+foo: 2

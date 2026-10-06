@@ -1,12 +1,8 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-import copy
 import functools
-import pickle
-import warnings
-from pathlib import Path
 from typing import Any, Callable
 
-from omegaconf import DictConfig, open_dict, read_write
+from omegaconf import DictConfig
 
 from . import version
 from ._internal.execution_policy import ExecutionWhitelist
@@ -14,32 +10,7 @@ from ._internal.execution_policy import (
     execution_whitelist as execution_whitelist_context,
 )
 from ._internal.utils import _run_hydra, get_args_parser
-from .core.hydra_config import HydraConfig
-from .core.utils import _flush_loggers, configure_log
 from .types import TaskFunction
-
-
-def _get_rerun_conf(file_path: str, overrides: list[str]) -> DictConfig:
-    msg = "Experimental rerun CLI option, other command line args are ignored."
-    warnings.warn(msg, UserWarning)
-    file = Path(file_path)
-    if not file.exists():
-        raise ValueError(f"File {file} does not exist!")
-
-    if len(overrides) > 0:
-        msg = "Config overrides are not supported as of now."
-        warnings.warn(msg, UserWarning)
-
-    with open(str(file), "rb") as input:
-        config = pickle.load(input)  # nosec
-    configure_log(config.hydra.job_logging, config.hydra.verbose)
-    HydraConfig.instance().set_config(config)
-    task_cfg = copy.deepcopy(config)
-    with read_write(task_cfg):
-        with open_dict(task_cfg):
-            del task_cfg["hydra"]
-    assert isinstance(task_cfg, DictConfig)
-    return task_cfg
 
 
 def main(
@@ -71,20 +42,15 @@ def main(
                 else:
                     args_parser = get_args_parser()
                     args = args_parser.parse_intermixed_args()
-                    if args.experimental_rerun is not None:
-                        cfg = _get_rerun_conf(args.experimental_rerun, args.overrides)
-                        task_function(cfg)
-                        _flush_loggers()
-                    else:
-                        # no return value from run_hydra() as it may sometime actually run the task_function
-                        # multiple times (--multirun)
-                        _run_hydra(
-                            args=args,
-                            args_parser=args_parser,
-                            task_function=task_function,
-                            config_path=config_path,
-                            config_name=config_name,
-                        )
+                    # no return value from run_hydra() as it may sometime actually run the task_function
+                    # multiple times (--multirun)
+                    _run_hydra(
+                        args=args,
+                        args_parser=args_parser,
+                        task_function=task_function,
+                        config_path=config_path,
+                        config_name=config_name,
+                    )
 
         return decorated_main
 
