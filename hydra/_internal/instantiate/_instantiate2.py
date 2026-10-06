@@ -327,7 +327,7 @@ def _validate_callsite_override(value: Any, path: tuple[Any, ...]) -> None:
         str(component.value if isinstance(component, Enum) else component)
         for component in path
     )
-    if isinstance(raw_value, str) and raw_value == "???":
+    if OmegaConf.is_missing(raw_value):
         raise InstantiationException(
             f"Call-site override '{full_key}' cannot be an OmegaConf missing value. "
             "Pass a concrete runtime value instead."
@@ -674,7 +674,7 @@ def _get_effective_control(
 
 def _is_missing_parameter(node: Any, overrides: ConfigOverlay | None, key: str) -> bool:
     if overrides is not None and key in overrides:
-        return isinstance(overrides[key], str) and overrides[key] == "???"
+        return OmegaConf.is_missing(overrides[key])
     return OmegaConf.is_missing(node, key)
 
 

@@ -347,7 +347,7 @@ def _check_not_missing(
     containing_config_path: str | None,
 ) -> bool:
     path = default.get_config_path()
-    if path.endswith("???"):
+    if default.is_missing():
         if skip_missing:
             return True
         if isinstance(default, GroupDefault):

@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from textwrap import dedent
 from typing import Optional, Pattern, Union
 
-from omegaconf import AnyNode, DictConfig
+from omegaconf import AnyNode, DictConfig, OmegaConf
 
 from hydra.errors import ConfigCompositionException
 
@@ -217,7 +217,12 @@ class InputDefault:
                     return choice
             return match.group(0)
 
-        ret = _defaults_list_interpolation_pattern.sub(replace, val)
+        match = _defaults_list_interpolation_pattern.fullmatch(val)
+        ret = (
+            replace(match)
+            if match
+            else _defaults_list_interpolation_pattern.sub(replace, val)
+        )
         if "${" in ret:
             options = [
                 x
@@ -416,7 +421,7 @@ class ConfigDefault(InputDefault):
         self.path = f"/{resolved.lstrip('/')}" if absolute else resolved
 
     def is_missing(self) -> bool:
-        return self.get_name() == "???"
+        return OmegaConf.is_missing(self.path)
 
     def is_override(self) -> bool:
         return False
@@ -555,7 +560,7 @@ See http://hydra.cc/docs/1.1/upgrades/1.0_to_1.1/defaults_list_interpolation for
 
     def is_missing(self) -> bool:
         if self.is_name():
-            return self.get_name() == "???"
+            return OmegaConf.is_missing(self.get_name())
         else:
             return False
 
