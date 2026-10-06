@@ -1,0 +1,2 @@
+driver: mysql
+mysql_only: 1
