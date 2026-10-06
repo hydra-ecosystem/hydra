@@ -235,6 +235,29 @@ Note that trailing and leading whitespace are ignored, the above is equivalent t
 $ python my_app.py 'msg=    hello world    '
 ```
 
+### Missing values and literal question marks
+
+Hydra 1.4 requires OmegaConf 2.4.0rc1 or newer. The whole value `???` is
+mandatory missing, even when quoted. Prefix it with a backslash to store the
+literal text `???`. OmegaConf preserves that distinction through interpolation,
+resolution, and YAML output.
+
+```shell
+'value=???'           # Missing value
+'value=\???'          # Literal ???
+'value="\???"'        # Literal ???, with Hydra value quotes
+'value=\\\\???'       # Literal \???; Hydra unquoted backslashes need doubling
+'value="\\???"'       # Literal \??? using Hydra value quotes
+'~value=\???'         # Delete only if the value is literal ???
+```
+
+The outer single quotes protect the override from shell interpretation. These
+forms also work in lists, dictionaries, and choice sweeps. Reloading Hydra's
+`--cfg` output or `.hydra/config.yaml` preserves literal and missing values.
+To inspect a value, use `OmegaConf.is_missing(cfg, "value")` or
+`OmegaConf.is_missing(value)`: a literal `???` compares equal to the ordinary
+Python string `"???"`.
+
 ### Escaped characters in unquoted values
 Hydra's parser considers some characters to be illegal in unquoted strings.
 These otherwise special characters may be included in unquoted values by escaping them with a `\`.

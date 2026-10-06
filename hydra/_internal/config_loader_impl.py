@@ -524,9 +524,19 @@ class ConfigLoaderImpl(ConfigLoader):
                     config_val_for_match = (
                         "???" if node._is_missing() else _get_value(node)
                     )
+                    if override.value_type is not None and isinstance(
+                        config_val_for_match, Container
+                    ):
+                        # Resolve a copy so matching retains container interpolation
+                        # behavior without changing the config when deletion fails.
+                        config_val_for_match = copy.deepcopy(config_val_for_match)
+                        OmegaConf.resolve(config_val_for_match)
                     if (
                         override.value_type is not None
-                        and value != config_val_for_match
+                        and not OmegaConf.structural_equality(
+                            OmegaConf.create({"value": config_val_for_match}),
+                            OmegaConf.create({"value": value}),
+                        )
                     ):
                         # Bandit mistakes this user-facing message for a SQL snippet.
                         raise ConfigCompositionException(

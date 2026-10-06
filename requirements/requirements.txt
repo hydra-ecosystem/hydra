@@ -1,1 +1,1 @@
-omegaconf>=2.4.0.dev15
+omegaconf>=2.4.0rc1
