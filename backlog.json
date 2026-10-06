@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-06",
-  "generated_at": "2026-10-06T07:21:29Z",
+  "generated_at": "2026-10-06T07:30:40Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 47,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 45
+        "count": 44
       },
       {
         "status": "done",
@@ -71,6 +71,24 @@
     ]
   },
   "issues": [
+    {
+      "number": 3480,
+      "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3512,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3512"
+        }
+      ],
+      "created": "2026-09-26",
+      "updated": "2026-09-26",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -780,19 +798,6 @@
       "updated": "2026-09-25",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3461"
-    },
-    {
-      "number": 3480,
-      "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-09-26",
-      "updated": "2026-09-26",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3480"
     },
     {
       "number": 3498,
@@ -2357,6 +2362,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-06T07:30:40Z",
+      "kind": "pr",
+      "issue": 3480,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3480",
+      "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4",
+      "detail": "linked #3512"
+    },
+    {
+      "ts": "2026-10-06T07:30:40Z",
+      "kind": "status",
+      "issue": 3480,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3480",
+      "title": "Support OmegaConf escaped literal `???` values in Hydra 1.4",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3512,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3512"
+      }
+    },
     {
       "ts": "2026-10-06T06:50:00Z",
       "kind": "closed",
@@ -3990,20 +4015,6 @@
       "issue": 2898,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2898",
       "title": "[Feature Request & Solution] Troublehooting guide to prevent duplicated log messages"
-    },
-    {
-      "ts": "2026-08-31T12:05:45Z",
-      "kind": "closed",
-      "issue": 2892,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2892",
-      "title": "[Help requested] Optuna Sweeper Multiple GPU Parallelism"
-    },
-    {
-      "ts": "2026-08-31T12:05:45Z",
-      "kind": "new",
-      "issue": 3425,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425",
-      "title": "Expose Optuna GridSampler seed in the structured config"
     }
   ]
 }
