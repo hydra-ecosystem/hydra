@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from textwrap import dedent
 from typing import Callable
 
-from omegaconf import OmegaConf
+from omegaconf import ListConfig, OmegaConf
 
 from hydra import MissingConfigException
 from hydra._internal.config_repository import IConfigRepository
@@ -76,6 +76,15 @@ class Overrides:
             is_config = repo.config_exists(override.key_or_group)
             value = override.value()
             is_dict = isinstance(override.value(), dict)
+            if is_group and isinstance(value, (str, list)):
+                value_config = OmegaConf.create({"value": value})
+                value_node = value_config._get_node("value")
+                assert value_node is not None
+                if isinstance(value, list):
+                    assert isinstance(value_node, ListConfig)
+                    value = list(value_node._iter_ex(resolve=False))
+                else:
+                    value = value_node._value()
             if override.is_delete() and (is_group or is_config):
                 key = override.get_key_element()[1:]
                 if is_group:
@@ -247,7 +256,10 @@ class Overrides:
                 if deletion.name is None:
                     return True
                 else:
-                    return deletion.name == default.get_name()
+                    return OmegaConf.structural_equality(
+                        OmegaConf.create({"value": deletion.name}),
+                        OmegaConf.create({"value": default.get_name()}),
+                    )
         elif isinstance(default, ConfigDefault):
             key = default.get_config_path()
             if key in self.deletions:
@@ -347,7 +359,7 @@ def _check_not_missing(
     containing_config_path: str | None,
 ) -> bool:
     path = default.get_config_path()
-    if path.endswith("???"):
+    if default.is_missing():
         if skip_missing:
             return True
         if isinstance(default, GroupDefault):
@@ -718,6 +730,7 @@ def _create_defaults_tree_impl(
                     if d.is_external_append():
                         node = ConfigDefault(
                             path=f"{d.get_group_path()}/{item}",
+                            _name=item,
                             package=d.package,
                             optional=d.is_optional(),
                         )
@@ -726,6 +739,7 @@ def _create_defaults_tree_impl(
                     else:
                         node = ConfigDefault(
                             path=f"{d.group}/{item}",
+                            _name=item,
                             package=d.package,
                             optional=d.is_optional(),
                         )
