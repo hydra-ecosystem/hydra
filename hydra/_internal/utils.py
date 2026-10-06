@@ -7,9 +7,11 @@ import sys
 import traceback
 import warnings
 from os.path import dirname, join, normpath, realpath
+from pathlib import Path
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any, Sequence, cast
 
+from omegaconf import OmegaConf
 from omegaconf.errors import OmegaConfBaseException
 
 from hydra._internal._locate import _locate as _locate_impl
@@ -441,6 +443,30 @@ def run_and_report(func: Any) -> Any:
         sys.exit(1)
 
 
+def _get_rerun_overrides(job_dir: str) -> tuple[str | None, list[str]]:
+    from hydra.core.override_parser.types import Quote, QuotedString
+
+    output_dir = Path(job_dir).resolve()
+    metadata_dir = output_dir / ".hydra"
+    saved_hydra = OmegaConf.load(metadata_dir / "hydra.yaml").hydra
+    overrides = cast(
+        list[str], OmegaConf.to_container(saved_hydra.overrides.hydra, resolve=False)
+    ) + cast(
+        list[str],
+        OmegaConf.to_container(
+            OmegaConf.load(metadata_dir / "overrides.yaml"), resolve=False
+        ),
+    )
+    # A saved sweep job is rerun as one job, in its original directory by default.
+    overrides.extend(
+        [
+            "hydra.mode=RUN",
+            f"hydra.run.dir={QuotedString(str(output_dir), Quote.double).with_quotes()}",
+        ]
+    )
+    return saved_hydra.job.config_name, overrides
+
+
 def _run_hydra(
     args: argparse.Namespace,
     args_parser: argparse.ArgumentParser,
@@ -453,6 +479,16 @@ def _run_hydra(
     from hydra.core.override_parser.overrides_parser import OverridesParser
 
     from .hydra import Hydra
+
+    if args.experimental_rerun is not None:
+        if args.multirun:
+            raise ValueError("--experimental-rerun does not support --multirun")
+        if args.config_name is not None:
+            raise ValueError("--experimental-rerun does not support --config-name")
+        config_name, saved_overrides = run_and_report(
+            lambda: _get_rerun_overrides(args.experimental_rerun)
+        )
+        args.overrides = saved_overrides + args.overrides
 
     if args.config_name is not None:
         config_name = args.config_name
@@ -532,13 +568,16 @@ def _run_hydra(
             parsed_overrides = run_and_report(
                 lambda: OverridesParser.create().parse_overrides(overrides)
             )
-            run_mode = run_and_report(
-                lambda: hydra.get_mode(
-                    config_name=config_name,
-                    overrides=overrides,
-                    parsed_overrides=parsed_overrides,
+            if args.experimental_rerun is not None:
+                run_mode = RunMode.RUN
+            else:
+                run_mode = run_and_report(
+                    lambda: hydra.get_mode(
+                        config_name=config_name,
+                        overrides=overrides,
+                        parsed_overrides=parsed_overrides,
+                    )
                 )
-            )
             _run_app(
                 run=args.run,
                 multirun=args.multirun,
@@ -753,7 +792,7 @@ def get_args_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--experimental-rerun",
-        help="Rerun a job from a previous config pickle",
+        help="Rerun a job from its output directory",
     )
 
     info_choices = [

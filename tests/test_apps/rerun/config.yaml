@@ -1,0 +1,11 @@
+defaults:
+  - schema
+  - db: mysql
+  - _self_
+
+foo: 1
+
+hydra:
+  callbacks:
+    recording:
+      _target_: my_app.RecordingCallback
