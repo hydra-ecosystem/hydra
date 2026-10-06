@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-06",
-  "generated_at": "2026-10-06T16:52:05Z",
+  "generated_at": "2026-10-06T19:47:56Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 46,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 44
+        "count": 43
       },
       {
         "status": "done",
@@ -71,6 +71,26 @@
     ]
   },
   "issues": [
+    {
+      "number": 3248,
+      "title": "Upgrade experimental rerun to recompose config and overlay saved values",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3513,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3513"
+        }
+      ],
+      "created": "2026-06-29",
+      "updated": "2026-08-23",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3248"
+    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -633,21 +653,6 @@
         "needs decision"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3236"
-    },
-    {
-      "number": 3248,
-      "title": "Upgrade experimental rerun to recompose config and overlay saved values",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-06-29",
-      "updated": "2026-08-23",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3248"
     },
     {
       "number": 3279,
@@ -2363,6 +2368,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-06T19:47:56Z",
+      "kind": "pr",
+      "issue": 3248,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3248",
+      "title": "Upgrade experimental rerun to recompose config and overlay saved values",
+      "detail": "linked #3513"
+    },
+    {
+      "ts": "2026-10-06T19:47:56Z",
+      "kind": "status",
+      "issue": 3248,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3248",
+      "title": "Upgrade experimental rerun to recompose config and overlay saved values",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3513,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3513"
+      }
+    },
+    {
       "ts": "2026-10-06T16:48:59Z",
       "kind": "closed",
       "issue": 3480,
@@ -4001,20 +4026,6 @@
       "issue": 3427,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3427",
       "title": "HydraConfig is unavailable during multirun controller initialization"
-    },
-    {
-      "ts": "2026-08-31T14:35:07Z",
-      "kind": "new",
-      "issue": 3426,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
-      "title": "Support `NSGAIIISampler` on Optuna Sweeper"
-    },
-    {
-      "ts": "2026-08-31T12:59:52Z",
-      "kind": "closed",
-      "issue": 2938,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2938",
-      "title": "How to override the default model in main.yaml in code when testing different models"
     }
   ]
 }
