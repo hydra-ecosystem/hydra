@@ -7,6 +7,7 @@ from textwrap import dedent
 from typing import Any, MutableSequence
 
 from omegaconf import (
+    AnyNode,
     Container,
     DictConfig,
     OmegaConf,
@@ -524,9 +525,11 @@ class ConfigLoaderImpl(ConfigLoader):
                     config_val_for_match = (
                         "???" if node._is_missing() else _get_value(node)
                     )
-                    if (
-                        override.value_type is not None
-                        and value != config_val_for_match
+                    if isinstance(value, str):
+                        value = AnyNode(value)._value()
+                    if override.value_type is not None and (
+                        OmegaConf.is_missing(value) != node._is_missing()
+                        or value != config_val_for_match
                     ):
                         # Bandit mistakes this user-facing message for a SQL snippet.
                         raise ConfigCompositionException(
