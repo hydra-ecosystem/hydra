@@ -134,9 +134,6 @@ must be aggregated across jobs.
 
 ## Hydra-provided callbacks
 
-`PickleJobInfoCallback` supports the experimental
-[rerun feature](/experimental/rerun.md).
-
 `LogJobReturnCallback` is a deprecated no-op in Hydra 1.4 and will be removed in
 Hydra 1.5. Remove it from `hydra.callbacks`; Hydra logs task exceptions to
 per-job logs without this callback. Logging successful return values is
