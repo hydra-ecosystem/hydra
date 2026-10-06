@@ -235,6 +235,18 @@ Note that trailing and leading whitespace are ignored, the above is equivalent t
 $ python my_app.py 'msg=    hello world    '
 ```
 
+### Literal question marks
+
+`???` is mandatory missing, even when quoted. Escape it to use it as text:
+
+```shell
+python my_app.py 'value=\???'      # Literal ???
+python my_app.py 'value="\\???"'   # Literal \???
+```
+
+Use `OmegaConf.is_missing(cfg, "value")` instead of comparing with `"???"`.
+Interpolation and YAML round trips preserve the distinction.
+
 ### Escaped characters in unquoted values
 Hydra's parser considers some characters to be illegal in unquoted strings.
 These otherwise special characters may be included in unquoted values by escaping them with a `\`.
