@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-06",
-  "generated_at": "2026-10-06T06:50:00Z",
+  "generated_at": "2026-10-06T07:21:29Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 47,
@@ -1742,6 +1742,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3230"
     },
     {
+      "number": 3250,
+      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-06-30",
+      "updated": "2026-08-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
+    },
+    {
       "number": 3252,
       "title": "Migrate Hydra plugin discovery from namespace scanning to entry points",
       "category": "Enhancement",
@@ -2341,19 +2354,6 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 3250,
-      "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-06-30",
-      "updated": "2026-08-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3250"
     }
   ],
   "updates": [
