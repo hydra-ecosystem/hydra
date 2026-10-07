@@ -107,6 +107,10 @@ python tools/release/release.py \
 The GitHub publish workflows use the repository-aware form so already-published
 files are not uploaded again.
 
+Both build and dev-release validation reject source distributions containing a
+JAR without `ATTRIBUTION/LICENSE-antlr4`, and wheels containing any JAR. These
+checks run before the publish workflow uploads distribution artifacts.
+
 The workflows also write a release summary listing the target repository,
 publish mode, trigger, ref, commit, and every artifact that was built.
 
