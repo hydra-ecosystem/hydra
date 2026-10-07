@@ -16,3 +16,7 @@ def test_rerun(tmpdir: Path) -> None:
 
     result, _err = run_python_script(cmd)
     assert "[JOB] cfg.foo=bar" in result
+    result, _err = run_python_script(
+        [cmd[0], "--experimental-rerun", str(tmpdir), "foo=baz"]
+    )
+    assert "[JOB] cfg.foo=baz" in result

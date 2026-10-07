@@ -1,0 +1,5 @@
+defaults:
+  - db: mysql
+  - _self_
+
+foo: 1
