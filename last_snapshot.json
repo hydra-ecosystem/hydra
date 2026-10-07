@@ -84,6 +84,7 @@
     "3427": "2026-09-07",
     "3436": "2026-09-05",
     "3440": "2026-09-30",
+    "3444": "2026-10-07",
     "3454": "2026-09-26",
     "3456": "2026-09-25",
     "3457": "2026-09-22",
@@ -96,7 +97,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-07T06:36:19Z",
+  "generated_at": "2026-10-07T06:46:51Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -505,18 +506,6 @@
       "status": "not started",
       "title": "Improve type safety of Hydra logging configurations",
       "updated_at": "2026-09-05T17:17:47Z"
-    },
-    "3444": {
-      "category": "Build",
-      "created_at": "2026-09-10T15:48:51Z",
-      "labels": [],
-      "pr_numbers": [
-        "3514"
-      ],
-      "state": "OPEN",
-      "status": "in progress",
-      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
-      "updated_at": "2026-09-10T15:48:51Z"
     },
     "3445": {
       "category": "Enhancement",
@@ -1751,6 +1740,18 @@
       "status": "done",
       "title": "hydra.mode discovery composes the config twice on every invocation",
       "updated_at": "2026-09-07T19:40:55Z"
+    },
+    "3444": {
+      "category": "Build",
+      "created_at": "2026-09-10T15:48:51Z",
+      "labels": [],
+      "pr_numbers": [
+        "3514"
+      ],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
+      "updated_at": "2026-09-10T15:48:51Z"
     },
     "3454": {
       "category": "Enhancement",

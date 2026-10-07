@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-07",
-  "generated_at": "2026-10-07T06:36:19Z",
+  "generated_at": "2026-10-07T06:46:51Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 45,
+    "open_total": 44,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 2.2
+        "percentage": 2.3
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 39,
-        "percentage": 86.7
+        "percentage": 88.6
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 4.4
+        "percentage": 4.5
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.2
+        "percentage": 2.3
       },
       {
         "category": "Refactor",
@@ -38,15 +38,15 @@
       {
         "category": "Build",
         "emoji": "🏗️",
-        "count": 2,
-        "percentage": 4.4
+        "count": 1,
+        "percentage": 2.3
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,29 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 95
+        "count": 96
       }
     ]
   },
   "issues": [
-    {
-      "number": 3444,
-      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
-      "category": "Build",
-      "category_emoji": "🏗️",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3514,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3514"
-        }
-      ],
-      "created": "2026-09-10",
-      "updated": "2026-09-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3444"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2364,9 +2346,34 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 3444,
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
+      "category": "Build",
+      "category_emoji": "🏗️",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3514,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3514"
+        }
+      ],
+      "created": "2026-09-10",
+      "updated": "2026-09-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3444"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-07T06:46:51Z",
+      "kind": "closed",
+      "issue": 3444,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3444",
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists"
+    },
     {
       "ts": "2026-10-07T06:36:19Z",
       "kind": "pr",
@@ -4015,18 +4022,6 @@
       "issue": 2943,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2943",
       "title": "[Feature Request] It'd be nice to have a custom resolver for accessing data files for a given python package."
-    },
-    {
-      "ts": "2026-09-01T11:31:06Z",
-      "kind": "status",
-      "issue": 3426,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
-      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3432,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3432"
-      }
     }
   ]
 }
