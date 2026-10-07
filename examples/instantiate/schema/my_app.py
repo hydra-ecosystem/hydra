@@ -63,12 +63,6 @@ class Config:
     db: DBConfig = MISSING
 
 
-cs = ConfigStore.instance()
-cs.store(name="config", node=Config)
-cs.store(group="db", name="mysql", node=MySQLConfig)
-cs.store(group="db", name="postgresql", node=PostGreSQLConfig)
-
-
 @hydra.main(config_name="config")
 def my_app(cfg: Config) -> None:
     with execution_whitelist("my_app.*"):
@@ -77,4 +71,9 @@ def my_app(cfg: Config) -> None:
 
 
 if __name__ == "__main__":
+    # instantiate() imports this file as my_app; register only when run as a script.
+    cs = ConfigStore.instance()
+    cs.store(name="config", node=Config)
+    cs.store(group="db", name="mysql", node=MySQLConfig)
+    cs.store(group="db", name="postgresql", node=PostGreSQLConfig)
     my_app()

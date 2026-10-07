@@ -21,6 +21,7 @@ class ConfigStore(metaclass=Singleton):
         group: str | None = None,
         package: str | None = None,
         provider: str | None = None,
+        replace: bool | None = None,
     ) -> None:
         """
         Stores a config node into the repository
@@ -33,9 +34,26 @@ class ConfigStore(metaclass=Singleton):
             Child separator is '.', for example foo.bar.baz
         :param provider: the name of the module/app providing this config.
             Helps debugging.
+        :param replace: On a collision, True replaces silently, False raises
+            ValueError, and None warns and replaces (an error in Hydra 1.5).
         """
     ...
 ```
+
+### Replacing an existing registration
+
+A registration collides when its config name and group match an existing one.
+The package and provider do not create separate registrations. Names with and
+without `.yaml` are equivalent, as are `group=None` and `group=""`.
+
+In Hydra 1.4, omitting `replace` on a collision emits a
+`Hydra15MigrationWarning` and replaces the existing config. Set `replace=True`
+for intentional replacement, or `replace=False` to raise `ValueError` and keep
+the original registration. Neither setting changes first-time registration.
+`ConfigStoreWithProvider.store()` supports the same argument.
+
+In Hydra 1.5, omitting `replace` on a collision will raise an error. See the
+[migration guide](/docs/upgrades/1.3_to_1.4/config_store_collisions) for examples.
 
 ### ConfigStore and YAML input configs
 
