@@ -2040,6 +2040,24 @@ def test_cast_preserves_sweep_metadata(
 
 
 @mark.parametrize(
+    "expression,expected",
+    [
+        param(
+            "float(sort(range(0,1,0.25),reverse=true))",
+            [0.75, 0.5, 0.25, 0.0],
+            id="float",
+        ),
+        param("int(sort(range(1.0,4.0),reverse=true))", [3, 2, 1], id="int"),
+    ],
+)
+def test_cast_sorted_float_range(expression: str, expected: list[Any]) -> None:
+    override = parser.parse_override(f"key={expression}")
+    values = list(override.sweep_iterator())
+    assert values == expected
+    assert [type(v) for v in values] == [type(v) for v in expected]
+
+
+@mark.parametrize(
     "value,expected_value",
     [
         param("abs(10)", 10, id="abs(10)"),

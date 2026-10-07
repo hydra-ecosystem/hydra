@@ -105,7 +105,8 @@ def cast_int(*args: CastType, value: CastType | None = None) -> Any:
         return cast_range(value, cast_int)
     elif isinstance(value, IntervalSweep):
         return cast_interval(value, cast_int)
-    assert isinstance(value, (int, float, bool, str))
+    # sort() stores float range bounds as Decimal
+    assert isinstance(value, (int, float, bool, str, decimal.Decimal))
     return int(value)
 
 
@@ -123,7 +124,7 @@ def cast_float(*args: CastType, value: CastType | None = None) -> Any:
         return cast_range(value, cast_float)
     elif isinstance(value, IntervalSweep):
         return cast_interval(value, cast_float)
-    assert isinstance(value, (int, float, bool, str))
+    assert isinstance(value, (int, float, bool, str, decimal.Decimal))
     return float(value)
 
 
