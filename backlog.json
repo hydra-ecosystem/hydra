@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-07",
-  "generated_at": "2026-10-07T06:14:26Z",
+  "generated_at": "2026-10-07T06:36:19Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 45,
@@ -79,10 +79,6 @@
       "status": "in progress",
       "status_emoji": "🔄",
       "prs": [
-        {
-          "number": 3460,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3460"
-        },
         {
           "number": 3514,
           "url": "https://github.com/hydra-ecosystem/hydra/pull/3514"
@@ -2372,6 +2368,14 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-07T06:36:19Z",
+      "kind": "pr",
+      "issue": 3444,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3444",
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
+      "detail": "unlinked #3460"
+    },
+    {
       "ts": "2026-10-07T06:14:26Z",
       "kind": "pr",
       "issue": 3444,
@@ -4023,14 +4027,6 @@
         "number": 3432,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3432"
       }
-    },
-    {
-      "ts": "2026-09-01T07:15:35Z",
-      "kind": "pr",
-      "issue": 3425,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425",
-      "title": "Align Optuna sampler structured configs with Optuna 4.9",
-      "detail": "linked #3431"
     }
   ]
 }
