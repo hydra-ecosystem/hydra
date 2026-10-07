@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-07",
-  "generated_at": "2026-10-07T04:39:23Z",
+  "generated_at": "2026-10-07T06:14:26Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 45,
@@ -46,12 +46,12 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 2
+        "count": 1
       },
       {
         "status": "blocked",
@@ -72,6 +72,28 @@
   },
   "issues": [
     {
+      "number": 3444,
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
+      "category": "Build",
+      "category_emoji": "🏗️",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3460,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3460"
+        },
+        {
+          "number": 3514,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3514"
+        }
+      ],
+      "created": "2026-09-10",
+      "updated": "2026-09-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3444"
+    },
+    {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
       "category": "Enhancement",
@@ -90,24 +112,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2453"
-    },
-    {
-      "number": 3444,
-      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
-      "category": "Build",
-      "category_emoji": "🏗️",
-      "status": "community PR",
-      "status_emoji": "🤝",
-      "prs": [
-        {
-          "number": 3460,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3460"
-        }
-      ],
-      "created": "2026-09-10",
-      "updated": "2026-09-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3444"
     },
     {
       "number": 468,
@@ -1714,6 +1718,26 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3230"
     },
     {
+      "number": 3248,
+      "title": "Upgrade experimental rerun to recompose config and overlay saved values",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3513,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3513"
+        }
+      ],
+      "created": "2026-06-29",
+      "updated": "2026-08-23",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3248"
+    },
+    {
       "number": 3250,
       "title": "Evaluate selected OmegaConf key-path forms for Hydra overrides",
       "category": "Enhancement",
@@ -2344,29 +2368,29 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 3248,
-      "title": "Upgrade experimental rerun to recompose config and overlay saved values",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3513,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3513"
-        }
-      ],
-      "created": "2026-06-29",
-      "updated": "2026-08-23",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3248"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-07T06:14:26Z",
+      "kind": "pr",
+      "issue": 3444,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3444",
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
+      "detail": "linked #3514"
+    },
+    {
+      "ts": "2026-10-07T06:14:26Z",
+      "kind": "status",
+      "issue": 3444,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3444",
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
+      "detail": "community PR → in progress",
+      "pr": {
+        "number": 3460,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3460"
+      }
+    },
     {
       "ts": "2026-10-07T04:39:23Z",
       "kind": "closed",
@@ -4007,25 +4031,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425",
       "title": "Align Optuna sampler structured configs with Optuna 4.9",
       "detail": "linked #3431"
-    },
-    {
-      "ts": "2026-09-01T07:15:35Z",
-      "kind": "status",
-      "issue": 3425,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425",
-      "title": "Align Optuna sampler structured configs with Optuna 4.9",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3431,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3431"
-      }
-    },
-    {
-      "ts": "2026-08-31T15:28:38Z",
-      "kind": "closed",
-      "issue": 2942,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2942",
-      "title": "[Feature Request] I'd like to be able to do multirun over files matching a glob (ideally a glob that depends on other, non-sweeped params in the config file)"
     }
   ]
 }
