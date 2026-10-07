@@ -1,6 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import importlib
-import importlib.util
 import inspect
 import pkgutil
 import re
@@ -197,7 +196,7 @@ class Plugins(metaclass=Singleton):
         scanned_plugins: list[type[Plugin]] = []
 
         for mdl in modules:
-            for importer, modname, ispkg in pkgutil.walk_packages(
+            for _, modname, _ in pkgutil.walk_packages(
                 path=mdl.__path__, prefix=mdl.__name__ + ".", onerror=lambda x: None
             ):
                 try:
@@ -210,21 +209,7 @@ class Plugins(metaclass=Singleton):
                     import_time = timer()
 
                     with warnings.catch_warnings(record=True) as recorded_warnings:
-                        if sys.version_info < (3, 10):
-                            m = importer.find_module(modname)  # type: ignore
-                            assert m is not None
-                            loaded_mod = m.load_module(modname)
-                        else:
-                            spec = importer.find_spec(modname)  # type: ignore[call-arg]
-                            assert spec is not None
-                            if modname in sys.modules:
-                                loaded_mod = sys.modules[modname]
-                            else:
-                                loaded_mod = importlib.util.module_from_spec(spec)
-                            if loaded_mod is not None:
-                                assert spec.loader is not None
-                                spec.loader.exec_module(loaded_mod)
-                                sys.modules[modname] = loaded_mod
+                        loaded_mod = importlib.import_module(modname)
 
                     import_time = timer() - import_time
                     if len(recorded_warnings) > 0:

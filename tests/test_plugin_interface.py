@@ -9,6 +9,7 @@ from omegaconf import DictConfig, OmegaConf
 from pytest import MonkeyPatch, mark, raises, warns
 
 from hydra.core.config_search_path import ConfigSearchPath
+from hydra.core.config_store import ConfigStore
 from hydra.core.plugins import Plugins, _warn_unenumerable_editable_namespace
 from hydra.core.utils import JobReturn
 from hydra.plugins.launcher import Launcher
@@ -103,6 +104,30 @@ def test_register_bad_plugin() -> None:
 
     with raises(ValueError, match="Not a valid Hydra Plugin"):
         Plugins.instance().register(NotAPlugin)  # type: ignore
+
+
+def test_discovery_preserves_imported_plugin_and_config(
+    hydra_restore_singletons: Any,
+) -> None:
+    module = importlib.import_module("hydra._internal.core_plugins.basic_launcher")
+    launcher = module.BasicLauncher
+    cs = ConfigStore.instance()
+    cs.store(
+        group="hydra/launcher",
+        name="basic",
+        node={"custom": True},
+        provider="test",
+        replace=True,
+    )
+
+    plugins = Plugins.instance()
+    plugins._initialize()
+
+    assert module.BasicLauncher is launcher
+    assert launcher in plugins.discover(Launcher)
+    config = cs.load("hydra/launcher/basic.yaml")
+    assert config.node == {"custom": True}
+    assert config.provider == "test"
 
 
 def test_entry_point_plugin_discovery(
