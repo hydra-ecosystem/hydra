@@ -1,0 +1,1 @@
+Fix `sort()` of a shuffled sweep still iterating in random order
