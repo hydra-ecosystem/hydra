@@ -5,8 +5,10 @@ import pathlib
 import re
 import subprocess
 import sys
+import tarfile
 import tempfile
 import textwrap
+import zipfile
 from contextlib import nullcontext
 from typing import cast
 
@@ -683,7 +685,7 @@ def test_check_build_artifacts_upgrades_smoke_environment_pip(
     monkeypatch, tmp_path
 ) -> None:
     wheel = tmp_path / "package.whl"
-    wheel.touch()
+    _write_test_artifact(wheel, ["package/__init__.py"])
     smoke_dir = tmp_path / "smoke"
     calls = []
 
@@ -743,3 +745,69 @@ def test_get_remote_url_accepts_sapling_path_output_formats(
 )
 def test_get_github_repo_slug_accepts_common_github_remote_urls(remote_url) -> None:
     assert release.get_github_repo_slug(remote_url) == "hydra-ecosystem/hydra"
+
+
+def _write_test_artifact(path: pathlib.Path, names: list[str]) -> None:
+    if path.name.endswith(".tar.gz"):
+        with tarfile.open(path, "w:gz") as archive:
+            for name in names:
+                archive.addfile(tarfile.TarInfo(f"package/{name}"))
+    else:
+        with zipfile.ZipFile(path, "w") as archive:
+            for name in names:
+                archive.writestr(name, "")
+
+
+@pytest.mark.parametrize("entry_point", ["build", "dev_release"])
+@pytest.mark.parametrize(
+    ("suffix", "names", "error"),
+    [
+        (
+            ".tar.gz",
+            ["build_helpers/bin/antlr.jar", "ATTRIBUTION/LICENSE-antlr4"],
+            None,
+        ),
+        (".tar.gz", ["build_helpers/bin/antlr.jar"], "no ATTRIBUTION/LICENSE-antlr4"),
+        (".tar.gz", ["setup.py"], None),
+        (".whl", ["hydra/__init__.py"], None),
+        (".whl", ["build_helpers/bin/antlr.jar"], "wheel contains a JAR"),
+    ],
+)
+def test_release_build_checks_bundled_jar_licenses(
+    monkeypatch, tmp_path, entry_point, suffix, names, error
+) -> None:
+    build_dir = tmp_path / "dist"
+    cfg = release.Config(
+        action=release.Action.build,
+        build_policy=release.BuildPolicy.all,
+        build_dir=str(build_dir),
+        packages={"hydra": Package(name="hydra-core", path=".")},
+    )
+
+    def fake_build_package(cfg, pkg_path, output_dir):
+        _write_test_artifact(pathlib.Path(output_dir) / f"package{suffix}", names)
+
+    monkeypatch.setattr(release, "build_package", fake_build_package)
+    monkeypatch.setattr(
+        release, "find_parent_dir_containing", lambda **kw: str(tmp_path)
+    )
+    monkeypatch.setattr(release, "selected_package_set_name", lambda: "hydra-core")
+    monkeypatch.setattr(release, "validate_package_versions", lambda *a: None)
+    monkeypatch.setattr(release, "_run_checked", lambda *a: "")
+    # The dev-release smoke check also requires a wheel for sdist-only cases.
+    if entry_point == "dev_release" and suffix == ".tar.gz":
+        build_dir.mkdir()
+        _write_test_artifact(build_dir / "package.whl", ["hydra/__init__.py"])
+        monkeypatch.setattr(release, "prepare_build_dir", lambda *a: None)
+
+    with pytest.raises(ValueError, match=error) if error else nullcontext():
+        if entry_point == "build":
+            release.main.__wrapped__(cfg)
+        else:
+            release.validate_dev_release_artifacts(
+                cfg,
+                str(tmp_path),
+                build_dir,
+                parse_version("1.4.0.dev11"),
+                set_versions=False,
+            )
