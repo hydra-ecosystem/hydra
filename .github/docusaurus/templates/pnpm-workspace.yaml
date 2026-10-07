@@ -1,0 +1,13 @@
+packages:
+  - "."
+
+minimumReleaseAge: 14400
+blockExoticSubdeps: true
+strictDepBuilds: true
+allowBuilds:
+  core-js: false
+  core-js-pure: false
+  fsevents: false
+
+# Merge project-specific overrides and exact-version release-age exceptions.
+# Never copy another deployment's dependency versions or broaden script approvals.
