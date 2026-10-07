@@ -64,9 +64,9 @@ class Config:
 
 
 cs = ConfigStore.instance()
-cs.store(name="config", node=Config)
-cs.store(group="db", name="mysql", node=MySQLConfig)
-cs.store(group="db", name="postgresql", node=PostGreSQLConfig)
+cs.store(name="config", node=Config, replace=True)
+cs.store(group="db", name="mysql", node=MySQLConfig, replace=True)
+cs.store(group="db", name="postgresql", node=PostGreSQLConfig, replace=True)
 
 
 @hydra.main(config_name="config")

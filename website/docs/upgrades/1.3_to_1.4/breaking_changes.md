@@ -34,6 +34,15 @@ complete. The final release notes will be the authoritative list.
   the primary config or pass `hydra.mode=RUN` or `hydra.mode=MULTIRUN` on the
   command line.
 
+### ConfigStore registrations
+
+Replacing an existing ConfigStore registration without an explicit `replace`
+argument emits `Hydra15MigrationWarning` in Hydra 1.4. Replacement still happens,
+unless warnings are configured as errors. Set `replace=True` for intentional
+replacement or `replace=False` to reject collisions. Omitting `replace` on a
+collision will become an error in Hydra 1.5. See
+[ConfigStore collision handling](/docs/upgrades/1.3_to_1.4/config_store_collisions).
+
 ### Hydra 1.1 compatibility behavior
 
 `version_base="1.1"` is no longer accepted, and the following legacy behavior

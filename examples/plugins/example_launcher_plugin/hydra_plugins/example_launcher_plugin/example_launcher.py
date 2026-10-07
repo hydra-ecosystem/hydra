@@ -41,7 +41,10 @@ class LauncherConfig:
 
 
 ConfigStore.instance().store(
-    group="hydra/launcher", name="example", node=LauncherConfig
+    group="hydra/launcher",
+    name="example",
+    node=LauncherConfig,
+    replace=True,
 )
 
 

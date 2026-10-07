@@ -94,6 +94,7 @@ ConfigStore.instance().store(
     name="submitit_local",
     node=LocalQueueConf(),
     provider="submitit_launcher",
+    replace=True,
 )
 
 
@@ -102,4 +103,5 @@ ConfigStore.instance().store(
     name="submitit_slurm",
     node=SlurmQueueConf(),
     provider="submitit_launcher",
+    replace=True,
 )

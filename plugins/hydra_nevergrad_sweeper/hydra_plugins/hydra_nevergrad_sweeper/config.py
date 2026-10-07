@@ -87,4 +87,5 @@ ConfigStore.instance().store(
     name="nevergrad",
     node=NevergradSweeperConf,
     provider="nevergrad",
+    replace=True,
 )

@@ -37,7 +37,9 @@ class LauncherConfig:
     bar: str = "abcde"
 
 
-ConfigStore.instance().store(group="hydra/sweeper", name="example", node=LauncherConfig)
+ConfigStore.instance().store(
+    group="hydra/sweeper", name="example", node=LauncherConfig, replace=True
+)
 
 
 class ExampleSweeper(Sweeper):
