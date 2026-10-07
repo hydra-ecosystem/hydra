@@ -36,6 +36,14 @@ The build also regenerates the Landscape data automatically.
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
+### Dependency maintenance
+
+See the [shared Docusaurus maintenance policy](../.github/docusaurus/maintenance.md).
+The project directory and audit schedule are configured in
+[`.github/docusaurus.json`](../.github/docusaurus.json).
+The normal website build owns the security parser checks and Landscape
+generation; the dependency audit invokes that build without duplicating them.
+
 ### Deployment
 
 Done automatically once a website change is landed to main.
