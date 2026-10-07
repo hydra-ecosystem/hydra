@@ -2048,6 +2048,20 @@ def test_cast_preserves_sweep_metadata(
             id="float",
         ),
         param("int(sort(range(1.0,4.0),reverse=true))", [3, 2, 1], id="int"),
+        param(
+            "int(sort(range(0.0,3.0),reverse=true))", [2, 1, 0], id="int:zero_boundary"
+        ),
+        param(
+            "int(sort(range(-3.0,0.0),reverse=true))",
+            [-1, -2, -3],
+            id="int:negative",
+        ),
+        param("int(sort(range(3.0,0.0,-1.0)))", [1, 2, 3], id="int:ascending"),
+        param(
+            "int(sort(range(0.0,-3.0,-1.0)))",
+            [-2, -1, 0],
+            id="int:ascending_negative",
+        ),
     ],
 )
 def test_cast_sorted_float_range(expression: str, expected: list[Any]) -> None:

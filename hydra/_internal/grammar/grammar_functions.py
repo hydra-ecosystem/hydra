@@ -57,10 +57,23 @@ def cast_interval(value: IntervalSweep, function: Callable[..., Any]) -> Interva
 def cast_range(value: RangeSweep, function: Callable[..., Any]) -> RangeSweep:
     if function not in (cast_float, cast_int):
         raise ValueError("Range can only be cast to int or float")
+    start = function(value.start)
+    stop = function(value.stop)
+    step = function(value.step)
+    if function is cast_int and step != 0:
+        # Truncating the exclusive stop on its own can drop elements, e.g. the
+        # stop of sort(range(0.0,3.0),reverse=true) is -0.5, which becomes 0.
+        # Keep the number of elements of the original range instead.
+        count = _float_range_count(
+            start=decimal.Decimal(str(value.start)),
+            stop=decimal.Decimal(str(value.stop)),
+            step=decimal.Decimal(str(value.step)),
+        )
+        stop = start + count * step
     return RangeSweep(
-        start=function(value.start),
-        stop=function(value.stop),
-        step=function(value.step),
+        start=start,
+        stop=stop,
+        step=step,
         tags=copy(value.tags),
         shuffle=value.shuffle,
     )
