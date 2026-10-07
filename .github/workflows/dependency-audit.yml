@@ -1,0 +1,13 @@
+name: Documentation dependency audit
+'on':
+  schedule:
+    - cron: 0 2 30 1 *
+  workflow_dispatch: null
+permissions:
+  contents: read
+jobs:
+  audit:
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/docusaurus-audit.yml

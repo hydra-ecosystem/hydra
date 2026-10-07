@@ -1,0 +1,6 @@
+{
+  "directory": "website",
+  "schedule": [
+    "0 2 30 1 *"
+  ]
+}

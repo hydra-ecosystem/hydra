@@ -25,6 +25,7 @@ LEGACY_ORGANIZATION = re.compile(
 
 CHECKED_SUFFIXES = {".py", ".pyi"}
 EXCLUDED_PREFIXES = (
+    ".github/docusaurus/",
     ".stubs/",
     "hydra/grammar/gen/",
     "temp/",

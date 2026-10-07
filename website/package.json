@@ -10,7 +10,8 @@
     "docusaurus": "docusaurus",
     "generate:landscape": "node scripts/run-landscape-generator.mjs",
     "start": "node scripts/run-landscape-generator.mjs && docusaurus start --port 9134",
-    "build": "node scripts/run-landscape-generator.mjs && docusaurus build",
+    "build": "node scripts/test-security-patches.mjs && node scripts/run-landscape-generator.mjs && docusaurus build",
+    "serve": "docusaurus serve",
     "validate:landscape": "node scripts/run-landscape-generator.mjs --check && node scripts/validate-landscape.mjs",
     "swizzle": "docusaurus swizzle",
     "test:security-patches": "node scripts/test-security-patches.mjs"
