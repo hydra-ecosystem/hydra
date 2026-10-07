@@ -68,6 +68,7 @@ preview = true
 select = ["E", "F", "I", "W", "CPY"]
 
 [tool.ruff.lint.per-file-ignores]
+".github/docusaurus/**" = ["CPY001"]
 ".stubs/**" = ["CPY001"]
 "examples/plugins/**" = ["I001"]
 "hydra/plugins/**" = ["I001"]
