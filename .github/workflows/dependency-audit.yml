@@ -1,0 +1,172 @@
+name: Documentation dependency audit
+
+'on':
+  schedule:
+    - cron: '0 2 30 1 *'  # January 30, 02:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-audit
+  cancel-in-progress: false
+
+env:
+  # Change this configured project when copying the workflow to another deployment.
+  NPM_PROJECT: website
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Validate manual dispatch ref
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          expected_ref="refs/heads/$DEFAULT_BRANCH"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && [ "$GITHUB_REF" != "$expected_ref" ]; then
+            echo "::error::Manual dispatch must target the repository default branch ($expected_ref); got $GITHUB_REF." >&2
+            exit 1
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        with:
+          node-version: 24
+      - name: Enable the project's pinned pnpm
+        run: corepack enable
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.13'
+      - name: Install audit report parser
+        run: python -m pip install PyYAML==6.0.3
+      - name: Test the audit helper and publisher
+        run: |
+          python -m pip install pytest==8.4.2
+          python -m pytest .github/scripts/test_dependency_audit*.py -q
+      - name: Audit, propose upgrades, and build
+        run: |
+          python .github/scripts/dependency_audit.py --directory "$NPM_PROJECT" --report "$RUNNER_TEMP/dependency-audit-pr.md"
+          cat "$RUNNER_TEMP/dependency-audit-pr.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: dependency-audit-dependencies
+          if-no-files-found: error
+          path: |
+            ${{ env.NPM_PROJECT }}/package.json
+            ${{ env.NPM_PROJECT }}/package-lock.json
+            ${{ env.NPM_PROJECT }}/pnpm-lock.yaml
+            ${{ env.NPM_PROJECT }}/pnpm-workspace.yaml
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: dependency-audit-report
+          if-no-files-found: error
+          path: ${{ runner.temp }}/dependency-audit-pr.md
+
+  pull-request:
+    needs: audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Verify audit dependency state
+        env:
+          AUDIT_SHA: ${{ github.sha }}
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          dependency_paths=(
+            "$NPM_PROJECT/package.json"
+            "$NPM_PROJECT/package-lock.json"
+            "$NPM_PROJECT/pnpm-lock.yaml"
+            "$NPM_PROJECT/pnpm-workspace.yaml"
+          )
+          git fetch --no-tags origin "$BASE_BRANCH:refs/remotes/origin/$BASE_BRANCH"
+          git checkout --detach "refs/remotes/origin/$BASE_BRANCH"
+          if ! git cat-file -e "${AUDIT_SHA}^{commit}" 2>/dev/null; then
+            echo "Triggering audit revision ${AUDIT_SHA} is not available locally; fetching it."
+            if ! git fetch --no-tags origin "$AUDIT_SHA"; then
+              echo "::error::Unable to fetch the triggering audit revision; refusing stale publication."
+              exit 1
+            fi
+          fi
+          if ! git cat-file -e "${AUDIT_SHA}^{commit}" 2>/dev/null; then
+            echo "::error::The triggering audit revision could not be resolved; refusing publication."
+            exit 1
+          fi
+          if git diff --quiet "$AUDIT_SHA" HEAD -- "${dependency_paths[@]}"; then
+            :
+          else
+            comparison_status=$?
+            if [ "$comparison_status" -eq 1 ]; then
+              echo "::error::The default branch dependency files changed since ${AUDIT_SHA}; rerun the audit from the current default branch."
+            else
+              echo "::error::Unable to compare default-branch dependency files with ${AUDIT_SHA}; refusing publication."
+            fi
+            exit 1
+          fi
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          name: dependency-audit-dependencies
+          path: ${{ env.NPM_PROJECT }}
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c  # v8.0.1
+        with:
+          name: dependency-audit-report
+          path: ${{ runner.temp }}
+      - name: Open or update the umbrella PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+          PR_BRANCH: maintenance/dependency-audit
+          PR_TITLE: 'Documentation dependencies: best-effort upgrade drive'
+          PR_FOOTER: |
+            The audit workflow performs the frozen install and production build;
+            review their results above before merging. Generated dependency commits
+            use [skip ci] to avoid duplicate PR checks. Nothing is merged automatically.
+
+            Remove [skip ci] from the squash commit message to run normal post-merge
+            CI and deployment. If the merged commit retains the marker, use the
+            documentation deployment workflow's manual trigger.
+
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          expected_head=$(git rev-parse --verify "refs/remotes/origin/$PR_BRANCH" 2>/dev/null || true)
+          body_file="$RUNNER_TEMP/dependency-audit-pr.md"
+          printf '\n%s\n' "$PR_FOOTER" >> "$body_file"
+          pr_number=$(gh pr list --state open --head "$PR_BRANCH" --base "$BASE_BRANCH" --json number,isCrossRepository --jq '[.[] | select(.isCrossRepository == false)][0].number // empty')
+          git checkout -B "$PR_BRANCH"
+          git add -- "$NPM_PROJECT/package.json"
+          for file in package-lock.json pnpm-lock.yaml pnpm-workspace.yaml; do
+            if [ -f "$NPM_PROJECT/$file" ]; then
+              git add -- "$NPM_PROJECT/$file"
+            fi
+          done
+          if git diff --cached --quiet; then
+            if [ -z "$pr_number" ]; then
+              echo 'No dependency changes; see the Actions run summary for the audit report.'
+              exit 0
+            fi
+            printf '\nThis run produced no dependency changes relative to `%s`. The existing PR branch was left unchanged; the audit above describes this run.\n' "$BASE_BRANCH" >> "$body_file"
+          else
+            git commit -m 'Documentation dependency audit and upgrades [skip ci]'
+            git push --force-with-lease="refs/heads/$PR_BRANCH:$expected_head" origin "HEAD:refs/heads/$PR_BRANCH"
+          fi
+          if [ -n "$pr_number" ]; then
+            gh pr edit "$pr_number" --title "$PR_TITLE" --body-file "$body_file"
+          else
+            gh pr create --head "$PR_BRANCH" --base "$BASE_BRANCH" --title "$PR_TITLE" --body-file "$body_file"
+          fi
