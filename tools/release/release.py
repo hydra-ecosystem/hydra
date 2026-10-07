@@ -6,7 +6,9 @@ import re
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
+import zipfile
 from dataclasses import dataclass
 from enum import Enum
 from functools import lru_cache
@@ -427,11 +429,33 @@ def _python_bin(venv_path: Path) -> Path:
     return venv_path / "bin" / "python"
 
 
+def check_bundled_jar_licenses(artifacts: list[Path]) -> None:
+    for path in artifacts:
+        if path.name.endswith(".tar.gz"):
+            with tarfile.open(path) as archive:
+                names = {
+                    member.name.split("/", 1)[-1]
+                    for member in archive.getmembers()
+                    if member.isfile()
+                }
+            license_file = "ATTRIBUTION/LICENSE-antlr4"
+            if (
+                any(name.endswith(".jar") for name in names)
+                and license_file not in names
+            ):
+                raise ValueError(f"{path.name} contains a JAR but no {license_file}")
+        elif path.suffix == ".whl":
+            with zipfile.ZipFile(path) as archive:
+                if any(name.endswith(".jar") for name in archive.namelist()):
+                    raise ValueError(f"{path.name}: wheel contains a JAR")
+
+
 def check_build_artifacts(build_dir_path: Path) -> None:
     artifacts = sorted(path for path in build_dir_path.iterdir() if path.is_file())
     if not artifacts:
         raise ValueError(f"No artifacts found in {build_dir_path}")
 
+    check_bundled_jar_licenses(artifacts)
     _run_checked([sys.executable, "-m", "twine", "check", *map(str, artifacts)])
 
     wheels = [path for path in artifacts if path.suffix == ".whl"]
@@ -825,6 +849,10 @@ def main(cfg: Config) -> None:
         if cfg.require_artifacts and not built_any:
             raise ValueError(
                 f"No publishable artifacts were built for {cfg.repository.name}"
+            )
+        if built_any:
+            check_bundled_jar_licenses(
+                sorted(path for path in build_dir_path.iterdir() if path.is_file())
             )
     elif cfg.action == Action.bump:
         log.info(f"Bumping version of packages published on {cfg.repository.name}")
