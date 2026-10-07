@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-07",
-  "generated_at": "2026-10-07T06:46:51Z",
+  "generated_at": "2026-10-07T07:22:29Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 44,
@@ -2208,6 +2208,24 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3440"
     },
     {
+      "number": 3444,
+      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
+      "category": "Build",
+      "category_emoji": "🏗️",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3514,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3514"
+        }
+      ],
+      "created": "2026-09-10",
+      "updated": "2026-09-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3444"
+    },
+    {
       "number": 3454,
       "title": "Improve provenance and default presentation of config composition errors",
       "category": "Enhancement",
@@ -2346,24 +2364,6 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 3444,
-      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
-      "category": "Build",
-      "category_emoji": "🏗️",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3514,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3514"
-        }
-      ],
-      "created": "2026-09-10",
-      "updated": "2026-09-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3444"
     }
   ],
   "updates": [
