@@ -367,6 +367,8 @@ def _sort_sweep(
     sweep: ChoiceSweep | RangeSweep, reverse: bool
 ) -> ChoiceSweep | RangeSweep:
     sweep = copy(sweep)
+    # a sorted sweep is iterated in order, even if the input was shuffled
+    sweep.shuffle = False
 
     if isinstance(sweep, ChoiceSweep):
         # sorted will raise an error if types cannot be compared

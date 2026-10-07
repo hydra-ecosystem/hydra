@@ -1443,6 +1443,22 @@ def test_tag_sweep(value: str, expected: str) -> None:
             RangeSweep(start=1, stop=10, step=1, shuffle=True),
             id="range:shuffle",
         ),
+        # sorting a shuffled sweep gives an ordered sweep
+        param(
+            "sort(shuffle(range(1, 10)))",
+            RangeSweep(start=1, stop=10, step=1),
+            id="sort:shuffle:range",
+        ),
+        param(
+            "sort(shuffle(choice(3,1,2)))",
+            ChoiceSweep(list=[1, 2, 3]),
+            id="sort:shuffle:choice",
+        ),
+        param(
+            "sort(shuffle(3,1,2),reverse=true)",
+            ChoiceSweep(list=[3, 2, 1], simple_form=True),
+            id="sort:shuffle:simple_choice",
+        ),
     ],
 )
 def test_sort(value: str, expected: str) -> None:
