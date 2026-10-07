@@ -130,3 +130,10 @@ def test_added_paths_uses_nul_delimited_git_diff(tmp_path: Path) -> None:
 
 def test_main_skips_an_all_zero_base() -> None:
     assert check_new_files.main(["--base", "0" * 40]) == 0
+
+
+def test_shared_docusaurus_exemption_is_scoped(tmp_path: Path) -> None:
+    shared = write(tmp_path, ".github/docusaurus/project.py", "value = 10\n")
+    ordinary = write(tmp_path, ".github/scripts/ordinary.py", "value = 10\n")
+    assert check_new_files.check_paths([shared], root=tmp_path) == []
+    assert len(check_new_files.check_paths([ordinary], root=tmp_path)) == 1

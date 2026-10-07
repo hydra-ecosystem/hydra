@@ -4,6 +4,7 @@ packages:
 allowBuilds:
   core-js: false
   core-js-pure: false
+  fsevents: false
 blockExoticSubdeps: true
 
 minimumReleaseAge: 14400
