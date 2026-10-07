@@ -177,4 +177,5 @@ cs.store(
     name="config",
     node=HydraConf(),
     provider="hydra",
+    replace=True,
 )
