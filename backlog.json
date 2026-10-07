@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-07",
-  "generated_at": "2026-10-07T04:28:02Z",
+  "generated_at": "2026-10-07T04:39:23Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 46,
+    "open_total": 45,
     "by_category": [
       {
         "category": "Bug",
@@ -14,14 +14,14 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 40,
-        "percentage": 87.0
+        "count": 39,
+        "percentage": 86.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 4.3
+        "percentage": 4.4
       },
       {
         "category": "Question",
@@ -39,14 +39,14 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 2,
-        "percentage": 4.3
+        "percentage": 4.4
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,31 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 94
+        "count": 95
       }
     ]
   },
   "issues": [
-    {
-      "number": 3248,
-      "title": "Upgrade experimental rerun to recompose config and overlay saved values",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3513,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3513"
-        }
-      ],
-      "created": "2026-06-29",
-      "updated": "2026-08-23",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3248"
-    },
     {
       "number": 2453,
       "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
@@ -2364,9 +2344,36 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 3248,
+      "title": "Upgrade experimental rerun to recompose config and overlay saved values",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3513,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3513"
+        }
+      ],
+      "created": "2026-06-29",
+      "updated": "2026-08-23",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3248"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-07T04:39:23Z",
+      "kind": "closed",
+      "issue": 3248,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3248",
+      "title": "Upgrade experimental rerun to recompose config and overlay saved values"
+    },
     {
       "ts": "2026-10-06T19:47:56Z",
       "kind": "pr",
@@ -4019,13 +4026,6 @@
       "issue": 2942,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2942",
       "title": "[Feature Request] I'd like to be able to do multirun over files matching a glob (ideally a glob that depends on other, non-sweeped params in the config file)"
-    },
-    {
-      "ts": "2026-08-31T15:09:56Z",
-      "kind": "new",
-      "issue": 3427,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3427",
-      "title": "HydraConfig is unavailable during multirun controller initialization"
     }
   ]
 }
