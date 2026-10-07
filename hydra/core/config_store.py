@@ -6,8 +6,10 @@ from typing import Any
 
 from omegaconf import DictConfig, OmegaConf
 
+from hydra._internal.deprecation_warning import deprecation_warning
 from hydra.core.object_type import ObjectType
 from hydra.core.singleton import Singleton
+from hydra.errors import Hydra15MigrationWarning
 from hydra.plugins.config_source import ConfigLoadError
 
 
@@ -24,9 +26,15 @@ class ConfigStoreWithProvider:
         node: Any,
         group: str | None = None,
         package: str | None = None,
+        replace: bool | None = None,
     ) -> None:
         ConfigStore.instance().store(
-            group=group, name=name, node=node, package=package, provider=self.provider
+            group=group,
+            name=name,
+            node=node,
+            package=package,
+            provider=self.provider,
+            replace=replace,
         )
 
     def __exit__(self, exc_type: Any, exc_value: Any, exc_traceback: Any) -> Any: ...
@@ -58,6 +66,7 @@ class ConfigStore(metaclass=Singleton):
         group: str | None = None,
         package: str | None = None,
         provider: str | None = None,
+        replace: bool | None = None,
     ) -> None:
         """
         Stores a config node into the repository
@@ -70,6 +79,8 @@ class ConfigStore(metaclass=Singleton):
             Child separator is '.', for example foo.bar.baz
         :param provider: the name of the module/app providing this config.
             Helps debugging.
+        :param replace: On a collision, True replaces silently, False raises
+            ValueError, and None warns and replaces (an error in Hydra 1.5).
         """
         # An empty string group is treated as a config without a config group.
         if group == "":
@@ -85,6 +96,27 @@ class ConfigStore(metaclass=Singleton):
         if not name.endswith(".yaml"):
             name = f"{name}.yaml"
         assert isinstance(cur, dict)
+        if name in cur and replace is not True:
+            previous = cur[name]
+            path = f"{group}/{name}" if group else name
+            previous_provider = (
+                previous.provider if isinstance(previous, ConfigNode) else None
+            )
+            message = (
+                f"ConfigStore config '{path}' is already registered "
+                f"(provider={previous_provider!r}); attempted registration has "
+                f"provider={provider!r}. "
+                "Use replace=True to replace it or replace=False to reject collisions."
+            )
+            if replace is False:
+                raise ValueError(message)
+            deprecation_warning(
+                message + " Omitting replace warns and replaces in Hydra 1.4, "
+                "but will raise an error in Hydra 1.5. "
+                "See https://hydra.cc/docs/next/upgrades/1.3_to_1.4/config_store_collisions",
+                stacklevel=2,
+                category=Hydra15MigrationWarning,
+            )
         cfg = OmegaConf.structured(node)
         cur[name] = ConfigNode(
             name=name, node=cfg, group=group, package=package, provider=provider

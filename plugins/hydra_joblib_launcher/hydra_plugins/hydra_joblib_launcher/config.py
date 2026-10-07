@@ -50,4 +50,5 @@ ConfigStore.instance().store(
     name="joblib",
     node=JobLibLauncherConf,
     provider="joblib_launcher",
+    replace=True,
 )

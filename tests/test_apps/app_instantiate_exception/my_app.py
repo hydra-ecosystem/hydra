@@ -31,7 +31,7 @@ class AppConfig:
     case: InstantiationCase = MISSING
 
 
-ConfigStore.instance().store(name="instantiate_exception", node=AppConfig)
+ConfigStore.instance().store(name="instantiate_exception", node=AppConfig, replace=True)
 
 
 class FailingTarget:

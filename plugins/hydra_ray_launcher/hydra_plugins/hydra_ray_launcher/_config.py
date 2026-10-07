@@ -377,10 +377,12 @@ config_store.store(
     name="ray",
     node=RayLauncherConf,
     provider="ray_launcher",
+    replace=True,
 )
 config_store.store(
     group="hydra/launcher",
     name="ray_aws",
     node=RayAWSLauncherConf,
     provider="ray_launcher",
+    replace=True,
 )

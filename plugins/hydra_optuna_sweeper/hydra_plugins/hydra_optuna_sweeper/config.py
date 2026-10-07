@@ -217,6 +217,7 @@ ConfigStore.instance().store(
     name="optuna",
     node=OptunaSweeperConf,
     provider="optuna_sweeper",
+    replace=True,
 )
 
 ConfigStore.instance().store(
@@ -224,6 +225,7 @@ ConfigStore.instance().store(
     name="tpe",
     node=TPESamplerConfig,
     provider="optuna_sweeper",
+    replace=True,
 )
 
 ConfigStore.instance().store(
@@ -231,6 +233,7 @@ ConfigStore.instance().store(
     name="random",
     node=RandomSamplerConfig,
     provider="optuna_sweeper",
+    replace=True,
 )
 
 ConfigStore.instance().store(
@@ -238,6 +241,7 @@ ConfigStore.instance().store(
     name="cmaes",
     node=CmaEsSamplerConfig,
     provider="optuna_sweeper",
+    replace=True,
 )
 
 ConfigStore.instance().store(
@@ -245,6 +249,7 @@ ConfigStore.instance().store(
     name="nsgaii",
     node=NSGAIISamplerConfig,
     provider="optuna_sweeper",
+    replace=True,
 )
 
 ConfigStore.instance().store(
@@ -252,6 +257,7 @@ ConfigStore.instance().store(
     name="nsgaiii",
     node=NSGAIIISamplerConfig,
     provider="optuna_sweeper",
+    replace=True,
 )
 
 ConfigStore.instance().store(
@@ -259,6 +265,7 @@ ConfigStore.instance().store(
     name="motpe",
     node=MOTPESamplerConfig,
     provider="optuna_sweeper",
+    replace=True,
 )
 
 ConfigStore.instance().store(
@@ -266,6 +273,7 @@ ConfigStore.instance().store(
     name="grid",
     node=GridSamplerConfig,
     provider="optuna_sweeper",
+    replace=True,
 )
 
 ConfigStore.instance().store(
@@ -273,6 +281,7 @@ ConfigStore.instance().store(
     name="gp",
     node=GPSamplerConfig,
     provider="optuna_sweeper",
+    replace=True,
 )
 
 ConfigStore.instance().store(
@@ -280,4 +289,5 @@ ConfigStore.instance().store(
     name="qmc",
     node=QMCSamplerConfig,
     provider="optuna_sweeper",
+    replace=True,
 )
