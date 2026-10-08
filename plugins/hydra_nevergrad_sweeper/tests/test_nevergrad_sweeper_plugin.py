@@ -94,6 +94,12 @@ def test_create_nevergrad_parameter_from_config(
         ("key=shuffle(range(1,3))", ng.p.Choice([1, 2])),
         ("key=range(1,5)", ng.p.Choice([1, 2, 3, 4])),
         ("key=float(range(1,5))", ng.p.Choice([1.0, 2.0, 3.0, 4.0])),
+        ("key=int(range(0,5,1.5))", ng.p.Choice([0, 1, 3, 4])),
+        ("key=int(range(0,1,0.25))", ng.p.Choice([0, 0, 0, 0])),
+        (
+            "key=float(sort(range(0,1,0.25),reverse=true))",
+            ng.p.Choice([0.75, 0.5, 0.25, 0.0]),
+        ),
         (
             "key=int(interval(1,12))",
             get_scalar_with_integer_bounds(lower=1, upper=12, type=ng.p.Scalar),

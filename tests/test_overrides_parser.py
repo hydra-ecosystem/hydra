@@ -1508,7 +1508,7 @@ def test_sort_range_materializes_to_sorted_values(
         ),
         param(
             "shuffle(float(range(10,1))))",
-            RangeSweep(start=10.0, stop=1.0, shuffle=True),
+            ChoiceSweep(list=[], shuffle=True),
             id="shuffle:float:range",
         ),
         param(
@@ -1951,8 +1951,8 @@ class CastResults:
         param(
             "range(1,10)",
             CastResults(
-                int=RangeSweep(start=1, stop=10, step=1),
-                float=RangeSweep(start=1.0, stop=10.0, step=1.0),
+                int=ChoiceSweep(list=list(builtins.range(1, 10))),
+                float=ChoiceSweep(list=[float(x) for x in builtins.range(1, 10)]),
                 str=CastResults.error(
                     "ValueError while evaluating 'str(range(1,10))': Range can only be cast to int or float"
                 ),
@@ -1968,8 +1968,8 @@ class CastResults:
         param(
             "range(1.0,10.0)",
             CastResults(
-                int=RangeSweep(start=1, stop=10, step=1),
-                float=RangeSweep(start=1.0, stop=10.0, step=1.0),
+                int=ChoiceSweep(list=list(builtins.range(1, 10))),
+                float=ChoiceSweep(list=[float(x) for x in builtins.range(1, 10)]),
                 str=CastResults.error(
                     "ValueError while evaluating 'str(range(1.0,10.0))': Range can only be cast to int or float"
                 ),
@@ -2037,6 +2037,88 @@ def test_cast_preserves_sweep_metadata(
     assert sweep.tags == {"meta"}
     assert sweep.shuffle
     assert list(override.sweep_iterator()) == expected
+
+
+@mark.parametrize("cast", [int, float])
+@mark.parametrize(
+    "expression,values",
+    [
+        param("range(0,5,1.5)", [0.0, 1.5, 3.0, 4.5], id="non_landing"),
+        param("range(0,1,0.1)", [x / 10 for x in builtins.range(10)], id="small_step"),
+        param("range(0,1.1)", [0.0, 1.0], id="fractional_stop"),
+        param("range(-2,1,0.6)", [-2.0, -1.4, -0.8, -0.2, 0.4], id="negative_values"),
+        param("range(5,0,-1.5)", [5.0, 3.5, 2.0, 0.5], id="descending"),
+        param("range(0,0)", [], id="empty"),
+        param("range(3,1)", [], id="empty_positive_step"),
+        param("range(0,3,-0.5)", [], id="empty_negative_step"),
+        param("range(1,1.5)", [1.0], id="single_value"),
+        param("sort(range(0,3.0),reverse=true)", [2.0, 1.0, 0.0], id="sorted_zero"),
+        param(
+            "sort(range(-3,0.0),reverse=true)", [-1.0, -2.0, -3.0], id="sorted_negative"
+        ),
+        param("sort(range(1,0,-0.25))", [0.25, 0.5, 0.75, 1.0], id="sorted_ascending"),
+        param(
+            "range(9007199254740992,9007199254740995)",
+            [9007199254740992, 9007199254740993, 9007199254740994],
+            id="large_ints",
+        ),
+    ],
+)
+def test_cast_range_values(
+    cast: Callable[[Any], Any], expression: str, values: list[int | float]
+) -> None:
+    override = parser.parse_override(f"key={cast.__name__}({expression})")
+    actual = list(override.sweep_iterator())
+    assert actual == [cast(value) for value in values]
+    assert all(type(value) is cast for value in actual)
+    assert isinstance(override.value(), ChoiceSweep)
+
+
+@mark.parametrize("expression", ["int(range(0,3,0.0))", "float(range(0,3,0))"])
+def test_cast_range_rejects_zero_step(expression: str) -> None:
+    with raises(HydraException):
+        parser.parse_override(f"key={expression}")
+
+
+@mark.parametrize(
+    "expression,expected",
+    [
+        ("sort(shuffle(range(0,5,1.5)))", [0.0, 1.5, 3.0, 4.5]),
+        ("sort(shuffle(choice(3,1,2)),reverse=true)", [3, 2, 1]),
+        ("sort(shuffle(3,1,2))", [1, 2, 3]),
+        ("sort(int(shuffle(range(0,5,1.5))),reverse=true)", [4, 3, 1, 0]),
+        ("int(sort(shuffle(range(0,1,0.25)),reverse=true))", [0, 0, 0, 0]),
+        ("float(int(range(0,1,0.25)))", [0.0, 0.0, 0.0, 0.0]),
+        ("sort(float(sort(range(0,1,0.25),reverse=true)))", [0.0, 0.25, 0.5, 0.75]),
+    ],
+)
+def test_composed_range_operations(
+    expression: str, expected: list[int | float]
+) -> None:
+    override = parser.parse_override(f"key={expression}")
+    sweep = override.value()
+    assert isinstance(sweep, (ChoiceSweep, RangeSweep))
+    assert not sweep.shuffle
+    assert list(override.sweep_iterator()) == expected
+
+
+@mark.parametrize(
+    "sweep",
+    [
+        ChoiceSweep(list=[3, 1, 2], tags={"meta"}, shuffle=True),
+        RangeSweep(start=3, stop=0, step=-1, tags={"meta"}, shuffle=True),
+    ],
+)
+def test_sort_preserves_input_sweep(sweep: ChoiceSweep | RangeSweep) -> None:
+    sorted_sweep = grammar_functions.sort(sweep)
+    assert sorted_sweep is not sweep
+    assert not sorted_sweep.shuffle
+    assert sorted_sweep.tags == {"meta"}
+    assert sweep.shuffle
+    if isinstance(sweep, ChoiceSweep):
+        assert sweep.list == [3, 1, 2]
+    else:
+        assert (sweep.start, sweep.stop, sweep.step) == (3, 0, -1)
 
 
 @mark.parametrize(

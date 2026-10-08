@@ -168,6 +168,11 @@ def check_distribution(expected: BaseDistribution, actual: BaseDistribution) -> 
         ("key=tag(log, interval(1, 5))", FloatDistribution(1, 5, log=True)),
         ("key=tag(log, int(interval(1, 5)))", IntDistribution(1, 5, log=True)),
         ("key=range(0.5, 5.5, step=1)", FloatDistribution(0.5, 5.5, step=1)),
+        ("key=int(range(0,5,1.5))", CategoricalDistribution([0, 1, 3, 4])),
+        (
+            "key=float(sort(range(0,1,0.25),reverse=true))",
+            CategoricalDistribution([0.75, 0.5, 0.25, 0.0]),
+        ),
     ],
 )
 def test_create_optuna_distribution_from_override(input: Any, expected: Any) -> None:
@@ -175,6 +180,13 @@ def test_create_optuna_distribution_from_override(input: Any, expected: Any) -> 
     parsed = parser.parse_overrides([input])[0]
     actual = _impl.create_optuna_distribution_from_override(parsed)
     check_distribution(expected, actual)
+
+
+def test_cast_range_preserves_duplicate_optuna_choices() -> None:
+    override = OverridesParser.create().parse_override("key=int(range(0,1,0.25))")
+    distribution = _impl.create_optuna_distribution_from_override(override)
+    assert isinstance(distribution, CategoricalDistribution)
+    assert distribution.choices == (0, 0, 0, 0)
 
 
 @mark.parametrize(

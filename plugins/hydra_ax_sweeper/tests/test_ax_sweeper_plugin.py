@@ -316,6 +316,33 @@ def test_command_line_log_interval_configures_ax_log_range() -> None:
     assert ax_parameter.scaling == "log"
 
 
+@mark.parametrize(
+    "expression,values,parameter_type",
+    [
+        ("int(range(0,5,1.5))", [0, 1, 3, 4], "int"),
+        ("int(range(0,1,0.25))", [0, 0, 0, 0], "int"),
+        ("float(sort(range(0,1,0.25),reverse=true))", [0.75, 0.5, 0.25, 0.0], "float"),
+    ],
+)
+def test_cast_range_configures_ax_choices(
+    expression: str, values: list[int | float], parameter_type: str
+) -> None:
+    from ax.api.configs import ChoiceParameterConfig  # type: ignore
+
+    from hydra_plugins.hydra_ax_sweeper._core import (
+        CoreAxSweeper,
+        create_ax_parameter_config,
+    )
+    from hydra_plugins.hydra_ax_sweeper.config import AxConfig
+
+    sweeper = CoreAxSweeper(AxConfig(), max_batch_size=None)
+    (parameter,) = sweeper.parse_commandline_args([f"x={expression}"])
+    ax_parameter = create_ax_parameter_config(parameter)
+    assert isinstance(ax_parameter, ChoiceParameterConfig)
+    assert ax_parameter.parameter_type == parameter_type
+    assert ax_parameter.values == values
+
+
 def test_create_ax_raw_data() -> None:
     from hydra_plugins.hydra_ax_sweeper._core import create_ax_raw_data
 
