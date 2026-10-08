@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-08",
-  "generated_at": "2026-10-08T19:59:13Z",
+  "generated_at": "2026-10-08T20:02:31Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 45,
+    "open_total": 43,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 2.2
+        "percentage": 2.3
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 40,
-        "percentage": 88.9
+        "count": 38,
+        "percentage": 88.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 4.4
+        "percentage": 4.7
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.2
+        "percentage": 2.3
       },
       {
         "category": "Refactor",
@@ -39,14 +39,14 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.2
+        "percentage": 2.3
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 2
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,51 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 97
+        "count": 99
       }
     ]
   },
   "issues": [
-    {
-      "number": 3520,
-      "title": "Make range sweep casting and ordering consistent",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3522,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3522"
-        }
-      ],
-      "created": "2026-10-08",
-      "updated": "2026-10-08",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3520"
-    },
-    {
-      "number": 3521,
-      "title": "Optuna Sweeper: preserve range sweep values and reject invalid steps",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3522,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3522"
-        },
-        {
-          "number": 3523,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3523"
-        }
-      ],
-      "created": "2026-10-08",
-      "updated": "2026-10-08",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3521"
-    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -2408,9 +2368,63 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 3520,
+      "title": "Make range sweep casting and ordering consistent",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3522,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3522"
+        }
+      ],
+      "created": "2026-10-08",
+      "updated": "2026-10-08",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3520"
+    },
+    {
+      "number": 3521,
+      "title": "Optuna Sweeper: preserve range sweep values and reject invalid steps",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3522,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3522"
+        },
+        {
+          "number": 3523,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3523"
+        }
+      ],
+      "created": "2026-10-08",
+      "updated": "2026-10-08",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3521"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-08T20:02:31Z",
+      "kind": "closed",
+      "issue": 3521,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3521",
+      "title": "Optuna Sweeper: preserve range sweep values and reject invalid steps"
+    },
+    {
+      "ts": "2026-10-08T20:02:31Z",
+      "kind": "closed",
+      "issue": 3520,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3520",
+      "title": "Make range sweep casting and ordering consistent"
+    },
     {
       "ts": "2026-10-08T17:44:57Z",
       "kind": "pr",
@@ -4059,22 +4073,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/802",
       "title": "Improve Hydra test coverage to 100%",
       "detail": "community PR → not started"
-    },
-    {
-      "ts": "2026-09-04T12:46:42Z",
-      "kind": "pr",
-      "issue": 3369,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3369",
-      "title": "Remove redundant setup-xcode step from macOS CI",
-      "detail": "unlinked #3380"
-    },
-    {
-      "ts": "2026-09-04T12:46:42Z",
-      "kind": "pr",
-      "issue": 3369,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3369",
-      "title": "Remove redundant setup-xcode step from macOS CI",
-      "detail": "linked #3434"
     }
   ]
 }
