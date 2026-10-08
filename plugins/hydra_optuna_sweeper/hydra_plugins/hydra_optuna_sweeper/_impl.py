@@ -2,6 +2,8 @@
 import functools
 import logging
 import sys
+from decimal import Decimal
+from math import ceil, ulp
 from typing import (
     Any,
     Callable,
@@ -16,6 +18,7 @@ import optuna
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.override_parser.types import (
     ChoiceSweep,
+    FloatRange,
     IntervalSweep,
     Override,
     RangeSweep,
@@ -81,24 +84,50 @@ def create_optuna_distribution_from_override(override: Override) -> Any:
         assert isinstance(value, RangeSweep)
         assert value.start is not None
         assert value.stop is not None
-        if value.shuffle:
+        if value.step == 0:
+            raise ValueError("An Optuna range sweep requires a nonzero step.")
+        if value.shuffle or value.transformers:
             for x in override.sweep_iterator(transformer=Transformer.encode):
                 assert isinstance(x, (str, int, float, bool, type(None))), (
                     f"A choice sweep expects str, int, float, bool, or None type. Got {type(x)}."
                 )
                 choices.append(x)
             return CategoricalDistribution(choices)
+        values = value.range()
+        if isinstance(values, range):
+            if not values:
+                raise ValueError(
+                    "An Optuna range sweep must contain at least one value."
+                )
+            low, high = sorted((values[0], values[-1]))
+            return IntDistribution(low, high, step=abs(values.step))
+
+        assert isinstance(values.start, Decimal)
+        assert isinstance(values.stop, Decimal)
+        assert isinstance(values.step, Decimal)
+        count = ceil((values.stop - values.start) / values.step)
+        if count <= 0:
+            raise ValueError("An Optuna range sweep must contain at least one value.")
+        # Optuna includes both endpoints; Hydra's stop is exclusive.
+        last = values.start + (count - 1) * values.step
+        low_float, high_float = sorted((float(values.start), float(last)))
+        step_float = float(abs(values.step))
         if (
-            isinstance(value.start, float)
-            or isinstance(value.stop, float)
-            or isinstance(value.step, float)
-        ):
-            return FloatDistribution(
-                float(value.start),
-                float(value.stop),
-                step=float(value.step) if value.step else None,
+            Decimal(str(low_float)) != min(values.start, last)
+            or Decimal(str(high_float)) != max(values.start, last)
+            or Decimal(str(step_float)) != abs(values.step)
+            or (
+                step_float < max(ulp(low_float), ulp(high_float))
+                and low_float != high_float
             )
-        return IntDistribution(int(value.start), int(value.stop), step=int(value.step))
+        ):
+            for x in override.sweep_iterator(transformer=Transformer.encode):
+                assert isinstance(x, (str, int, float, bool, type(None))), (
+                    f"A choice sweep expects str, int, float, bool, or None type. Got {type(x)}."
+                )
+                choices.append(x)
+            return CategoricalDistribution(choices)
+        return FloatDistribution(low_float, high_float, step=step_float)
 
     if override.is_interval_sweep():
         assert isinstance(value, IntervalSweep)
@@ -240,21 +269,31 @@ class OptunaSweeperImpl(Sweeper):
 
         return [f"{k!s}={v}" for k, v in self.params.items()]
 
-    def _to_grid_sampler_choices(self, distribution: BaseDistribution) -> Any:
+    @staticmethod
+    def _to_grid_sampler_choices(distribution: BaseDistribution) -> Any:
         if isinstance(distribution, CategoricalDistribution):
             return distribution.choices
         elif isinstance(distribution, IntDistribution):
             assert distribution.step is not None, (
                 "`step` of IntDistribution must be a positive integer."
             )
-            n_items = (distribution.high - distribution.low) // distribution.step
-            return [distribution.low + i * distribution.step for i in range(n_items)]
+            return list(
+                range(distribution.low, distribution.high + 1, distribution.step)
+            )
         elif (
             isinstance(distribution, FloatDistribution)
             and distribution.step is not None
         ):
-            n_items = int((distribution.high - distribution.low) // distribution.step)
-            return [distribution.low + i * distribution.step for i in range(n_items)]
+            choices = list(
+                FloatRange(
+                    distribution.low,
+                    distribution.high,
+                    distribution.step,
+                )
+            )
+            if not choices or choices[-1] != distribution.high:
+                choices.append(distribution.high)
+            return choices
         else:
             raise ValueError("GridSampler only supports discrete distributions.")
 
