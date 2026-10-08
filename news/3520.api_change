@@ -1,0 +1,1 @@
+Range sweep casts now convert each generated value during iteration.

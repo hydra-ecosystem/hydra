@@ -57,13 +57,10 @@ def cast_interval(value: IntervalSweep, function: Callable[..., Any]) -> Interva
 def cast_range(value: RangeSweep, function: Callable[..., Any]) -> RangeSweep:
     if function not in (cast_float, cast_int):
         raise ValueError("Range can only be cast to int or float")
-    return RangeSweep(
-        start=function(value.start),
-        stop=function(value.stop),
-        step=function(value.step),
-        tags=copy(value.tags),
-        shuffle=value.shuffle,
-    )
+    result = copy(value)
+    result.tags = copy(value.tags)
+    result.transformers = (*value.transformers, function)
+    return result
 
 
 CastType = ParsedElementType | Sweep
@@ -183,8 +180,7 @@ def cast_json_str(*args: Any, value: Any | None = None) -> Any:
         json_choices = cast_choice(value, extract_text)
         return cast_choice(json_choices, json.dumps)
     elif isinstance(value, RangeSweep):
-        json_range = cast_range(value, extract_text)
-        return cast_range(json_range, json.dumps)
+        return cast_range(value, json.dumps)
     elif isinstance(value, IntervalSweep):
         raise ValueError("Intervals cannot be cast to json_str")
 
@@ -367,6 +363,7 @@ def _sort_sweep(
     sweep: ChoiceSweep | RangeSweep, reverse: bool
 ) -> ChoiceSweep | RangeSweep:
     sweep = copy(sweep)
+    sweep.shuffle = False
 
     if isinstance(sweep, ChoiceSweep):
         # sorted will raise an error if types cannot be compared

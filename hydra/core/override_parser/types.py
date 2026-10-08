@@ -135,6 +135,14 @@ class RangeSweep(Sweep):
 
     shuffle: bool = False
 
+    transformers: tuple[Callable[[Any], Any], ...] = ()
+
+    def __iter__(self) -> Iterator[int | float]:
+        values: Iterator[int | float] = iter(self.range())
+        for transformer in self.transformers:
+            values = map(transformer, values)
+        return values
+
     def range(self) -> range | FloatRange:
         assert self.start is not None
         assert self.stop is not None
@@ -360,11 +368,11 @@ class Override:
                 lst = self._value.list
         elif isinstance(self._value, RangeSweep):
             if self._value.shuffle:
-                lst = list(self._value.range())
+                lst = list(self._value)
                 shuffle(lst)
                 lst = iter(lst)
             else:
-                lst = self._value.range()
+                lst = self._value
         elif isinstance(self._value, Glob):
             if self.config_loader is None:
                 raise HydraException("ConfigLoader is not set")

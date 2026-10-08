@@ -48,6 +48,24 @@ from hydra.test_utils.test_utils import assert_multiline_regex_search, run_proce
         ),
         param(["a=range(0,3)"], None, [[["a=0"], ["a=1"], ["a=2"]]], id="range"),
         param(["a=range(3)"], None, [[["a=0"], ["a=1"], ["a=2"]]], id="range_no_start"),
+        param(
+            ["a=int(range(0,5,1.5))"],
+            None,
+            [[["a=0"], ["a=1"], ["a=3"], ["a=4"]]],
+            id="cast_range_values",
+        ),
+        param(
+            ["a=int(range(0,1,0.25))"],
+            2,
+            [[["a=0"], ["a=0"]], [["a=0"], ["a=0"]]],
+            id="cast_range_duplicates",
+        ),
+        param(
+            ["a=float(sort(range(0,1,0.25),reverse=true))"],
+            None,
+            [[["a=0.75"], ["a=0.5"], ["a=0.25"], ["a=0.0"]]],
+            id="cast_sorted_float_range",
+        ),
     ],
 )
 def test_split(
