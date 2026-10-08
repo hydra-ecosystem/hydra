@@ -144,8 +144,33 @@ By default, `interval` is converted to [`FloatDistribution`](https://optuna.read
 
 #### Range override
 
-`range` is converted to [`IntDistribution`](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.distributions.IntDistribution.html). If you apply `shuffle` to `range`, [`CategoricalDistribution`](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.distributions.CategoricalDistribution.html) is used instead.
-If any of `range`'s start, stop or step is of type float, it will be converted to [`FloatDistribution`](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.distributions.FloatDistribution.html)
+Integer ranges are converted to [`IntDistribution`](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.distributions.IntDistribution.html).
+Float ranges, including sorted float ranges, use [`FloatDistribution`](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.distributions.FloatDistribution.html).
+The distribution includes exactly the discrete values in the range: its stop
+is exclusive, and descending ranges are supported. Empty ranges and zero steps
+are rejected. For example, `range(1,3)` permits only `1` and `2`, while
+`range(0,1,0.3)` permits `0.0`, `0.3`, `0.6`, and `0.9`.
+
+When converting a float range would make its Decimal endpoints or step
+unrepresentable as an Optuna numeric distribution, the sweeper uses a
+[`CategoricalDistribution`](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.distributions.CategoricalDistribution.html)
+with the generated values instead. This precision-boundary fallback preserves
+the exact values and duplicates; representable ordinary uncast ranges remain
+numeric and are converted without enumerating their values.
+
+Applying `shuffle`, `int`, or `float` to a range uses
+[`CategoricalDistribution`](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.distributions.CategoricalDistribution.html)
+containing its generated values. Casts apply to each value, so
+`int(range(0,5,1.5))` permits `0`, `1`, `3`, and `4`. Duplicate cast values are
+retained. Sorting or shuffling does not change the permitted values. Optuna
+does not promise to evaluate trials in range order.
+
+GridSampler evaluates all values in each discrete distribution, including a
+singleton or the distribution's inclusive upper endpoint.
+
+These corrections changed range search spaces in Hydra 1.4; earlier unshuffled
+ranges could admit an excluded stop. See the
+[migration guide](/docs/upgrades/1.3_to_1.4/breaking_changes#optuna-range-sweeps).
 
 <details>
   <summary>Example for range override</summary>

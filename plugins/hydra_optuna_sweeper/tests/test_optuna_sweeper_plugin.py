@@ -12,6 +12,7 @@ import numpy
 import optuna
 from hydra import compose, initialize
 from hydra.core.override_parser.overrides_parser import OverridesParser
+from hydra.core.override_parser.types import RangeSweep
 from hydra.core.plugins import Plugins
 from hydra.errors import InstantiationException
 from hydra.plugins.sweeper import Sweeper
@@ -29,7 +30,7 @@ from optuna.distributions import (
     FloatDistribution,
     IntDistribution,
 )
-from pytest import mark, param, raises
+from pytest import mark, param, raises, warns
 
 from hydra_plugins.hydra_optuna_sweeper import _impl
 from hydra_plugins.hydra_optuna_sweeper.config import (
@@ -162,12 +163,12 @@ def check_distribution(expected: BaseDistribution, actual: BaseDistribution) -> 
         ("key=choice(true, false)", CategoricalDistribution([True, False])),
         ("key=choice('hello', 'world')", CategoricalDistribution(["hello", "world"])),
         ("key=shuffle(range(1,3))", CategoricalDistribution((1, 2))),
-        ("key=range(1,3)", IntDistribution(1, 3)),
+        ("key=range(1,3)", IntDistribution(1, 2)),
         ("key=interval(1, 5)", FloatDistribution(1, 5)),
         ("key=int(interval(1, 5))", IntDistribution(1, 5)),
         ("key=tag(log, interval(1, 5))", FloatDistribution(1, 5, log=True)),
         ("key=tag(log, int(interval(1, 5)))", IntDistribution(1, 5, log=True)),
-        ("key=range(0.5, 5.5, step=1)", FloatDistribution(0.5, 5.5, step=1)),
+        ("key=range(0.5, 5.5, step=1)", FloatDistribution(0.5, 4.5, step=1)),
     ],
 )
 def test_create_optuna_distribution_from_override(input: Any, expected: Any) -> None:
@@ -175,6 +176,134 @@ def test_create_optuna_distribution_from_override(input: Any, expected: Any) -> 
     parsed = parser.parse_overrides([input])[0]
     actual = _impl.create_optuna_distribution_from_override(parsed)
     check_distribution(expected, actual)
+
+
+@mark.parametrize(
+    "expression,values,distribution_type",
+    [
+        ("range(1,3)", [1, 2], IntDistribution),
+        ("range(0,8,3)", [0, 3, 6], IntDistribution),
+        ("range(3,0,-1)", [1, 2, 3], IntDistribution),
+        ("range(0,1,0.5)", [0.0, 0.5], FloatDistribution),
+        ("range(0,1,0.3)", [0.0, 0.3, 0.6, 0.9], FloatDistribution),
+        ("range(1,0,-0.3)", [0.1, 0.4, 0.7, 1.0], FloatDistribution),
+        ("range(0,1,0.1)", [i / 10 for i in range(10)], FloatDistribution),
+        ("sort(range(1,0,-0.25))", [0.25, 0.5, 0.75, 1.0], FloatDistribution),
+        (
+            "sort(range(0,1,0.25),reverse=true)",
+            [0.0, 0.25, 0.5, 0.75],
+            FloatDistribution,
+        ),
+        ("range(2,3,4)", [2], IntDistribution),
+        ("range(0.5,1,2)", [0.5], FloatDistribution),
+        ("int(range(0,5,1.5))", [0, 1, 3, 4], CategoricalDistribution),
+        ("int(range(0,1,0.25))", [0, 0, 0, 0], CategoricalDistribution),
+        ("float(range(1,3))", [1.0, 2.0], CategoricalDistribution),
+        ("float(int(range(0,1,0.25)))", [0.0, 0.0, 0.0, 0.0], CategoricalDistribution),
+        ("shuffle(range(1,3))", [1, 2], CategoricalDistribution),
+        ("sort(shuffle(range(1,3)))", [1, 2], IntDistribution),
+    ],
+)
+def test_range_distribution_values(
+    expression: str,
+    values: list[int | float],
+    distribution_type: type[BaseDistribution],
+) -> None:
+    override = OverridesParser.create().parse_override(f"key={expression}")
+    distribution = _impl.create_optuna_distribution_from_override(override)
+    assert isinstance(distribution, distribution_type)
+    grid = _impl.OptunaSweeperImpl._to_grid_sampler_choices(distribution)
+    assert sorted(grid) == values
+    assert [type(value) for value in sorted(grid)] == [type(value) for value in values]
+    sweep = override.value()
+    assert isinstance(sweep, RangeSweep)
+    assert sorted(sweep) == values
+
+
+@mark.parametrize(
+    "expression",
+    [
+        "range(0,1,0)",
+        "range(0,1,0.0)",
+        "int(range(0,1,0.0))",
+        "shuffle(range(0,1,0))",
+        "range(0,0)",
+        "range(3,1)",
+        "range(0,1,-0.5)",
+    ],
+)
+def test_invalid_optuna_range(expression: str) -> None:
+    override = OverridesParser.create().parse_override(f"key={expression}")
+    with raises(ValueError):
+        _impl.create_optuna_distribution_from_override(override)
+
+
+def test_numeric_range_conversion_does_not_enumerate() -> None:
+    override = OverridesParser.create().parse_override("key=range(0,1000000000000)")
+    with patch.object(RangeSweep, "__iter__", side_effect=AssertionError("enumerated")):
+        distribution = _impl.create_optuna_distribution_from_override(override)
+    assert distribution == IntDistribution(0, 999999999999)
+
+
+@mark.parametrize(
+    "expression,expected",
+    [
+        (
+            "range(-1000000000000000.0,1e-15,1.0)",
+            FloatDistribution(-1000000000000000.0, 0.0, step=1.0),
+        ),
+        (
+            "range(1000000000000000.0,-1e-15,-1.0)",
+            FloatDistribution(0.0, 1000000000000000.0, step=1.0),
+        ),
+    ],
+)
+def test_float_range_length_ignores_decimal_context_rounding(
+    expression: str, expected: FloatDistribution
+) -> None:
+    override = OverridesParser.create().parse_override(f"key={expression}")
+    with patch.object(RangeSweep, "__iter__", side_effect=AssertionError("enumerated")):
+        distribution = _impl.create_optuna_distribution_from_override(override)
+    assert distribution == expected
+
+
+def test_float_range_precision_boundary_uses_exact_categorical_values() -> None:
+    override = OverridesParser.create().parse_override(
+        "key=range(-1000000000000000.0,-999999999999999.5,0.3)"
+    )
+    distribution = _impl.create_optuna_distribution_from_override(override)
+    assert isinstance(distribution, CategoricalDistribution)
+    assert distribution.choices == (-1000000000000000.0, -999999999999999.8)
+
+
+@mark.parametrize(
+    "distribution,values",
+    [
+        (IntDistribution(1, 3), [1, 2, 3]),
+        (IntDistribution(2, 2), [2]),
+        (FloatDistribution(0.0, 0.3, step=0.1), [0.0, 0.1, 0.2, 0.3]),
+        (FloatDistribution(0.5, 0.5, step=1.0), [0.5]),
+        (CategoricalDistribution([0, 0, 1]), [0, 0, 1]),
+    ],
+)
+def test_grid_sampler_includes_distribution_endpoints(
+    distribution: BaseDistribution, values: list[int | float]
+) -> None:
+    assert (
+        list(_impl.OptunaSweeperImpl._to_grid_sampler_choices(distribution)) == values
+    )
+
+
+def test_float_grid_choices_stay_within_precision_boundary() -> None:
+    with warns(UserWarning, match="range is not divisible"):
+        distribution = FloatDistribution(
+            -1000000000000000.0,
+            -999999999999999.2,
+            step=0.07,
+        )
+    choices = _impl.OptunaSweeperImpl._to_grid_sampler_choices(distribution)
+    assert choices[-1] == distribution.high
+    assert all(distribution.low <= value <= distribution.high for value in choices)
 
 
 @mark.parametrize(
@@ -191,7 +320,7 @@ def test_create_optuna_distribution_from_override(input: Any, expected: Any) -> 
             (
                 {
                     "key1": CategoricalDistribution([1, 2]),
-                    "key3": IntDistribution(1, 3),
+                    "key3": IntDistribution(1, 2),
                 },
                 {"key2": "5"},
                 [],
