@@ -188,6 +188,27 @@ def restore_invalid_state(
         and current[1].keys() == snapshot[1].keys()
         and (not frozen or (current[0] == snapshot[0] and current[1] == snapshot[1]))
     ):
+        dependency_sections = {
+            "dependencies",
+            "devDependencies",
+            "optionalDependencies",
+        }
+        if {
+            key: value
+            for key, value in current[2].items()
+            if key not in dependency_sections
+        } != {
+            key: value
+            for key, value in snapshot[2].items()
+            if key not in dependency_sections
+        }:
+            restore_snapshot(directory, snapshot)
+            notes.append(
+                f"{operation} changed package.json fields outside dependencies, "
+                "devDependencies, or optionalDependencies; restored the last "
+                "valid snapshot and did not claim its changes."
+            )
+            return True
         if "pnpm-workspace.yaml" not in current[1]:
             return False
         policy = yaml.safe_load(current[1]["pnpm-workspace.yaml"])
