@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-WORKFLOW_PATH = Path(__file__).parents[2] / "workflows/docusaurus-audit.yml"
+WORKFLOW_PATH = Path(__file__).parents[2] / "workflows/dependency-audit.yml"
 if not WORKFLOW_PATH.exists():
     WORKFLOW_PATH = Path(__file__).parents[1] / "templates/dependency-audit.yml"
 WORKFLOW = yaml.safe_load(WORKFLOW_PATH.read_text())
@@ -86,4 +86,7 @@ def test_generated_dependency_commit_skips_ci_and_preserves_build_report(
     if writes:
         assert writes[0][2] == ("edit" if existing else "create")
         assert "--draft" not in writes[0]
+        assert writes[0][writes[0].index("--title") + 1] == (
+            "Docusaurus maintenance: security audit and dependency upgrades"
+        )
     assert (tmp_path / "dependency-audit-pr.md").read_text().startswith(report)

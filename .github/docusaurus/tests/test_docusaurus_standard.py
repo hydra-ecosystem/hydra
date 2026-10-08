@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 import yaml
 
-WORKFLOW_PATH = Path(__file__).parents[2] / "workflows/docusaurus-audit.yml"
+WORKFLOW_PATH = Path(__file__).parents[2] / "workflows/dependency-audit.yml"
 if not WORKFLOW_PATH.exists():
     WORKFLOW_PATH = Path(__file__).parents[1] / "templates/dependency-audit.yml"
 
@@ -215,7 +215,13 @@ def test_remaining_summary_reports_unavailable_and_incomplete_evidence(data, exp
 def test_workflow_dispatch_uses_the_configured_project():
     workflow = WORKFLOW_PATH.read_text()
 
-    assert "  workflow_call:\n" in workflow
+    assert "  workflow_dispatch:\n" in workflow
+    assert "workflow_call" not in workflow
+    assert "uses: ./.github/workflows/" not in workflow
+    assert (
+        "PR_TITLE: 'Docusaurus maintenance: security audit and dependency upgrades'"
+        in workflow
+    )
     assert "inputs.directory" not in workflow
     assert 'project.py --github-env "$GITHUB_ENV"' in workflow
     assert "Landscape" not in workflow
