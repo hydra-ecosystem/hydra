@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-08",
-  "generated_at": "2026-10-08T11:52:18Z",
+  "generated_at": "2026-10-08T12:06:23Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 44,
+    "open_total": 43,
     "by_category": [
       {
         "category": "Bug",
@@ -14,14 +14,14 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 39,
-        "percentage": 88.6
+        "count": 38,
+        "percentage": 88.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 4.5
+        "percentage": 4.7
       },
       {
         "category": "Question",
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,35 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 96
+        "count": 97
       }
     ]
   },
   "issues": [
-    {
-      "number": 2453,
-      "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3459,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3459"
-        },
-        {
-          "number": 3518,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3518"
-        }
-      ],
-      "created": "2022-11-07",
-      "updated": "2026-07-29",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2453"
-    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -2368,9 +2344,40 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
+    },
+    {
+      "number": 2453,
+      "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3459,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3459"
+        },
+        {
+          "number": 3518,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3518"
+        }
+      ],
+      "created": "2022-11-07",
+      "updated": "2026-07-29",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2453"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-08T12:06:23Z",
+      "kind": "closed",
+      "issue": 2453,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2453",
+      "title": "[Feature Request] ConfigStore to warn or raise on name/group collision"
+    },
     {
       "ts": "2026-10-07T19:48:31Z",
       "kind": "pr",
@@ -4024,13 +4031,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
       "title": "Support `NSGAIIISampler` on Optuna Sweeper",
       "detail": "community PR → not started"
-    },
-    {
-      "ts": "2026-09-02T10:14:46Z",
-      "kind": "closed",
-      "issue": 3425,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3425",
-      "title": "Align Optuna sampler structured configs with Optuna 4.9"
     }
   ]
 }
