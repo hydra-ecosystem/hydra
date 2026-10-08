@@ -168,6 +168,9 @@ sort(list=[1,3,2], reverse=true)    # [3,2,1]
 sort(1)                             # 1
 ```
 
+Sorting a sweep clears any preceding `shuffle()`. Use `shuffle(sort(...))` to
+shuffle the sorted sweep again.
+
 ### shuffle
 ```python title="Signature"
 def shuffle(
@@ -194,7 +197,7 @@ int(value=3.14)            # 3 (int)
 float(10)                  # 10.0 (float)
 str(10)                    # "10" (str)
 bool(1)                    # true (bool)
-float(range(1,10))         # range(1.0,10.0)
+float(range(1,10))         # range with values 1.0,2.0,...,9.0
 str([1,2,3])               # ['1','2','3']
 str({a:10})                # {a:'10'}
 ```
@@ -304,7 +307,17 @@ def cast_int(value: Any):
 </div>
 
 #### Casting ranges
-Ranges can be cast to float or int, resulting in start, stop and step being cast and thus the range elements being cast.
+Ranges can be cast to float or int. Casting preserves the range and converts
+each generated value during iteration, retaining the element count, duplicates,
+tags and shuffling. Cast ranges remain lazy until their values are consumed.
+
+```python title="Examples"
+int(range(0,5,1.5))        # values: 0,1,3,4
+int(range(0,1,0.25))       # values: 0,0,0,0
+```
+
+This changed in Hydra 1.4. See
+[Range sweep casting](/docs/upgrades/1.3_to_1.4/breaking_changes#range-sweep-casting).
 
 <div className="row">
 <div className="col col--6">
@@ -327,11 +340,8 @@ def cast_int(value: Any):
 ```python title="Hydra"
 def cast_int(value: Any):
     if isinstance(value, RangeSweep):
-        return RangeSweep(
-            start=cast_int(value.start),
-            stop=cast_int(value.stop),
-            step=cast_int(value.step),
-        )
+        # Preserve the range and cast its values during iteration.
+        return cast_range(value, cast_int)
     else:
         return int(v)
 ```
@@ -378,5 +388,5 @@ Input are grouped by type.
 |     choice(1,a)    	| error       	| error             	| choice(“1”,”a”)   	| error                 	| choice(“1”, '“a”')     |
 | interval(1.0, 2.0) 	| interval(1, 2)| interval(1.0, 2.0)   	| error             	| error                 	| interval(“1.0”, “2.0”) |
 | interval(1, 2)     	| interval(1, 2)| interval(1.0, 2.0)   	| error             	| error                 	| interval(“1”, “2”)     |
-|     range(1,10)    	| range(1,10) 	| range(1.0,10.0)   	| error             	| error                 	| error                  |
-|  range(1.0, 10.0)  	| range(1,10) 	| range(1.0,10.0)   	| error             	| error                 	| error                  |
+|     range(1,10)    	| Range of ints 	| Range of floats   	| error             	| error                 	| error                  |
+|  range(1.0, 10.0)  	| Range of ints 	| Range of floats   	| error             	| error                 	| error                  |

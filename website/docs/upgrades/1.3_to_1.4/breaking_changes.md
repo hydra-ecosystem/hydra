@@ -34,6 +34,29 @@ complete. The final release notes will be the authoritative list.
   the primary config or pass `hydra.mode=RUN` or `hydra.mode=MULTIRUN` on the
   command line.
 
+### Range sweep casting
+
+`int(range(...))` and `float(range(...))` now cast each generated value,
+preserving the element count and duplicates. Previously they cast the range's
+`start`, `stop`, and `step`, which could change the sequence or truncate the step
+to zero.
+
+| Expression | Hydra 1.3 | Hydra 1.4 |
+| --- | --- | --- |
+| `int(range(0,5,1.5))` | `[0,1,2,3,4]` | `[0,1,3,4]` |
+| `int(range(0,1.1))` | `[0]` | `[0,1]` |
+| `int(range(0,1,0.1))` | Zero-step error | Ten zeros |
+
+To keep the former sequence in the first example, use `range(0,5,1)` explicitly.
+
+Casting preserves the `RangeSweep` and its original bounds and step. The cast
+is applied lazily during iteration. Code using the override parser should
+enumerate it with `Override.sweep_iterator()` to obtain the transformed values.
+Nested casts are applied in order. Ordinary, uncast ranges retain their
+existing behavior. Sweeper integrations should consume the transformed values
+through `Override.sweep_iterator()` rather than reconstructing a cast range
+from its bounds and step.
+
 ### ConfigStore registrations
 
 Replacing an existing ConfigStore registration without an explicit `replace`
