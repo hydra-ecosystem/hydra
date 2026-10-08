@@ -98,7 +98,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-08T12:54:06Z",
+  "generated_at": "2026-10-08T13:30:09Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -546,6 +546,16 @@
       "status": "not started",
       "title": "Make range sweep casting and ordering consistent",
       "updated_at": "2026-10-08T12:52:38Z"
+    },
+    "3521": {
+      "category": "Enhancement",
+      "created_at": "2026-10-08T13:28:46Z",
+      "labels": [],
+      "pr_numbers": [],
+      "state": "OPEN",
+      "status": "not started",
+      "title": "Optuna Sweeper: preserve range sweep values and reject invalid steps",
+      "updated_at": "2026-10-08T13:28:46Z"
     },
     "468": {
       "category": "Enhancement",
