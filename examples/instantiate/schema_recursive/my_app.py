@@ -32,10 +32,6 @@ class Config:
     tree: TreeConf = MISSING
 
 
-cs = ConfigStore.instance()
-cs.store(name="config_schema", node=Config)
-
-
 # pretty print utility
 def pretty_print(tree: Tree, name: str = "root", depth: int = 0) -> None:
     pad = " " * depth * 2
@@ -54,4 +50,7 @@ def my_app(cfg: Config) -> None:
 
 
 if __name__ == "__main__":
+    # instantiate() imports this file as my_app; register only when run as a script.
+    cs = ConfigStore.instance()
+    cs.store(name="config_schema", node=Config)
     my_app()
