@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-08",
-  "generated_at": "2026-10-08T13:30:09Z",
+  "generated_at": "2026-10-08T15:00:32Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 45,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 45
+        "count": 44
       },
       {
         "status": "done",
@@ -71,6 +71,24 @@
     ]
   },
   "issues": [
+    {
+      "number": 3520,
+      "title": "Make range sweep casting and ordering consistent",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3522,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3522"
+        }
+      ],
+      "created": "2026-10-08",
+      "updated": "2026-10-08",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3520"
+    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -756,19 +774,6 @@
       "updated": "2026-10-02",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
-    },
-    {
-      "number": 3520,
-      "title": "Make range sweep casting and ordering consistent",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-10-08",
-      "updated": "2026-10-08",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3520"
     },
     {
       "number": 3521,
@@ -2397,6 +2402,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-08T15:00:32Z",
+      "kind": "pr",
+      "issue": 3520,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3520",
+      "title": "Make range sweep casting and ordering consistent",
+      "detail": "linked #3522"
+    },
+    {
+      "ts": "2026-10-08T15:00:32Z",
+      "kind": "status",
+      "issue": 3520,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3520",
+      "title": "Make range sweep casting and ordering consistent",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3522,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3522"
+      }
+    },
     {
       "ts": "2026-10-08T13:30:09Z",
       "kind": "new",
@@ -4040,21 +4065,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364",
       "title": "Make Compose API initialization contexts nestable and self-contained",
       "detail": "unlinked #3399"
-    },
-    {
-      "ts": "2026-09-04T07:14:45Z",
-      "kind": "status",
-      "issue": 3364,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364",
-      "title": "Make Compose API initialization contexts nestable and self-contained",
-      "detail": "community PR → not started"
-    },
-    {
-      "ts": "2026-09-02T22:16:57Z",
-      "kind": "closed",
-      "issue": 3426,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
-      "title": "Support `NSGAIIISampler` on Optuna Sweeper"
     }
   ]
 }
