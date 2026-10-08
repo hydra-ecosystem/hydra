@@ -11,7 +11,7 @@ import yaml
 SHARED = Path(__file__).parents[1]
 read_project = runpy.run_path(str(SHARED / "project.py"))["project"]
 AUDIT = SHARED / "templates/dependency_audit.py"
-WORKFLOW = Path(__file__).parents[2] / "workflows/docusaurus-audit.yml"
+WORKFLOW = Path(__file__).parents[2] / "workflows/dependency-audit.yml"
 if not WORKFLOW.exists():
     WORKFLOW = SHARED / "templates/dependency-audit.yml"
 
