@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-10-08",
-  "generated_at": "2026-10-08T12:06:23Z",
+  "generated_at": "2026-10-08T12:54:06Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 43,
+    "open_total": 44,
     "by_category": [
       {
         "category": "Bug",
@@ -14,14 +14,14 @@
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 38,
-        "percentage": 88.4
+        "count": 39,
+        "percentage": 88.6
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 4.7
+        "percentage": 4.5
       },
       {
         "category": "Question",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 43
+        "count": 44
       },
       {
         "status": "done",
@@ -758,6 +758,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
     },
     {
+      "number": 3520,
+      "title": "Make range sweep casting and ordering consistent",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-08",
+      "updated": "2026-10-08",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3520"
+    },
+    {
       "number": 385,
       "title": "Experimentation tracking support",
       "category": "Enhancement",
@@ -975,6 +988,30 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/2412"
+    },
+    {
+      "number": 2453,
+      "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3459,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3459"
+        },
+        {
+          "number": 3518,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3518"
+        }
+      ],
+      "created": "2022-11-07",
+      "updated": "2026-07-29",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/2453"
     },
     {
       "number": 2664,
@@ -2344,33 +2381,16 @@
         "callbacks"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3491"
-    },
-    {
-      "number": 2453,
-      "title": "[Feature Request] ConfigStore to warn or raise on name/group collision",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3459,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3459"
-        },
-        {
-          "number": 3518,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3518"
-        }
-      ],
-      "created": "2022-11-07",
-      "updated": "2026-07-29",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/2453"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-08T12:54:06Z",
+      "kind": "new",
+      "issue": 3520,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3520",
+      "title": "Make range sweep casting and ordering consistent"
+    },
     {
       "ts": "2026-10-08T12:06:23Z",
       "kind": "closed",
@@ -4023,14 +4043,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
       "title": "Support `NSGAIIISampler` on Optuna Sweeper",
       "detail": "unlinked #3432"
-    },
-    {
-      "ts": "2026-09-02T18:50:10Z",
-      "kind": "status",
-      "issue": 3426,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3426",
-      "title": "Support `NSGAIIISampler` on Optuna Sweeper",
-      "detail": "community PR → not started"
     }
   ]
 }
