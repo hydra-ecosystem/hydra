@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-08",
-  "generated_at": "2026-10-08T15:00:32Z",
+  "generated_at": "2026-10-08T16:40:51Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 45,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 2
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 44
+        "count": 43
       },
       {
         "status": "done",
@@ -88,6 +88,24 @@
       "updated": "2026-10-08",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3520"
+    },
+    {
+      "number": 3521,
+      "title": "Optuna Sweeper: preserve range sweep values and reject invalid steps",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3522,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3522"
+        }
+      ],
+      "created": "2026-10-08",
+      "updated": "2026-10-08",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3521"
     },
     {
       "number": 468,
@@ -774,19 +792,6 @@
       "updated": "2026-10-02",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
-    },
-    {
-      "number": 3521,
-      "title": "Optuna Sweeper: preserve range sweep values and reject invalid steps",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-10-08",
-      "updated": "2026-10-08",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3521"
     },
     {
       "number": 385,
@@ -2402,6 +2407,26 @@
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-08T16:40:51Z",
+      "kind": "pr",
+      "issue": 3521,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3521",
+      "title": "Optuna Sweeper: preserve range sweep values and reject invalid steps",
+      "detail": "linked #3522"
+    },
+    {
+      "ts": "2026-10-08T16:40:51Z",
+      "kind": "status",
+      "issue": 3521,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3521",
+      "title": "Optuna Sweeper: preserve range sweep values and reject invalid steps",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3522,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3522"
+      }
+    },
     {
       "ts": "2026-10-08T15:00:32Z",
       "kind": "pr",
@@ -4050,21 +4075,6 @@
         "number": 3434,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3434"
       }
-    },
-    {
-      "ts": "2026-09-04T09:30:35Z",
-      "kind": "closed",
-      "issue": 3405,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3405",
-      "title": "Reject optional and override on the same Defaults List entry"
-    },
-    {
-      "ts": "2026-09-04T07:14:45Z",
-      "kind": "pr",
-      "issue": 3364,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3364",
-      "title": "Make Compose API initialization contexts nestable and self-contained",
-      "detail": "unlinked #3399"
     }
   ]
 }
