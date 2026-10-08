@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-08",
-  "generated_at": "2026-10-08T16:40:51Z",
+  "generated_at": "2026-10-08T17:44:57Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 45,
@@ -100,6 +100,10 @@
         {
           "number": 3522,
           "url": "https://github.com/hydra-ecosystem/hydra/pull/3522"
+        },
+        {
+          "number": 3523,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3523"
         }
       ],
       "created": "2026-10-08",
@@ -2408,6 +2412,14 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-08T17:44:57Z",
+      "kind": "pr",
+      "issue": 3521,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3521",
+      "title": "Optuna Sweeper: preserve range sweep values and reject invalid steps",
+      "detail": "linked #3523"
+    },
+    {
       "ts": "2026-10-08T16:40:51Z",
       "kind": "pr",
       "issue": 3521,
@@ -4063,18 +4075,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3369",
       "title": "Remove redundant setup-xcode step from macOS CI",
       "detail": "linked #3434"
-    },
-    {
-      "ts": "2026-09-04T12:46:42Z",
-      "kind": "status",
-      "issue": 3369,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3369",
-      "title": "Remove redundant setup-xcode step from macOS CI",
-      "detail": "community PR → in progress",
-      "pr": {
-        "number": 3434,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3434"
-      }
     }
   ]
 }
