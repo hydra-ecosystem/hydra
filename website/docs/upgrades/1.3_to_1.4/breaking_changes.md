@@ -57,6 +57,23 @@ existing behavior. Sweeper integrations should consume the transformed values
 through `Override.sweep_iterator()` rather than reconstructing a cast range
 from its bounds and step.
 
+### Optuna range sweeps
+
+The Optuna Sweeper now preserves a range's discrete values and exclusive stop,
+including descending and sorted float ranges. Previously, `range(1,3)` could
+sample `3`; it now permits only `1` and `2`. Use `range(1,4)` to retain that
+former search space. Empty ranges and zero steps are rejected.
+
+Cast ranges use categorical distributions containing the generated, cast
+values. This supports the core element-wise casting behavior described above.
+GridSampler now includes all values in a discrete distribution, including its
+upper endpoint and singleton distributions.
+
+At floating-point precision boundaries where an exact numeric Optuna
+distribution is not representable, the sweeper preserves the range values in
+a categorical distribution. Ordinary representable uncast ranges remain
+numeric; the precision fallback may enumerate the affected range.
+
 ### ConfigStore registrations
 
 Replacing an existing ConfigStore registration without an explicit `replace`
