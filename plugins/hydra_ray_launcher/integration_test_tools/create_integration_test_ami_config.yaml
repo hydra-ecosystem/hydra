@@ -71,7 +71,7 @@ ray_yaml:
   file_mounts: {}
   initialization_commands: []
   setup_commands:
-    - pip install ray[default]==1.12.0
+    - pip install ray[default]==2.55.0
     - pip install --ignore-installed PyYAML
   head_setup_commands: []
   worker_setup_commands: []
