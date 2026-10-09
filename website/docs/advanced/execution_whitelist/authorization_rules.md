@@ -84,9 +84,9 @@ Here `my_app.get_model_class` authorizes the factory call and
 
 ## Threat model and implementation state
 
-Declarative instantiation and logging configuration may be untrusted. Installed
-Python code and execution whitelists supplied by trusted Python code are trusted;
-the execution policy is not a general Python sandbox.
+Declarative instantiation configuration may be untrusted. Logging configuration,
+installed Python code, and execution whitelists supplied by trusted Python code
+are trusted; the execution policy is not a general Python sandbox.
 
 Configuration cannot reference objects under `hydra._internal`, expose Hydra
 module state through discovery, or modify existing Python functions and classes.

@@ -30,6 +30,10 @@ Hydra automatically permits targets used by its built-in logging
 configurations. Add application-defined handlers, formatters, filters, queues,
 and listeners explicitly.
 
+Logging configuration remains trusted. The execution whitelist does not restrict
+where log files are written. Do not load logging configuration from untrusted
+sources.
+
 ## Migrate direct calls
 
 Pass expected targets to direct `instantiate()` calls:
