@@ -55,6 +55,9 @@ narrower prefixes for shared namespaces.
 
 ## Python logging configured by Hydra
 
+Hydra treats logging configuration as trusted. The execution whitelist does not
+restrict where log files are written.
+
 When Hydra configures Python logging, its use of
 `logging.config.dictConfig()` can import handler `class` values and call
 formatter, filter, handler, queue, and listener `()` values. Add custom logging
