@@ -41,6 +41,11 @@ class OverridesConf:
     task: list[str] = field(default_factory=lambda: [])
 
 
+@dataclass
+class OverrideConf:
+    aliases: dict[str, str] = field(default_factory=dict)
+
+
 # job runtime information will be populated here
 @dataclass
 class JobConf:
@@ -152,6 +157,7 @@ class HydraConf:
     output_subdir: str | None = ".hydra"
 
     # Those lists will contain runtime overrides
+    override: OverrideConf = field(default_factory=OverrideConf)
     overrides: OverridesConf = field(default_factory=OverridesConf)
 
     job: JobConf = field(default_factory=JobConf)

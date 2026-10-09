@@ -10,6 +10,8 @@ The Compose API lets you compose configs programmatically after Hydra has been
 initialized, either by [`@hydra.main()`](hydra_main.md) or by one of the
 initialization methods below.
 
+[Override aliases](override_aliases.md) also work in `compose(overrides=[...])`.
+
 ### When to use the Compose API
 
 Use the Compose API when `@hydra.main()` is not suitable as an entry point, or
