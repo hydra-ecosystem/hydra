@@ -183,7 +183,7 @@ source configuration read-only, including while target constructors run, and
 restores its previous state before returning. Constructors can use OmegaConf's
 `read_write()` context manager to opt in to mutation explicitly.
 
-Hydra `_partial_` factories cannot be pickled before invocation. Invoke the
+Hydra `_partial_` factories cannot be pickled. Invoke the
 factory first; whether the constructed object can be pickled is determined by
 that object's type.
 

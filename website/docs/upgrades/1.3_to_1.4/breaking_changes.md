@@ -3,10 +3,10 @@ id: breaking_changes
 title: Current breaking changes
 ---
 
-Hydra 1.4 and OmegaConf 2.4 are still under development. This page is a
-working inventory of changes currently known to require application updates.
-It is derived from their news fragments, may change, and may not yet be
-complete. The final release notes will be the authoritative list.
+This page is the current migration inventory for Hydra 1.4 and OmegaConf 2.4.
+It is derived from Hydra's news fragments and OmegaConf's release notes, may
+change, and may not yet be complete. The final release notes will be the
+authoritative list.
 
 ## Hydra 1.4
 
@@ -27,12 +27,45 @@ complete. The final release notes will be the authoritative list.
   only supported config group separator. Paths that used `\` previously
   composed on Windows only, where the operating system resolved the backslash
   as a filesystem separator.
+- Defaults List options containing `/` are normalized to a nested config group.
+  For example, `foo: bar/baz` becomes `foo/bar: baz`, changing the override key
+  to `foo/bar` and the default package to `foo.bar`. See
+  [Slash in default option normalization](/docs/upgrades/1.3_to_1.4/slash_in_default).
+- Defaults List interpolations can reference selected config groups, including
+  relocated groups, but cannot invoke OmegaConf resolvers. Move resolver-based
+  selection into application code or pass a concrete config-group override.
 - The optional `hydra.mode` is no longer effective when set in a config other
   than the primary config. A conflicting mode from a config group raises an
   error rather than being silently ignored. Interpolations that require
   Defaults List composition also cannot select the mode. Move such a value to
   the primary config or pass `hydra.mode=RUN` or `hydra.mode=MULTIRUN` on the
   command line.
+
+### Deprecations
+
+- `version_base` is deprecated and will be removed in Hydra 1.5. Explicit values,
+  including `None`, emit `Hydra15MigrationWarning`; values below `"1.3"` are
+  rejected. Omit it when running on Hydra 1.4. See
+  [Preparing for Hydra 1.4](/docs/upgrades/1.3_to_1.4/prepare_for_1_4)
+  for applications that still need to run on Hydra 1.3.
+- Using `_target_: functools.partial` is deprecated. Set `_target_` to the
+  effective callable and use `_partial_: true` instead. Direct
+  `functools.partial` targets will become an error in Hydra 1.5.
+- `hydra.job.override_dirname` is deprecated. Replace
+  `${hydra.job.override_dirname}` with `${hydra_override_dirname:}`. See
+  [hydra.job.override_dirname](/docs/upgrades/1.3_to_1.4/hydra_job_override_dirname).
+- Legacy `hydra_plugins` namespace scanning is deprecated. Register plugins
+  through [entry points](/docs/upgrades/1.3_to_1.4/plugin_discovery).
+
+### Execution whitelist
+
+Resolving config-selected Python targets without an execution whitelist supplied
+by trusted Python code emits a warning in Hydra 1.4 and will become an error in
+Hydra 1.5. This applies to `instantiate()` and Python logging configured by
+Hydra. See the [execution whitelist migration guide](/docs/upgrades/1.3_to_1.4/execution_whitelist).
+
+Logging configuration remains trusted. The whitelist controls callable selection;
+it does not restrict where log files are written.
 
 ### Range sweep casting
 
@@ -153,14 +186,58 @@ have been removed:
   instantiation. With `_recursive_=False`, `_convert_="none"`, and no call-site
   overrides, Config containers are passed through without a final copy. See
   [Instantiate resolution and call-site overrides](/docs/upgrades/1.3_to_1.4/instantiate_resolution).
+- During instantiation without call-site overrides, Hydra temporarily makes the
+  source configuration read-only and restores its previous state afterward.
+  Constructors that intentionally mutate it must opt in with OmegaConf's
+  `read_write()` context manager. See
+  [Instantiate resolution and call-site overrides](/docs/upgrades/1.3_to_1.4/instantiate_resolution).
+- Hydra `_partial_` factories cannot be pickled. Construct the object before
+  serialization, if its type supports pickling, or recreate the factory in the
+  receiving process.
 - Launcher and sweeper plugin configurations are instantiated
   non-recursively.
-- Entry points are the preferred plugin discovery mechanism. Legacy
-  `hydra_plugins` namespace scanning remains available in 1.4 but is
-  deprecated. See [Plugin discovery with entry points](/docs/upgrades/1.3_to_1.4/plugin_discovery).
 - Some security-sensitive modules can no longer be instantiated by default.
   This restriction is not a security boundary; do not rely on it to make
   untrusted configurations safe.
+
+### Experimental rerun
+
+`PickleJobInfoCallback` has been removed. Remove it from `hydra.callbacks`.
+`--experimental-rerun` now takes a job output directory containing
+`.hydra/hydra.yaml` and `.hydra/overrides.yaml`, rather than a pickle file.
+It recomposes from the current project's config sources and saved overrides;
+saved `config.yaml` values are not loaded. See
+[Re-run a job from its output directory](/docs/experimental/rerun).
+
+### Bundled plugins and Configen
+
+Upgrade bundled plugins alongside Hydra. Their current versions require
+`hydra-core>=1.4.0.dev1,<1.5.0.dev0` and cannot be used with Hydra 1.3.
+`hydra-configen` also requires Hydra 1.4 or newer.
+
+| Plugin | Dependency changes |
+| --- | --- |
+| Ax Sweeper | Python 3.11–3.14; `ax-platform>=1.2.4,<1.3.0`; `torch>=2.2` |
+| Joblib Launcher | `joblib>=1.5.3` |
+| Nevergrad Sweeper | `nevergrad>=1.0.12` |
+| Optuna Sweeper | `optuna>=4.9.0,<6.0.0` |
+| RQ Launcher | `fakeredis>=2.36.2,<3`; `rq>=2.10.0,<3` |
+| Submitit Launcher | `submitit>=1.5.0` |
+
+The Optuna `motpe` sampler is no longer supported. Use
+`hydra/sweeper/sampler=tpe`, which supports multi-objective optimization.
+Nevergrad's `hydra.sweeper.parametrization` is deprecated and will be removed
+in Hydra 1.5. Move search-space entries to `hydra.sweeper.params`; see
+[Nevergrad Sweeper search-space configuration](/docs/upgrades/1.3_to_1.4/nevergrad_sweeper).
+
+### Testing and error reporting
+
+- `hydra.test_utils.test_utils.assert_regex_match()` has been removed. Use
+  `assert_multiline_regex_search()`; add anchors if a full-string match is
+  required.
+- Hydra no longer suggests `HYDRA_FULL_ERROR=1` after a sanitized error.
+  The variable still disables traceback sanitization; see the
+  [developer guide](/docs/development/overview).
 
 ## OmegaConf 2.4
 
@@ -175,6 +252,8 @@ have been removed:
 - Native tuples create immutable `TupleConfig` values instead of mutable
   `ListConfig` values, and conversion returns tuples instead of lists. See the
   [OmegaConf tuple migration guide](https://omegaconf.readthedocs.io/en/latest/tuple_migration.html).
+- `DictConfig` and `ListConfig` are unhashable and cannot be dictionary keys or
+  set elements. Use a separate immutable key instead.
 - `OmegaConf.create(None)` returns `None` instead of a `DictConfig` wrapping
   `None`.
 - `OmegaConf.get_type()` returns `NoneType` for nodes containing `None`, and
@@ -185,6 +264,25 @@ have been removed:
 - `OmegaConf.to_container(..., resolve=True)` resolves a custom resolver at
   most once per resolved node during a conversion pass. Code relying on
   repeated side effects from the same resolver may behave differently.
+- `OmegaConf.register_resolver()` is the canonical custom resolver API.
+  `OmegaConf.register_new_resolver()` and
+  `OmegaConf.legacy_register_resolver()` are deprecated. When migrating a
+  legacy resolver, check argument parsing and caching behavior.
+- Custom resolvers now warn when their arguments or return values do not match
+  their annotations. Correct the annotations or values, or choose an explicit
+  `annotation_validation` policy when registering the resolver.
+- `OmegaConf.missing_keys()` no longer evaluates custom resolvers by default.
+  Pass `resolve_custom_resolvers=True` when this evaluation is required.
+- Typed container and union interpolations are validated and converted against
+  their destination type on lazy access. Values that previously bypassed
+  validation may now raise an error.
+- Plain `???` returned by a resolver is treated as missing on access. Return
+  `r"\???"` when the intended value is the literal string `???`.
+- Integer-looking key paths can resolve integer dictionary keys. Configurations
+  reject ambiguous pairs such as `1` and `"1"`; use one key representation.
+- YAML loading limits alias expansion by default. Large configurations that
+  exceed the limit must be simplified or use an explicit higher
+  `OMEGACONF_MAX_YAML_EXPANDED_NODES` limit for trusted input.
 - A backslash immediately before a key-path delimiter now escapes that
   delimiter. This changes the interpretation of key paths involving keys whose
   names end in a backslash.
