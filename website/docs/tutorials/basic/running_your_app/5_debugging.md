@@ -47,8 +47,15 @@ By default, config interpolations are not resolved. To print resolved config use
 ### Info
 The `--info` flag can provide information about various aspects of Hydra and your application:
  - `--info all`: Default behavior, prints everything
+ - `--info aliases`: Lists override aliases and shows how supplied overrides expand,
+   including unchanged inputs. This does not require full composition.
  - `--info config`: Prints information useful to understanding the config composition:  
    Config Search Path, Defaults Tree, Defaults List and the final config.
  - `--info defaults`: Prints the Final Defaults List
  - `--info defaults-tree`: Prints the Defaults Tree
  - `--info plugins`: Prints information about installed plugins
+
+For example, if `bs` aliases `trainer.batch_size`,
+`python my_app.py --info aliases bs=32` shows
+`bs=32 -> trainer.batch_size=32`. See [Override aliases](/advanced/override_aliases.md)
+for definitions and examples. Expansion is also shown under Hydra debug logging.

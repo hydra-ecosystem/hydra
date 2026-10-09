@@ -179,7 +179,7 @@ class CompletionPlugin(Plugin):
                 parent_group = word[0:last_slash_index]
 
         all_matched_groups = self.config_loader.get_group_options(
-            group_name=parent_group,
+            group_name=parent_group.split("@", 1)[0],
             results_filter=results_filter,
             config_name=config_name,
             overrides=words,
@@ -217,16 +217,41 @@ class CompletionPlugin(Plugin):
         return matched_groups, exact_match
 
     def _query(self, config_name: str | None, line: str) -> list[str]:
+        from hydra._internal.config_loader_impl import ConfigLoaderImpl
+        from hydra._internal.override_aliases import OverrideAliases, split_override
+
         from .._internal.utils import get_args
 
         new_word = len(line) == 0 or line[-1] == " "
         parsed_args = get_args(line.split())
+        if parsed_args.config_name is not None:
+            config_name = parsed_args.config_name
         words = parsed_args.overrides
         if new_word or len(words) == 0:
             word = ""
         else:
             word = words[-1]
             words = words[0:-1]
+
+        aliases = (
+            self.config_loader.get_override_aliases(config_name)
+            if isinstance(self.config_loader, ConfigLoaderImpl)
+            else OverrideAliases()
+        )
+        prefix, key, value = split_override(word)
+        alias_matches = []
+        if not value:
+            for name, target in aliases.targets.items():
+                if name.startswith(key):
+                    _, _, target_value = split_override(target)
+                    suffix = "" if target_value or prefix == "~" else "="
+                    alias_matches.append(prefix + name + suffix)
+
+        original_key = prefix + key
+        target = aliases.targets.get(key)
+        if target is not None and not split_override(target)[2]:
+            word = prefix + target + value
+        expanded_key = prefix + split_override(word)[1]
 
         fname_prefix, filename = CompletionPlugin._get_filename(word)
         if filename is not None:
@@ -245,7 +270,14 @@ class CompletionPlugin(Plugin):
                     config = self.config_loader.load_configuration(
                         config_name=config_name, overrides=words, run_mode=run_mode
                     )
-                    config_matches = CompletionPlugin._get_matches(config, word)
+                    config_word = (
+                        word[len(prefix) :]
+                        if target is not None and not split_override(target)[2]
+                        else word
+                    )
+                    config_matches = CompletionPlugin._get_matches(config, config_word)
+                    if config_word != word:
+                        config_matches = [prefix + match for match in config_matches]
                 except ConfigCompositionException:
                     # if config fails to load for whatever reason, do not provide config matches.
                     # possible reasons:
@@ -255,6 +287,14 @@ class CompletionPlugin(Plugin):
                     pass
 
             result = list(set(matched_groups + config_matches))
+
+        if original_key != expanded_key:
+            result = [
+                original_key + match[len(expanded_key) :]
+                for match in result
+                if match.startswith(expanded_key + "=")
+            ]
+        result = list(set(result + alias_matches))
 
         return sorted(result)
 

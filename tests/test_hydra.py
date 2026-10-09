@@ -936,7 +936,7 @@ for details.
                 --config-name,-cn : Overrides the config_name specified in hydra.main()
                 --config-dir,-cd : Adds an additional config dir to the config search path
                 --experimental-rerun : Rerun a job from its output directory
-                --info,-i : Print Hydra information [all|config|defaults|defaults-tree|plugins|searchpath]
+                --info,-i : Print Hydra information [all|aliases|config|defaults|defaults-tree|plugins|searchpath]
                 Overrides : Any key=value arguments to override config values (use dots for.nested=overrides)
                 """),
             id="overriding_help_template:$FLAGS_HELP",
@@ -992,7 +992,7 @@ for details.
                 --config-name,-cn : Overrides the config_name specified in hydra.main()
                 --config-dir,-cd : Adds an additional config dir to the config search path
                 --experimental-rerun : Rerun a job from its output directory
-                --info,-i : Print Hydra information [all|config|defaults|defaults-tree|plugins|searchpath]
+                --info,-i : Print Hydra information [all|aliases|config|defaults|defaults-tree|plugins|searchpath]
                 Overrides : Any key=value arguments to override config values (use dots for.nested=overrides)
                 """),
             id="overriding_hydra_help_template:$FLAGS_HELP",

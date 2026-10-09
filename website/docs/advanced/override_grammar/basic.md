@@ -16,6 +16,9 @@ The rest are manipulating the config object.
 Bracket paths and escaped keys always manipulate the config object, even if a
 config group has the same name.
 
+[Override aliases](../override_aliases.md) can provide shortcuts for keys and
+complete expressions. They expand before normal override parsing.
+
 ## Basic examples
 ### Modifying the Config Object
 - Overriding a config value : `foo.bar=value`
