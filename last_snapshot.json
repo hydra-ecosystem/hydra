@@ -52,6 +52,7 @@
     "3202": "2026-09-15",
     "3220": "2026-10-01",
     "3221": "2026-10-01",
+    "3224": "2026-10-09",
     "3230": "2026-09-28",
     "3248": "2026-10-07",
     "3250": "2026-10-06",
@@ -100,7 +101,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-09T12:11:47Z",
+  "generated_at": "2026-10-09T12:20:43Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -383,20 +384,6 @@
       "status": "not started",
       "title": "[Feature Request] Type validation for instantiate arguments",
       "updated_at": "2026-06-26T08:39:24Z"
-    },
-    "3224": {
-      "category": "Enhancement",
-      "created_at": "2026-06-20T20:37:15Z",
-      "labels": [
-        "enhancement"
-      ],
-      "pr_numbers": [
-        "3525"
-      ],
-      "state": "OPEN",
-      "status": "in progress",
-      "title": "Add hydra.override.aliases for explicit CLI override aliases",
-      "updated_at": "2026-10-09T06:43:39Z"
     },
     "3236": {
       "category": "Enhancement",
@@ -1348,6 +1335,20 @@
       "status": "done",
       "title": "Clean up deprecations older than Hydra 1.2",
       "updated_at": "2026-06-25T03:00:01Z"
+    },
+    "3224": {
+      "category": "Enhancement",
+      "created_at": "2026-06-20T20:37:15Z",
+      "labels": [
+        "enhancement"
+      ],
+      "pr_numbers": [
+        "3525"
+      ],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Add hydra.override.aliases for explicit CLI override aliases",
+      "updated_at": "2026-10-09T06:43:39Z"
     },
     "3230": {
       "category": "Enhancement",
