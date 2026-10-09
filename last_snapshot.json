@@ -101,7 +101,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-09T19:24:46Z",
+  "generated_at": "2026-10-09T20:24:17Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -538,7 +538,7 @@
       "state": "OPEN",
       "status": "in progress",
       "title": "Ray launcher cloudpickle constraint breaks exception serialization on Python 3.14",
-      "updated_at": "2026-10-09T19:22:18Z"
+      "updated_at": "2026-10-09T19:28:02Z"
     },
     "468": {
       "category": "Enhancement",
