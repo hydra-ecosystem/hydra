@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-09",
-  "generated_at": "2026-10-09T16:48:09Z",
+  "generated_at": "2026-10-09T19:24:46Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 42,
+    "open_total": 43,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 1,
-        "percentage": 2.4
+        "count": 2,
+        "percentage": 4.7
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 37,
-        "percentage": 88.1
+        "percentage": 86.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 4.8
+        "percentage": 4.7
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.4
+        "percentage": 2.3
       },
       {
         "category": "Refactor",
@@ -39,14 +39,14 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.4
+        "percentage": 2.3
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -71,6 +71,24 @@
     ]
   },
   "issues": [
+    {
+      "number": 3528,
+      "title": "Ray launcher cloudpickle constraint breaks exception serialization on Python 3.14",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3529,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3529"
+        }
+      ],
+      "created": "2026-10-09",
+      "updated": "2026-10-09",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3528"
+    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -2417,6 +2435,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-09T19:24:46Z",
+      "kind": "new",
+      "issue": 3528,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3528",
+      "title": "Ray launcher cloudpickle constraint breaks exception serialization on Python 3.14"
+    },
+    {
       "ts": "2026-10-09T12:20:43Z",
       "kind": "closed",
       "issue": 3224,
@@ -4074,13 +4099,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/802",
       "title": "Improve Hydra test coverage to 100%",
       "detail": "unlinked #3377"
-    },
-    {
-      "ts": "2026-09-04T13:36:55Z",
-      "kind": "closed",
-      "issue": 3369,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3369",
-      "title": "Remove redundant setup-xcode step from macOS CI"
     }
   ]
 }
