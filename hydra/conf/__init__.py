@@ -151,6 +151,9 @@ class HydraConf:
     # Setting to None will prevent the creation of the output subdir.
     output_subdir: str | None = ".hydra"
 
+    # Override alias definitions from the primary config
+    aliases: dict[str, str] = field(default_factory=dict)
+
     # Those lists will contain runtime overrides
     overrides: OverridesConf = field(default_factory=OverridesConf)
 

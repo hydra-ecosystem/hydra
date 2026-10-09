@@ -16,6 +16,10 @@ If a Defaults List choice is mandatory (`group: ???`), `--help` still lists the
 available options. `$CONFIG` shows the partial configuration until a choice is
 provided.
 
+The default application help also lists [override aliases](../advanced/override_aliases.md).
+Custom templates can include `$OVERRIDE_ALIASES` to display them, including their
+heading. This variable is empty when no aliases are defined.
+
 Example output of `--help`:
 ```text
 $ python my_app.py --help
@@ -66,6 +70,7 @@ footer: |-
 #
 # Configuration generated with overrides:
 #   $CONFIG : Generated config
+#   $OVERRIDE_ALIASES : Alias definitions, including a heading when nonempty.
 #
 template: |-
   ${hydra.help.header}

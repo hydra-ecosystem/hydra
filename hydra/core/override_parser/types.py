@@ -284,6 +284,9 @@ class Override:
     # Explicit value-path syntax cannot select a config group.
     is_value_path: bool = False
 
+    # Original spelling before override alias expansion, for diagnostics.
+    original_input_line: str | None = None
+
     def is_delete(self) -> bool:
         """
         :return: True if this override represents a deletion of a config value or config group option

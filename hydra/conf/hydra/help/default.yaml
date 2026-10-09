@@ -18,6 +18,7 @@ footer: |
 #
 # Configuration generated with overrides:
 #   $CONFIG : Generated config
+#   $OVERRIDE_ALIASES : Available aliases, including a heading when nonempty.
 #
 template: |
   ${hydra.help.header}
@@ -26,7 +27,7 @@ template: |
 
   $APP_CONFIG_GROUPS
 
-  == Config ==
+  $OVERRIDE_ALIASES== Config ==
   Override anything in the config (foo.bar=value)
 
   $CONFIG
