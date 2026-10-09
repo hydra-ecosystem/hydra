@@ -489,6 +489,7 @@ def _run_hydra(
 
     from .hydra import Hydra
 
+    saved_overrides: list[str] = []
     if args.experimental_rerun is not None:
         if args.multirun:
             raise ValueError("--experimental-rerun does not support --multirun")
@@ -543,8 +544,31 @@ def _run_hydra(
     )
 
     try:
+        from .config_loader_impl import ConfigLoaderImpl
+
+        parsed_overrides = None
+        # Saved rerun inputs are canonical on every CLI path, including inspection.
+        if (
+            args.experimental_rerun is not None
+            and not args.shell_completion
+            and args.info != "aliases"
+        ):
+            parsed_overrides = run_and_report(
+                lambda: (
+                    hydra.config_loader.parse_overrides(
+                        config_name, args.overrides, alias_start=len(saved_overrides)
+                    )
+                    if isinstance(hydra.config_loader, ConfigLoaderImpl)
+                    else OverridesParser.create().parse_overrides(args.overrides)
+                )
+            )
         if args.help:
-            hydra.app_help(config_name=config_name, args_parser=args_parser, args=args)
+            hydra.app_help(
+                config_name=config_name,
+                args_parser=args_parser,
+                args=args,
+                parsed_overrides=parsed_overrides,
+            )
             sys.exit(0)
         has_show_cfg = args.cfg is not None
         if args.resolve and (not has_show_cfg and not args.help):
@@ -553,7 +577,10 @@ def _run_hydra(
             )
         if args.hydra_help:
             hydra.hydra_help(
-                config_name=config_name, args_parser=args_parser, args=args
+                config_name=config_name,
+                args_parser=args_parser,
+                args=args,
+                parsed_overrides=parsed_overrides,
             )
             sys.exit(0)
 
@@ -574,9 +601,16 @@ def _run_hydra(
         overrides = args.overrides
 
         if args.run or args.multirun:
-            parsed_overrides = run_and_report(
-                lambda: OverridesParser.create().parse_overrides(overrides)
-            )
+            if parsed_overrides is None:
+                parsed_overrides = run_and_report(
+                    lambda: (
+                        hydra.config_loader.parse_overrides(
+                            config_name, overrides, alias_start=len(saved_overrides)
+                        )
+                        if isinstance(hydra.config_loader, ConfigLoaderImpl)
+                        else OverridesParser.create().parse_overrides(overrides)
+                    )
+                )
             if args.experimental_rerun is not None:
                 run_mode = RunMode.RUN
             else:
@@ -605,6 +639,7 @@ def _run_hydra(
                     cfg_type=args.cfg,
                     package=args.package,
                     resolve=args.resolve,
+                    parsed_overrides=parsed_overrides,
                 )
             )
         elif args.shell_completion:
@@ -615,7 +650,11 @@ def _run_hydra(
             )
         elif args.info:
             hydra.show_info(
-                args.info, config_name=config_name, overrides=args.overrides
+                args.info,
+                config_name=config_name,
+                overrides=args.overrides,
+                parsed_overrides=parsed_overrides,
+                alias_start=len(saved_overrides),
             )
         else:
             sys.stderr.write("Command not specified\n")
@@ -806,6 +845,7 @@ def get_args_parser() -> argparse.ArgumentParser:
 
     info_choices = [
         "all",
+        "aliases",
         "config",
         "defaults",
         "defaults-tree",

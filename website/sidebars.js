@@ -103,6 +103,7 @@ module.exports = {
                     'advanced/override_grammar/extended',
                 ]
             },
+            'advanced/override_aliases',
             'advanced/defaults_list',
             'advanced/overriding_packages',
             {
