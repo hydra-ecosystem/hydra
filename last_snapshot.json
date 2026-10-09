@@ -100,7 +100,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-08T20:03:49Z",
+  "generated_at": "2026-10-09T07:23:27Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -394,7 +394,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "Add hydra.override.aliases for explicit CLI override aliases",
-      "updated_at": "2026-06-20T20:42:36Z"
+      "updated_at": "2026-10-09T06:43:39Z"
     },
     "3236": {
       "category": "Enhancement",
