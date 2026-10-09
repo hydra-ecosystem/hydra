@@ -221,6 +221,7 @@ Upgrade bundled plugins alongside Hydra. Their current versions require
 | Joblib Launcher | `joblib>=1.5.3` |
 | Nevergrad Sweeper | `nevergrad>=1.0.12` |
 | Optuna Sweeper | `optuna>=4.9.0,<6.0.0` |
+| Ray Launcher | `ray[default]>=2.55.0,<3`; `cloudpickle>=3.1.2,<4` |
 | RQ Launcher | `fakeredis>=2.36.2,<3`; `rq>=2.10.0,<3` |
 | Submitit Launcher | `submitit>=1.5.0` |
 

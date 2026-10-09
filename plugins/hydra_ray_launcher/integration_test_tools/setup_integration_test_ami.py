@@ -6,10 +6,10 @@ from datetime import datetime
 dependencies = [
     "boto3==1.22.6",
     "hydra-core>=1.1.2",
-    "ray[default]==1.12.0",
+    "ray[default]==2.55.0",
     # https://github.com/aio-libs/aiohttp/issues/6203
     "aiohttp==3.8.1",
-    "cloudpickle==2.0.0",
+    "cloudpickle==3.1.2",
     "pickle5==0.0.11; python_version < '3.8.0'",
 ]
 
