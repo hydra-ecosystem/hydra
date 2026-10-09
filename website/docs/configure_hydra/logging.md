@@ -41,10 +41,12 @@ disable_existing_loggers: false
 <details>
 <summary>Security considerations</summary>
 
-When Hydra configures Python logging, the configuration can import and call the
-values of handler `class` keys and formatter, filter, and handler `()` keys.
-Configure an execution whitelist in trusted Python code whenever Hydra's
-logging configuration may come from an untrusted source:
+Hydra treats logging configuration as trusted. The execution whitelist controls
+callable selection; it does not restrict where log files are written. Do not load
+logging configuration from untrusted sources.
+
+Authorize custom logging components with an execution whitelist supplied by
+trusted Python code:
 
 ```python
 import hydra
