@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-09",
-  "generated_at": "2026-10-09T12:20:43Z",
+  "generated_at": "2026-10-09T13:42:15Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 42,
@@ -1670,6 +1670,26 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3221"
     },
     {
+      "number": 3224,
+      "title": "Add hydra.override.aliases for explicit CLI override aliases",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3525,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3525"
+        }
+      ],
+      "created": "2026-06-20",
+      "updated": "2026-10-09",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3224"
+    },
+    {
       "number": 3230,
       "title": "Add Compose API initializer for multiple config search path entries",
       "category": "Enhancement",
@@ -2393,26 +2413,6 @@
       "updated": "2026-10-08",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3521"
-    },
-    {
-      "number": 3224,
-      "title": "Add hydra.override.aliases for explicit CLI override aliases",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [
-        {
-          "number": 3525,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3525"
-        }
-      ],
-      "created": "2026-06-20",
-      "updated": "2026-10-09",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3224"
     }
   ],
   "updates": [
