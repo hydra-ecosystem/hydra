@@ -27,6 +27,7 @@ from hydra._internal.config_repository import (
     IConfigRepository,
 )
 from hydra._internal.defaults_list import DefaultsList, create_defaults_list
+from hydra._internal.override_aliases import OverrideAliases
 from hydra.conf import ConfigSourceInfo
 from hydra.core.config_loader import ConfigLoader
 from hydra.core.config_search_path import ConfigSearchPath
@@ -35,7 +36,12 @@ from hydra.core.object_type import ObjectType
 from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.override_parser.types import Override, OverrideType, ValueType
 from hydra.core.utils import JobRuntime
-from hydra.errors import ConfigCompositionException, MissingConfigException
+from hydra.errors import (
+    ConfigCompositionException,
+    HydraException,
+    MissingConfigException,
+    OverrideParseException,
+)
 from hydra.plugins.config_source import ConfigResult, ConfigSource
 from hydra.types import RunMode
 
@@ -52,6 +58,54 @@ class ConfigLoaderImpl(ConfigLoader):
         self.config_search_path = config_search_path
         self.repository = ConfigRepository(config_search_path=config_search_path)
         self._active_repository: IConfigRepository | None = None
+
+    def get_override_aliases(self, config_name: str | None) -> OverrideAliases:
+        if config_name is None:
+            return OverrideAliases()
+        loaded = self.repository.load_config(config_name)
+        if loaded is None:
+            return OverrideAliases()
+        if not isinstance(loaded.config, DictConfig):
+            raise ConfigCompositionException(
+                f"primary config '{config_name}' must be a DictConfig, got {type(loaded.config).__name__}"
+            )
+        primary = ConfigDefault(path=config_name, primary=True)
+        primary.update_parent(parent_base_dir="", parent_package="")
+        primary.set_package_header(loaded.header["package"])
+        if primary.get_final_package() != "":
+            return OverrideAliases()
+        return OverrideAliases.from_config(loaded.config)
+
+    def parse_overrides(
+        self, config_name: str | None, overrides: list[str], alias_start: int = 0
+    ) -> list[Override]:
+        aliases = self.get_override_aliases(config_name)
+        expanded = overrides[:alias_start] + [
+            aliases.expand(value) for value in overrides[alias_start:]
+        ]
+        try:
+            parsed = OverridesParser.create().parse_overrides(expanded)
+        except OverrideParseException as e:
+            index = expanded.index(e.override)
+            if expanded[index] != overrides[index]:
+                raise OverrideParseException(
+                    override=overrides[index],
+                    message=f"{e}\nAlias expansion: {overrides[index]!r} -> {expanded[index]!r}",
+                ) from e
+            raise
+        for original, override in zip(overrides, parsed):
+            if original != override.input_line:
+                override.original_input_line = original
+        return parsed
+
+    @staticmethod
+    def _alias_error_context(parsed_overrides: list[Override]) -> str:
+        changes = [
+            f"  {v.original_input_line!r} -> {v.input_line!r}"
+            for v in parsed_overrides
+            if v.original_input_line is not None
+        ]
+        return "\nAlias expansion:\n" + "\n".join(changes) if changes else ""
 
     def get_mode(
         self,
@@ -222,26 +276,6 @@ class ConfigLoaderImpl(ConfigLoader):
             activate_config_repository=False,
         )
 
-    def _load_configuration_with_active_repository(
-        self,
-        config_name: str | None,
-        overrides: list[str],
-        run_mode: RunMode,
-        from_shell: bool = True,
-        validate_sweep_overrides: bool = True,
-        parsed_overrides: list[Override] | None = None,
-    ) -> DictConfig:
-        return self._load_configuration(
-            config_name=config_name,
-            overrides=overrides,
-            run_mode=run_mode,
-            from_shell=from_shell,
-            validate_sweep_overrides=validate_sweep_overrides,
-            skip_missing_defaults=False,
-            activate_config_repository=True,
-            parsed_overrides=parsed_overrides,
-        )
-
     def _load_configuration(
         self,
         config_name: str | None,
@@ -253,6 +287,9 @@ class ConfigLoaderImpl(ConfigLoader):
         activate_config_repository: bool,
         parsed_overrides: list[Override] | None = None,
     ) -> DictConfig:
+        if parsed_overrides is None:
+            self.ensure_main_config_source_available()
+            parsed_overrides = self.parse_overrides(config_name, overrides)
         try:
             return self._load_configuration_impl(
                 config_name=config_name,
@@ -264,7 +301,18 @@ class ConfigLoaderImpl(ConfigLoader):
                 activate_config_repository=activate_config_repository,
                 parsed_overrides=parsed_overrides,
             )
+        except (HydraException, ValueError) as e:
+            context = self._alias_error_context(parsed_overrides)
+            if context:
+                message = f"{e}{context}"
+                e.args = (message,)
+                if isinstance(e, OverrideParseException):
+                    e.message = message
+            raise
         except OmegaConfBaseException as e:
+            context = self._alias_error_context(parsed_overrides)
+            if context:
+                raise ConfigCompositionException(f"{e}{context}") from e
             raise ConfigCompositionException().with_traceback(sys.exc_info()[2]) from e
 
     def _process_config_searchpath(
@@ -350,8 +398,7 @@ class ConfigLoaderImpl(ConfigLoader):
         parsed_overrides: list[Override] | None = None,
     ) -> tuple[list[Override], CachingConfigRepository]:
         if parsed_overrides is None:
-            parser = OverridesParser.create()
-            parsed_overrides = parser.parse_overrides(overrides=overrides)
+            parsed_overrides = self.parse_overrides(config_name, overrides)
         caching_repo = CachingConfigRepository(self.repository)
         self._process_config_searchpath(config_name, parsed_overrides, caching_repo)
         return parsed_overrides, caching_repo
@@ -402,7 +449,28 @@ class ConfigLoaderImpl(ConfigLoader):
         OmegaConf.set_readonly(cfg.hydra, False)
 
         # Apply command line overrides after enabling struct mode
-        ConfigLoaderImpl._apply_overrides_to_config(config_overrides, cfg)
+        alias_definitions = OmegaConf.to_container(cfg.hydra.aliases, resolve=False)
+        with flag_override(cfg.hydra.aliases, "readonly", True):
+            try:
+                ConfigLoaderImpl._apply_overrides_to_config(config_overrides, cfg)
+            except ConfigCompositionException as e:
+                if isinstance(e.__cause__, OmegaConfBaseException) and split_key(
+                    e.__cause__.full_key or ""
+                )[:2] == ["hydra", "aliases"]:
+                    raise ConfigCompositionException(
+                        "hydra.aliases can only be defined in the primary config; "
+                        "command-line overrides cannot change them"
+                    ) from e
+                raise
+        definitions = OmegaConf.select(cfg, "hydra.aliases")
+        if (
+            definitions is None
+            or OmegaConf.to_container(definitions, resolve=False) != alias_definitions
+        ):
+            raise ConfigCompositionException(
+                "hydra.aliases can only be defined in the primary config; "
+                "command-line overrides cannot change them"
+            )
         for override in parsed_overrides:
             if override.is_hydra_override():
                 cfg.hydra.overrides.hydra.append(override.input_line)
@@ -440,10 +508,17 @@ class ConfigLoaderImpl(ConfigLoader):
         overrides = OmegaConf.to_container(master_config.hydra.overrides.hydra)
         assert isinstance(overrides, list)
         overrides = overrides + sweep_overrides
-        sweep_config = self.load_configuration(
+        # Sweep overrides are already expanded in the master config. Do not
+        # expand again: a target may also happen to be another alias name.
+        sweep_config = self._load_configuration(
             config_name=master_config.hydra.job.config_name,
             overrides=overrides,
             run_mode=RunMode.RUN,
+            from_shell=True,
+            validate_sweep_overrides=True,
+            skip_missing_defaults=False,
+            activate_config_repository=False,
+            parsed_overrides=OverridesParser.create().parse_overrides(overrides),
         )
         ConfigLoaderImpl._ensure_sweep_config_controller_unchanged(
             master_config=master_config,
@@ -617,6 +692,17 @@ class ConfigLoaderImpl(ConfigLoader):
                 " from the primary config"
             )
 
+        if (
+            not default.primary
+            and config_path != "hydra/config"
+            and isinstance(res.config, DictConfig)
+            and OmegaConf.select(res.config, "hydra.aliases") is not None
+        ):
+            raise ConfigCompositionException(
+                f"In '{config_path}': hydra.aliases can only be defined "
+                "in the primary config"
+            )
+
         return res
 
     @staticmethod
@@ -705,8 +791,17 @@ class ConfigLoaderImpl(ConfigLoader):
         overrides: list[str],
         run_mode: RunMode,
     ) -> DefaultsList:
+        return self._compute_defaults_list(config_name, overrides, run_mode)
+
+    def _compute_defaults_list(
+        self,
+        config_name: str | None,
+        overrides: list[str],
+        run_mode: RunMode,
+        parsed_overrides: list[Override] | None = None,
+    ) -> DefaultsList:
         parsed_overrides, caching_repo = self._parse_overrides_and_create_caching_repo(
-            config_name, overrides
+            config_name, overrides, parsed_overrides
         )
         defaults_list = create_defaults_list(
             repo=caching_repo,
