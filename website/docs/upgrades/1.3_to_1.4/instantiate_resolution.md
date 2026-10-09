@@ -214,3 +214,10 @@ independent = OmegaConf.create(
     OmegaConf.to_container(cfg.payload, resolve=True)
 )
 ```
+
+## Partial factories and serialization
+
+Hydra `_partial_` factories cannot be pickled. If work crosses a process
+boundary, invoke the factory first and serialize the constructed object if its
+type supports pickling, or recreate the factory in the receiving process.
+Invoking a factory does not make the factory itself pickleable.

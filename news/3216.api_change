@@ -2,7 +2,9 @@
 traversal reaches them instead of resolving the entire input configuration up
 front. With `_recursive_=False`, `_convert_="none"`, and no call-site overrides,
 configured OmegaConf containers passed as target arguments retain their
-identity, so mutations to them affect the input configuration. See the
+identity. The source configuration is temporarily read-only during instantiation;
+constructors can opt in to mutation with OmegaConf's `read_write()` context
+manager. Such mutations affect the input configuration. See the
 [Hydra 1.4 instantiate migration guide](https://hydra.cc/docs/upgrades/1.3_to_1.4/instantiate_resolution/)
 for details.
 Plain Python call-site overrides must be concrete runtime values; `???` and
