@@ -7,6 +7,11 @@ sidebar_label: Tab completion
 Tab completion can complete config groups, config nodes and values.
 To complete paths, start them with `/` or `./`.
 
+Completion also suggests [override aliases](/advanced/override_aliases.md).
+Key aliases are suggested with `=`, while complete-expression aliases are
+suggested as bare tokens. Completing a key alias's value uses its target key or
+config group and preserves the alias spelling.
+
 See this short video demonstration of tab completion:
 
 import Script from '@site/src/components/Script.jsx';
