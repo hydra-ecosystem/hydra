@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-09",
-  "generated_at": "2026-10-09T07:23:27Z",
+  "generated_at": "2026-10-09T09:35:17Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 43,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 43
+        "count": 42
       },
       {
         "status": "done",
@@ -71,6 +71,26 @@
     ]
   },
   "issues": [
+    {
+      "number": 3224,
+      "title": "Add hydra.override.aliases for explicit CLI override aliases",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3525,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3525"
+        }
+      ],
+      "created": "2026-06-20",
+      "updated": "2026-10-09",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3224"
+    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -562,21 +582,6 @@
         "instantiate_api"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3203"
-    },
-    {
-      "number": 3224,
-      "title": "Add hydra.override.aliases for explicit CLI override aliases",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-06-20",
-      "updated": "2026-10-09",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3224"
     },
     {
       "number": 3236,
@@ -2412,6 +2417,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-09T09:35:17Z",
+      "kind": "pr",
+      "issue": 3224,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3224",
+      "title": "Add hydra.override.aliases for explicit CLI override aliases",
+      "detail": "linked #3525"
+    },
+    {
+      "ts": "2026-10-09T09:35:17Z",
+      "kind": "status",
+      "issue": 3224,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3224",
+      "title": "Add hydra.override.aliases for explicit CLI override aliases",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3525,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3525"
+      }
+    },
+    {
       "ts": "2026-10-08T20:02:31Z",
       "kind": "closed",
       "issue": 3521,
@@ -4056,22 +4081,6 @@
       "issue": 2237,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2237",
       "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
-      "detail": "community PR → not started"
-    },
-    {
-      "ts": "2026-09-04T13:36:55Z",
-      "kind": "status",
-      "issue": 1749,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1749",
-      "title": "tests: Use multiline regex search instead of assert_regex_match",
-      "detail": "community PR → not started"
-    },
-    {
-      "ts": "2026-09-04T13:36:55Z",
-      "kind": "status",
-      "issue": 802,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/802",
-      "title": "Improve Hydra test coverage to 100%",
       "detail": "community PR → not started"
     }
   ]
