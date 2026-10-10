@@ -221,9 +221,9 @@ By default, the parameters passed to the target are either primitives (int,
 float, bool etc) or OmegaConf containers (`DictConfig`, `ListConfig`).
 OmegaConf containers have many advantages over primitive dicts and lists,
 including convenient attribute access for keys,
-[duck-typing as instances of dataclasses or attrs classes](https://omegaconf.readthedocs.io/en/latest/structured_config.html), and
-support for [variable interpolation](https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation)
-and [custom resolvers](https://omegaconf.readthedocs.io/en/latest/custom_resolvers.html).
+[duck-typing as instances of dataclasses or attrs classes](https://omegaconf.cli.dev/docs/concepts/structured-configs), and
+support for [variable interpolation](https://omegaconf.cli.dev/docs/concepts/interpolation)
+and [custom resolvers](https://omegaconf.cli.dev/docs/guides/custom-resolvers).
 If the callable targeted by `instantiate` leverages OmegaConf's features, it
 will make sense to pass `DictConfig` and `ListConfig` instances directly to
 that callable.
