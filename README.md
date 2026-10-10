@@ -36,13 +36,12 @@
 
 ### Releases
 
-#### Development
+#### Release candidate
 
-**Hydra 1.4** is the current development version of Hydra.
-- Hydra 1.4 is coming soon. Until the stable release is available, you can
-  install Hydra from development releases on PyPI.
+**Hydra 1.4** is in the release candidate phase.
+- [1.4.0rc1 release notes](https://github.com/hydra-ecosystem/hydra/releases/tag/v1.4.0rc1)
 - [Documentation](https://hydra.cc/docs/intro/)
-- Installation: `pip install --pre --upgrade hydra-core`
+- Install the latest published prerelease: `pip install --pre --upgrade hydra-core`
 - Supported Python versions: 3.10 through 3.14.
 
 #### Stable

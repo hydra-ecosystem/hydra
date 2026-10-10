@@ -28,12 +28,11 @@ that behavior; it does not establish Hydra 1.4 compatibility.
 
 ## Test on Hydra 1.4
 
-Hydra 1.4 is not finalized and currently depends on a prerelease of OmegaConf
-2.4. Both are large releases with a significant number of breaking changes.
-Early testers should expect additional breaking changes before the stable
-releases, as well as breaking changes that are not yet publicly documented.
-Testing against development releases provides early migration feedback; it
-does not establish compatibility with the final releases.
+Hydra 1.4 is in the release candidate phase. Review the
+[1.4.0rc1 release notes](https://github.com/hydra-ecosystem/hydra/releases/tag/v1.4.0rc1)
+and the [current breaking changes](/docs/upgrades/1.3_to_1.4/breaking_changes)
+before testing. Testing prereleases provides migration feedback; it does not
+establish compatibility with the final release.
 
 Install Hydra 1.4 for testing:
 
@@ -44,7 +43,7 @@ python -m pip install --upgrade --pre "hydra-core>=1.4.0.dev0,<1.5"
 Using a separate environment is recommended but not required. The upper bound
 prevents installation of a later Hydra release. Install matching Hydra 1.4
 versions of any launchers or sweepers used by the application. Do not use a
-Hydra 1.4 development release in production.
+Hydra 1.4 prerelease in production.
 
 When testing on Hydra 1.4, remove `version_base` to eliminate the expected
 `Hydra15MigrationWarning`.
