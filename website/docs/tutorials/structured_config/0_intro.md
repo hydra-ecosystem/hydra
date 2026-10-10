@@ -22,10 +22,10 @@ describe your configuration structure and types. They enable:
 - Optional fields
 
 #### Structured Configs Limitations:
-- `Union` types are only partially supported (see [OmegaConf docs on unions](https://omegaconf.readthedocs.io/en/latest/structured_config.html#union-types))
+- `Union` types are only partially supported (see [OmegaConf docs on unions](https://omegaconf.cli.dev/docs/reference/types#unions))
 - User methods are not supported
 
-See the [OmegaConf docs on Structured Configs](https://omegaconf.readthedocs.io/en/latest/structured_config.html) for more details.
+See the [OmegaConf docs on Structured Configs](https://omegaconf.cli.dev/docs/concepts/structured-configs) for more details.
 
 #### There are two primary patterns for using Structured configs with Hydra
 
@@ -37,4 +37,4 @@ This tutorial covers both. \***Read it in order**\*.
 
 Hydra supports OmegaConf's Structured Configs via the `ConfigStore` API.
 This tutorial does not assume any knowledge of them.
-It is recommended that you visit the <a class="external" href="https://omegaconf.readthedocs.io/en/latest/structured_config.html" target="_blank" rel="noopener noreferrer">OmegaConf Structured Configs page</a> to learn more later.
+It is recommended that you visit the <a class="external" href="https://omegaconf.cli.dev/docs/concepts/structured-configs" target="_blank" rel="noopener noreferrer">OmegaConf Structured Configs page</a> to learn more later.

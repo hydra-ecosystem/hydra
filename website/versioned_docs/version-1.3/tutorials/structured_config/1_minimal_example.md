@@ -73,7 +73,7 @@ Value 'fail' could not be converted to Integer
 We will see additional types of runtime errors that Hydra can catch later in this tutorial. Such as:
 - Trying to read or write a non existent field in your config object
 - Assigning a value that is incompatible with the declared type
-- Attempting to modify a [frozen config](https://omegaconf.readthedocs.io/en/latest/structured_config.html#frozen)
+- Attempting to modify a [frozen config](https://omegaconf.cli.dev/docs/guides/flags#read-only)
 
 ## Duck typing
 

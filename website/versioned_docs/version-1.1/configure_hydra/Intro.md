@@ -133,7 +133,7 @@ The following fields are present at the top level of the Hydra Config.
 
 
 ### Resolvers provided by Hydra
-Hydra provides the following [OmegaConf resolvers](https://omegaconf.readthedocs.io/en/latest/usage.html#resolvers) by default.
+Hydra provides the following [OmegaConf resolvers](https://omegaconf.cli.dev/docs/concepts/resolvers) by default.
 
 **hydra**: Interpolates into the `hydra` config node. e.g. Use `${hydra:job.name}` to get the Hydra job name.
 
@@ -151,4 +151,4 @@ minor:   ${python_version:minor}     # 3.8
 micro:   ${python_version:micro}     # 3.8.2
 ```
 
-You can learn more about OmegaConf <a class="external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#access-and-manipulation" target="_blank" rel="noopener noreferrer">here</a>.
+You can learn more about OmegaConf <a class="external" href="https://omegaconf.cli.dev/docs/concepts/configs-and-values" target="_blank" rel="noopener noreferrer">here</a>.

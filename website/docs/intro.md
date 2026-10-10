@@ -92,7 +92,7 @@ def my_app(cfg : DictConfig) -> None:
 if __name__ == "__main__":
     my_app()
 ```
-You can learn more about OmegaConf [here](https://omegaconf.readthedocs.io/en/latest/usage.html#access-and-manipulation) later.
+You can learn more about OmegaConf [here](https://omegaconf.cli.dev/docs/concepts/configs-and-values) later.
 
 `config.yaml` is loaded automatically when you run your application
 ```yaml

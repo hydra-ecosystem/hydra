@@ -21,7 +21,7 @@ def my_app(cfg):
 if __name__ == "__main__":
     my_app()
 ```
-The `cfg` is an <a class="external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#access-and-manipulation" target="_blank" rel="noopener noreferrer">OmegaConf</a>
+The `cfg` is an <a class="external" href="https://omegaconf.cli.dev/docs/concepts/configs-and-values" target="_blank" rel="noopener noreferrer">OmegaConf</a>
 object that holds the configuration for your function.
 You don't need a deep understanding of OmegaConf for this tutorial.
 
