@@ -34,7 +34,7 @@ Strict mode is implemented by setting the OmegaConf `struct` flag to True on the
 - You can disable the struct flag a specific context using `open_dict`.
 - You can disable the struct flag permanently for your config using `OmegaConf.set_struct(cfg, False)`.
 
-Learn more about OmegaConf struct flag <a class="external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#struct-flag" target="_blank" rel="noopener noreferrer">here</a>.
+Learn more about OmegaConf struct flag <a class="external" href="https://omegaconf.cli.dev/docs/guides/flags#struct" target="_blank" rel="noopener noreferrer">here</a>.
 
 
 ### Field existence check

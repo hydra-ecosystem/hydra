@@ -10,7 +10,7 @@ import {ExampleGithubLink} from "@site/src/components/GithubLink"
 Sometimes you want to prevent a config node from being changed accidentally.
 
 ### Solution
-Structured Configs can enable it by passing [frozen=True](https://omegaconf.readthedocs.io/en/latest/structured_config.html#frozen) in the dataclass definition.
+Structured Configs can enable it by passing [frozen=True](https://omegaconf.cli.dev/docs/guides/flags#read-only) in the dataclass definition.
 Using Structured Configs, you can annotate a dataclass as frozen. This is recursive and applies to all child nodes.
 
 This will prevent modifications via code, command line overrides and config composition.

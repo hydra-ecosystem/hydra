@@ -90,4 +90,4 @@ minor_version: ${python_version:minor}                     # runtime python vers
 micro_version: ${python_version:micro}                     # runtime python version in the format major.minor.micro, eg: 3.8.2
 ```
 
-You can learn more about OmegaConf <a class="external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#access-and-manipulation" target="_blank" rel="noopener noreferrer">here</a>.
+You can learn more about OmegaConf <a class="external" href="https://omegaconf.cli.dev/docs/concepts/configs-and-values" target="_blank" rel="noopener noreferrer">here</a>.
