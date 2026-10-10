@@ -4,9 +4,11 @@ title: Current breaking changes
 ---
 
 This page is the current migration inventory for Hydra 1.4 and OmegaConf 2.4.
-It is derived from Hydra's news fragments and OmegaConf's release notes, may
-change, and may not yet be complete. The final release notes will be the
-authoritative list.
+Hydra 1.4 is in the release candidate phase; its migration inventory may still
+change. OmegaConf 2.4.0 has been released. Review the
+[Hydra 1.4.0rc1 release notes](https://github.com/hydra-ecosystem/hydra/releases/tag/v1.4.0rc1)
+and the [OmegaConf 2.4 release notes](https://github.com/hydra-ecosystem/omegaconf/releases/tag/v2.4.0)
+alongside this guide.
 
 ## Hydra 1.4
 
@@ -255,7 +257,7 @@ in Hydra 1.5. Move search-space entries to `hydra.sweeper.params`; see
   Python 3.10 or newer.
 - Native tuples create immutable `TupleConfig` values instead of mutable
   `ListConfig` values, and conversion returns tuples instead of lists. See the
-  [OmegaConf tuple migration guide](https://omegaconf.readthedocs.io/en/latest/tuple_migration.html).
+  [OmegaConf 2.4 migration guide](https://omegaconf.cli.dev/docs/migration/2.4).
 - `DictConfig` and `ListConfig` are unhashable and cannot be dictionary keys or
   set elements. Use a separate immutable key instead.
 - `OmegaConf.create(None)` returns `None` instead of a `DictConfig` wrapping

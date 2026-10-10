@@ -44,11 +44,11 @@
 - Install the latest published prerelease: `pip install --pre --upgrade hydra-core`
 - Supported Python versions: 3.10 through 3.14.
 
-#### Stable
+#### Legacy
 
-**Hydra 1.3** is the stable version of Hydra.
+**Hydra 1.3** is the legacy version of Hydra.
 - [Documentation](https://hydra.cc/docs/1.3/intro/)
-- Installation : `pip install hydra-core --upgrade`
+- Installation: `pip install --upgrade "hydra-core>=1.3,<1.4"`
 
 See the [NEWS.md](NEWS.md) file for a summary of recent changes to Hydra.
 

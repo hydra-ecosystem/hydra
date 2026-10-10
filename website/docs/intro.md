@@ -43,7 +43,7 @@ Use the version switcher in the top bar to switch between documentation versions
     </tr>
     <tr>
       <td></td>
-      <td>1.3 (Stable)</td>
+      <td>1.3 (Legacy)</td>
       <td><a href="https://github.com/hydra-ecosystem/hydra/releases/tag/v1.3.0">Release notes</a></td>
       <td><strong>3.6 - 3.11</strong></td>
     </tr>
@@ -66,10 +66,10 @@ prerelease:
 pip install --pre --upgrade hydra-core
 ```
 
-For the latest stable Hydra release, install:
+For the legacy Hydra 1.3 release line, install:
 
 ```commandline
-pip install hydra-core --upgrade
+pip install --upgrade "hydra-core>=1.3,<1.4"
 ```
 
 ### Basic example

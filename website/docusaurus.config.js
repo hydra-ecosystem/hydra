@@ -100,7 +100,10 @@ module.exports = {
                     lastVersion: 'current',
                     versions: {
                         current: {
-                            label: '1.4 (RC)',
+                            label: '1.4 (Release candidate)',
+                        },
+                        '1.3': {
+                            label: '1.3 (Legacy)',
                         },
                     },
                 },
