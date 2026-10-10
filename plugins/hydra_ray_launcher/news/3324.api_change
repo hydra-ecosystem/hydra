@@ -1,2 +1,1 @@
 Require Hydra Core 1.4 for the Ray launcher.
-Require Ray 2.55.0 or newer and cloudpickle 3.1.2 or newer.
