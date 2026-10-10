@@ -27,7 +27,7 @@ Use the version switcher in the top bar to switch between documentation versions
  
 |        |          Version          |  Release notes                                                                      | Python Versions    |
 | -------|---------------------------|-------------------------------------------------------------------------------------| -------------------|
-| &#9658;| 1.3 (Stable)              | [Release notes](https://github.com/facebookresearch/hydra/releases/tag/v1.3.0)      | **3.6 - 3.11**     |
+| &#9658;| 1.3 (Legacy)              | [Release notes](https://github.com/facebookresearch/hydra/releases/tag/v1.3.0)      | **3.6 - 3.11**     |
 |        | 1.2                       | [Release notes](https://github.com/facebookresearch/hydra/releases/tag/v1.2.0)      | **3.6 - 3.10**     |
 |        | 1.1                       | [Release notes](https://github.com/facebookresearch/hydra/releases/tag/v1.1.1)      | **3.6 - 3.9**      |
 |        | 1.0                       | [Release notes](https://github.com/facebookresearch/hydra/releases/tag/v1.0.7)      | **3.6 - 3.8**      |
@@ -41,7 +41,7 @@ Please also read the full [tutorial](tutorials/basic/your_first_app/1_simple_cli
 
 ### Installation
 ```commandline
-pip install hydra-core --upgrade
+pip install --upgrade "hydra-core>=1.3,<1.4"
 ```
 
 ### Basic example

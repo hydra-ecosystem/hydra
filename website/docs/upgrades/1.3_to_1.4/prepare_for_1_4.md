@@ -29,7 +29,8 @@ that behavior; it does not establish Hydra 1.4 compatibility.
 ## Test on Hydra 1.4
 
 Hydra 1.4 is in the release candidate phase. Review the
-[1.4.0rc1 release notes](https://github.com/hydra-ecosystem/hydra/releases/tag/v1.4.0rc1)
+[1.4.0rc1 release notes](https://github.com/hydra-ecosystem/hydra/releases/tag/v1.4.0rc1),
+the [OmegaConf 2.4 migration guide](https://omegaconf.cli.dev/docs/migration/2.4),
 and the [current breaking changes](/docs/upgrades/1.3_to_1.4/breaking_changes)
 before testing. Testing prereleases provides migration feedback; it does not
 establish compatibility with the final release.
