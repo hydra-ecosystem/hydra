@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-10",
-  "generated_at": "2026-10-10T13:48:50Z",
+  "generated_at": "2026-10-10T15:45:12Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 42,
+    "open_total": 43,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 2.4
+        "percentage": 2.3
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 37,
-        "percentage": 88.1
+        "count": 38,
+        "percentage": 88.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 2,
-        "percentage": 4.8
+        "percentage": 4.7
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.4
+        "percentage": 2.3
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.4
+        "percentage": 2.3
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 42
+        "count": 43
       },
       {
         "status": "done",
@@ -741,6 +741,22 @@
       "updated": "2026-10-02",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
+    },
+    {
+      "number": 3534,
+      "title": "Support package destinations inside list items",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-10",
+      "updated": "2026-10-10",
+      "labels": [
+        "enhancement",
+        "list composition"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3534"
     },
     {
       "number": 385,
@@ -2453,6 +2469,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-10T15:45:12Z",
+      "kind": "new",
+      "issue": 3534,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3534",
+      "title": "Support package destinations inside list items"
+    },
+    {
       "ts": "2026-10-10T13:48:50Z",
       "kind": "closed",
       "issue": 3532,
@@ -4112,13 +4135,6 @@
       "issue": 2949,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2949",
       "title": "[Feature Request] Use @hydra.main() decorator for multiple python scripts from one bash script"
-    },
-    {
-      "ts": "2026-09-04T16:26:41Z",
-      "kind": "closed",
-      "issue": 2757,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2757",
-      "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs"
     }
   ]
 }
