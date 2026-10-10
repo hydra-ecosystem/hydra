@@ -23,8 +23,7 @@ module.exports = {
     projectName: 'hydra', // Usually your repo name.
     customFields: {
         githubLinkVersionToBaseUrl: {
-            // TODO: Update once a branch is cut for 1.4
-            "1.4": "https://github.com/hydra-ecosystem/hydra/blob/main/",
+            "1.4": "https://github.com/hydra-ecosystem/hydra/blob/1.4_branch/",
             "1.3": "https://github.com/hydra-ecosystem/hydra/blob/1.3_branch/",
             "1.2": "https://github.com/hydra-ecosystem/hydra/blob/1.2_branch/",
             "1.1": "https://github.com/hydra-ecosystem/hydra/blob/1.1_branch/",
@@ -99,6 +98,11 @@ module.exports = {
                     showLastUpdateTime: false,
                     editUrl: 'https://github.com/hydra-ecosystem/hydra/edit/main/website/',
                     lastVersion: 'current',
+                    versions: {
+                        current: {
+                            label: '1.4 (RC)',
+                        },
+                    },
                 },
                 gtag: {
                     trackingID: 'G-1E68PJ51JC',

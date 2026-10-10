@@ -37,8 +37,8 @@ Use the version switcher in the top bar to switch between documentation versions
   <tbody>
     <tr>
       <td>&#9658;</td>
-      <td>1.4 (Development)</td>
-      <td>Development releases are available on PyPI.</td>
+      <td>1.4 (Release candidate)</td>
+      <td><a href="https://github.com/hydra-ecosystem/hydra/releases/tag/v1.4.0rc1">Release notes</a></td>
       <td><strong>3.10 - 3.14</strong></td>
     </tr>
     <tr>
@@ -59,8 +59,8 @@ If you only want to use Hydra for config composition, check out Hydra's [compose
 Please also read the full [tutorial](tutorials/basic/your_first_app/1_simple_cli.md) to gain a deeper understanding.
 
 ### Installation
-Hydra 1.4 is coming soon. Until the stable release is available, you can try
-the development release:
+Hydra 1.4 is in the release candidate phase. To install the latest published
+prerelease:
 
 ```commandline
 pip install --pre --upgrade hydra-core
