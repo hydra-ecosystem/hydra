@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-10",
-  "generated_at": "2026-10-10T09:18:01Z",
+  "generated_at": "2026-10-10T12:30:07Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 42,
+    "open_total": 43,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 2.4
+        "percentage": 2.3
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 37,
-        "percentage": 88.1
+        "percentage": 86.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
-        "count": 2,
-        "percentage": 4.8
+        "count": 3,
+        "percentage": 7.0
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.4
+        "percentage": 2.3
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.4
+        "percentage": 2.3
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 42
+        "count": 43
       },
       {
         "status": "done",
@@ -741,6 +741,19 @@
       "updated": "2026-10-02",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
+    },
+    {
+      "number": 3532,
+      "title": "Update Hydra documentation links to the new OmegaConf website",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-10",
+      "updated": "2026-10-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3532"
     },
     {
       "number": 385,
@@ -2435,6 +2448,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-10T12:30:07Z",
+      "kind": "new",
+      "issue": 3532,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3532",
+      "title": "Update Hydra documentation links to the new OmegaConf website"
+    },
+    {
       "ts": "2026-10-09T20:48:37Z",
       "kind": "closed",
       "issue": 3528,
@@ -4090,14 +4110,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2237",
       "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
       "detail": "unlinked #3333"
-    },
-    {
-      "ts": "2026-09-04T13:36:55Z",
-      "kind": "pr",
-      "issue": 1749,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/1749",
-      "title": "tests: Use multiline regex search instead of assert_regex_match",
-      "detail": "unlinked #3327"
     }
   ]
 }

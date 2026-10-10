@@ -973,3 +973,4 @@
 {"ts": "2026-10-09T12:20:43Z", "kind": "closed", "issue": 3224, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3224", "title": "Add hydra.override.aliases for explicit CLI override aliases"}
 {"ts": "2026-10-09T19:24:46Z", "kind": "new", "issue": 3528, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3528", "title": "Ray launcher cloudpickle constraint breaks exception serialization on Python 3.14"}
 {"ts": "2026-10-09T20:48:37Z", "kind": "closed", "issue": 3528, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3528", "title": "Ray launcher cloudpickle constraint breaks exception serialization on Python 3.14"}
+{"ts": "2026-10-10T12:30:07Z", "kind": "new", "issue": 3532, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3532", "title": "Update Hydra documentation links to the new OmegaConf website"}
