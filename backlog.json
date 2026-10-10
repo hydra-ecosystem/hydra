@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-10",
-  "generated_at": "2026-10-10T12:30:07Z",
+  "generated_at": "2026-10-10T12:49:39Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 43,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 43
+        "count": 42
       },
       {
         "status": "done",
@@ -71,6 +71,24 @@
     ]
   },
   "issues": [
+    {
+      "number": 3532,
+      "title": "Update Hydra documentation links to the new OmegaConf website",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3533,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3533"
+        }
+      ],
+      "created": "2026-10-10",
+      "updated": "2026-10-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3532"
+    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -741,19 +759,6 @@
       "updated": "2026-10-02",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3506"
-    },
-    {
-      "number": 3532,
-      "title": "Update Hydra documentation links to the new OmegaConf website",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-10-10",
-      "updated": "2026-10-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3532"
     },
     {
       "number": 385,
@@ -2448,6 +2453,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-10T12:49:39Z",
+      "kind": "pr",
+      "issue": 3532,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3532",
+      "title": "Update Hydra documentation links to the new OmegaConf website",
+      "detail": "linked #3533"
+    },
+    {
+      "ts": "2026-10-10T12:49:39Z",
+      "kind": "status",
+      "issue": 3532,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3532",
+      "title": "Update Hydra documentation links to the new OmegaConf website",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3533,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3533"
+      }
+    },
+    {
       "ts": "2026-10-10T12:30:07Z",
       "kind": "new",
       "issue": 3532,
@@ -4095,21 +4120,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2944",
       "title": "[Feature Request] I would like resolvers to access the decorated main function's docstring and the name of the running script, as well as some other capabilities.",
       "detail": "removed \"triage\""
-    },
-    {
-      "ts": "2026-09-04T15:09:16Z",
-      "kind": "closed",
-      "issue": 3419,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3419",
-      "title": "[Feature Request] Switch and reproduce label-aware augmentation policies with Hydra multirun"
-    },
-    {
-      "ts": "2026-09-04T13:36:55Z",
-      "kind": "pr",
-      "issue": 2237,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2237",
-      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
-      "detail": "unlinked #3333"
     }
   ]
 }
