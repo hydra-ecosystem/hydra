@@ -28,7 +28,7 @@ module.exports = {
             "1.2": "https://github.com/hydra-ecosystem/hydra/blob/1.2_branch/",
             "1.1": "https://github.com/hydra-ecosystem/hydra/blob/1.1_branch/",
             "1.0": "https://github.com/hydra-ecosystem/hydra/blob/1.0_branch/",
-            current: "https://github.com/hydra-ecosystem/hydra/blob/main/",
+            current: "https://github.com/hydra-ecosystem/hydra/blob/1.4_branch/",
         },
     },
     themeConfig: {
