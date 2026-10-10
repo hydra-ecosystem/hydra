@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-10",
-  "generated_at": "2026-10-10T13:25:13Z",
+  "generated_at": "2026-10-10T13:48:50Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 43,
+    "open_total": 42,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 1,
-        "percentage": 2.3
+        "percentage": 2.4
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 37,
-        "percentage": 86.0
+        "percentage": 88.1
       },
       {
         "category": "Documentation",
         "emoji": "📄",
-        "count": 3,
-        "percentage": 7.0
+        "count": 2,
+        "percentage": 4.8
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.3
+        "percentage": 2.4
       },
       {
         "category": "Refactor",
@@ -39,14 +39,14 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.3
+        "percentage": 2.4
       }
     ],
     "by_status": [
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,29 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 101
+        "count": 102
       }
     ]
   },
   "issues": [
-    {
-      "number": 3532,
-      "title": "Update Hydra documentation links to the new OmegaConf website",
-      "category": "Documentation",
-      "category_emoji": "📄",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3533,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3533"
-        }
-      ],
-      "created": "2026-10-10",
-      "updated": "2026-10-10",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3532"
-    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -2449,9 +2431,34 @@
       "updated": "2026-10-09",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3528"
+    },
+    {
+      "number": 3532,
+      "title": "Update Hydra documentation links to the new OmegaConf website",
+      "category": "Documentation",
+      "category_emoji": "📄",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3533,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3533"
+        }
+      ],
+      "created": "2026-10-10",
+      "updated": "2026-10-10",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3532"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-10T13:48:50Z",
+      "kind": "closed",
+      "issue": 3532,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3532",
+      "title": "Update Hydra documentation links to the new OmegaConf website"
+    },
     {
       "ts": "2026-10-10T12:49:39Z",
       "kind": "pr",
@@ -4112,14 +4119,6 @@
       "issue": 2757,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2757",
       "title": "[Bug] Submitit Local Launcher does not share jobs across GPUs"
-    },
-    {
-      "ts": "2026-09-04T15:22:40Z",
-      "kind": "label",
-      "issue": 2944,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2944",
-      "title": "[Feature Request] I would like resolvers to access the decorated main function's docstring and the name of the running script, as well as some other capabilities.",
-      "detail": "removed \"triage\""
     }
   ]
 }

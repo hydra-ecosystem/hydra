@@ -98,11 +98,12 @@
     "3520": "2026-10-08",
     "3521": "2026-10-08",
     "3528": "2026-10-09",
+    "3532": "2026-10-10",
     "385": "2026-09-05",
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-10T13:25:13Z",
+  "generated_at": "2026-10-10T13:48:50Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -528,18 +529,6 @@
       "status": "not started",
       "title": "Retire the Ax Sweeper after Hydra 1.4",
       "updated_at": "2026-10-02T21:52:08Z"
-    },
-    "3532": {
-      "category": "Documentation",
-      "created_at": "2026-10-10T12:28:53Z",
-      "labels": [],
-      "pr_numbers": [
-        "3533"
-      ],
-      "state": "OPEN",
-      "status": "in progress",
-      "title": "Update Hydra documentation links to the new OmegaConf website",
-      "updated_at": "2026-10-10T12:28:53Z"
     },
     "468": {
       "category": "Enhancement",
@@ -1907,6 +1896,18 @@
       "status": "done",
       "title": "Ray launcher cloudpickle constraint breaks exception serialization on Python 3.14",
       "updated_at": "2026-10-09T19:28:02Z"
+    },
+    "3532": {
+      "category": "Documentation",
+      "created_at": "2026-10-10T12:28:53Z",
+      "labels": [],
+      "pr_numbers": [
+        "3533"
+      ],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Update Hydra documentation links to the new OmegaConf website",
+      "updated_at": "2026-10-10T12:28:53Z"
     },
     "385": {
       "category": "Enhancement",

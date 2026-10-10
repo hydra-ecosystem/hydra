@@ -976,3 +976,4 @@
 {"ts": "2026-10-10T12:30:07Z", "kind": "new", "issue": 3532, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3532", "title": "Update Hydra documentation links to the new OmegaConf website"}
 {"ts": "2026-10-10T12:49:39Z", "kind": "status", "issue": 3532, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3532", "title": "Update Hydra documentation links to the new OmegaConf website", "detail": "not started → in progress", "pr": {"number": 3533, "url": "https://github.com/hydra-ecosystem/hydra/pull/3533"}}
 {"ts": "2026-10-10T12:49:39Z", "kind": "pr", "issue": 3532, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3532", "title": "Update Hydra documentation links to the new OmegaConf website", "detail": "linked #3533"}
+{"ts": "2026-10-10T13:48:50Z", "kind": "closed", "issue": 3532, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3532", "title": "Update Hydra documentation links to the new OmegaConf website"}
