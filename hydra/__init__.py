@@ -1,7 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 
 # Source of truth for Hydra's version
-__version__ = "1.4.0.dev11"
+__version__ = "1.4.0rc2"
 from hydra import utils
 from hydra.errors import MissingConfigException
 from hydra.main import main
