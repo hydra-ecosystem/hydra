@@ -3,7 +3,8 @@
 
 ### Bug Fixes
 
-- Block YAML targets except safe load/dump functions.
+- Prevent arbitrary code execution through unsafe PyYAML loaders in
+  `hydra.utils.instantiate()`. Safe YAML loading and dumping remain supported.
 1.3.7 (2026-09-14)
 ==================
 
