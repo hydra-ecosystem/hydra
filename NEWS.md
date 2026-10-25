@@ -1,3 +1,9 @@
+1.3.8 (2026-10-25)
+==================
+
+### Bug Fixes
+
+- Block YAML targets except safe load/dump functions.
 1.3.7 (2026-09-14)
 ==================
 
