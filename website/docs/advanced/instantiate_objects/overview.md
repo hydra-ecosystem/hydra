@@ -22,6 +22,10 @@ security boundary: an installed application callable can still dispatch an
 operation that never appears as a `_target_`. Do not pass configuration from an
 untrusted source to `instantiate()` or `call()`.
 
+The `yaml.*` namespace is blocked except for `yaml.safe_load`,
+`yaml.safe_load_all`, `yaml.safe_dump`, and `yaml.safe_dump_all`. These exceptions
+allow only the exact functions, not their attributes or other YAML targets.
+
 :::
 
 Call/instantiate supports:

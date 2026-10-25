@@ -320,6 +320,9 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIXES = (
     "doctest.",
     "shelve.",
     "trace.",
+    # PyYAML exposes Python-object loading and constructor dispatch. Keep only
+    # exact safe load/dump functions available.
+    "yaml.",
     "pydoc.",
     "pdb.",
     "bdb.",
@@ -333,6 +336,10 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS = frozenset(
         "pydoc.HTMLDoc",
         "pydoc.TextDoc",
         "trace.Trace",
+        "yaml.safe_load",
+        "yaml.safe_load_all",
+        "yaml.safe_dump",
+        "yaml.safe_dump_all",
     }
 )
 
@@ -484,7 +491,7 @@ def _target_policy_digest(policy: _TargetPolicySnapshot) -> str:
 
 
 _EXPECTED_TARGET_POLICY_DIGEST = (
-    "b07ea4f51a25bad173cdcb52070d5f3971d4c919d5e368c2c28ed0fe5f408ed8"
+    "73bf7f617a627fa54bc01889ed4d923471c4b5e39fbd40e119d7f0d485c8a36b"
 )
 
 
