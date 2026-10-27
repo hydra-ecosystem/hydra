@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-10-27",
-  "generated_at": "2026-10-27T10:32:58Z",
+  "generated_at": "2026-10-27T12:59:23Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 47,
+    "open_total": 48,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 4.3
+        "percentage": 4.2
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 40,
-        "percentage": 85.1
+        "count": 41,
+        "percentage": 85.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 6.4
+        "percentage": 6.2
       },
       {
         "category": "Question",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 45
+        "count": 46
       },
       {
         "status": "done",
@@ -819,6 +819,21 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3578"
+    },
+    {
+      "number": 3583,
+      "title": "[Feature Request] Support tuple literals in overrides, following OmegaConf",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-27",
+      "updated": "2026-10-27",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3583"
     },
     {
       "number": 385,
@@ -2674,6 +2689,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-27T12:59:23Z",
+      "kind": "new",
+      "issue": 3583,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3583",
+      "title": "[Feature Request] Support tuple literals in overrides, following OmegaConf"
+    },
+    {
       "ts": "2026-10-27T10:32:58Z",
       "kind": "new",
       "issue": 3580,
@@ -4356,14 +4378,6 @@
       "issue": 2664,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2664",
       "title": "[Not sure if bug/feature] Where does submitit error output go?"
-    },
-    {
-      "ts": "2026-09-15T12:19:05Z",
-      "kind": "pr",
-      "issue": 2664,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2664",
-      "title": "[Not sure if bug/feature] Where does submitit error output go?",
-      "detail": "linked #3447"
     }
   ]
 }

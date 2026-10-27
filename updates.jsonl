@@ -1020,3 +1020,4 @@
 {"ts": "2026-10-23T18:34:53Z", "kind": "new", "issue": 3578, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3578", "title": "Add slice() for lists and discrete sweeps"}
 {"ts": "2026-10-27T10:32:58Z", "kind": "new", "issue": 3579, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3579", "title": "[Bug] instantiate() fails with TypeError: 'UnionNode' object is not subscriptable for union-typed configs"}
 {"ts": "2026-10-27T10:32:58Z", "kind": "new", "issue": 3580, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3580", "title": "[Bug] A dict call-site override replaces a union-typed Structured Config instead of merging into it"}
+{"ts": "2026-10-27T12:59:23Z", "kind": "new", "issue": 3583, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3583", "title": "[Feature Request] Support tuple literals in overrides, following OmegaConf"}
