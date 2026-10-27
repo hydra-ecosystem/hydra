@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-27",
-  "generated_at": "2026-10-27T07:21:04Z",
+  "generated_at": "2026-10-27T10:32:58Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 45,
+    "open_total": 47,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 0,
-        "percentage": 0.0
+        "count": 2,
+        "percentage": 4.3
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 40,
-        "percentage": 88.9
+        "percentage": 85.1
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 6.7
+        "percentage": 6.4
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.2
+        "percentage": 2.1
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.2
+        "percentage": 2.1
       }
     ],
     "by_status": [
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 0
+        "count": 2
       },
       {
         "status": "blocked",
@@ -71,6 +71,42 @@
     ]
   },
   "issues": [
+    {
+      "number": 3579,
+      "title": "[Bug] instantiate() fails with TypeError: 'UnionNode' object is not subscriptable for union-typed configs",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "community PR",
+      "status_emoji": "🤝",
+      "prs": [
+        {
+          "number": 3581,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3581"
+        }
+      ],
+      "created": "2026-10-27",
+      "updated": "2026-10-27",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3579"
+    },
+    {
+      "number": 3580,
+      "title": "[Bug] A dict call-site override replaces a union-typed Structured Config instead of merging into it",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "community PR",
+      "status_emoji": "🤝",
+      "prs": [
+        {
+          "number": 3581,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3581"
+        }
+      ],
+      "created": "2026-10-27",
+      "updated": "2026-10-27",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3580"
+    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -2638,6 +2674,20 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-27T10:32:58Z",
+      "kind": "new",
+      "issue": 3580,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3580",
+      "title": "[Bug] A dict call-site override replaces a union-typed Structured Config instead of merging into it"
+    },
+    {
+      "ts": "2026-10-27T10:32:58Z",
+      "kind": "new",
+      "issue": 3579,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3579",
+      "title": "[Bug] instantiate() fails with TypeError: 'UnionNode' object is not subscriptable for union-typed configs"
+    },
+    {
       "ts": "2026-10-23T18:34:53Z",
       "kind": "new",
       "issue": 3578,
@@ -4314,25 +4364,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2664",
       "title": "[Not sure if bug/feature] Where does submitit error output go?",
       "detail": "linked #3447"
-    },
-    {
-      "ts": "2026-09-15T12:19:05Z",
-      "kind": "status",
-      "issue": 2664,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2664",
-      "title": "[Not sure if bug/feature] Where does submitit error output go?",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3447,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3447"
-      }
-    },
-    {
-      "ts": "2026-09-15T12:00:39Z",
-      "kind": "closed",
-      "issue": 3202,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3202",
-      "title": "Disallow parent traversal in Defaults List config groups"
     }
   ]
 }

@@ -1018,3 +1018,5 @@
 {"ts": "2026-10-23T17:51:48Z", "kind": "new", "issue": 3576, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3576", "title": "Add per-name {item} substitution to override aliases"}
 {"ts": "2026-10-23T17:51:48Z", "kind": "new", "issue": 3577, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3577", "title": "Add nested groups to override aliases"}
 {"ts": "2026-10-23T18:34:53Z", "kind": "new", "issue": 3578, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3578", "title": "Add slice() for lists and discrete sweeps"}
+{"ts": "2026-10-27T10:32:58Z", "kind": "new", "issue": 3579, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3579", "title": "[Bug] instantiate() fails with TypeError: 'UnionNode' object is not subscriptable for union-typed configs"}
+{"ts": "2026-10-27T10:32:58Z", "kind": "new", "issue": 3580, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3580", "title": "[Bug] A dict call-site override replaces a union-typed Structured Config instead of merging into it"}
