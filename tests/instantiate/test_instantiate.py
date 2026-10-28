@@ -1,4 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import asyncio
 import builtins
 import contextlib
 import copy
@@ -1593,6 +1594,15 @@ def test_blocklisted_target_fails(instantiate_func: Any, target: str) -> None:
     assert hasattr(err, "__cause__")
     chained = err.__cause__
     assert chained is None
+
+
+def test_asyncio_requires_allowlist_override(monkeypatch: Any) -> None:
+    cfg = {"_target_": "asyncio.Queue"}
+    monkeypatch.delenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", raising=False)
+    with raises(InstantiationException, match="blocklisted"):
+        _instantiate2.instantiate(cfg)
+    monkeypatch.setenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "asyncio.Queue")
+    assert isinstance(_instantiate2.instantiate(cfg), asyncio.Queue)
 
 
 def test_allowlist_override_works_for_general_target(monkeypatch: Any) -> None:
