@@ -11,6 +11,7 @@ import sys
 import types
 from contextlib import contextmanager, nullcontext
 from contextvars import Context, ContextVar
+from fnmatch import fnmatchcase
 from textwrap import dedent
 from typing import (
     Any,
@@ -37,10 +38,13 @@ from hydra.errors import InstantiationException
 # The policy prevents configuration from changing Hydra's authorization state
 # or existing Python code.
 #
-# These operations are fully named by the target itself. Trusted users may
-# authorize them with HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE.
+# Trusted users may authorize individual targets with
+# HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE using exact target names. Blocklist
+# entries may also be package prefixes ending in `.*`.
 DEFAULT_BLOCKLISTED_MODULES = frozenset(
     {
+        "asyncio.*",
+        "_asyncio.*",
         "_sitebuiltins.Quitter",
         "builtins.exit",
         "builtins.quit",
@@ -491,7 +495,7 @@ def _target_policy_digest(policy: _TargetPolicySnapshot) -> str:
 
 
 _EXPECTED_TARGET_POLICY_DIGEST = (
-    "73bf7f617a627fa54bc01889ed4d923471c4b5e39fbd40e119d7f0d485c8a36b"
+    "4bfec989ce35a7e5e47aa30c055e9ab60697c9f96ff1c41b1d87e276d22c8e4b"
 )
 
 
@@ -947,9 +951,9 @@ def _get_policy_alias_target(target: str) -> str:
 def _is_blocklisted_target(target: str) -> bool:
     policy = _current_target_policy()
     canonical_target = _get_os_alias_target(target)
-    if (
-        canonical_target in policy.default_blocklisted_modules
-        or canonical_target in policy.uncontrolled_execution_targets
+    if canonical_target in policy.uncontrolled_execution_targets or any(
+        fnmatchcase(canonical_target, pattern)
+        for pattern in policy.default_blocklisted_modules
     ):
         return True
     if canonical_target in policy.uncontrolled_execution_target_prefix_exceptions:
@@ -1085,7 +1089,7 @@ def _authorize_target_name(
             execution-capable target family. It cannot be authorized with
             HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE.""")
         raise InstantiationException(_with_full_key(msg, full_key))
-    if canonical_target not in _current_target_policy().default_blocklisted_modules:
+    if not _is_blocklisted_target(canonical_target):
         return
 
     allowlist = os.environ.get("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "")
