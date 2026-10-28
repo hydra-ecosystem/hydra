@@ -10,8 +10,8 @@ guidelines and call out only actionable gaps, especially:
 - missing documentation updates for API or behavior changes;
 - missing news fragments for non-trivial user-visible changes;
 - news fragments in the wrong `news/` directory or with the wrong category;
-- pull requests that do not link to an issue and the maintainer's agreement
-  on the change;
+- pull requests that do not link to the maintainer's agreement that the
+  contributor can take the issue on;
 - validation claims that are not supported by the tests or checks shown in the
   pull request.
 

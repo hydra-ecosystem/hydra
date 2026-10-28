@@ -22,9 +22,10 @@ supported Python version, but keep the default local checkout environment in
 `.venv`.
 
 ## Pull Requests
-Please open an issue and get maintainer agreement before starting substantial
-work. Only open a PR once a maintainer has agreed that the change is wanted,
-and link to that discussion in your PR.
+Before starting substantial work, offer to send a PR in the issue description
+or a comment, and wait for a maintainer to agree that you can take it on. This
+also applies to issues in active milestones or marked “help wanted.” Only open
+a PR after that agreement, and link to the conversation.
 
 1. Fork the repo and create your feature branch from `main`.
 2. If you've added code add suitable tests.

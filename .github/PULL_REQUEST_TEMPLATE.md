@@ -2,10 +2,9 @@
 
 ## Maintainer agreement
 
-Only open a PR after a maintainer has agreed that the change is wanted.
-Opening an issue alone is not enough.
+**Has a maintainer agreed that you can take this issue on?**
 
-**Link to the issue and the maintainer's agreement:**
+Link to that conversation:
 
 ## Motivation
 

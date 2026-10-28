@@ -25,11 +25,9 @@ assignees: ''
 **Describe alternatives you've considered**
 <!-- A clear and concise description of any alternative solutions or features you've considered. -->
 
-**Are you willing to open a pull request?** (See [CONTRIBUTING](https://github.com/hydra-ecosystem/hydra/blob/main/CONTRIBUTING.md))
+**Are you willing to submit a PR for this issue?** (See [CONTRIBUTING](https://github.com/hydra-ecosystem/hydra/blob/main/CONTRIBUTING.md))
 
-Please open an issue and get maintainer agreement before starting substantial
-work. Only open a PR once a maintainer has agreed that the change is wanted,
-and link to that discussion in your PR.
+Please wait for maintainer agreement before starting substantial work.
 
 ## Additional context
 Add any other context or screenshots about the feature request here.
