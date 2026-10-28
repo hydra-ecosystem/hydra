@@ -14,7 +14,7 @@ from pytest import mark, raises
 
 from hydra.errors import InstantiationException
 from hydra.utils import instantiate
-from tests.instantiate import ArgsClass
+from tests.instantiate import ArgsClass, TreeConf
 
 WHITELIST = ["tests.instantiate.*", "builtins.dict"]
 
@@ -81,6 +81,26 @@ def test_isolation_preserves_ancestor_resolution(
     assert payload.alias == 8
     assert OmegaConf.to_container(cfg, resolve=False) == original
     assert OmegaConf.is_readonly(cfg)
+
+
+def test_isolation_resolves_readonly_union_argument() -> None:
+    @dataclass
+    class Job:
+        _target_: str = "tests.instantiate.ArgsClass"
+        payload: TreeConf | int = field(
+            default_factory=lambda: TreeConf(value="${width}")
+        )
+
+    cfg = OmegaConf.create({"width": 8, "job": Job()})
+    OmegaConf.set_readonly(cfg.job.payload, True)
+    result = instantiate(
+        cfg.job, isolate=True, _recursive_=False, _execution_whitelist_=WHITELIST
+    )
+    payload = result.kwargs["payload"]
+    assert payload.value == 8
+    assert payload is not cfg.job.payload
+    assert OmegaConf.is_interpolation(cfg.job.payload, "value")
+    assert OmegaConf.is_readonly(cfg.job.payload)
 
 
 def test_isolation_applies_to_nested_targets() -> None:

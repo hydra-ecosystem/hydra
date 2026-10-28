@@ -247,6 +247,18 @@ def test_any_structured_value_mapping_patch_retains_schema_validation(
     assert result["payload"].payload == ("template" if interpolated else "default")
 
 
+def test_nested_typed_union_override_preserves_type() -> None:
+    @dataclass
+    class WithUnion:
+        value: Child | OtherChild = field(default_factory=Child)
+
+    cfg = OmegaConf.create({"_target_": "builtins.dict", "payload": WithUnion()})
+    result = call(cfg, payload={"value": OmegaConf.structured(OtherChild(count=2))})
+    assert OmegaConf.get_type(result["payload"].value) is OtherChild
+    assert result["payload"].value.count == 2
+    assert OmegaConf.get_type(cfg.payload.value) is Child
+
+
 def test_any_structured_value_explicit_omegaconf_patch_skips_resolution() -> None:
     calls = []
     OmegaConf.register_resolver("strict_lazy_patch", lambda: calls.append(1) or 2)

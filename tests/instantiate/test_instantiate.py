@@ -1153,6 +1153,21 @@ def test_no_override_config_is_readonly_during_instantiation_and_restored(
     assert not OmegaConf.is_readonly(cfg.payload)
 
 
+def test_union_argument_is_readonly_during_instantiation(instantiate_func: Any) -> None:
+    @dataclass
+    class Config:
+        _target_: str = f"{__name__}.ConfigMutationProbe"
+        _recursive_: bool = False
+        payload: TreeConf | int = field(default_factory=lambda: TreeConf(value=10))
+
+    cfg = OmegaConf.structured(Config)
+    OmegaConf.set_readonly(cfg.payload, False)
+    result = instantiate_func(cfg)
+    assert result.mutation_blocked
+    assert cfg.payload.value == 10
+    assert not OmegaConf.is_readonly(cfg.payload)
+
+
 def test_no_override_config_read_write_unlocks_nested_nodes(
     instantiate_func: Any,
 ) -> None:
@@ -2143,6 +2158,36 @@ def test_dict_override_merge_is_independent_of_callsite_argument_order(
         "template": {"original": 0, "configured": 10},
         "value": {"original": 0, "configured": 10, "runtime": 20},
     }
+
+
+@fixture
+def union_config() -> DictConfig:
+    @dataclass
+    class Config:
+        _target_: str = "tests.instantiate.ArgsClass"
+        base: int = 10
+        node: TreeConf | int = field(default_factory=lambda: TreeConf(value="${base}"))
+        alias: TreeConf | int = "${node}"  # type: ignore[assignment]
+
+    return OmegaConf.structured(Config)
+
+
+def test_union_member_keeps_parent_context(
+    instantiate_func: Any, union_config: DictConfig
+) -> None:
+    result = instantiate_func(union_config.node, left={"value": 2})
+    assert result == Tree(value=10, left=Tree(value=2))
+    assert union_config.node.left is None
+
+
+@mark.parametrize("key", ["node", "alias"])
+def test_mapping_override_merges_union_target(
+    instantiate_func: Any, union_config: DictConfig, key: str
+) -> None:
+    result = instantiate_func(union_config, **{key: {"value": 20}})
+    assert result.kwargs[key] == Tree(value=20)
+    assert union_config.node.value == 10
+    assert OmegaConf.is_interpolation(union_config, "alias")
 
 
 def test_dict_override_merges_interpolated_structured_config(
