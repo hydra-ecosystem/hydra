@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-28",
-  "generated_at": "2026-10-28T10:50:09Z",
+  "generated_at": "2026-10-28T11:02:47Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 48,
@@ -785,21 +785,6 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3578"
     },
     {
-      "number": 3583,
-      "title": "[Feature Request] Support tuple literals in overrides, following OmegaConf",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-10-27",
-      "updated": "2026-10-27",
-      "labels": [
-        "enhancement"
-      ],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3583"
-    },
-    {
       "number": 3579,
       "title": "[Bug] instantiate() fails with TypeError: 'UnionNode' object is not subscriptable for union-typed configs",
       "category": "Bug",
@@ -824,6 +809,21 @@
       "updated": "2026-10-27",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3580"
+    },
+    {
+      "number": 3583,
+      "title": "[Feature Request] Support tuple literals in overrides, following OmegaConf",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-27",
+      "updated": "2026-10-27",
+      "labels": [
+        "enhancement"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3583"
     },
     {
       "number": 385,
