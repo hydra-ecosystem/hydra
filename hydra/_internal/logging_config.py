@@ -94,7 +94,7 @@ class HydraDictConfigurator(logging.config.DictConfigurator):
             None
             if execution_whitelist is UNSAFE_DISABLE_EXECUTION_CHECKS
             else _validated_execution_policy(
-                "208a0d1fdfebeb40610a31c5aff0373b690af5cbcc1bb1cf3c83cfd8bf3ccf41"
+                "01ce6d9286e16da5ae032e1743b94414bd621c6686ba07110247a4128332e7a9"
             )
         )
         self._resolved_targets: dict[str, Any] = {}
