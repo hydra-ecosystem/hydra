@@ -24,7 +24,6 @@ from omegaconf import (
     Node,
     OmegaConf,
     SCMode,
-    UnionNode,
     flag_override,
 )
 from omegaconf._utils import is_structured_config
@@ -106,7 +105,7 @@ def _read_only_config_tree(*configs: Node) -> Iterator[None]:
             # Merged nodes can retain a parent only as interpolation context and
             # may therefore not be owned by the next ancestor.
             pending.append(ancestor)
-            ancestor = ancestor._get_parent()
+            ancestor = ancestor._get_parent_container()
     seen = set()
     while pending:
         node = pending.pop()
@@ -122,13 +121,9 @@ def _read_only_config_tree(*configs: Node) -> Iterator[None]:
             else:
                 keys = range(len(cast(Sequence[Any], node)))
             for key in keys:
-                child = node._get_node(key)
+                child = node._get_child(key)
                 if isinstance(child, Node):
                     pending.append(child)
-        elif isinstance(node, UnionNode):
-            child = node._value()
-            if isinstance(child, Node):
-                pending.append(child)
 
     root_overrides = ExitStack()
     descendant_overrides = ExitStack()
@@ -156,7 +151,7 @@ class _ReadOnlyDeferredTargetContext:
         self._config_refs: list[weakref.ReferenceType[Node]] = []
         while config is not None:
             self._config_refs.append(weakref.ref(config))
-            config = config._get_parent()
+            config = config._get_parent_container()
 
     def __call__(
         self,
@@ -235,7 +230,7 @@ def _extract_pos_args(input_args: Any, kwargs: Any, full_key: str) -> tuple[Any,
 def _isolate_config_argument(value: Any) -> Any:
     if OmegaConf.is_config(value):
         isolated = copy.deepcopy(value)
-        parent = value._get_parent()
+        parent = value._get_parent_container()
         if parent is not None:
             isolated._set_parent(_copy_config_with_parent_context(parent))
         _resolve_isolated_config(isolated)
@@ -878,7 +873,7 @@ def _get_dict_override_merge_base(
     node: Any, key: str, *, is_target_parameter: bool
 ) -> ConfigOverlay | None:
     """Return the configured mapping to merge with a dict override, if any."""
-    configured_value = node._get_node(key, validate_access=False)
+    configured_value = node._get_child(key, validate_access=False)
     if (
         is_target_parameter
         and configured_value is not None
@@ -906,11 +901,28 @@ def _get_dict_override_merge_base(
     return None
 
 
+def _merge_dict_override(
+    node: DictConfig, key: str, configured_value: ConfigOverlay, override: ConfigOverlay
+) -> Any:
+    if isinstance(configured_value, dict):
+        return OmegaConf.merge(configured_value, override)
+    # Preserve the field's schema and interpolation context without copying siblings.
+    target = OmegaConf.masked_copy(node, [key])
+    child = target._get_node(key)
+    assert child is not None
+    child._set_parent(node)
+    source = OmegaConf.create({key: override}, flags={"allow_objects": True})
+    target._merge_with(source, _allow_readonly_target=True)
+    merged = target[key]
+    merged._set_parent(node)
+    return merged
+
+
 def _get_override_child(source: Any, key: Any) -> Any:
     if isinstance(source, DictConfig):
-        return source._get_node(key, validate_access=False)
+        return source._get_child(key, validate_access=False)
     if OmegaConf.is_sequence(source):
-        return source._get_node(key)
+        return source._get_child(key)
     return source[key]
 
 
@@ -938,7 +950,12 @@ def _create_override_node(
 ) -> Any:
     mapping = _override_mapping(value)
     if mapping is not None:
-        result = OmegaConf.create({}, flags={"allow_objects": True})
+        result = (
+            copy.deepcopy(mapping)
+            if isinstance(mapping, DictConfig)
+            else OmegaConf.create({})
+        )
+        result._set_flag("allow_objects", True)
         for child_key in mapping:
             child = _create_override_node(
                 _get_override_child(mapping, child_key),
@@ -954,7 +971,12 @@ def _create_override_node(
         isinstance(value, (list, tuple)) or OmegaConf.is_sequence(value)
     ):
         is_tuple = type(value) is tuple or OmegaConf.is_tuple(value)
-        result = OmegaConf.create(() if is_tuple else [])
+        result = (
+            copy.deepcopy(value)
+            if isinstance(value, Container)
+            else OmegaConf.create(() if is_tuple else [])
+        )
+        result._set_flag("allow_objects", True)
         content = []
         for index in range(len(value)):
             child = _create_override_node(
@@ -1022,22 +1044,24 @@ def _apply_override_interpolations(
                 merge_base = _get_dict_override_merge_base(
                     node, key, is_target_parameter=is_target_parameter
                 )
+                if merge_base is None:
+                    continue
+                dict_override = _get_dict_override(_get_override_child(overrides, key))
+                merged = _merge_dict_override(
+                    node, key, merge_base, override_nodes[key]
+                )
+                if isinstance(merged, DictConfig) and dict_override is not None:
+                    _validate_override_types(merged, dict_override)
             finally:
                 _replace_child(node, key, current_value)
-
-            if merge_base is not None:
-                dict_override = _get_dict_override(_get_override_child(overrides, key))
-                if isinstance(merge_base, DictConfig) and dict_override is not None:
-                    _validate_override_types(merge_base, dict_override)
-                merged = OmegaConf.merge(merge_base, override_nodes[key])
-                _replace_child(node, key, merged)
+            _replace_child(node, key, merged)
 
 
 def _copy_config_with_parent_context(config: Any) -> Any:
     path = []
     current: Any = config
-    while current._get_parent() is not None:
-        parent = current._get_parent()
+    while current._get_parent_container() is not None:
+        parent = current._get_parent_container()
         key = current._key()
         path.append((key, current, _get_override_child(parent, key) is current))
         current = parent
@@ -1045,7 +1069,8 @@ def _copy_config_with_parent_context(config: Any) -> Any:
     copied_root = copy.deepcopy(current)
     copied_config = copied_root
     for key, source_config, parent_owns_source in reversed(path):
-        copied_config = _get_override_child(copied_config, key)
+        copied_parent = copied_config
+        copied_config = _get_override_child(copied_parent, key)
         # Merged nodes can retain a parent only as interpolation context.
         if not parent_owns_source:
             # This tree is a private copy, so it is safe to mutate even when it
@@ -1055,6 +1080,7 @@ def _copy_config_with_parent_context(config: Any) -> Any:
             # original parent while preserving that parent for interpolation.
             merge_source._set_flags_root(True)
             copied_config._merge_with(merge_source, _allow_readonly_target=True)
+            copied_config = _get_override_child(copied_parent, key)
 
     return copied_config
 
@@ -1080,14 +1106,12 @@ def _resolve_isolated_config(config: Any) -> None:
                 writable.enter_context(flag_override(node, "readonly", False))
             if isinstance(node, Container):
                 content = node._value()
-                if isinstance(content, dict):
-                    pending.extend(content.values())
-                elif isinstance(content, (list, tuple)):
-                    pending.extend(content)
-            elif isinstance(node, UnionNode):
-                child = node._value()
-                if isinstance(child, Node):
-                    pending.append(child)
+                if isinstance(content, (dict, list, tuple)):
+                    keys = content if isinstance(content, dict) else range(len(content))
+                    for key in keys:
+                        child = node._get_child(key)
+                        if isinstance(child, Node):
+                            pending.append(child)
         OmegaConf.resolve(config)
 
 
@@ -1156,7 +1180,7 @@ def _instantiate_effective_value(
                 node, key, is_target_parameter=is_target_parameter
             )
             if configured_value is not None:
-                value = OmegaConf.merge(configured_value, dict_override)
+                value = _merge_dict_override(node, key, configured_value, dict_override)
                 if isinstance(dict_override, dict):
                     _restore_nested_structured_config_objects(value, dict_override)
                 if recursive:
