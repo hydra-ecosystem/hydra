@@ -111,7 +111,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-27T13:00:39Z",
+  "generated_at": "2026-10-28T05:00:40Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -605,7 +605,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "[Feature Request] Support tuple literals in overrides, following OmegaConf",
-      "updated_at": "2026-10-27T12:58:05Z"
+      "updated_at": "2026-10-27T13:02:35Z"
     },
     "468": {
       "category": "Enhancement",
