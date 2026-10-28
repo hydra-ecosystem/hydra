@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-10-28",
-  "generated_at": "2026-10-28T21:45:56Z",
+  "generated_at": "2026-10-28T21:59:24Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 49,
+    "open_total": 51,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 3,
-        "percentage": 6.1
+        "count": 5,
+        "percentage": 9.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 41,
-        "percentage": 83.7
+        "percentage": 80.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 6.1
+        "percentage": 5.9
       },
       {
         "category": "Question",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 47
+        "count": 49
       },
       {
         "status": "done",
@@ -847,6 +847,32 @@
       "updated": "2026-10-28",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3592"
+    },
+    {
+      "number": 3593,
+      "title": "[Bug] Optuna sweeper: fixed value beats a command-line sweep; GridSampler repeats trials",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-28",
+      "updated": "2026-10-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3593"
+    },
+    {
+      "number": 3594,
+      "title": "[Bug] Multirun drops the quotes from choice() and str() values, so '1.10' runs as 1.1",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-28",
+      "updated": "2026-10-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3594"
     },
     {
       "number": 385,
@@ -2702,6 +2728,20 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-28T21:59:24Z",
+      "kind": "new",
+      "issue": 3594,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3594",
+      "title": "[Bug] Multirun drops the quotes from choice() and str() values, so '1.10' runs as 1.1"
+    },
+    {
+      "ts": "2026-10-28T21:59:24Z",
+      "kind": "new",
+      "issue": 3593,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3593",
+      "title": "[Bug] Optuna sweeper: fixed value beats a command-line sweep; GridSampler repeats trials"
+    },
+    {
       "ts": "2026-10-28T19:58:38Z",
       "kind": "new",
       "issue": 3592,
@@ -4372,26 +4412,6 @@
         "number": 3452,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3452"
       }
-    },
-    {
-      "ts": "2026-09-16T21:42:00Z",
-      "kind": "status",
-      "issue": 2237,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2237",
-      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3451,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3451"
-      }
-    },
-    {
-      "ts": "2026-09-16T20:28:27Z",
-      "kind": "pr",
-      "issue": 3444,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3444",
-      "title": "Include ANTLR license with the build JAR in Hydra 1.4 sdists",
-      "detail": "unlinked #3450"
     }
   ]
 }
