@@ -247,25 +247,36 @@ def test_any_structured_value_mapping_patch_retains_schema_validation(
     assert result["payload"].payload == ("template" if interpolated else "default")
 
 
-def test_any_structured_value_explicit_omegaconf_patch_skips_resolution() -> None:
+def test_nested_typed_union_override_preserves_type() -> None:
+    @dataclass
+    class WithUnion:
+        value: Child | OtherChild = field(default_factory=Child)
+
+    cfg = OmegaConf.create({"_target_": "builtins.dict", "payload": WithUnion()})
+    result = call(cfg, payload={"value": OmegaConf.structured(OtherChild(count=2))})
+    assert OmegaConf.get_type(result["payload"].value) is OtherChild
+    assert result["payload"].value.count == 2
+    assert OmegaConf.get_type(cfg.payload.value) is Child
+
+
+def test_any_structured_value_explicit_omegaconf_patch_skips_resolution(
+    hydra_restore_singletons: Any,
+) -> None:
     calls = []
     OmegaConf.register_resolver("strict_lazy_patch", lambda: calls.append(1) or 2)
-    try:
 
-        @dataclass
-        class AnyConfig:
-            _target_: str = "builtins.dict"
-            payload: Any = field(default_factory=Child)
+    @dataclass
+    class AnyConfig:
+        _target_: str = "builtins.dict"
+        payload: Any = field(default_factory=Child)
 
-        cfg = OmegaConf.structured(AnyConfig)
-        patch = OmegaConf.create({"count": "${strict_lazy_patch:}"})
-        config_before = OmegaConf.to_container(cfg, resolve=False)
-        instantiate_impl._validate_override_types(cfg, {"payload": patch})
-        assert calls == []
-        assert OmegaConf.is_interpolation(patch, "count")
-        assert OmegaConf.to_container(cfg, resolve=False) == config_before
-    finally:
-        OmegaConf.clear_resolver("strict_lazy_patch")
+    cfg = OmegaConf.structured(AnyConfig)
+    patch = OmegaConf.create({"count": "${strict_lazy_patch:}"})
+    config_before = OmegaConf.to_container(cfg, resolve=False)
+    instantiate_impl._validate_override_types(cfg, {"payload": patch})
+    assert calls == []
+    assert OmegaConf.is_interpolation(patch, "count")
+    assert OmegaConf.to_container(cfg, resolve=False) == config_before
 
 
 @mark.parametrize("marker", ["???", "${strict_missing_marker}"])
