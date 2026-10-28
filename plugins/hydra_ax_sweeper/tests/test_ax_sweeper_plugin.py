@@ -19,6 +19,12 @@ from hydra_plugins.hydra_ax_sweeper.ax_sweeper import AxSweeper
 chdir_plugin_root()
 
 WARNING_FILTERS = [
+    # 2026-10-28: PyTorch probes unsupported virtual MPS devices on macOS.
+    # Remove when that probe no longer emits this warning under -Werror.
+    (
+        "ignore:Skipping device Apple Paravirtual device that does not support Metal 2.0:"
+        "UserWarning:torch.mps"
+    ),
     # 2026-05-15: linear_operator 0.6.1 imports torch.jit.script via
     # Ax -> Botorch -> GPyTorch on Python 3.14 with Torch 2.12.
     # Remove when the current Ax stack no longer emits it under -Werror.
