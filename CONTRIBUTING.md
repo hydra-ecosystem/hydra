@@ -22,20 +22,15 @@ supported Python version, but keep the default local checkout environment in
 `.venv`.
 
 ## Pull Requests
-We welcome your pull requests.
+Please open an issue and get maintainer agreement before starting substantial
+work. Only open a PR once a maintainer has agreed that the change is wanted,
+and link to that discussion in your PR.
 
 1. Fork the repo and create your feature branch from `main`.
 2. If you've added code add suitable tests.
 3. If you've changed APIs, update the documentation.
 4. Ensure the test suite and lint pass.
 5. Review the Contributor License Agreement ("CLA") transition note below.
-
-For non-trivial features, API changes, or user-visible behavior changes, please
-open an issue or design discussion and wait for maintainer feedback before
-starting substantial implementation work. Pull requests in these areas should
-link to the issue or discussion where the direction was agreed. Pull requests
-without prior design alignment may be redirected to discussion before
-implementation review.
 
 ## News fragments
 
