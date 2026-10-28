@@ -33,5 +33,9 @@ assignees: ''
 - **Virtual environment type and version** : 
 - **Operating system** : 
 
+**Are you willing to submit a PR for this issue?** (See [CONTRIBUTING](https://github.com/hydra-ecosystem/hydra/blob/main/CONTRIBUTING.md))
+
+Please wait for maintainer agreement before starting substantial work.
+
 ## Additional context
 Add any other context about the problem here.

@@ -2430,5 +2430,27 @@
     "note": "Included as Good Hydra Usage and a feature candidate. VersatIL uses Hydra as the documented configuration interface for its robot-policy training, deployment, compression, inference, and explainability workflows, with hierarchical config groups, typed dataclasses, ConfigStore registration, overrides, sweeps, packaged configs, and instantiate. Its active maintenance, robotics coverage, and explicit Hydra >=1.4.0.dev5,<1.5 dependency with Python 3.13 and 3.14 CI outweigh its limited current adoption.",
     "proposal_accepted_as_is": true,
     "repo": "Lorenzo-Mazza/VersatIL"
+  },
+  {
+    "decided_at": "2026-10-23",
+    "decision": "include",
+    "feature_candidate": false,
+    "group": "powered_by_hydra",
+    "listing": {
+      "description": "Robot-learning framework with Hydra integration for task and agent configuration across reinforcement-learning workflows.",
+      "kind": "framework",
+      "name": "Isaac Lab",
+      "relationships": [],
+      "tags": [
+        "machine_learning",
+        "robotics",
+        "simulation"
+      ],
+      "type": "Framework",
+      "url": "https://github.com/isaac-sim/IsaacLab"
+    },
+    "note": "Included as Powered by Hydra. Isaac Lab has project-owned task and agent configuration code and user-facing Hydra documentation. At revision 8c9b995cb95c74ec81498ae948ce4c1d4e20ae00, the root manifest directly declares hydra-core and uv.lock resolves 1.4.0.dev10. Its custom replacement-only preset and override layer supports meaningful subsystem usage without establishing exemplary Hydra configuration design. Runtime compatibility with the current Hydra release has not been independently tested.",
+    "proposal_accepted_as_is": true,
+    "repo": "isaac-sim/IsaacLab"
   }
 ]

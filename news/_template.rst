@@ -10,7 +10,7 @@
 
 {% if definitions[category]['showcontent'] %}
 {% for text, values in sections[section][category]|dictsort(by='value') %}
-- {{ text }}{% if category != 'plugin' and category != 'process' %} ({{ values|sort|join(', ') }}){% endif %}
+- {{ text }}{% if values and category != 'plugin' and category != 'process' %} ({{ values|sort|join(', ') }}){% endif %}
 
 {% endfor %}
 {% else %}

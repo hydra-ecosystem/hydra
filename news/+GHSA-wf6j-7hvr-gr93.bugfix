@@ -1,0 +1,2 @@
+Prevent arbitrary code execution through unsafe PyYAML loaders in
+`hydra.utils.instantiate()`. Safe YAML loading and dumping remain supported.

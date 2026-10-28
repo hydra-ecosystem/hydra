@@ -3543,6 +3543,16 @@ def test_blacklisted_target_fails(target: str) -> None:
     assert chained is None
 
 
+def test_asyncio_requires_execution_whitelist() -> None:
+    cfg = {"_target_": "asyncio.Queue"}
+    with raises(InstantiationException, match="blacklisted"):
+        _instantiate2.instantiate(cfg)
+    assert isinstance(
+        _instantiate2.instantiate(cfg, _execution_whitelist_="asyncio.Queue"),
+        asyncio.Queue,
+    )
+
+
 @mark.parametrize(
     "target",
     [

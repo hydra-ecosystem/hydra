@@ -97,6 +97,10 @@ processes, or deserialize executable objects cannot be authorized. This
 includes families such as `eval` and `exec`, subprocess and shell execution,
 dynamic import loaders, `ctypes` library loading, and pickle-backed loaders.
 
+The `yaml.*` namespace is restricted except for `yaml.safe_load`,
+`yaml.safe_load_all`, `yaml.safe_dump`, and `yaml.safe_dump_all`. These exceptions
+allow only the exact functions, not their attributes or other YAML targets.
+
 These operations should remain in trusted Python code rather than composed
 configuration.
 

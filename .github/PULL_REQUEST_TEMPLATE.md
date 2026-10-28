@@ -1,12 +1,10 @@
 <!-- Thank you for sending a PR and taking the time to improve Hydra -->
 
-## Contributor License Agreement
+## Maintainer agreement
 
-Hydra requires contributors to accept its
-[Individual Contributor License Agreement](https://hydra.cc/legal/individual-cla/).
-CLA Assistant will check the pull request and provide a signing link if needed.
-Obtain any approval required by your employer or other obligations before
-signing.
+**Has a maintainer agreed that you can take this issue on?**
+
+Link to that conversation:
 
 ## Motivation
 
@@ -16,14 +14,12 @@ signing.
 
 Yes/No
 
-### For non-trivial features, API changes, or behavior changes: is there an issue or design discussion where maintainers agreed on the direction?
-
-(Link to the issue or discussion. Pull requests without prior design alignment
-may be redirected to discussion before implementation review.)
-
 ## Test Plan
 
 (How should this PR be tested? Do you require special setup to run the test or repro the fixed bug?)
+
+**CLA:** A signed [Hydra CLA](https://hydra.cc/legal/individual-cla/) is required.
+The bot will provide a signing link if needed.
 
 ## Related Issues and PRs
 

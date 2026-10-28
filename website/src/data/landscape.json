@@ -771,6 +771,23 @@
       "reviewedAt": "2026-08-02"
     },
     {
+      "repository": "isaac-sim/IsaacLab",
+      "name": "Isaac Lab",
+      "url": "https://github.com/isaac-sim/IsaacLab",
+      "description": "Robot-learning framework with Hydra integration for task and agent configuration across reinforcement-learning workflows.",
+      "kind": "framework",
+      "type": "Framework",
+      "tags": [
+        "machine_learning",
+        "robotics",
+        "simulation"
+      ],
+      "relationships": [],
+      "group": "powered_by_hydra",
+      "featureCandidate": false,
+      "reviewedAt": "2026-10-23"
+    },
+    {
       "repository": "climate-analytics-lab/jax-gcm",
       "name": "JAX-GCM",
       "url": "https://github.com/climate-analytics-lab/jax-gcm",

@@ -35,7 +35,7 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
-    uses: hydra-ecosystem/github-actions/.github/workflows/node-maintenance.yml@v1
+    uses: hydra-ecosystem/github-actions/.github/workflows/node-maintenance.yml@0938f9298b84dd6741a394fc2db8dfd6e04942a7
     with:
       audit-kind: ${{ inputs.audit-kind || 'auto' }}
       app-client-id: ${{ vars.NODE_AUDIT_APP_CLIENT_ID }}

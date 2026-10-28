@@ -1,0 +1,84 @@
+name: Dependency repair infrastructure pilot
+on:
+  workflow_dispatch:
+    inputs:
+      request-id:
+        description: Verified request UUID
+        required: true
+        type: string
+      pull-request:
+        description: Managed PR number
+        required: true
+        type: string
+      expected-head:
+        description: Confirmed PR head SHA
+        required: true
+        type: string
+      expected-base:
+        description: Confirmed PR base SHA
+        required: true
+        type: string
+      selections:
+        description: Exact selected items as compact JSON
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  validate-inputs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate and summarize the five dispatch inputs
+        env:
+          REQUEST_ID: ${{ inputs['request-id'] }}
+          PULL_REQUEST: ${{ inputs['pull-request'] }}
+          EXPECTED_HEAD: ${{ inputs['expected-head'] }}
+          EXPECTED_BASE: ${{ inputs['expected-base'] }}
+          SELECTIONS: ${{ inputs.selections }}
+        shell: python
+        run: |
+          import json
+          import os
+          import re
+          import time
+
+          def require(condition):
+              if not condition:
+                  raise SystemExit('Invalid pilot input')
+
+          require(re.fullmatch(r'[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}', os.environ['REQUEST_ID']))
+          require(re.fullmatch(r'[1-9][0-9]*', os.environ['PULL_REQUEST']))
+          for key in ['EXPECTED_HEAD', 'EXPECTED_BASE']:
+              require(re.fullmatch(r'[a-f0-9]{40}', os.environ[key]))
+          items = json.loads(os.environ['SELECTIONS'])
+          require(isinstance(items, list) and 1 <= len(items) <= 20)
+          names = []
+          for item in items:
+              require(isinstance(item, dict) and list(item) == ['name', 'from', 'to'])
+              require(all(isinstance(value, str) for value in item.values()))
+              name = item['name']
+              require(len(name) <= 214 and name not in ['node_modules', 'favicon.ico'])
+              require(re.fullmatch(r'(?:@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*', name))
+              for version in [item['from'], item['to']]:
+                  require(re.fullmatch(r'(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)', version))
+              before, after = item['from'].split('.'), item['to'].split('.')
+              require(before[:2] == after[:2])
+              require((len(before[2]), before[2]) < (len(after[2]), after[2]))
+              names.append(name)
+          require(names == sorted(set(names)))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('### Infrastructure pilot input receipt\n\n')
+              summary.write('No PR code was checked out. No dependency files or repository contents were changed.\n\n')
+              summary.write('```json\n' + json.dumps({
+                  'request-id': os.environ['REQUEST_ID'],
+                  'pull-request': os.environ['PULL_REQUEST'],
+                  'expected-head': os.environ['EXPECTED_HEAD'],
+                  'expected-base': os.environ['EXPECTED_BASE'],
+                  'selections': items,
+              }, indent=2) + '\n```\n')
+          # Controlled infrastructure probes exist only in this harmless fixture.
+          if 'pilot-failure' in names:
+              raise SystemExit('Requested pilot failure')
+          if 'pilot-cancellation' in names:
+              time.sleep(120)

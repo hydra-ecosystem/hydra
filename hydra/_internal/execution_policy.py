@@ -16,6 +16,7 @@ from textwrap import dedent
 from typing import (
     Any,
     Callable,
+    Iterable,
     Iterator,
     Mapping,
     NamedTuple,
@@ -44,10 +45,13 @@ from hydra.errors import InstantiationException
 # identify equivalent application wrappers. An execution whitelist supplied from
 # trusted Python code is the real security boundary.
 # Generally problematic targets are refused on the legacy path, but trusted
-# Python code may authorize them with an execution whitelist. Keep this set
-# for operations whose effect is fully named and bounded by the target itself.
+# Python code may authorize them with an execution whitelist. Entries match
+# exact target names or package prefixes ending in `.*`.
 DEFAULT_BLACKLISTED_MODULES = frozenset(
     {
+        # Temporary legacy-only namespace block, including C implementations.
+        "asyncio.*",
+        "_asyncio.*",
         "_sitebuiltins.Quitter",
         "builtins.exit",
         "builtins.quit",
@@ -356,6 +360,9 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIXES = (
     # unpickles a counts file. The inert Trace constructor is excepted below.
     "shelve.",
     "trace.",
+    # PyYAML exposes Python-object loading and constructor dispatch. Keep only
+    # exact safe load/dump functions available.
+    "yaml.",
     # pydoc imports/executes modules and files (importfile runs a file,
     # safeimport imports by name). Inert documentation formatters are excepted
     # below.
@@ -367,7 +374,7 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIXES = (
     "bdb.",
 )
 
-# Exact legitimate constructors within otherwise denied module families. Exact
+# Exact legitimate targets within otherwise denied module families. Exact
 # entries in UNCONTROLLED_EXECUTION_TARGETS still take precedence over exceptions.
 # An exception permits only the named target, not its methods or descendants.
 UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS = frozenset(
@@ -378,6 +385,10 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS = frozenset(
         "pydoc.HTMLDoc",
         "pydoc.TextDoc",
         "trace.Trace",
+        "yaml.safe_load",
+        "yaml.safe_load_all",
+        "yaml.safe_dump",
+        "yaml.safe_dump_all",
     }
 )
 
@@ -1083,7 +1094,7 @@ def _is_blacklisted_target(target: str) -> bool:
     policy = _current_execution_policy()
     canonical_target = _get_os_alias_target(target)
     if (
-        canonical_target in policy.default_blacklisted_modules
+        _matches_target_patterns(canonical_target, policy.default_blacklisted_modules)
         or canonical_target in policy.uncontrolled_execution_targets
     ):
         return True
@@ -1259,10 +1270,8 @@ def _get_active_execution_whitelist() -> NormalizedExecutionWhitelist:
     return _EXECUTION_WHITELIST_CONTEXT.get()
 
 
-def _is_execution_whitelisted(
-    target: str, execution_whitelist: tuple[str, ...]
-) -> bool:
-    for pattern in execution_whitelist:
+def _matches_target_patterns(target: str, patterns: Iterable[str]) -> bool:
+    for pattern in patterns:
         if pattern.endswith(".*"):
             prefix = pattern[:-2]
             if target.startswith(f"{prefix}."):
@@ -1632,7 +1641,7 @@ def _authorize_target_name(
                     full_key,
                 )
             )
-    elif not _is_execution_whitelisted(
+    elif not _matches_target_patterns(
         target_name, cast(tuple[str, ...], execution_whitelist)
     ):
         raise InstantiationException(

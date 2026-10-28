@@ -39,6 +39,12 @@ WARNING_FILTERS = [
     # the Ax surrogate for log-scale tests. Remove when the current Ax stack no
     # longer emits it under -Werror for the plugin's log-scale sweep.
     "ignore:A not p.d., added jitter:Warning",
+    # 2026-10-25: Ax 1.2.4 uses APIs deprecated in pandas 3.1.
+    # Remove when Ax fixes these warnings. Use the built-in parent category
+    # because Python cannot import pandas.errors when processing subprocess -W.
+    "ignore:The 'future.infer_string' option is deprecated:DeprecationWarning",
+    "ignore:The inplace keyword in DataFrame.:DeprecationWarning",
+    "ignore:The 'lsuffix' and 'rsuffix' keywords in DataFrame.join:DeprecationWarning",
 ]
 
 pytestmark = [mark.filterwarnings(warning_filter) for warning_filter in WARNING_FILTERS]
