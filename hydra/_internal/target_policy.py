@@ -38,9 +38,9 @@ from hydra.errors import InstantiationException
 # The policy prevents configuration from changing Hydra's authorization state
 # or existing Python code.
 #
-# Trusted users may authorize these targets with
-# HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE. Entries match exact target names or
-# package prefixes ending in `.*`.
+# Trusted users may authorize individual targets with
+# HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE using exact target names. Blocklist
+# entries may also be package prefixes ending in `.*`.
 DEFAULT_BLOCKLISTED_MODULES = frozenset(
     {
         "asyncio.*",
@@ -951,9 +951,9 @@ def _get_policy_alias_target(target: str) -> str:
 def _is_blocklisted_target(target: str) -> bool:
     policy = _current_target_policy()
     canonical_target = _get_os_alias_target(target)
-    if (
-        canonical_target in policy.default_blocklisted_modules
-        or canonical_target in policy.uncontrolled_execution_targets
+    if canonical_target in policy.uncontrolled_execution_targets or any(
+        fnmatchcase(canonical_target, pattern)
+        for pattern in policy.default_blocklisted_modules
     ):
         return True
     if canonical_target in policy.uncontrolled_execution_target_prefix_exceptions:
@@ -1089,10 +1089,7 @@ def _authorize_target_name(
             execution-capable target family. It cannot be authorized with
             HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE.""")
         raise InstantiationException(_with_full_key(msg, full_key))
-    if not any(
-        fnmatchcase(canonical_target, pattern)
-        for pattern in _current_target_policy().default_blocklisted_modules
-    ):
+    if not _is_blocklisted_target(canonical_target):
         return
 
     allowlist = os.environ.get("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", "")

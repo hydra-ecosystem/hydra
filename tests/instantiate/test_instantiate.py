@@ -1598,6 +1598,7 @@ def test_blocklisted_target_fails(instantiate_func: Any, target: str) -> None:
 
 def test_asyncio_requires_allowlist_override(monkeypatch: Any) -> None:
     cfg = {"_target_": "asyncio.Queue"}
+    assert target_policy._is_blocklisted_target("asyncio.Queue")
     monkeypatch.delenv("HYDRA_INSTANTIATE_ALLOWLIST_OVERRIDE", raising=False)
     with raises(InstantiationException, match="blocklisted"):
         _instantiate2.instantiate(cfg)
