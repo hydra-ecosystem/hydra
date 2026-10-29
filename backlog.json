@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-29",
-  "generated_at": "2026-10-29T10:00:47Z",
+  "generated_at": "2026-10-29T10:38:20Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 49,
+    "open_total": 48,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 3,
-        "percentage": 6.1
+        "count": 2,
+        "percentage": 4.2
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 41,
-        "percentage": 83.7
+        "percentage": 85.4
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 6.1
+        "percentage": 6.2
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.0
+        "percentage": 2.1
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.0
+        "percentage": 2.1
       }
     ],
     "by_status": [
@@ -61,12 +61,12 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 49
+        "count": 48
       },
       {
         "status": "done",
         "emoji": "✅",
-        "count": 112
+        "count": 113
       }
     ]
   },
@@ -798,19 +798,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3583"
-    },
-    {
-      "number": 3592,
-      "title": "[Bug] tag() error says \"got NoneType\" when the last argument isn't a sweep",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-10-28",
-      "updated": "2026-10-28",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3592"
     },
     {
       "number": 3593,
@@ -2724,9 +2711,29 @@
       "updated": "2026-10-27",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3580"
+    },
+    {
+      "number": 3592,
+      "title": "[Bug] tag() error says \"got NoneType\" when the last argument isn't a sweep",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-10-28",
+      "updated": "2026-10-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3592"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-29T10:38:20Z",
+      "kind": "closed",
+      "issue": 3592,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3592",
+      "title": "[Bug] tag() error says \"got NoneType\" when the last argument isn't a sweep"
+    },
     {
       "ts": "2026-10-29T06:25:19Z",
       "kind": "closed",
@@ -4398,14 +4405,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
       "detail": "in progress → not started"
-    },
-    {
-      "ts": "2026-09-16T21:42:00Z",
-      "kind": "pr",
-      "issue": 3406,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
-      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
-      "detail": "linked #3452"
     }
   ]
 }
