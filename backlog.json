@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-10-29",
-  "generated_at": "2026-10-29T13:02:54Z",
+  "generated_at": "2026-10-29T14:13:05Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 50,
+    "open_total": 49,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 4.0
+        "percentage": 4.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 43,
-        "percentage": 86.0
+        "count": 42,
+        "percentage": 85.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 6.0
+        "percentage": 6.1
       },
       {
         "category": "Question",
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 1
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,33 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 113
+        "count": 114
       }
     ]
   },
   "issues": [
-    {
-      "number": 3598,
-      "title": "Align execution whitelist behavior with Hydra’s trust model",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3595,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3595"
-        },
-        {
-          "number": 3596,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3596"
-        }
-      ],
-      "created": "2026-10-29",
-      "updated": "2026-10-29",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3598"
-    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -2762,9 +2740,38 @@
       "updated": "2026-10-28",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3592"
+    },
+    {
+      "number": 3598,
+      "title": "Align execution whitelist behavior with Hydra’s trust model",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3595,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3595"
+        },
+        {
+          "number": 3596,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3596"
+        }
+      ],
+      "created": "2026-10-29",
+      "updated": "2026-10-29",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3598"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-29T14:13:05Z",
+      "kind": "closed",
+      "issue": 3598,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3598",
+      "title": "Align execution whitelist behavior with Hydra’s trust model"
+    },
     {
       "ts": "2026-10-29T13:02:54Z",
       "kind": "label",
@@ -4435,13 +4442,6 @@
       "issue": 3454,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3454",
       "title": "Improve provenance and default presentation of config composition errors"
-    },
-    {
-      "ts": "2026-09-17T19:29:51Z",
-      "kind": "closed",
-      "issue": 3401,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3401",
-      "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5"
     }
   ]
 }

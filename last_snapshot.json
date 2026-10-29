@@ -110,11 +110,12 @@
     "3579": "2026-10-29",
     "3580": "2026-10-29",
     "3592": "2026-10-29",
+    "3598": "2026-10-29",
     "385": "2026-09-05",
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-10-29T13:02:54Z",
+  "generated_at": "2026-10-29T14:13:05Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -605,19 +606,6 @@
       "status": "not started",
       "title": "[Bug] Multirun drops the quotes from choice() and str() values, so '1.10' runs as 1.1",
       "updated_at": "2026-10-28T21:58:27Z"
-    },
-    "3598": {
-      "category": "Enhancement",
-      "created_at": "2026-10-29T11:47:27Z",
-      "labels": [],
-      "pr_numbers": [
-        "3595",
-        "3596"
-      ],
-      "state": "OPEN",
-      "status": "in progress",
-      "title": "Align execution whitelist behavior with Hydra\u2019s trust model",
-      "updated_at": "2026-10-29T11:47:27Z"
     },
     "3599": {
       "category": "Enhancement",
@@ -2148,6 +2136,19 @@
       "status": "done",
       "title": "[Bug] tag() error says \"got NoneType\" when the last argument isn't a sweep",
       "updated_at": "2026-10-28T19:57:15Z"
+    },
+    "3598": {
+      "category": "Enhancement",
+      "created_at": "2026-10-29T11:47:27Z",
+      "labels": [],
+      "pr_numbers": [
+        "3595",
+        "3596"
+      ],
+      "state": "CLOSED",
+      "status": "done",
+      "title": "Align execution whitelist behavior with Hydra\u2019s trust model",
+      "updated_at": "2026-10-29T11:47:27Z"
     },
     "385": {
       "category": "Enhancement",
