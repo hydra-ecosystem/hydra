@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-10-29",
-  "generated_at": "2026-10-29T11:16:22Z",
+  "generated_at": "2026-10-29T11:48:48Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 48,
+    "open_total": 49,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 4.2
+        "percentage": 4.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 41,
-        "percentage": 85.4
+        "count": 42,
+        "percentage": 85.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 6.2
+        "percentage": 6.1
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.1
+        "percentage": 2.0
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.1
+        "percentage": 2.0
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 48
+        "count": 49
       },
       {
         "status": "done",
@@ -824,6 +824,19 @@
       "updated": "2026-10-28",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3594"
+    },
+    {
+      "number": 3598,
+      "title": "Align execution whitelist behavior with Hydra’s trust model",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-29",
+      "updated": "2026-10-29",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3598"
     },
     {
       "number": 385,
@@ -2728,6 +2741,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-29T11:48:48Z",
+      "kind": "new",
+      "issue": 3598,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3598",
+      "title": "Align execution whitelist behavior with Hydra’s trust model"
+    },
+    {
       "ts": "2026-10-29T10:38:20Z",
       "kind": "closed",
       "issue": 3592,
@@ -4397,14 +4417,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
       "detail": "unlinked #3452"
-    },
-    {
-      "ts": "2026-09-17T05:17:28Z",
-      "kind": "status",
-      "issue": 3406,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
-      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
-      "detail": "in progress → not started"
     }
   ]
 }
