@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-29",
-  "generated_at": "2026-10-29T13:00:20Z",
+  "generated_at": "2026-10-29T13:02:54Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 50,
@@ -857,7 +857,10 @@
       "prs": [],
       "created": "2026-10-29",
       "updated": "2026-10-29",
-      "labels": [],
+      "labels": [
+        "enhancement",
+        "sweep"
+      ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3599"
     },
     {
@@ -2763,6 +2766,14 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-29T13:02:54Z",
+      "kind": "label",
+      "issue": 3599,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3599",
+      "title": "Consolidate sweeper override precedence after 1.4",
+      "detail": "added \"enhancement\", \"sweep\""
+    },
+    {
       "ts": "2026-10-29T13:00:20Z",
       "kind": "new",
       "issue": 3599,
@@ -4431,14 +4442,6 @@
       "issue": 3401,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3401",
       "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5"
-    },
-    {
-      "ts": "2026-09-17T12:19:12Z",
-      "kind": "pr",
-      "issue": 3401,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3401",
-      "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5",
-      "detail": "linked #3453"
     }
   ]
 }
