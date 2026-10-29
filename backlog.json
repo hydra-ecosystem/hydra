@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-10-29",
-  "generated_at": "2026-10-29T06:17:04Z",
+  "generated_at": "2026-10-29T06:25:19Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 51,
+    "open_total": 49,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 5,
-        "percentage": 9.8
+        "count": 3,
+        "percentage": 6.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 41,
-        "percentage": 80.4
+        "percentage": 83.7
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 5.9
+        "percentage": 6.1
       },
       {
         "category": "Question",
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 2
+        "count": 0
       },
       {
         "status": "community PR",
@@ -66,47 +66,11 @@
       {
         "status": "done",
         "emoji": "✅",
-        "count": 110
+        "count": 112
       }
     ]
   },
   "issues": [
-    {
-      "number": 3579,
-      "title": "[Bug] instantiate() fails with TypeError: 'UnionNode' object is not subscriptable for union-typed configs",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3589,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3589"
-        }
-      ],
-      "created": "2026-10-27",
-      "updated": "2026-10-28",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3579"
-    },
-    {
-      "number": 3580,
-      "title": "[Bug] A dict call-site override replaces a union-typed Structured Config instead of merging into it",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3589,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3589"
-        }
-      ],
-      "created": "2026-10-27",
-      "updated": "2026-10-27",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3580"
-    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -2724,9 +2688,59 @@
         "structured config"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3568"
+    },
+    {
+      "number": 3579,
+      "title": "[Bug] instantiate() fails with TypeError: 'UnionNode' object is not subscriptable for union-typed configs",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3589,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3589"
+        }
+      ],
+      "created": "2026-10-27",
+      "updated": "2026-10-28",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3579"
+    },
+    {
+      "number": 3580,
+      "title": "[Bug] A dict call-site override replaces a union-typed Structured Config instead of merging into it",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [
+        {
+          "number": 3589,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3589"
+        }
+      ],
+      "created": "2026-10-27",
+      "updated": "2026-10-27",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3580"
     }
   ],
   "updates": [
+    {
+      "ts": "2026-10-29T06:25:19Z",
+      "kind": "closed",
+      "issue": 3580,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3580",
+      "title": "[Bug] A dict call-site override replaces a union-typed Structured Config instead of merging into it"
+    },
+    {
+      "ts": "2026-10-29T06:25:19Z",
+      "kind": "closed",
+      "issue": 3579,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3579",
+      "title": "[Bug] instantiate() fails with TypeError: 'UnionNode' object is not subscriptable for union-typed configs"
+    },
     {
       "ts": "2026-10-28T21:59:24Z",
       "kind": "new",
@@ -4392,26 +4406,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
       "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
       "detail": "linked #3452"
-    },
-    {
-      "ts": "2026-09-16T21:42:00Z",
-      "kind": "pr",
-      "issue": 2237,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2237",
-      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value",
-      "detail": "linked #3451"
-    },
-    {
-      "ts": "2026-09-16T21:42:00Z",
-      "kind": "status",
-      "issue": 3406,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
-      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3452,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3452"
-      }
     }
   ]
 }
