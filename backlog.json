@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-10-29",
-  "generated_at": "2026-10-29T11:51:06Z",
+  "generated_at": "2026-10-29T13:00:20Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 49,
+    "open_total": 50,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 4.1
+        "percentage": 4.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 42,
-        "percentage": 85.7
+        "count": 43,
+        "percentage": 86.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 6.1
+        "percentage": 6.0
       },
       {
         "category": "Question",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 48
+        "count": 49
       },
       {
         "status": "done",
@@ -830,7 +830,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2026-10-28",
-      "updated": "2026-10-28",
+      "updated": "2026-10-29",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3593"
     },
@@ -846,6 +846,19 @@
       "updated": "2026-10-28",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3594"
+    },
+    {
+      "number": 3599,
+      "title": "Consolidate sweeper override precedence after 1.4",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-29",
+      "updated": "2026-10-29",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3599"
     },
     {
       "number": 385,
@@ -2750,6 +2763,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-29T13:00:20Z",
+      "kind": "new",
+      "issue": 3599,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3599",
+      "title": "Consolidate sweeper override precedence after 1.4"
+    },
+    {
       "ts": "2026-10-29T11:51:06Z",
       "kind": "pr",
       "issue": 3598,
@@ -4419,18 +4439,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3401",
       "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5",
       "detail": "linked #3453"
-    },
-    {
-      "ts": "2026-09-17T12:19:12Z",
-      "kind": "status",
-      "issue": 3401,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3401",
-      "title": "Deprecate LogJobReturnCallback in Hydra 1.4 and remove it in 1.5",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3453,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3453"
-      }
     }
   ]
 }
