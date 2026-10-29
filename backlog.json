@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-10-29",
-  "generated_at": "2026-10-29T14:13:05Z",
+  "generated_at": "2026-10-29T17:28:43Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 49,
+    "open_total": 50,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 4.1
+        "percentage": 4.0
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 42,
-        "percentage": 85.7
+        "count": 43,
+        "percentage": 86.0
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 6.1
+        "percentage": 6.0
       },
       {
         "category": "Question",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 49
+        "count": 50
       },
       {
         "status": "done",
@@ -821,7 +821,7 @@
       "status_emoji": "⬜",
       "prs": [],
       "created": "2026-10-28",
-      "updated": "2026-10-28",
+      "updated": "2026-10-29",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3594"
     },
@@ -840,6 +840,19 @@
         "sweep"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3599"
+    },
+    {
+      "number": 3600,
+      "title": "Wifi",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-29",
+      "updated": "2026-10-29",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3600"
     },
     {
       "number": 385,
@@ -2766,6 +2779,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-29T17:28:43Z",
+      "kind": "new",
+      "issue": 3600,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3600",
+      "title": "Wifi"
+    },
+    {
       "ts": "2026-10-29T14:13:05Z",
       "kind": "closed",
       "issue": 3598,
@@ -4435,13 +4455,6 @@
         "number": 3455,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3455"
       }
-    },
-    {
-      "ts": "2026-09-17T20:02:34Z",
-      "kind": "new",
-      "issue": 3454,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3454",
-      "title": "Improve provenance and default presentation of config composition errors"
     }
   ]
 }
