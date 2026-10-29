@@ -1741,14 +1741,16 @@ def _authorize_target_invocation(
     _reject_process_environment_mutation(
         target, args, kwargs, full_key, execution_whitelist
     )
+    if execution_whitelist is not None:
+        return target, args, kwargs
+
     if target_name == "builtins.iter" and len(args) == 2:
         msg = dedent(
             """\
             Target 'builtins.iter' cannot use its two-argument callback form from
-            config because callback execution is deferred beyond instantiate's
-            target authorization. Use one-argument iter(iterable), or perform the
-            callback iteration in trusted Python code. Pass UNSAFE_DISABLE_EXECUTION_CHECKS
-            only to explicitly disable target safety checks."""
+            legacy configuration. Use one-argument iter(iterable), or pass an
+            execution whitelist from trusted Python code to authorize callback
+            iteration."""
         )
         raise InstantiationException(_with_full_key(msg, full_key))
 
@@ -1765,10 +1767,10 @@ def _authorize_target_invocation(
             msg = dedent(
                 f"""\
                 Target '{target_name}' cannot configure callable attributes,
-                children, or wrappers from config (unsafe parameters: {joined}).
+                children, or wrappers from legacy configuration (unsafe parameters: {joined}).
                 Only one positional spec and the name, spec, and spec_set keyword
-                parameters are allowed. Pass UNSAFE_DISABLE_EXECUTION_CHECKS only to
-                explicitly disable target safety checks."""
+                parameters are allowed on this path. Pass an execution whitelist
+                from trusted Python code to authorize other constructor arguments."""
             )
             raise InstantiationException(_with_full_key(msg, full_key))
 
@@ -1785,9 +1787,8 @@ def _authorize_target_invocation(
                 msg = dedent(
                     f"""\
                     Target '{target_name}' cannot be used for dynamic class construction
-                    from config. Metaclass constructor methods cannot be authorized with
-                    an execution whitelist. Pass UNSAFE_DISABLE_EXECUTION_CHECKS only to explicitly
-                    disable target safety checks."""
+                    from legacy configuration. Pass an execution whitelist from trusted
+                    Python code to authorize the constructor and the returned class."""
                 )
                 raise InstantiationException(_with_full_key(msg, full_key))
 
@@ -1800,8 +1801,9 @@ def _authorize_target_invocation(
     msg = dedent(
         f"""\
         Target '{target_name}' cannot be used for dynamic class construction from
-        config. Only one-argument type(obj) introspection is allowed. Pass
-        UNSAFE_DISABLE_EXECUTION_CHECKS only to explicitly disable target safety checks."""
+        legacy configuration. Only one-argument type(obj) introspection is
+        allowed on this path. Pass an execution whitelist from trusted Python
+        code to authorize the constructor and the returned class."""
     )
     raise InstantiationException(_with_full_key(msg, full_key))
 

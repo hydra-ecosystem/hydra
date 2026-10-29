@@ -366,7 +366,7 @@ def test_logging_handler_class_result_uses_execution_whitelist() -> None:
     assert not CallableHandler.configured
 
 
-def test_logging_factory_invocation_uses_argument_checks() -> None:
+def test_logging_authorized_factory_must_return_handler() -> None:
     config = _logging_config(
         {"()": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
     )
@@ -376,11 +376,11 @@ def test_logging_factory_invocation_uses_argument_checks() -> None:
             configure_log(config)
 
     cause = _root_cause(exc_info.value)
-    assert isinstance(cause, InstantiationException)
-    assert "unsafe parameters: return_value" in str(cause)
+    assert isinstance(cause, TypeError)
+    assert "must return a logging.Handler" in str(cause)
 
 
-def test_logging_handler_class_invocation_uses_argument_checks() -> None:
+def test_logging_authorized_handler_class_must_return_handler() -> None:
     config = _logging_config(
         {"class": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
     )
@@ -390,8 +390,8 @@ def test_logging_handler_class_invocation_uses_argument_checks() -> None:
             configure_log(config)
 
     cause = _root_cause(exc_info.value)
-    assert isinstance(cause, InstantiationException)
-    assert "unsafe parameters: return_value" in str(cause)
+    assert isinstance(cause, TypeError)
+    assert "must return a logging.Handler" in str(cause)
 
 
 def test_logging_handler_class_is_resolved_once() -> None:
@@ -1178,3 +1178,33 @@ def test_logging_environment_factory_needs_explicit_authorization(
         assert isinstance(cause, InstantiationException)
         assert "not in the Hydra execution whitelist" in str(cause)
         assert data == {}
+
+
+@mark.filterwarnings("ignore:Hydra configured Python logging:UserWarning")
+def test_logging_factory_invocation_uses_argument_checks_in_legacy_mode() -> None:
+    config = _logging_config(
+        {"()": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
+    )
+
+    with execution_whitelist(None):
+        with raises(ValueError, match="Unable to configure handler") as exc_info:
+            configure_log(config)
+
+    cause = _root_cause(exc_info.value)
+    assert isinstance(cause, InstantiationException)
+    assert "unsafe parameters: return_value" in str(cause)
+
+
+@mark.filterwarnings("ignore:Hydra configured Python logging:UserWarning")
+def test_logging_handler_class_invocation_uses_argument_checks_in_legacy_mode() -> None:
+    config = _logging_config(
+        {"class": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
+    )
+
+    with execution_whitelist(None):
+        with raises(ValueError, match="Unable to configure handler") as exc_info:
+            configure_log(config)
+
+    cause = _root_cause(exc_info.value)
+    assert isinstance(cause, InstantiationException)
+    assert "unsafe parameters: return_value" in str(cause)

@@ -118,8 +118,10 @@ lr: 0.01
 ```
 
 Hydra authorizes the configured target when creating the partial. When the
-partial is invoked, Hydra checks runtime-selected discovery paths, argument-
-sensitive operations, and callable results before returning them.
+partial is invoked, Hydra checks runtime-selected discovery paths,
+protected-state operations, and callable results before returning them. Explicit
+authorization accepts the constructor arguments and deferred callbacks that the target can consume. The
+legacy path keeps its existing argument restrictions.
 
 Discovery helpers may also use `_partial_: true`. Hydra checks their effective
 `path` when the deferred factory is invoked, including a path supplied or

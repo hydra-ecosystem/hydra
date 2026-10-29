@@ -35,7 +35,7 @@ from omegaconf import (
     read_write,
 )
 from omegaconf.errors import ReadonlyConfigError, ValidationError
-from pytest import MonkeyPatch, fixture, mark, param, raises, warns
+from pytest import MonkeyPatch, fixture, mark, param, raises, skip, warns
 
 from hydra._internal import execution_policy
 from hydra._internal.instantiate import _instantiate2
@@ -4761,7 +4761,7 @@ def test_two_argument_iter_callback_is_blocked_in_legacy_mode() -> None:
     assert calls == []
 
 
-def test_two_argument_iter_callback_cannot_be_whitelisted() -> None:
+def test_two_argument_iter_can_be_explicitly_authorized() -> None:
     calls: list[str] = []
 
     def callback() -> int:
@@ -4769,12 +4769,12 @@ def test_two_argument_iter_callback_cannot_be_whitelisted() -> None:
         return 1
 
     cfg = {"_target_": "builtins.iter", "_args_": [callback, 2]}
-    with raises(InstantiationException, match="two-argument callback form"):
-        _instantiate2.instantiate(
-            config_with_objects(cfg), _execution_whitelist_="builtins.iter"
-        )
-
+    result = _instantiate2.instantiate(
+        config_with_objects(cfg), _execution_whitelist_="builtins.iter"
+    )
     assert calls == []
+    assert next(result) == 1
+    assert calls == ["called"]
 
 
 def test_partial_call_target_reauthorizes_effective_callable() -> None:
@@ -4885,6 +4885,9 @@ def test_property_get_target_cannot_be_whitelisted() -> None:
 def test_descriptor_callback_wrappers_follow_state_access_policy(
     target: str, canonical_target: str
 ) -> None:
+    if sys.version_info < (3, 11) and target.startswith("enum.property"):
+        skip("enum.property requires Python 3.11")
+
     if canonical_target in {
         "abc.abstractmethod",
         "builtins.getset_descriptor.__get__",
@@ -5109,6 +5112,9 @@ def test_operator_dispatch_targets_are_blacklisted(target: str) -> None:
 def test_execution_whitelist_operator_dispatch_preserves_state_restrictions(
     target: str,
 ) -> None:
+    if sys.version_info < (3, 11) and target.endswith(".call"):
+        skip("operator.call requires Python 3.11")
+
     if target in {
         "operator.attrgetter",
         "operator.getitem",
@@ -6023,7 +6029,8 @@ def test_type_introspection_is_allowed() -> None:
 
 
 @mark.parametrize("target", ["builtins.type", "abc.ABCMeta"])
-def test_dynamic_type_construction_is_not_allowed(target: str) -> None:
+@mark.filterwarnings("ignore:hydra.utils.instantiate:UserWarning")
+def test_dynamic_type_construction_is_not_allowed_in_legacy_mode(target: str) -> None:
     cfg = {
         "_target_": target,
         "_args_": ["Selector", [], {"__call__": dict.get}],
@@ -6034,26 +6041,22 @@ def test_dynamic_type_construction_is_not_allowed(target: str) -> None:
         InstantiationException,
         match="cannot be used for dynamic class construction",
     ):
-        _instantiate2.instantiate(
-            config_with_objects(cfg), _execution_whitelist_=target
-        )
+        _instantiate2.instantiate(config_with_objects(cfg), _execution_whitelist_=None)
 
 
 def test_partial_type_reauthorizes_runtime_arguments() -> None:
     deferred = _instantiate2.instantiate(
         {"_target_": "builtins.type", "_partial_": True},
-        _execution_whitelist_=["builtins.type", "builtins.int"],
+        _execution_whitelist_=["builtins.type", "builtins.int", f"{__name__}.Selector"],
     )
-
     assert deferred(10) is int
-    with raises(
-        InstantiationException,
-        match="cannot be used for dynamic class construction",
-    ):
-        deferred("Selector", (), {"__call__": dict.get})
+    assert deferred("Selector", (), {"__module__": __name__}).__name__ == "Selector"
 
 
-def test_resolved_partial_target_cannot_bypass_dynamic_type_guard() -> None:
+@mark.filterwarnings("ignore:hydra.utils.instantiate:UserWarning")
+def test_resolved_partial_target_cannot_bypass_dynamic_type_guard_in_legacy_mode() -> (
+    None
+):
     initialized_subclasses: list[type] = []
 
     class Base:
@@ -6067,13 +6070,16 @@ def test_resolved_partial_target_cannot_bypass_dynamic_type_guard() -> None:
     ):
         _instantiate2.instantiate(
             config_with_objects({"_target_": target}),
-            _execution_whitelist_="builtins.type",
+            _execution_whitelist_=None,
         )
 
     assert initialized_subclasses == []
 
 
-def test_resolved_partial_target_cannot_bypass_mock_parameter_guard() -> None:
+@mark.filterwarnings("ignore:hydra.utils.instantiate:UserWarning")
+def test_resolved_partial_target_cannot_bypass_mock_parameter_guard_in_legacy_mode() -> (
+    None
+):
     target = partial(NonCallableMock, wraps={})
     with raises(
         InstantiationException,
@@ -6081,7 +6087,7 @@ def test_resolved_partial_target_cannot_bypass_mock_parameter_guard() -> None:
     ):
         _instantiate2.instantiate(
             config_with_objects({"_target_": target}),
-            _execution_whitelist_="unittest.mock.NonCallableMock",
+            _execution_whitelist_=None,
         )
 
 
@@ -6089,7 +6095,10 @@ def test_resolved_partial_target_cannot_bypass_mock_parameter_guard() -> None:
     not hasattr(functools, "Placeholder"),
     reason="functools.Placeholder requires Python 3.14",
 )
-def test_resolved_partial_target_substitutes_placeholder_before_guard() -> None:
+@mark.filterwarnings("ignore:hydra.utils.instantiate:UserWarning")
+def test_resolved_partial_target_substitutes_placeholder_before_guard_in_legacy_mode() -> (
+    None
+):
     initialized_subclasses: list[type] = []
 
     class Base:
@@ -6104,7 +6113,7 @@ def test_resolved_partial_target_substitutes_placeholder_before_guard() -> None:
     ):
         _instantiate2.instantiate(
             config_with_objects({"_target_": target, "_args_": ["Selector"]}),
-            _execution_whitelist_="builtins.type",
+            _execution_whitelist_=None,
         )
 
     assert initialized_subclasses == []
@@ -6125,14 +6134,15 @@ def test_resolved_partial_target_preserves_unfilled_placeholder_error() -> None:
         )
 
 
-def test_metaclass_constructor_method_is_not_allowed() -> None:
+@mark.filterwarnings("ignore:hydra.utils.instantiate:UserWarning")
+def test_metaclass_constructor_method_is_not_allowed_in_legacy_mode() -> None:
     with raises(
         InstantiationException,
         match="cannot be used for dynamic class construction",
     ):
         _instantiate2.instantiate(
             {"_target_": "abc.ABCMeta.__new__"},
-            _execution_whitelist_="abc.ABCMeta.__new__",
+            _execution_whitelist_=None,
         )
 
 
@@ -6164,7 +6174,8 @@ def test_non_callable_mock_allows_one_positional_spec() -> None:
         {"wraps": {}},
     ],
 )
-def test_non_callable_mock_cannot_configure_callable_children(
+@mark.filterwarnings("ignore:hydra.utils.instantiate:UserWarning")
+def test_non_callable_mock_cannot_configure_callable_children_in_legacy_mode(
     unsafe_kwargs: dict[str, Any],
 ) -> None:
     target = "unittest.mock.NonCallableMock"
@@ -6173,19 +6184,18 @@ def test_non_callable_mock_cannot_configure_callable_children(
         InstantiationException,
         match="cannot configure callable attributes",
     ):
-        _instantiate2.instantiate(
-            config_with_objects(cfg), _execution_whitelist_=target
-        )
+        _instantiate2.instantiate(config_with_objects(cfg), _execution_whitelist_=None)
 
 
-def test_non_callable_mock_rejects_positional_wraps() -> None:
+@mark.filterwarnings("ignore:hydra.utils.instantiate:UserWarning")
+def test_non_callable_mock_rejects_positional_wraps_in_legacy_mode() -> None:
     target = "unittest.mock.NonCallableMock"
     cfg = {"_target_": target, "_args_": [None, {}]}
     with raises(
         InstantiationException,
         match="cannot configure callable attributes",
     ):
-        _instantiate2.instantiate(cfg, _execution_whitelist_=target)
+        _instantiate2.instantiate(cfg, _execution_whitelist_=None)
 
 
 def test_partial_non_callable_mock_reauthorizes_runtime_configuration() -> None:
@@ -6193,18 +6203,10 @@ def test_partial_non_callable_mock_reauthorizes_runtime_configuration() -> None:
     deferred = _instantiate2.instantiate(
         {"_target_": target, "_partial_": True}, _execution_whitelist_=target
     )
-
     assert not callable(deferred(name="inert"))
-    with raises(
-        InstantiationException,
-        match="cannot configure callable attributes",
-    ):
-        deferred(**{"child.side_effect": dict.get})
-    with raises(
-        InstantiationException,
-        match="cannot configure callable attributes",
-    ):
-        deferred(None, {})
+    result = deferred(**{"child.side_effect": dict.get})
+    assert result.child.side_effect is dict.get
+    assert not callable(deferred(None, {}))
 
 
 def test_context_decorator_cannot_hide_deferred_callable_selection() -> None:
@@ -7660,3 +7662,73 @@ def test_environment_mutation_requires_explicit_target_authorization(
     assert data == {}
     _instantiate2.instantiate(cfg, _execution_whitelist_=target)
     assert data == {b"NEW": b"value"}
+
+
+@mark.filterwarnings("ignore:hydra.utils.instantiate:UserWarning")
+def test_partial_type_reauthorizes_runtime_arguments_in_legacy_mode() -> None:
+    deferred = _instantiate2.instantiate(
+        {"_target_": "builtins.type", "_partial_": True},
+        _execution_whitelist_=None,
+    )
+
+    assert deferred(10) is int
+    with raises(
+        InstantiationException,
+        match="cannot be used for dynamic class construction",
+    ):
+        deferred("Selector", (), {"__call__": dict.get})
+
+
+@mark.filterwarnings("ignore:hydra.utils.instantiate:UserWarning")
+def test_partial_non_callable_mock_reauthorizes_runtime_configuration_in_legacy_mode() -> (
+    None
+):
+    target = "unittest.mock.NonCallableMock"
+    deferred = _instantiate2.instantiate(
+        {"_target_": target, "_partial_": True}, _execution_whitelist_=None
+    )
+
+    assert not callable(deferred(name="inert"))
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        deferred(**{"child.side_effect": dict.get})
+    with raises(
+        InstantiationException,
+        match="cannot configure callable attributes",
+    ):
+        deferred(None, {})
+
+
+@mark.parametrize("target", ["builtins.type", "abc.ABCMeta"])
+def test_dynamic_type_construction_can_be_authorized(target: str) -> None:
+    cfg = {
+        "_target_": target,
+        "_args_": ["Selector", (), {"__module__": __name__}],
+        "_convert_": "all",
+    }
+    result = _instantiate2.instantiate(
+        config_with_objects(cfg), _execution_whitelist_=[target, f"{__name__}.Selector"]
+    )
+    assert isinstance(result, type)
+    assert result.__name__ == "Selector"
+
+
+@mark.parametrize(
+    "unsafe_kwargs",
+    [
+        {"child": dict.get},
+        {"child.side_effect": dict.get},
+        {"wraps": {}},
+    ],
+)
+def test_non_callable_mock_configuration_can_be_authorized(
+    unsafe_kwargs: dict[str, Any],
+) -> None:
+    target = "unittest.mock.NonCallableMock"
+    result = _instantiate2.instantiate(
+        config_with_objects({"_target_": target, **unsafe_kwargs}),
+        _execution_whitelist_=target,
+    )
+    assert not callable(result)

@@ -77,8 +77,13 @@ after `instantiate()` returns. Hydra does not inspect the callback's behavior.
 Ordinary callable-wrapper constructors can also be explicitly authorized.
 The descriptor-binding targets described above and helpers that modify
 existing functions, such as `functools.update_wrapper`, remain restricted.
-Argument checks on dynamic class construction, the two-argument `iter()` form,
-and non-callable mock configuration still apply.
+
+Explicit authorization also accepts argument-controlled construction: the
+two-argument `iter(callback, sentinel)` form, dynamic class constructors, and
+non-callable mock configuration with callbacks or wrappers. These forms remain
+restricted on the legacy path. Immediate callable results and discovery paths
+still need their own authorization, and direct code or policy-state access stays
+blocked.
 
 ## Formatting traversal
 

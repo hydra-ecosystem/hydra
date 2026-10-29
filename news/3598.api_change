@@ -1,2 +1,3 @@
 Allow explicit authorization of execution helpers and environment mutation.
 Require exact whitelist entries for standard-library and Hydra targets.
+Explicit authorization accepts constructor arguments.
