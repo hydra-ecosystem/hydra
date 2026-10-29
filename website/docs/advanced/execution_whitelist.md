@@ -90,7 +90,10 @@ def my_app(cfg):
     ...
 ```
 
-Entries can be exact targets or package prefixes ending in `.*`. The wildcard
+Entries can be exact targets or application and third-party package prefixes
+ending in `.*`. Python standard-library and Hydra targets require exact entries,
+including targets in their submodules. For example, use `os.getcwd` or
+`hydra.utils.get_class`; `os.*` and `hydra.utils.*` are rejected. The wildcard
 `*` by itself is not allowed.
 
 Be careful with namespace packages and plugin namespaces. An entry such as
@@ -126,6 +129,11 @@ configurations during logging setup. It does not support replacing Python's
 global `logging.config.dictConfigClass`; a custom configurator would bypass
 Hydra's checks. Express custom components in logging configuration and
 whitelist their targets instead.
+
+Hydra authorizes a factory before calling it. A return-type check verifies that
+the result is an appropriate logging component; it cannot undo side effects
+from an explicitly authorized factory. The built-in allowance remains an exact
+list and does not authorize arbitrary factories or a `logging.*` namespace.
 
 This does not protect calls that application code makes directly to
 `logging.config.dictConfig()` or other Python logging configuration APIs.

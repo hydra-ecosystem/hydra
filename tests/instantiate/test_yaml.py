@@ -8,6 +8,7 @@ from typing import Any
 import yaml
 from pytest import MonkeyPatch, mark, param, raises, warns
 
+from hydra._internal import execution_policy
 from hydra._internal.instantiate._instantiate2 import _resolve_target
 from hydra.errors import InstantiationException
 from hydra.utils import UNSAFE_DISABLE_EXECUTION_CHECKS, instantiate
@@ -65,32 +66,38 @@ from hydra.utils import UNSAFE_DISABLE_EXECUTION_CHECKS, instantiate
 )
 @mark.parametrize("policy", [None, "exact", "yaml.*"])
 @mark.parametrize("as_callable", [False, True])
-def test_yaml_targets_are_restricted(
+def test_yaml_targets_require_authorization(
     target: str, policy: str | None, as_callable: bool
 ) -> None:
     configured_target: Any = target
     if as_callable:
         configured_target = _resolve_target(target, "", UNSAFE_DISABLE_EXECUTION_CHECKS)
-    match = "blacklisted" if policy is None else "cannot be authorized"
-    with raises(InstantiationException, match=match):
-        _resolve_target(
-            configured_target,
-            "nested",
-            (target,) if policy == "exact" else (policy,) if policy else None,
-        )
+    identity = (
+        execution_policy._get_resolved_target_name_for_check(configured_target)
+        if as_callable
+        else target
+    )
+    whitelist = (identity,) if policy == "exact" else (policy,) if policy else None
+    if policy is None:
+        with raises(InstantiationException, match="blacklisted"):
+            _resolve_target(configured_target, "nested", whitelist)
+    else:
+        assert callable(_resolve_target(configured_target, "nested", whitelist))
 
 
 @mark.parametrize("policy", [None, "exact"])
-def test_yaml_alias_is_restricted(monkeypatch: MonkeyPatch, policy: str | None) -> None:
+def test_yaml_alias_requires_authorization(
+    monkeypatch: MonkeyPatch, policy: str | None
+) -> None:
     monkeypatch.setattr(
         sys.modules[__name__], "yaml_alias", yaml.unsafe_load, raising=False
     )
     target = f"{__name__}.yaml_alias"
-    with raises(
-        InstantiationException,
-        match="blacklisted" if policy is None else "cannot be authorized",
-    ):
-        _resolve_target(target, "nested", (target,) if policy else None)
+    if policy is None:
+        with raises(InstantiationException, match="blacklisted"):
+            _resolve_target(target, "nested", None)
+    else:
+        assert _resolve_target(target, "nested", (target,)) is yaml.unsafe_load
 
 
 @mark.parametrize(
@@ -101,11 +108,11 @@ def test_yaml_alias_is_restricted(monkeypatch: MonkeyPatch, policy: str | None) 
 def test_yaml_namespace_is_restricted_by_default(
     target: str, policy: str | None
 ) -> None:
-    with raises(
-        InstantiationException,
-        match="blacklisted" if policy is None else "cannot be authorized",
-    ):
-        _resolve_target(target, "nested", (policy,) if policy else None)
+    if policy is None:
+        with raises(InstantiationException, match="blacklisted"):
+            _resolve_target(target, "nested", None)
+    else:
+        execution_policy._authorize_target_name(target, target, "nested", (policy,))
 
 
 @mark.parametrize("target", ["yaml.unsafe_load", "yaml.unsafe_load_all"])

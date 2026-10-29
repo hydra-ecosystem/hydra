@@ -4,9 +4,11 @@ title: Execution authorization rules
 sidebar_label: Authorization rules
 ---
 
-Hydra authorizes every callable that composed configuration can select.
-Authorizing one callable does not automatically authorize another callable that
-it selects or returns.
+Hydra authorizes configured targets, discovery paths, and immediate callable
+results that pass through its checks. Authorizing a factory does not automatically
+authorize a callable it returns. Authorizing a generic executor or dispatcher
+does accept the behavior it performs internally using configuration arguments;
+Hydra does not inspect that execution or recursively inspect containers.
 
 Here, selection means resolving a config-controlled target or discovery path,
 or choosing a callable result based on declarative arguments. Live Python
@@ -22,18 +24,20 @@ module prefix from hiding a target imported from somewhere else. Rejections
 identify both names, for example:
 
 ```text
-Target 'os.system' (resolved from 'my_app.compat.system') cannot be authorized ...
+Target 'os.system' (resolved from 'my_app.compat.system') is not in the Hydra execution whitelist.
 ```
 
 An exact whitelist entry deliberately authorizes that configured name, including
 a public re-export, unless the resolved callable is a restricted target. A
 package wildcard still requires the resolved callable to belong to an authorized
-package.
+package. Wildcards are available only for application and third-party packages;
+standard-library and Hydra targets require exact entries.
 
 ## Indirectly selected targets
 
-Some targets select another callable from configuration. In those cases, both
-the selector and the selected callable require authorization.
+For Hydra discovery helpers and immediate callable results, both the selector
+and the selected callable require authorization. This mediation does not extend
+to arbitrary calls performed internally by an authorized target.
 
 ### Discovery helpers
 
@@ -89,8 +93,14 @@ instantiation and Hydra-configured logging. Installed Python code, the
 application, and execution whitelists supplied by trusted Python code are
 trusted; the execution policy is not a general Python sandbox.
 
-Configuration cannot reference objects under `hydra._internal`, expose Hydra
-module state through discovery, or modify existing Python functions and classes.
+Logging uses the same target checks with a narrow
+allowance for the exact built-in logging components. File paths remain the
+application's responsibility.
+
+Hydra rejects direct configuration references under `hydra._internal`, Hydra
+module state exposed through discovery, and direct mutation of existing Python
+functions and classes. These guards do not sandbox explicitly authorized code
+evaluation, loaders, callbacks, or application functions.
 Hydra also validates and captures its immutable policy before resolving targets,
 so rebinding a policy global cannot change an operation already in progress and
 causes the next operation to fail closed. `UNSAFE_DISABLE_EXECUTION_CHECKS`

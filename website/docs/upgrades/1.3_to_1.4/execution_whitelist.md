@@ -26,6 +26,10 @@ def my_app(cfg):
     ...
 ```
 
+Standard-library and Hydra targets require exact entries. Replace entries such
+as `os.*` or `hydra.utils.*` with the specific targets the application needs.
+Application and third-party package wildcards remain supported.
+
 Hydra automatically permits targets used by its built-in logging
 configurations. Add application-defined handlers, formatters, filters, queues,
 and listeners explicitly.
@@ -56,6 +60,19 @@ from hydra.utils import execution_whitelist
 with execution_whitelist("my_app.*"):
     framework_function(cfg)
 ```
+
+## Explicit execution authorization
+
+Trusted Python code can explicitly whitelist execution helpers, including code
+evaluation, process launchers, loaders, callback dispatch, and ordinary callable
+wrappers. This accepts the behavior their arguments can request. Direct access
+to existing code or authorization state remains restricted. See
+[Restricted targets](/docs/advanced/execution_whitelist/restricted_targets).
+
+Explicitly authorizing an environment-mutating target accepts its process-wide
+effect. Ordinary built-in file logging keeps working without application
+permissions; other logging targets are not authorized by that default allowance.
+All existing no-whitelist restrictions remain in place.
 
 ## Temporary legacy behavior
 

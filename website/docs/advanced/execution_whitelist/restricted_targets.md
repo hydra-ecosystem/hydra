@@ -4,9 +4,10 @@ title: Restricted targets
 sidebar_label: Restricted targets
 ---
 
-Some callables are too generic or powerful for target-name authorization. Even
-an exact execution-whitelist entry cannot authorize these targets because the
-configured name does not bound the behavior that configuration can select.
+Some targets expose or modify existing Python code, live namespaces, or
+authorization state. An exact execution-whitelist entry cannot authorize those
+operations. Other execution-capable targets can be explicitly authorized by
+trusted Python code.
 
 Hydra's error identifies the exact rejected target and explains why it cannot be
 authorized.
@@ -27,14 +28,17 @@ builtins and mutate existing Python code or authorization state.
 
 Attribute operations such as `builtins.getattr`, `hasattr`, `setattr`, and
 `delattr` let configuration select an attribute or descriptor operation as data.
-Generic `operator` helpers such as `call`, `attrgetter`, `methodcaller`,
-`getitem`, `itemgetter`, `setitem`, `delitem`, and `contains` have the same
-problem.
+`operator` traversal helpers such as `attrgetter`, `methodcaller`, `getitem`,
+and `itemgetter` have the same problem. Dispatch and mutation helpers such as
+`call`, `contains`, `setitem`, and `delitem` can be explicitly authorized; direct
+mutation of existing code or authorization state remains blocked.
 
 Generic `__call__` indirection is authorized as the callable it actually
 invokes; spelling an allowed target through `.__call__` does not bypass its
-blacklist or whitelist status. Low-level descriptor `__get__` operations remain
-blocked because configuration would select the descriptor and receiver as data.
+blacklist or whitelist status. Selected descriptor-binding targets, including
+`builtins.property.__get__` and `types.FunctionType.__get__`, remain permanently
+restricted. Other descriptor methods, such as
+`functools.cached_property.__get__`, can be explicitly authorized.
 `locals` and both forms of `vars` are also blocked because they expose caller or
 object namespaces; rejecting the otherwise-safe `vars(obj)` form is intentional
 collateral damage for a simple fail-closed rule.
@@ -53,35 +57,28 @@ selection in trusted Python code.
 
 ## Process environment mutation
 
-Targets that modify the process environment are permanently restricted. This
-includes `os.putenv`, `os.unsetenv`, and mutating methods reached through
-`os.environ` or `os.environb`, such as assignment, deletion, `update`, `clear`,
-`pop`, `popitem`, and `setdefault`. Direct mutation of their backing mappings
-and attributes is also rejected.
+Targets that modify the process environment require explicit authorization.
+This includes `os.putenv`, `os.unsetenv`, and mutating methods reached through
+`os.environ` or `os.environb`. Their arguments can select keys, values, or whole
+mapping updates. Authorizing them accepts that process-wide effect.
 
-This restriction does not block environment reads, including OmegaConf's
-`oc.env` resolver. Perform required environment mutation in trusted Python code
-or expose a narrow application-owned wrapper whose behavior is bounded by its
-target name.
+The legacy path retains its existing environment-mutation restrictions.
+Environment reads, including OmegaConf's `oc.env` resolver, remain available.
+Built-in logging permissions do not authorize environment mutation; custom
+logging targets still require authorization from trusted Python code.
 
 ## Callback dispatch and callable wrappers
 
-Dispatchers such as `builtins.map`, `builtins.filter`, predicate-based
-`itertools` helpers, `functools.reduce`, `itertools.starmap`, and executor or
-pool submission APIs invoke a config-supplied callback. Invocation may continue
-outside Hydra's immediate callable-result checks.
+Dispatchers such as `builtins.map`, `builtins.filter`, `functools.reduce`, and
+executor submission APIs can invoke a callback selected by configuration. An
+explicit whitelist can authorize this dispatch, including execution that occurs
+after `instantiate()` returns. Hydra does not inspect the callback's behavior.
 
-Callable binding and wrapper helpers can similarly defer or obscure the
-effective callable. Examples include `classmethod`, `staticmethod`,
-`property`, `functools.cached_property`, the equivalent `abc` wrappers,
-`types.DynamicClassAttribute`, `enum.property`,
-`contextlib.contextmanager`, `contextlib.asynccontextmanager`,
-`functools.lru_cache`, `partialmethod`, `singledispatch`, `types.coroutine`, and
-`update_wrapper`.
-
-Perform this dispatch or wrapping in trusted Python code. If configuration must
-request a broader operation, expose a narrow application-owned wrapper whose
-behavior is bounded by its target name.
+Ordinary callable-wrapper constructors can also be explicitly authorized.
+The descriptor-binding targets described above and helpers that modify
+existing functions, such as `functools.update_wrapper`, remain restricted.
+Argument checks on dynamic class construction, the two-argument `iter()` form,
+and non-callable mock configuration still apply.
 
 ## Formatting traversal
 
@@ -97,19 +94,31 @@ with a warning, leaving the handler's default formatter in place. These
 restrictions do not affect ordinary format strings used by trusted Python code
 or OmegaConf.
 
-## Uncontrolled execution
+## Explicit execution authorization
 
-Targets that execute code, import modules, load native libraries, spawn
-processes, or deserialize executable objects cannot be authorized. This
-includes families such as `eval` and `exec`, subprocess and shell execution,
-dynamic import loaders, `ctypes` library loading, and pickle-backed loaders.
+Trusted Python code can explicitly authorize evaluation, process launchers,
+imports, native-library loading, and executable deserialization. For example:
 
-The `yaml.*` namespace is restricted except for `yaml.safe_load`,
-`yaml.safe_load_all`, `yaml.safe_dump`, and `yaml.safe_dump_all`. These exceptions
-allow only the exact functions, not their attributes or other YAML targets.
+```python
+from hydra.utils import instantiate
 
-These operations should remain in trusted Python code rather than composed
-configuration.
+result = instantiate(
+    {"_target_": "builtins.eval", "_args_": ["40 + 2"]},
+    _execution_whitelist_="builtins.eval",
+)
+assert result == 42
+```
+
+This accepts evaluation of the configured expression. Authorizing a loader or
+process launcher similarly accepts the payload, program, and arguments selected
+by configuration. An authorized callable can change process state through its
+own implementation; Hydra does not sandbox it.
+
+The legacy blacklist remains unchanged. On that path, `yaml.*` is restricted
+except for the exact `yaml.safe_load`, `yaml.safe_load_all`, `yaml.safe_dump`,
+and `yaml.safe_dump_all` functions. Explicit authorization can allow other YAML
+loaders, including Python-object deserialization. Prefer the safe functions
+unless that broader behavior is intentional.
 
 ## Reentrant instantiation
 
