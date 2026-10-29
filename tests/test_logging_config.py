@@ -253,7 +253,7 @@ def test_logging_rejects_internal_policy_reference() -> None:
 def test_logging_policy_integrity_mismatch_fails_closed(
     monkeypatch: MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(execution_policy, "UNCONTROLLED_EXECUTION_TARGETS", frozenset())
+    monkeypatch.setattr(execution_policy, "LEGACY_EXECUTION_TARGETS", frozenset())
 
     with raises(InstantiationException, match="integrity"):
         configure_log(_logging_config({"class": "logging.StreamHandler"}))

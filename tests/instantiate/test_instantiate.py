@@ -109,7 +109,7 @@ metadata_closure_victim = _make_metadata_closure_victim()
 
 
 def replace_execution_policy_targets() -> None:
-    execution_policy.UNCONTROLLED_EXECUTION_TARGETS = frozenset()
+    execution_policy.LEGACY_EXECUTION_TARGETS = frozenset()
 
 
 class GetattrDescriptorProbe:
@@ -3994,7 +3994,13 @@ def test_execution_whitelist_can_explicitly_allow_blacklisted_targets(
     assert type(result).__qualname__ == "Quitter"
 
 
-@mark.parametrize("target", sorted(execution_policy.UNCONTROLLED_EXECUTION_TARGETS))
+@mark.parametrize(
+    "target",
+    sorted(
+        execution_policy.LEGACY_EXECUTION_TARGETS
+        | execution_policy.NON_WHITELISTABLE_TARGETS
+    ),
+)
 def test_uncontrolled_execution_targets_cannot_be_whitelisted(target: str) -> None:
     assert execution_policy._is_blacklisted_target(target)
     assert execution_policy._is_non_whitelistable_target(target)
@@ -4180,12 +4186,12 @@ def test_ineffective_sys_modules_entries_are_not_in_policy() -> None:
         "sys.modules.tkinter",
     ):
         assert target not in execution_policy.DEFAULT_BLACKLISTED_MODULES
-        assert target not in execution_policy.UNCONTROLLED_EXECUTION_TARGETS
+        assert target not in execution_policy.LEGACY_EXECUTION_TARGETS
 
 
 def test_blacklist_policy_sections_are_disjoint() -> None:
     assert execution_policy.DEFAULT_BLACKLISTED_MODULES.isdisjoint(
-        execution_policy.UNCONTROLLED_EXECUTION_TARGETS
+        execution_policy.LEGACY_EXECUTION_TARGETS
     )
 
 
@@ -4196,8 +4202,9 @@ def test_execution_policy_collections_are_immutable() -> None:
         execution_policy.CALLABLE_WRAPPER_TARGETS,
         execution_policy._NON_CALLABLE_MOCK_TARGETS,
         execution_policy._NON_CALLABLE_MOCK_SAFE_PARAMETERS,
-        execution_policy.UNCONTROLLED_EXECUTION_TARGETS,
-        execution_policy.UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
+        execution_policy.LEGACY_EXECUTION_TARGETS,
+        execution_policy.NON_WHITELISTABLE_TARGETS,
+        execution_policy.LEGACY_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
         execution_policy.LEGACY_COMPATIBLE_NON_WHITELISTABLE_TARGETS,
         execution_policy.DISCOVERY_TARGETS,
     ):
@@ -4210,12 +4217,12 @@ def test_execution_policy_collections_are_immutable() -> None:
 
 def test_policy_mutation_via_instantiate_is_blocked() -> None:
     target = "builtins.eval"
-    assert target in execution_policy.UNCONTROLLED_EXECUTION_TARGETS
+    assert target in execution_policy.LEGACY_EXECUTION_TARGETS
 
     cfg = {
         "disarm": {
             "_target_": (
-                "hydra._internal.execution_policy.UNCONTROLLED_EXECUTION_TARGETS.discard"
+                "hydra._internal.execution_policy.LEGACY_EXECUTION_TARGETS.discard"
             ),
             "_args_": [target],
         },
@@ -4227,17 +4234,17 @@ def test_policy_mutation_via_instantiate_is_blocked() -> None:
         with raises(InstantiationException, match="implementation state"):
             _instantiate2.instantiate(cfg)
 
-    assert target in execution_policy.UNCONTROLLED_EXECUTION_TARGETS
+    assert target in execution_policy.LEGACY_EXECUTION_TARGETS
 
 
 @mark.parametrize("execution_whitelist", [None, "hydra._internal.execution_policy.*"])
 def test_policy_namespace_cannot_be_rebound_from_config(
     execution_whitelist: Any,
 ) -> None:
-    original = execution_policy.UNCONTROLLED_EXECUTION_TARGETS
+    original = execution_policy.LEGACY_EXECUTION_TARGETS
     config = {
         "_target_": "hydra._internal.execution_policy.__dict__.update",
-        "_args_": [{"UNCONTROLLED_EXECUTION_TARGETS": frozenset()}],
+        "_args_": [{"LEGACY_EXECUTION_TARGETS": frozenset()}],
     }
 
     with raises(InstantiationException, match="implementation state"):
@@ -4245,7 +4252,7 @@ def test_policy_namespace_cannot_be_rebound_from_config(
             config_with_objects(config), _execution_whitelist_=execution_whitelist
         )
 
-    assert execution_policy.UNCONTROLLED_EXECUTION_TARGETS is original
+    assert execution_policy.LEGACY_EXECUTION_TARGETS is original
 
 
 def test_aliased_policy_namespace_capability_is_blocked() -> None:
@@ -4344,7 +4351,7 @@ def test_vars_with_object_is_intentionally_non_whitelistable() -> None:
 
 
 def test_current_operation_uses_captured_policy() -> None:
-    original = execution_policy.UNCONTROLLED_EXECUTION_TARGETS
+    original = execution_policy.LEGACY_EXECUTION_TARGETS
     config = {
         "replace": {
             "_target_": (
@@ -4360,20 +4367,20 @@ def test_current_operation_uses_captured_policy() -> None:
             with raises(InstantiationException, match="blacklisted"):
                 _instantiate2.instantiate(config)
     finally:
-        execution_policy.UNCONTROLLED_EXECUTION_TARGETS = original
+        execution_policy.LEGACY_EXECUTION_TARGETS = original
 
 
 def test_execution_policy_integrity_mismatch_fails_closed(
     monkeypatch: MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(execution_policy, "UNCONTROLLED_EXECUTION_TARGETS", frozenset())
+    monkeypatch.setattr(execution_policy, "LEGACY_EXECUTION_TARGETS", frozenset())
 
     with raises(InstantiationException, match="integrity"):
         _instantiate2.instantiate({"_target_": "tests.instantiate.AClass", "a": 10})
 
 
 def test_unsafe_disable_bypasses_policy_integrity(monkeypatch: MonkeyPatch) -> None:
-    monkeypatch.setattr(execution_policy, "UNCONTROLLED_EXECUTION_TARGETS", frozenset())
+    monkeypatch.setattr(execution_policy, "LEGACY_EXECUTION_TARGETS", frozenset())
 
     assert (
         _instantiate2.instantiate(
@@ -4779,7 +4786,7 @@ def test_call_wrapper_reauthorizes_effective_callable() -> None:
 
 
 def test_generic_call_slots_are_not_permanently_blocked() -> None:
-    assert execution_policy.UNCONTROLLED_EXECUTION_TARGETS.isdisjoint(
+    assert execution_policy.LEGACY_EXECUTION_TARGETS.isdisjoint(
         {
             "builtins.builtin_function_or_method.__call__",
             "builtins.classmethod_descriptor.__call__",
@@ -7531,10 +7538,10 @@ def test_exact_blacklist_takes_precedence_over_prefix_exception(
     )
     monkeypatch.setattr(
         execution_policy,
-        "UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS",
+        "LEGACY_EXECUTION_TARGET_PREFIX_EXCEPTIONS",
         frozenset(
             {
-                *execution_policy.UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
+                *execution_policy.LEGACY_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
                 "trace.CoverageResults",
             }
         ),

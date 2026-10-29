@@ -132,7 +132,6 @@ _CALLABLE_DESCRIPTOR_BINDING_TARGETS: Mapping[type, str] = types.MappingProxyTyp
 # mediation.
 CALLABLE_WRAPPER_TARGETS = frozenset(
     {
-        "abc.abstractmethod",
         "builtins.classmethod",
         "builtins.property",
         "builtins.staticmethod",
@@ -148,8 +147,6 @@ CALLABLE_WRAPPER_TARGETS = frozenset(
         "functools.singledispatch",
         "functools.singledispatchmethod",
         "functools.singledispatchmethod.__get__",
-        "functools.update_wrapper",
-        "functools.wraps",
         "types.FunctionType",
         "types.MethodType",
         "types.coroutine",
@@ -160,7 +157,7 @@ CALLABLE_WRAPPER_TARGETS = frozenset(
         "unittest.mock.create_autospec",
         "unittest.mock.mock_open",
     }
-) | frozenset(_CALLABLE_DESCRIPTOR_BINDING_TARGETS.values())
+)
 
 _NON_CALLABLE_MOCK_TARGETS = frozenset(
     {
@@ -173,7 +170,7 @@ _NON_CALLABLE_MOCK_SAFE_PARAMETERS = frozenset({"name", "spec", "spec_set"})
 # These targets allow config data to select or supply executable behavior.
 # They are refused both on the legacy path and by a real execution whitelist.
 # UNSAFE_DISABLE_EXECUTION_CHECKS remains the explicit opt-out from all checks.
-UNCONTROLLED_EXECUTION_TARGETS = frozenset(
+LEGACY_EXECUTION_TARGETS = frozenset(
     {
         "_sitebuiltins._Helper",
         "builtins.__build_class__",
@@ -181,35 +178,18 @@ UNCONTROLLED_EXECUTION_TARGETS = frozenset(
         "builtins.compile",
         "builtins.eval",
         "builtins.exec",
-        "builtins.frame.clear",
-        "builtins.getset_descriptor.__get__",
         "builtins.help",
-        "builtins.locals",
-        "builtins.member_descriptor.__get__",
         "builtins.type.__new__",
-        # vars() exposes the caller's locals, while vars(obj) exposes an object
-        # namespace selected by config. Block both forms intentionally rather
-        # than maintain an argument-sensitive exception for vars(obj).
-        "builtins.vars",
-        "inspect",
         # Generic dispatch primitives delegate the effective callable, selected
         # member, or operation to config data instead of naming it as _target_.
         # Include public and canonical C-module spellings.
-        "operator.attrgetter",
         "operator.call",
         "operator.contains",
         "operator.delitem",
-        "operator.getitem",
-        "operator.itemgetter",
-        "operator.methodcaller",
         "operator.setitem",
-        "_operator.attrgetter",
         "_operator.call",
         "_operator.contains",
         "_operator.delitem",
-        "_operator.getitem",
-        "_operator.itemgetter",
-        "_operator.methodcaller",
         "_operator.setitem",
         "ctypes.CDLL",
         "ctypes.LibraryLoader.LoadLibrary",
@@ -250,31 +230,6 @@ UNCONTROLLED_EXECUTION_TARGETS = frozenset(
         "subprocess.getoutput",
         "subprocess.getstatusoutput",
         "subprocess.run",
-        "sys.exc_info",
-        "sys.exception",
-        "sys._current_exceptions",
-        "sys._current_frames",
-        "sys._getframe",
-        # Available only in CPython trace-refs builds; enumerates live objects.
-        "sys.getobjects",
-        # Formatting field syntax performs attribute and item traversal using
-        # config-controlled field names. Block the traversal entry points while
-        # leaving ordinary formatting in trusted Python untouched.
-        "builtins.str.format",
-        "builtins.str.format_map",
-        "logging.Formatter",
-        "logging.StrFormatStyle",
-        "string.Formatter._vformat",
-        "string.Formatter.format",
-        "string.Formatter.get_field",
-        "string.Formatter.vformat",
-        "_asyncio.Task.get_stack",
-        "asyncio.base_tasks._task_get_stack",
-        "asyncio.tasks.Task.get_stack",
-        "traceback.clear_frames",
-        "traceback._walk_tb_with_full_positions",
-        "traceback.walk_stack",
-        "traceback.walk_tb",
         # Unsafe deserialization sinks. Include friendly and canonical C spellings
         # so resolved identities such as pickle.loads -> _pickle.loads are caught.
         "pickle.load",
@@ -319,10 +274,6 @@ UNCONTROLLED_EXECUTION_TARGETS = frozenset(
         "typing.evaluate_forward_ref",
         "typing.get_type_hints",
         "types.new_class",
-        "unittest.mock.patch",
-        "unittest.mock.patch.dict",
-        "unittest.mock.patch.multiple",
-        "unittest.mock.patch.object",
         "annotationlib.ForwardRef._evaluate",
         "annotationlib.ForwardRef.evaluate",
         "annotationlib.get_annotations",
@@ -336,11 +287,7 @@ UNCONTROLLED_EXECUTION_TARGETS = frozenset(
 # These package families contain version-specific execution, import, debugger,
 # or unsafe loading surfaces. Prefixes make coverage version-resilient; narrow
 # inert constructors with plausible instantiate() use are excepted below.
-UNCONTROLLED_EXECUTION_TARGET_PREFIXES = (
-    # Reflection helpers expose live Python objects and code metadata. Block
-    # the whole family because individual accessors cannot be mediated safely.
-    "gc.",
-    "inspect.",
+LEGACY_EXECUTION_TARGET_PREFIXES = (
     "os.exec",
     "os.spawn",
     # Whole logging.config namespace: dictConfig/fileConfig and every
@@ -375,9 +322,9 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIXES = (
 )
 
 # Exact legitimate targets within otherwise denied module families. Exact
-# entries in UNCONTROLLED_EXECUTION_TARGETS still take precedence over exceptions.
+# entries in LEGACY_EXECUTION_TARGETS still take precedence over exceptions.
 # An exception permits only the named target, not its methods or descendants.
-UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS = frozenset(
+LEGACY_EXECUTION_TARGET_PREFIX_EXCEPTIONS = frozenset(
     {
         "doctest.DocTest",
         "doctest.DocTestParser",
@@ -391,6 +338,56 @@ UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS = frozenset(
         "yaml.safe_dump_all",
     }
 )
+
+# Direct access to live code, namespaces, and authorization state remains
+# restricted independently of the execution-helper policy.
+NON_WHITELISTABLE_TARGETS = frozenset(
+    {
+        "builtins.frame.clear",
+        "builtins.getset_descriptor.__get__",
+        "builtins.locals",
+        "builtins.member_descriptor.__get__",
+        "builtins.vars",
+        "inspect",
+        "operator.attrgetter",
+        "operator.getitem",
+        "operator.itemgetter",
+        "operator.methodcaller",
+        "_operator.attrgetter",
+        "_operator.getitem",
+        "_operator.itemgetter",
+        "_operator.methodcaller",
+        "sys.exc_info",
+        "sys.exception",
+        "sys._current_exceptions",
+        "sys._current_frames",
+        "sys._getframe",
+        "sys.getobjects",
+        "builtins.str.format",
+        "builtins.str.format_map",
+        "logging.Formatter",
+        "logging.StrFormatStyle",
+        "string.Formatter._vformat",
+        "string.Formatter.format",
+        "string.Formatter.get_field",
+        "string.Formatter.vformat",
+        "_asyncio.Task.get_stack",
+        "asyncio.base_tasks._task_get_stack",
+        "asyncio.tasks.Task.get_stack",
+        "traceback.clear_frames",
+        "traceback._walk_tb_with_full_positions",
+        "traceback.walk_stack",
+        "traceback.walk_tb",
+        "abc.abstractmethod",
+        "functools.update_wrapper",
+        "functools.wraps",
+        "unittest.mock.patch",
+        "unittest.mock.patch.dict",
+        "unittest.mock.patch.multiple",
+        "unittest.mock.patch.object",
+    }
+) | frozenset(_CALLABLE_DESCRIPTOR_BINDING_TARGETS.values())
+NON_WHITELISTABLE_TARGET_PREFIXES = ("gc.", "inspect.")
 
 # These additional callables cannot be safely authorized by the target-name
 # whitelist, but retain temporary legacy compatibility while users migrate.
@@ -464,9 +461,11 @@ class _ExecutionPolicySnapshot(NamedTuple):
     callable_descriptor_binding_targets: tuple[tuple[type, str], ...]
     non_callable_mock_targets: frozenset[str]
     non_callable_mock_safe_parameters: frozenset[str]
-    uncontrolled_execution_targets: frozenset[str]
-    uncontrolled_execution_target_prefixes: tuple[str, ...]
-    uncontrolled_execution_target_prefix_exceptions: frozenset[str]
+    legacy_execution_targets: frozenset[str]
+    legacy_execution_target_prefixes: tuple[str, ...]
+    legacy_execution_target_prefix_exceptions: frozenset[str]
+    non_whitelistable_targets: frozenset[str]
+    non_whitelistable_target_prefixes: tuple[str, ...]
     legacy_compatible_non_whitelistable_targets: frozenset[str]
     discovery_targets: frozenset[str]
     protected_function_attributes: frozenset[str]
@@ -490,12 +489,19 @@ def _checked_frozenset(name: str, value: Any) -> frozenset[str]:
 
 
 def _capture_execution_policy() -> _ExecutionPolicySnapshot:
-    if type(UNCONTROLLED_EXECUTION_TARGET_PREFIXES) is not tuple or any(
-        type(item) is not str for item in UNCONTROLLED_EXECUTION_TARGET_PREFIXES
+    if type(LEGACY_EXECUTION_TARGET_PREFIXES) is not tuple or any(
+        type(item) is not str for item in LEGACY_EXECUTION_TARGET_PREFIXES
     ):
         raise InstantiationException(
             "Hydra execution policy integrity check failed for "
-            "UNCONTROLLED_EXECUTION_TARGET_PREFIXES"
+            "LEGACY_EXECUTION_TARGET_PREFIXES"
+        )
+    if type(NON_WHITELISTABLE_TARGET_PREFIXES) is not tuple or any(
+        type(item) is not str for item in NON_WHITELISTABLE_TARGET_PREFIXES
+    ):
+        raise InstantiationException(
+            "Hydra execution policy integrity check failed for "
+            "NON_WHITELISTABLE_TARGET_PREFIXES"
         )
     if type(_CALLABLE_DESCRIPTOR_BINDING_TARGETS) is not types.MappingProxyType:
         raise InstantiationException(
@@ -519,9 +525,11 @@ def _capture_execution_policy() -> _ExecutionPolicySnapshot:
         CALLABLE_WRAPPER_TARGETS,
         _NON_CALLABLE_MOCK_TARGETS,
         _NON_CALLABLE_MOCK_SAFE_PARAMETERS,
-        UNCONTROLLED_EXECUTION_TARGETS,
-        UNCONTROLLED_EXECUTION_TARGET_PREFIXES,
-        UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
+        LEGACY_EXECUTION_TARGETS,
+        LEGACY_EXECUTION_TARGET_PREFIXES,
+        LEGACY_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
+        NON_WHITELISTABLE_TARGETS,
+        NON_WHITELISTABLE_TARGET_PREFIXES,
         LEGACY_COMPATIBLE_NON_WHITELISTABLE_TARGETS,
         DISCOVERY_TARGETS,
         _PROTECTED_FUNCTION_ATTRIBUTES,
@@ -540,14 +548,18 @@ def _capture_execution_policy() -> _ExecutionPolicySnapshot:
         non_callable_mock_safe_parameters=_checked_frozenset(
             "_NON_CALLABLE_MOCK_SAFE_PARAMETERS", _NON_CALLABLE_MOCK_SAFE_PARAMETERS
         ),
-        uncontrolled_execution_targets=_checked_frozenset(
-            "UNCONTROLLED_EXECUTION_TARGETS", UNCONTROLLED_EXECUTION_TARGETS
+        legacy_execution_targets=_checked_frozenset(
+            "LEGACY_EXECUTION_TARGETS", LEGACY_EXECUTION_TARGETS
         ),
-        uncontrolled_execution_target_prefixes=UNCONTROLLED_EXECUTION_TARGET_PREFIXES,
-        uncontrolled_execution_target_prefix_exceptions=_checked_frozenset(
-            "UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS",
-            UNCONTROLLED_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
+        legacy_execution_target_prefixes=LEGACY_EXECUTION_TARGET_PREFIXES,
+        legacy_execution_target_prefix_exceptions=_checked_frozenset(
+            "LEGACY_EXECUTION_TARGET_PREFIX_EXCEPTIONS",
+            LEGACY_EXECUTION_TARGET_PREFIX_EXCEPTIONS,
         ),
+        non_whitelistable_targets=_checked_frozenset(
+            "NON_WHITELISTABLE_TARGETS", NON_WHITELISTABLE_TARGETS
+        ),
+        non_whitelistable_target_prefixes=NON_WHITELISTABLE_TARGET_PREFIXES,
         legacy_compatible_non_whitelistable_targets=_checked_frozenset(
             "LEGACY_COMPATIBLE_NON_WHITELISTABLE_TARGETS",
             LEGACY_COMPATIBLE_NON_WHITELISTABLE_TARGETS,
@@ -562,7 +574,7 @@ def _capture_execution_policy() -> _ExecutionPolicySnapshot:
 
 def _execution_policy_digest(policy: _ExecutionPolicySnapshot) -> str:
     payload = {
-        "schema": "hydra-execution-policy-v1",
+        "schema": "hydra-execution-policy-v2",
         "default_blacklisted_modules": sorted(policy.default_blacklisted_modules),
         "callable_descriptor_binding_targets": sorted(
             (f"{key.__module__}.{key.__qualname__}", value)
@@ -572,12 +584,16 @@ def _execution_policy_digest(policy: _ExecutionPolicySnapshot) -> str:
         "non_callable_mock_safe_parameters": sorted(
             policy.non_callable_mock_safe_parameters
         ),
-        "uncontrolled_execution_targets": sorted(policy.uncontrolled_execution_targets),
-        "uncontrolled_execution_target_prefixes": list(
-            policy.uncontrolled_execution_target_prefixes
+        "legacy_execution_targets": sorted(policy.legacy_execution_targets),
+        "legacy_execution_target_prefixes": list(
+            policy.legacy_execution_target_prefixes
         ),
-        "uncontrolled_execution_target_prefix_exceptions": sorted(
-            policy.uncontrolled_execution_target_prefix_exceptions
+        "legacy_execution_target_prefix_exceptions": sorted(
+            policy.legacy_execution_target_prefix_exceptions
+        ),
+        "non_whitelistable_targets": sorted(policy.non_whitelistable_targets),
+        "non_whitelistable_target_prefixes": list(
+            policy.non_whitelistable_target_prefixes
         ),
         "legacy_compatible_non_whitelistable_targets": sorted(
             policy.legacy_compatible_non_whitelistable_targets
@@ -1095,35 +1111,49 @@ def _is_blacklisted_target(target: str) -> bool:
     canonical_target = _get_os_alias_target(target)
     if (
         _matches_target_patterns(canonical_target, policy.default_blacklisted_modules)
-        or canonical_target in policy.uncontrolled_execution_targets
+        or canonical_target in policy.legacy_execution_targets
+        or canonical_target in policy.non_whitelistable_targets
     ):
         return True
-    if canonical_target in policy.uncontrolled_execution_target_prefix_exceptions:
+    if canonical_target in policy.legacy_execution_target_prefix_exceptions:
         return False
-    return canonical_target.startswith(policy.uncontrolled_execution_target_prefixes)
+    return canonical_target.startswith(
+        policy.legacy_execution_target_prefixes
+        + policy.non_whitelistable_target_prefixes
+    )
 
 
 def _is_non_whitelistable_target(target: str) -> bool:
     policy = _current_execution_policy()
     canonical_target = _get_os_alias_target(target)
     if (
-        canonical_target in policy.uncontrolled_execution_targets
+        canonical_target in policy.legacy_execution_targets
+        or canonical_target in policy.non_whitelistable_targets
         or canonical_target in policy.legacy_compatible_non_whitelistable_targets
     ):
         return True
-    if canonical_target in policy.uncontrolled_execution_target_prefix_exceptions:
+    if canonical_target in policy.legacy_execution_target_prefix_exceptions:
         return False
-    return canonical_target.startswith(policy.uncontrolled_execution_target_prefixes)
+    return canonical_target.startswith(
+        policy.legacy_execution_target_prefixes
+        + policy.non_whitelistable_target_prefixes
+    )
 
 
-def _is_uncontrolled_execution_target(target: str) -> bool:
+def _is_legacy_execution_target(target: str) -> bool:
     policy = _current_execution_policy()
     canonical_target = _get_os_alias_target(target)
-    if canonical_target in policy.uncontrolled_execution_targets:
+    if (
+        canonical_target in policy.legacy_execution_targets
+        or canonical_target in policy.non_whitelistable_targets
+    ):
         return True
-    if canonical_target in policy.uncontrolled_execution_target_prefix_exceptions:
+    if canonical_target in policy.legacy_execution_target_prefix_exceptions:
         return False
-    return canonical_target.startswith(policy.uncontrolled_execution_target_prefixes)
+    return canonical_target.startswith(
+        policy.legacy_execution_target_prefixes
+        + policy.non_whitelistable_target_prefixes
+    )
 
 
 def _validate_execution_whitelist_pattern(pattern: Any) -> str:
@@ -1448,7 +1478,7 @@ def _blacklisted_target_message(
             Set '_target_' to the intended callable instead. Pass
             UNSAFE_DISABLE_EXECUTION_CHECKS only to explicitly disable target safety checks."""
         )
-    elif _is_uncontrolled_execution_target(target_name):
+    elif _is_legacy_execution_target(target_name):
         message = dedent(
             f"""\
             Target '{target_name}'{resolved_note} is blacklisted because it allows
@@ -1546,7 +1576,7 @@ def _non_whitelistable_target_message(
             config data.
             Set '_target_' to the intended callable instead."""
         )
-    elif _is_uncontrolled_execution_target(target_name):
+    elif _is_legacy_execution_target(target_name):
         message = dedent(
             f"""\
             Target '{target_name}'{resolved_note} cannot be authorized by the
