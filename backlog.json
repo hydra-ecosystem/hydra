@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-10-29",
-  "generated_at": "2026-10-29T11:48:48Z",
+  "generated_at": "2026-10-29T11:51:06Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 49,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 0
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 49
+        "count": 48
       },
       {
         "status": "done",
@@ -71,6 +71,28 @@
     ]
   },
   "issues": [
+    {
+      "number": 3598,
+      "title": "Align execution whitelist behavior with Hydra’s trust model",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "in progress",
+      "status_emoji": "🔄",
+      "prs": [
+        {
+          "number": 3595,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3595"
+        },
+        {
+          "number": 3596,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3596"
+        }
+      ],
+      "created": "2026-10-29",
+      "updated": "2026-10-29",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3598"
+    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -824,19 +846,6 @@
       "updated": "2026-10-28",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3594"
-    },
-    {
-      "number": 3598,
-      "title": "Align execution whitelist behavior with Hydra’s trust model",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-10-29",
-      "updated": "2026-10-29",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3598"
     },
     {
       "number": 385,
@@ -2741,6 +2750,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-29T11:51:06Z",
+      "kind": "pr",
+      "issue": 3598,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3598",
+      "title": "Align execution whitelist behavior with Hydra’s trust model",
+      "detail": "linked #3595, #3596"
+    },
+    {
+      "ts": "2026-10-29T11:51:06Z",
+      "kind": "status",
+      "issue": 3598,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3598",
+      "title": "Align execution whitelist behavior with Hydra’s trust model",
+      "detail": "not started → in progress",
+      "pr": {
+        "number": 3595,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3595"
+      }
+    },
+    {
       "ts": "2026-10-29T11:48:48Z",
       "kind": "new",
       "issue": 3598,
@@ -4402,21 +4431,6 @@
         "number": 3453,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3453"
       }
-    },
-    {
-      "ts": "2026-09-17T07:58:37Z",
-      "kind": "closed",
-      "issue": 2237,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/2237",
-      "title": "[Bug] Optuna sweeper raises uncaught exception when run ends with nan value"
-    },
-    {
-      "ts": "2026-09-17T05:17:28Z",
-      "kind": "pr",
-      "issue": 3406,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3406",
-      "title": "[Docs] Document hydra/env and using it with a SearchPathPlugin",
-      "detail": "unlinked #3452"
     }
   ]
 }
