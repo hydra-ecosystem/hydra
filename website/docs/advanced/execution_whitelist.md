@@ -21,6 +21,51 @@ the security boundary.
 
 :::
 
+## Threat model
+
+### Hydra 1.3
+
+Configuration must be trusted. Hydra's blacklist blocks known dangerous targets,
+but it is not guaranteed to prevent all attacks and must not be relied on as a
+security boundary.
+
+### Hydra 1.4 with an execution whitelist
+
+Configuration can select targets approved by trusted Python code. It cannot add
+its own permissions through Hydra's configuration interfaces. Installed Python
+code and the application are trusted.
+
+Whitelisting a function means trusting what it can do with the arguments
+configuration gives it. If it can run code, launch processes, or change the
+environment, configuration can request those actions. Hydra does not sandbox
+the function's internal behavior. Use narrow application functions when
+configuration should control only a limited operation.
+
+Hydra still blocks protected targets and objects, even when whitelisted. These
+checks limit direct access through Hydra to its policy state, live frames, and
+existing Python code. They do not stop an authorized function from accessing or
+modifying that state internally. Hydra checks immediate results, but does not
+recursively inspect arbitrary containers.
+See [Restricted targets](./execution_whitelist/restricted_targets.md).
+
+### Hydra 1.4 legacy mode
+
+Running without an execution whitelist is deprecated and requires trusted
+configuration. Its blacklist is not guaranteed to prevent all attacks and must
+not be relied on as a security boundary.
+
+### Hydra 1.5
+
+Hydra 1.5 will remove legacy mode and its blacklist fallback. Applications must
+provide an execution whitelist or explicitly disable checks. Protected-target
+restrictions will remain when using a whitelist.
+
+### Explicit unsafe opt-out
+
+In Hydra 1.4 and 1.5, trusted Python code can explicitly disable execution checks
+with `UNSAFE_DISABLE_EXECUTION_CHECKS`. This disables both whitelist and
+blacklist checks and requires trusted configuration.
+
 ## Configure an application
 
 Use `execution_whitelist` on `@hydra.main()` to authorize targets selected by
@@ -55,8 +100,10 @@ narrower prefixes for shared namespaces.
 
 ## Python logging configured by Hydra
 
-Hydra treats logging configuration as trusted. The execution whitelist does not
-restrict where log files are written.
+The execution whitelist controls which Python components logging configuration
+can select. Hydra automatically permits its built-in logging components,
+including `logging.FileHandler`. This does not restrict file destinations or
+sandbox an authorized component's behavior.
 
 When Hydra configures Python logging, its use of
 `logging.config.dictConfig()` can import handler `class` values and call

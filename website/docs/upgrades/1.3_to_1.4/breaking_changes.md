@@ -66,8 +66,8 @@ by trusted Python code emits a warning in Hydra 1.4 and will become an error in
 Hydra 1.5. This applies to `instantiate()` and Python logging configured by
 Hydra. See the [execution whitelist migration guide](/docs/upgrades/1.3_to_1.4/execution_whitelist).
 
-Logging configuration remains trusted. The whitelist controls callable selection;
-it does not restrict where log files are written.
+The whitelist controls logging component selection. It does not restrict file
+destinations or sandbox an authorized component's behavior.
 
 ### Range sweep casting
 

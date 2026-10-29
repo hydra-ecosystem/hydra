@@ -41,9 +41,9 @@ disable_existing_loggers: false
 <details>
 <summary>Security considerations</summary>
 
-Hydra treats logging configuration as trusted. The execution whitelist controls
-callable selection; it does not restrict where log files are written. Do not load
-logging configuration from untrusted sources.
+The execution whitelist controls which Python components logging configuration
+can select. It does not restrict file destinations or sandbox an authorized
+component's behavior.
 
 Authorize custom logging components with an execution whitelist supplied by
 trusted Python code:

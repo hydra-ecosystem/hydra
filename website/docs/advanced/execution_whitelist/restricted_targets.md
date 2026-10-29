@@ -11,6 +11,13 @@ configured name does not bound the behavior that configuration can select.
 Hydra's error identifies the exact rejected target and explains why it cannot be
 authorized.
 
+These restrictions supplement the [threat model](../execution_whitelist.md#threat-model).
+The whitelist authorizes selected callables; it does not sandbox their internal
+operations. Protected-target and protected-object checks still apply to targets,
+receivers, discovery paths, and immediate results checked by Hydra, even when a
+target is explicitly whitelisted. They do not control what authorized code does
+internally or recursively inspect arbitrary containers.
+
 Runtime-introspection APIs that expose live frames or tracebacks are also
 permanently restricted. This includes traceback walkers and task stack access;
 otherwise configuration could reach active function locals, globals, or
