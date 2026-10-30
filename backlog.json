@@ -1,6 +1,6 @@
 {
-  "generated_on": "2026-10-29",
-  "generated_at": "2026-10-29T17:28:43Z",
+  "generated_on": "2026-10-30",
+  "generated_at": "2026-10-30T07:10:59Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 50,
@@ -51,7 +51,7 @@
       {
         "status": "community PR",
         "emoji": "🤝",
-        "count": 0
+        "count": 1
       },
       {
         "status": "blocked",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 50
+        "count": 49
       },
       {
         "status": "done",
@@ -71,6 +71,24 @@
     ]
   },
   "issues": [
+    {
+      "number": 3593,
+      "title": "[Bug] Optuna sweeper: fixed value beats a command-line sweep; GridSampler repeats trials",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "community PR",
+      "status_emoji": "🤝",
+      "prs": [
+        {
+          "number": 3601,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3601"
+        }
+      ],
+      "created": "2026-10-28",
+      "updated": "2026-10-29",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3593"
+    },
     {
       "number": 468,
       "title": "Specify the schema for returning the result of optimization.",
@@ -798,19 +816,6 @@
         "enhancement"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3583"
-    },
-    {
-      "number": 3593,
-      "title": "[Bug] Optuna sweeper: fixed value beats a command-line sweep; GridSampler repeats trials",
-      "category": "Bug",
-      "category_emoji": "🐛",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-10-28",
-      "updated": "2026-10-29",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3593"
     },
     {
       "number": 3594,
@@ -2779,6 +2784,26 @@
   ],
   "updates": [
     {
+      "ts": "2026-10-30T07:10:59Z",
+      "kind": "pr",
+      "issue": 3593,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3593",
+      "title": "[Bug] Optuna sweeper: fixed value beats a command-line sweep; GridSampler repeats trials",
+      "detail": "linked #3601"
+    },
+    {
+      "ts": "2026-10-30T07:10:59Z",
+      "kind": "status",
+      "issue": 3593,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3593",
+      "title": "[Bug] Optuna sweeper: fixed value beats a command-line sweep; GridSampler repeats trials",
+      "detail": "not started → community PR",
+      "pr": {
+        "number": 3601,
+        "url": "https://github.com/hydra-ecosystem/hydra/pull/3601"
+      }
+    },
+    {
       "ts": "2026-10-29T17:28:43Z",
       "kind": "new",
       "issue": 3600,
@@ -4435,26 +4460,6 @@
       "issue": 3456,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3456",
       "title": "[Bug] Casting sweeps drops tags and shuffle settings"
-    },
-    {
-      "ts": "2026-09-18T07:15:41Z",
-      "kind": "pr",
-      "issue": 3361,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3361",
-      "title": "Show user frames in default instantiation error tracebacks",
-      "detail": "linked #3455"
-    },
-    {
-      "ts": "2026-09-18T07:15:41Z",
-      "kind": "status",
-      "issue": 3361,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3361",
-      "title": "Show user frames in default instantiation error tracebacks",
-      "detail": "not started → in progress",
-      "pr": {
-        "number": 3455,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3455"
-      }
     }
   ]
 }
