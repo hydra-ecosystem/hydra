@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-11-02",
-  "generated_at": "2026-11-02T17:52:46Z",
+  "generated_at": "2026-11-02T18:29:49Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 52,
@@ -882,7 +882,11 @@
       "prs": [],
       "created": "2026-11-02",
       "updated": "2026-11-02",
-      "labels": [],
+      "labels": [
+        "enhancement",
+        "plugin",
+        "compose_api"
+      ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3606"
     },
     {
@@ -2810,6 +2814,14 @@
   ],
   "updates": [
     {
+      "ts": "2026-11-02T18:29:49Z",
+      "kind": "label",
+      "issue": 3606,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606",
+      "title": "Authorize config search-path entries and plugins",
+      "detail": "added \"compose_api\", \"enhancement\", \"plugin\""
+    },
+    {
       "ts": "2026-11-02T17:52:46Z",
       "kind": "new",
       "issue": 3606,
@@ -4479,13 +4491,6 @@
         "number": 3459,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3459"
       }
-    },
-    {
-      "ts": "2026-09-22T09:12:30Z",
-      "kind": "new",
-      "issue": 3458,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3458",
-      "title": "[Bug] What is the correct way to use optuna-sweeper with joblib-sweeper?"
     }
   ]
 }

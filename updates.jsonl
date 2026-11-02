@@ -1046,3 +1046,4 @@
 {"ts": "2026-10-30T07:10:59Z", "kind": "pr", "issue": 3593, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3593", "title": "[Bug] Optuna sweeper: fixed value beats a command-line sweep; GridSampler repeats trials", "detail": "linked #3601"}
 {"ts": "2026-11-02T07:11:04Z", "kind": "new", "issue": 3569, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3569", "title": "Node audit configuration"}
 {"ts": "2026-11-02T17:52:46Z", "kind": "new", "issue": 3606, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606", "title": "Authorize config search-path entries and plugins"}
+{"ts": "2026-11-02T18:29:49Z", "kind": "label", "issue": 3606, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606", "title": "Authorize config search-path entries and plugins", "detail": "added \"compose_api\", \"enhancement\", \"plugin\""}

@@ -115,7 +115,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-11-02T17:52:46Z",
+  "generated_at": "2026-11-02T18:29:49Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -645,12 +645,16 @@
     "3606": {
       "category": "Enhancement",
       "created_at": "2026-11-02T17:51:11Z",
-      "labels": [],
+      "labels": [
+        "compose_api",
+        "enhancement",
+        "plugin"
+      ],
       "pr_numbers": [],
       "state": "OPEN",
       "status": "not started",
       "title": "Authorize config search-path entries and plugins",
-      "updated_at": "2026-11-02T17:51:11Z"
+      "updated_at": "2026-11-02T18:28:33Z"
     },
     "468": {
       "category": "Enhancement",
