@@ -2,8 +2,8 @@ name: Node dependency maintenance
 
 'on':
   schedule:
-  - cron: '0 2 * * 1'
-  - cron: '0 2 1 */3 *'
+    - cron: '0 2 * * 1'
+    - cron: '0 2 1 */3 *'
   workflow_dispatch:
     inputs:
       audit-kind:
@@ -11,15 +11,15 @@ name: Node dependency maintenance
         type: choice
         default: security
         options:
-        - security
-        - upgrades
+          - security
+          - upgrades
   push:
     branches:
-    - main
+      - main
     paths:
-    - '**/pnpm-lock.yaml'
-    - '**/package-lock.json'
-    - '.github/node-maintenance.json'
+      - '**/pnpm-lock.yaml'
+      - '**/package-lock.json'
+      - '.github/node-maintenance.json'
 
 permissions:
   contents: read
@@ -35,7 +35,9 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
-    uses: hydra-ecosystem/github-actions/.github/workflows/node-maintenance.yml@0938f9298b84dd6741a394fc2db8dfd6e04942a7
+      actions: read
+      checks: read
+    uses: hydra-ecosystem/github-actions/.github/workflows/node-maintenance.yml@96d75252154ffb292212792b83b2f94427df96a0
     with:
       audit-kind: ${{ inputs.audit-kind || 'auto' }}
       app-client-id: ${{ vars.NODE_AUDIT_APP_CLIENT_ID }}
