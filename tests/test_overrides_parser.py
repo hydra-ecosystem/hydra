@@ -3,7 +3,7 @@ import builtins
 import math
 import re
 from contextlib import nullcontext
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from itertools import islice
 from typing import Any, Callable, Dict, List, Union
 
@@ -72,6 +72,22 @@ def eq(item1: Any, item2: Any) -> bool:
         return item1 == item2 or math.isnan(item1) and math.isnan(item2)
     else:
         return item1 == item2  # type: ignore
+
+
+def plain(result: Any) -> Any:
+    """The Python value of a parse result: each QuotedString becomes its text."""
+    if isinstance(result, ChoiceSweep):
+        return replace(result, list=[plain(item) for item in result.list])
+    return Override._convert_value(result)
+
+
+def written_back(result: Any) -> Any:
+    """The Python value that the override text written for a parse result parses to."""
+    if isinstance(result, ChoiceSweep):
+        return replace(result, list=[written_back(item) for item in result.list])
+    if isinstance(result, Sweep):
+        return result
+    return parser.parse_override(f"key={Transformer.str(result)}").value()
 
 
 @mark.parametrize(
@@ -152,7 +168,11 @@ def test_element(value: str, expected: Any) -> None:
         param("faLse", False, id="value:bool"),
         # casts
         param("int(10.0)", 10, id="int(10.0)"),
-        param("str(10.0)", "10.0", id="str(10.0)"),
+        param(
+            "str(10.0)",
+            QuotedString(text="10.0", quote=Quote.single),
+            id="str(10.0)",
+        ),
         param("bool(10.0)", True, id="bool(10.0)"),
         param("float(10)", 10.0, id="float(10)"),
         param("float(float(10))", 10.0, id="float(float(10))"),
@@ -207,7 +227,9 @@ def test_element(value: str, expected: Any) -> None:
         ),
         param(
             "extend_list('5')",
-            ListExtensionOverrideValue(values=["5"]),
+            ListExtensionOverrideValue(
+                values=[QuotedString(text="5", quote=Quote.single)]
+            ),
             id="extend_list('5')",
         ),
         param(
@@ -393,7 +415,11 @@ def test_dict_container(value: str, expected: Any) -> None:
             ChoiceSweep(list=[10, 20]),
             id="sweep:choice( 10 , 20 )",
         ),
-        param("choice(str(10))", ChoiceSweep(list=["10"]), id="choice(str(10))"),
+        param(
+            "choice(str(10))",
+            ChoiceSweep(list=[QuotedString(text="10", quote=Quote.single)]),
+            id="choice(str(10))",
+        ),
     ],
 )
 def test_choice_sweep(value: str, expected: Any) -> None:
@@ -1017,7 +1043,16 @@ def test_primitive_quoted_string(value: str, expected: Any) -> None:
             ValueType.INTERVAL_SWEEP,
             id="interval:tags",
         ),
-        param("key=str([1,2])", "key", ["1", "2"], ValueType.ELEMENT, id="cast_list"),
+        param(
+            "key=str([1,2])",
+            "key",
+            [
+                QuotedString(text="1", quote=Quote.single),
+                QuotedString(text="2", quote=Quote.single),
+            ],
+            ValueType.ELEMENT,
+            id="cast_list",
+        ),
         param(
             "choice=reverse",
             "choice",
@@ -2031,7 +2066,8 @@ def test_cast_conversions(value: Any, expected_value: Any) -> None:
                     parser.parse_rule(cast_str, "function")
             else:
                 result = parser.parse_rule(cast_str, "function")
-                assert eq(result, expected), f"{field} cast result mismatch"
+                assert eq(plain(result), expected), f"{field} cast result mismatch"
+                assert eq(written_back(result), expected), f"{field} cast text mismatch"
 
 
 @mark.parametrize(
@@ -2046,7 +2082,9 @@ def test_cast_conversions(value: Any, expected_value: Any) -> None:
             id="choice:float",
         ),
         param(
-            "str(tag(meta,shuffle(choice(1,2,3))))", ["3", "2", "1"], id="choice:str"
+            "str(tag(meta,shuffle(choice(1,2,3))))",
+            [QuotedString(text=x, quote=Quote.single) for x in ("3", "2", "1")],
+            id="choice:str",
         ),
         param(
             "bool(tag(meta,shuffle(choice(0,1,2))))",
@@ -2298,7 +2336,7 @@ def test_eval(
     functions = Functions()
     functions.register(name=func_name, func=func)
     parser = OverridesParser(functions)
-    assert parser.parse_rule(value, "function") == expected
+    assert plain(parser.parse_rule(value, "function")) == expected
 
 
 @mark.parametrize(
@@ -2498,7 +2536,10 @@ def test_glob_filter(
         param(
             "key=str(\t  [  1,\t2  ]\t   )",
             "key",
-            ["1", "2"],
+            [
+                QuotedString(text="1", quote=Quote.single),
+                QuotedString(text="2", quote=Quote.single),
+            ],
             ValueType.ELEMENT,
             id="mixed",
         ),
@@ -2522,12 +2563,24 @@ def test_whitespaces(
     "value, expected_sweep_string_list, expected_sweep_encoded_list",
     [
         ("x=choice(1,2,3)", ["1", "2", "3"], [1, 2, 3]),
-        ("x=choice('1', '2', '3')", ["1", "2", "3"], ["1", "2", "3"]),
-        ("x=choice('a', 'b')", ["a", "b"], ["a", "b"]),
+        ("x=choice('1', '2', '3')", ["'1'", "'2'", "'3'"], ["'1'", "'2'", "'3'"]),
+        ("x=choice('a', 'b')", ["'a'", "'b'"], ["'a'", "'b'"]),
         (
             "x=choice(True, 'True', False, 'False', 'a', 1, 1.1, 2.0, 3, '1.5', '4')",
-            ["True", "True", "False", "False", "a", "1", "1.1", "2.0", "3", "1.5", "4"],
-            [True, "True", False, "False", "a", 1, 1.1, 2.0, 3, "1.5", "4"],
+            [
+                "True",
+                "'True'",
+                "False",
+                "'False'",
+                "'a'",
+                "1",
+                "1.1",
+                "2.0",
+                "3",
+                "'1.5'",
+                "'4'",
+            ],
+            [True, "'True'", False, "'False'", "'a'", 1, 1.1, 2.0, 3, "'1.5'", "'4'"],
         ),
         (
             "x=range(1, 10)",

@@ -4,7 +4,7 @@ import sys
 from textwrap import dedent
 from typing import Any
 
-from pytest import mark, param
+from pytest import MonkeyPatch, mark, param
 
 from hydra._internal.core_plugins.basic_sweeper import BasicSweeper
 from hydra.core.override_parser.overrides_parser import OverridesParser
@@ -77,6 +77,35 @@ def test_split(
     )
     lret = [list(x) for x in ret]
     assert lret == expected
+
+
+@mark.parametrize(
+    "args,expected",
+    [
+        param(["+q=choice('1.10','1','null')"], ["1.10", "1", "null"], id="choice"),
+        param(["+q=choice('café',\"it's\")"], ["café", "it's"], id="needs_quotes"),
+        param(["+q=sort('2','1')"], ["1", "2"], id="sort"),
+        param(["+q=sort(choice('2','1'))"], ["1", "2"], id="sort_choice"),
+        param(["+q=shuffle('1','2')"], ["2", "1"], id="shuffle"),
+        param(["+q=str(choice(1,2))"], ["1", "2"], id="str_choice"),
+        param(["+q=str(1)", "+y=a,b"], ["1", "1"], id="str_not_swept"),
+        param(
+            ["+q=sort(str([2,1]))", "+y=a,b"],
+            [["1", "2"], ["1", "2"]],
+            id="sort_str_list_not_swept",
+        ),
+    ],
+)
+def test_split_keeps_function_strings(
+    args: list[str], expected: list[Any], monkeypatch: MonkeyPatch
+) -> None:
+    monkeypatch.setattr("hydra.core.override_parser.types.shuffle", list.reverse)
+    parser = OverridesParser.create()
+    overrides = parser.parse_overrides(args)
+    chunks = BasicSweeper.split_arguments(overrides, max_batch_size=None)
+    assert len(chunks) == 1 and len(chunks[0]) == len(expected)
+    for job, value in zip(chunks[0], expected):
+        assert parser.parse_override(job[0]).value() == value
 
 
 def test_partial_failure(
