@@ -1044,3 +1044,4 @@
 {"ts": "2026-10-29T17:28:43Z", "kind": "new", "issue": 3600, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3600", "title": "Wifi"}
 {"ts": "2026-10-30T07:10:59Z", "kind": "status", "issue": 3593, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3593", "title": "[Bug] Optuna sweeper: fixed value beats a command-line sweep; GridSampler repeats trials", "detail": "not started → community PR", "pr": {"number": 3601, "url": "https://github.com/hydra-ecosystem/hydra/pull/3601"}}
 {"ts": "2026-10-30T07:10:59Z", "kind": "pr", "issue": 3593, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3593", "title": "[Bug] Optuna sweeper: fixed value beats a command-line sweep; GridSampler repeats trials", "detail": "linked #3601"}
+{"ts": "2026-11-02T07:11:04Z", "kind": "new", "issue": 3569, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3569", "title": "Node audit configuration"}
