@@ -14,16 +14,23 @@ Python code. The full [requirements](requirements.md) define the agreed boundary
 
 Use one `AuthorizationPolicy` for config sources, plugins and the execution
 whitelist used by instantiate and logging. Each category has separate grants.
+`allowed_search_path_entries` permits configuration to request locations;
+`config_search_path` on main/initialize selects and authorizes them.
 Check permission before importing a plugin or initializing a config source.
 Explicit Python, CLI and Compose source selections also authorize those sources;
 config-defined selections need an existing grant.
+
+Use `UNSAFE_DISABLE_AUTHORIZATION_CHECKS` in a policy field to opt that category
+out explicitly. The same constant works in all three categories in 1.4 and 1.5.
+Source containment and plugin discovery settings still apply. No separate
+unsafe-source flag is added to main or Compose.
 
 Restore policy and plugin registries when an initialization scope ends. Give
 workers the same policy before Hydra restores state or loads plugins and configs.
 In Hydra 1.4, legacy behavior remains the default with migration warnings;
 explicit lists enable checks.
 Hydra 1.5 defaults to empty grants and rejects legacy mode. Source-root escapes
-are errors starting in 1.4. See the approved [high-level design](high-level-design.md).
+are errors starting in 1.4. See the full [high-level design](high-level-design.md).
 
 ## Implementation summary
 
@@ -64,9 +71,13 @@ the [estimate rules and basis](implementation-plan.md#estimates).
 
 ## Next step
 
-Read the migrated design and obtain final implementation-plan approval.
-Commits and Hydra implementation need separate authorization. No delivery campaign
-has started, and there is no unresolved product-design question.
+Requirements review and general/DBB HLD review are clean, and the owner approved
+the consolidated HLD. Refresh the implementation-plan review and obtain final
+plan approval, followed by the committed delivery baseline.
+The public tracking issue is [#3606](https://github.com/hydra-ecosystem/hydra/issues/3606),
+and news paths are pinned in the slice inventory. No delivery campaign has been
+opened and no Hydra implementation has started. This revision is uncommitted;
+earlier review stamps cover their exact historical versions.
 
 Agents maintain this page as implementation progresses or the plan changes,
 including reviewed replanning and automatic splitting. The installed AWD helper

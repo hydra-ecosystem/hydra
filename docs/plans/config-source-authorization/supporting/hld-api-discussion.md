@@ -1,5 +1,10 @@
 # HLD API discussion
 
+2026-11-03: the shared unsafe constant and `allowed_search_path_entries` name
+are accepted. The specifications incorporate these API corrections; affected
+reviews and final approvals are complete. The final sections record the decisions.
+Earlier approvals retain their exact historical scope.
+
 Status: public-API discussion completed; individual decisions below are accepted.
 The HLD and matching requirements have been consolidated for renewed review.
 The corrected requirements review is clean in round 4 and owner-accepted. The
@@ -524,3 +529,123 @@ Its accepted requirements dependency remains
 `2052ba2d84fc04b98c5485b1561dcab752840b1e3f0e131908233566b98241e7`.
 The detailed plan, commit, delivery campaign and product implementation remain
 unapproved.
+
+## Accepted correction: shared authorization opt-out
+
+During review of the public issue draft, the owner questioned the separate
+unsafe-source argument and asked about other confusing API interactions.
+The owner confirmed that the lack of a plugin opt-out was not intentional and
+requested one shared constant. After rejecting the vague name UNSAFE and
+discussing one versus several constants, the owner accepted the proposal with
+"ok".
+
+Use `UNSAFE_DISABLE_AUTHORIZATION_CHECKS` as the shared opt-out value in each
+permission category. The receiving policy field scopes its effect. It remains
+available in 1.4 and 1.5. Preserve `UNSAFE_DISABLE_EXECUTION_CHECKS` as a
+compatibility alias. Additive lists preserve an inherited unsafe value;
+`replace([...])` enables checking again. Source containment and plugin discovery
+settings retain their independent effect.
+
+The proposed API correction moves source opt-out into the policy and removes the
+parallel main/Compose unsafe-source argument. The owner also agreed that Compose
+must report plugin changes requiring new discovery as an error, with guidance to
+authorize during initialization. The error-versus-warning discussion retained
+errors under checked source policy: 1.4 default LEGACY warns/continues, explicit
+source grants enable checks, and 1.5 enables checking by default.
+
+Renaming `config_sources` to `allowed_config_sources` was proposed but has not
+been accepted. Do not treat approval of the shared constant as approval of that
+rename. Requirements/HLD/plan updates and their affected reviews remain pending;
+this decision record changes no product code or trusted stamp.
+
+## Accepted correction: authorize search-path entries
+
+The initial `allowed_config_sources` proposal was clearer about permission, but
+the owner corrected the terminology: `pkg://foo.bar` identifies a config
+search-path entry, rather than a ConfigSource plugin. The agent proposed
+`allowed_search_path_entries`; the owner replied "better".
+
+Use `allowed_search_path_entries` for the policy field. It permits config-requested
+location entries. Keep `config_search_path` on main/initialize for selecting and
+authorizing entries. No behavior change to selection/grants is implied by the
+rename, and no compatibility alias is needed for either unimplemented earlier
+policy-field name.
+
+The revised requirements, HLD, engineering plan, canonical slice acceptance and
+overview now incorporate this name, the shared opt-out and Compose's discovery
+error. Slice IDs, dependencies, owned paths, statuses and line estimates are
+unchanged. Existing stamps attest earlier exact documents; no fresh review or
+approval of the corrected document set is claimed. No issue was posted and no
+product implementation started.
+
+## Authorized: post the issue and refresh affected reviews
+
+The owner approved posting the prepared issue, pinning its number in the existing
+news paths and continuing delivery preparation. The issue was posted as
+[#3606](https://github.com/hydra-ecosystem/hydra/issues/3606), then read back through
+`gh`. The nine slice IDs, dependencies, behavior and estimates remain unchanged;
+only the approved news ownership paths were added. Requirements round 5 is clean
+for the corrected exact bytes. HLD round 4 is under fresh general/DBB review.
+This records authorization for the requested actions, not a new whole-document
+approval or a completed delivery admission.
+
+## Reviewed correction: initialize-family adapter
+
+DBB found that the HLD interface table omitted authorization=None from deprecated
+initialize_config_search_path(). The accepted R11/AC25 requirement already covers
+that initializer. The coordinator accepted the narrow correction within that
+requirement: add the parameter and explicitly forward it unchanged before
+discovery. The HLD and corresponding plan detail now state this. No new public
+policy decision or runtime implementation was introduced.
+
+The same retained DBB reviewer verified the fix clean. Current HLD SHA256:
+`507c52bfdf4c4f6b0d568543c016955aadfe88921457d5998cbad034f3cc7d52`.
+The helper completed general/DBB durable clean closeout in round 6. The intervening
+round 5 records a failed coordinator manifest selection, with no specialist
+report or clean claim. Full evidence is retained in the existing review trail
+and external authority area; allowances and original reports were not reset.
+Whole-HLD owner approval is still pending and is not supplied by these reviews.
+
+## Owner acceptance: consolidated API-corrected HLD
+
+After the agent reported clean general/DBB HLD review and listed HLD approval,
+refreshed plan review/approval and a committed baseline as the remaining gates,
+the owner replied "approved". This accepts the consolidated HLD SHA256
+`507c52bfdf4c4f6b0d568543c016955aadfe88921457d5998cbad034f3cc7d52`
+and authorizes the dependent implementation-plan review. Its reviewed requirements
+dependency is SHA256
+`9a0bada60222ef2a95ec00d6a5086217502986581368174127ec061f31a2eabf`.
+The previously accepted API decisions and design scope are unchanged.
+Final plan approval and committed delivery readiness remain separate gates.
+
+## Disposition: plan review worker and measurement findings
+
+The agent presented the two plan-review findings and a concrete scoped patch.
+The owner asked about affected launchers and plugin changes, then directed use
+of the existing shared launcher suite. After that coverage was recorded, the
+owner replied "ok.". The agent stated its interpretation before applying the
+prepared worker-fallback and measurement-owner corrections and continuing the
+same retained DBB review.
+
+The correction requires bootstrap support when namespace scanning is explicitly
+disabled, even if the grant categories are LEGACY; otherwise dispatch fails.
+Slices 1/2 own the already-required bounded containment overhead observations.
+Slice 8 names the existing LauncherTestSuite for common worker-policy checks.
+This preserves public API signatures, slice IDs/dependencies and estimates.
+It is a plan-contract correction, not an implementation or performance result.
+Final whole-plan approval remains a separate gate after review verification.
+
+## Owner acceptance: final reviewed plan and implementation start
+
+After clean general/DBB round-5 closeout, the agent presented the final plan,
+unchanged nine-slice scope and production/test totals, and asked: "Approve the
+final plan so I can commit the design and start slice 1?" The owner replied "yes".
+This approves plan SHA256
+`d173afd90cd02c23b9bd0c176f3215ae549b5786ff0ee32cc78e42ff2a589e45`,
+inventory SHA256
+`59cc1c05b1b8bd3199f63dd35bdedf5fe93ede5e32ba63e6e119252ad59acdca`
+and the reviewed overview SHA256
+`f09d1ca40eddcd593fdf60b707be9f4c073a432e3dbe19f81c967a1abd3038a7`.
+It authorizes the scoped design checkpoint and starting slice 1 under the existing
+delivery workflow. Required baseline, admission, implementation validation and
+review gates still apply. It does not authorize merging PRs or cutting a release.

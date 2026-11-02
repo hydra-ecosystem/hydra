@@ -2,6 +2,109 @@
 
 ## Current position
 
+API correction, 2026-11-03: the owner accepted the shared
+`UNSAFE_DISABLE_AUTHORIZATION_CHECKS` value and the policy field name
+`allowed_search_path_entries`. The old execution constant remains an alias.
+Requirements/HLD/plan/slice acceptance and overview are updated; the parallel
+unsafe-source flag is removed, and Compose rejects plugin changes requiring new
+discovery. See the [decision record](hld-api-discussion.md#accepted-correction-authorize-search-path-entries).
+Affected reviews, approvals and refreshed committed-baseline checks must precede
+admission. Earlier reports remain historical exact-version evidence. The refreshed
+requirements review completed clean in round 5 for SHA256
+`9a0bada60222ef2a95ec00d6a5086217502986581368174127ec061f31a2eabf`;
+the helper refreshed its sidecar. The HLD has now completed clean general/DBB
+closeout in round 6 for SHA256
+`507c52bfdf4c4f6b0d568543c016955aadfe88921457d5998cbad034f3cc7d52`.
+Its helper-issued sidecar binds the current requirements and verified DBB report.
+The implementation-plan review has now completed round 4 with findings: one
+medium worker-compatibility gap and one low missing measurement owner. Round 4
+reviewed plan SHA256 `a730171ee1e0a1954917d344f7a2c3768153e16e050f705fda575d9d2b0e3702`.
+The subsequent owner-requested test ownership and disposition corrections have
+completed clean general/DBB verification in round 5. Current plan SHA256:
+`d173afd90cd02c23b9bd0c176f3215ae549b5786ff0ee32cc78e42ff2a589e45`.
+The helper completed durable clean closeout and issued a version-6 sidecar with
+the exact inventory, overview, reviewed upstream dependencies, committed
+predecessor and original DBB evidence. The complete current design-review closure
+validates with no rejected nodes. The owner subsequently approved the exact final
+plan and authorized committing the design and starting slice 1. Approval is recorded
+in the existing decision history. Baseline checkpoint, fresh committed-input checks
+and campaign admission remain prerequisites; implementation has not started yet.
+
+DBB round 4 found one compatibility-interface omission: the deprecated
+`initialize_config_search_path()` adapter did not explicitly accept the shared
+policy argument. Existing R11/AC25 already require it. The HLD table and forwarding
+paragraph now include `authorization=None`; matching plan detail is aligned.
+The same retained DBB reviewer verified this design-contract fix with no further
+findings. This is not a runtime implementation fix. Round 5 is retained as a
+failed coordinator setup: it mistakenly selected committed bytes instead of the
+working draft; the reviewer refused that mismatch and issued no report. The
+original findings, reports, session and spent rounds were preserved.
+
+Current immutable DBB report:
+`/home/omry/.local/state/awd/swe-review-authority/runs/run_6y5jsm8jnbtkyd6z3jtz646tw6-hld-api-dbb/security-report-r6.json`.
+SHA256 `04e0ac770ceab0e02538d5fdbed7b1b1a06886342c8b41e4630b179c3853646f`.
+Combined report: `temp/reviews/high-level-design/rounds/round-06.md`, SHA256
+`ef926d4589a2aa41041c2cf99d62f55c569e4fb5a0e425984ebe82c629eb6a2a`.
+The owner has now approved the consolidated API-corrected HLD, SHA256
+`507c52bfdf4c4f6b0d568543c016955aadfe88921457d5998cbad034f3cc7d52`.
+The implementation-plan round-4 findings were:
+
+- R4-1 (medium): the old worker/unsupported-launcher fallback must not ignore
+  explicit `legacy_plugin_discovery=False` merely because all three grant
+  categories are LEGACY. Require bootstrap support for that explicit restriction
+  or reject before dispatch.
+- R4-2 (low): assign the already-required bounded containment-overhead assessment
+  to slices 1/2, with representative observations and no new benchmark framework
+  or fixed performance guarantee.
+
+The [prepared correction](plan-review-r4-proposal.patch) has now been applied
+after the owner discussed launcher requirements, requested shared-suite coverage
+and replied "ok.". It keeps the API, nine IDs, dependencies and estimates unchanged.
+The same retained DBB reviewer verified it clean. Both original specialist
+findings and the exact report are retained. Immutable specialist report:
+`/home/omry/.local/state/awd/swe-review-authority/runs/run_6y5jsm8jnbtkyd6z3jtz646tw6-plan-api-dbb/security-report-r4.json`,
+SHA256 `801c876eb73e5b72f28fe9f513bcae7df8305d023805fbd9a3c306b19537e2ac`.
+Combined report: `temp/reviews/implementation-plan/rounds/round-04.md`, SHA256
+`d2e83b8eaf4250f67101cd37fcbf021dd7b69b0d5b0f35d6a6c6b36e8670a1bf`.
+Retain invocation `run_6y5jsm8jnbtkyd6z3jtz646tw6-plan-api-dbb` and actual DBB
+reviewer `/root/config_auth_plan_api_r4` for correction verification; do not start
+another specialist or reset allowances. Final plan approval is now recorded;
+the committed design baseline and delivery admission remain pending.
+
+The owner then directed that the existing launcher test suite cover policy
+propagation. Confirmed `LauncherTestSuite` in
+`hydra/test_utils/launcher_common_tests.py` is inherited by Basic, Joblib, Submitit,
+Ray and RQ tests. Slice 8 now owns that shared file and reusable pre-restore
+policy/scan enforcement, worker restriction/restoration checks, and required
+refusal for unsupported launchers. Backend-specific restore/resubmission checks
+stay in the existing plugin tests. This assigns the already-planned coverage to
+the existing suite; IDs, dependencies and estimates remain unchanged. No product
+code or tests were implemented. The R4-1/R4-2 proposal was regenerated against
+this coverage revision, then applied after disposition. It is retained as the
+reviewable correction record, not an outstanding proposal. Both findings have
+focused coordinator and same-specialist independent verification. Current immutable
+specialist report:
+`/home/omry/.local/state/awd/swe-review-authority/runs/run_6y5jsm8jnbtkyd6z3jtz646tw6-plan-api-dbb/security-report-r5.json`,
+SHA256 `66f5fefee6fe7aa47aee2116918e8d6a5309c1a8f9ba24fc132dea574610dc0e`.
+Combined report: `temp/reviews/implementation-plan/rounds/round-05.md`, SHA256
+`a73a73ffaa2e34564d43f869fb729514bdbca1e70527badf9db5cd06e4a8ddd6`.
+The current closure identity is
+`976dee0a7013dd7a7ec432d3dd22449f3cffb83bcee91d55446eb5e169727e57`.
+No pending or unresolved findings remain. All implementation is still pending.
+
+The public tracking issue is now
+[#3606](https://github.com/hydra-ecosystem/hydra/issues/3606). Approved numeric
+news paths are pinned in the existing slices; no fragment or product code has
+been created. The unpublished checkpoint was rebased onto public main
+`7201639e170825aebda206b620610c196db7ccce`; its new local identity is
+`5cdbb7ce80c882da522bc21d950b47edc1f840e1`. Before/after manifests verified that
+all twenty-four design-file bytes and modes survived the rebase unchanged.
+
+The delivery run remains at
+`f01-f01-s09-record-immutable-design-identities-inter`; no campaign was opened
+and no product implementation started. The records below describe the earlier
+reviewed migration baseline.
+
 On 2026-11-02 the owner requested alignment with the updated `swe:design`.
 Migration is complete. Start at the living [overview](../overview.md); its table
 is generated from canonical [slices.json](../slices.json). The engineering

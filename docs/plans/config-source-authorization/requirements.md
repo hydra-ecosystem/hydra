@@ -63,6 +63,10 @@ Source authorization and containment are separate checks. Basic containment
 checks config paths within a selected filesystem or package source even if that
 source was selected explicitly by trusted initialization code.
 
+The policy authorizes config search-path entries such as `pkg://foo.bar`.
+These identify locations; the scheme selects the ConfigSource implementation.
+Authorization of a custom implementation plugin remains a separate permission.
+
 ## Required behavior
 
 ### R1. Separate source selection from source permission
@@ -145,18 +149,24 @@ define source normalization and matching, including whether any descendant
 permission exists; no wildcard or prefix permission is implied by this draft.
 The decision must apply consistently to normal composition and inspection paths.
 
-### R5. Provide a caller-controlled unsafe option
+### R5. Keep explicit opt-outs in the authorization policy
 
-Support the explicit Python call
-`compose(..., unsafe_allow_undeclared_config_sources=True)`. The option defaults
-to false and, when restricted operation is active, permits that call's otherwise
-undeclared config sources. It must not grant permission to later calls or leak
-through restoration of an initialization context.
+Export one `UNSAFE_DISABLE_AUTHORIZATION_CHECKS` constant for use independently
+in the policy's search-path, plugin and execution fields. The receiving field
+identifies the category whose authorization checks are disabled. Support this
+explicit value in both 1.4 and 1.5. Preserve the existing execution unsafe
+constant as a compatibility alias with its existing behavior.
 
-Config content and config overrides cannot enable this option. It does not
-disable or broaden target execution authorization. Equivalent needs for an
-application owning `hydra.main()` must be addressed explicitly in the HLD rather
-than silently placing a bypass in configuration data.
+A source opt-out uses
+`AuthorizationPolicy(allowed_search_path_entries=UNSAFE_DISABLE_AUTHORIZATION_CHECKS)`.
+Pass it through the existing authorization argument or context. Do not add a
+separate main/Compose unsafe-source flag. The opt-out follows normal policy
+lifetime and restoration: an explicit Compose policy affects that call; a main
+policy affects that invocation; initializer policy belongs to its session.
+
+Config content and config overrides cannot enable an opt-out. Disabling one
+category's authorization does not disable another category's checks. Source
+containment, plugin discovery settings and ordinary validity checks still apply.
 
 ### R6. Make denial and migration understandable
 
@@ -178,12 +188,10 @@ including under inherited LEGACY. Warnings alone are not an enforcement boundary
 
 Hydra 1.5 defaults the three categories to empty grant lists and rejects explicit
 LEGACY values. Trusted declarations and Hydra's built-in components remain
-available. This does not remove the separate explicit unsafe execution opt-out
-or the scoped unsafe source option.
+available. The shared explicit unsafe value remains supported in every category.
 
-The design must reconcile the default-false unsafe option with compatibility
-operation: absence of an unsafe opt-out must not be misrepresented as enforcement
-while a category is LEGACY. The containment rollout is separate: R10 requires
+Absence of an unsafe opt-out must not be misrepresented as enforcement while a
+category is LEGACY. The containment rollout is separate: R10 requires
 immediate errors in Hydra 1.4. Removing automatic namespace scanning is distinct
 from allowing explicitly authorized classes under `hydra_plugins`.
 
@@ -199,15 +207,17 @@ Source and execution grants do not implicitly authorize external plugins.
 
 Context-scoped permissions must support nesting and restoration, including after
 exceptions, without becoming process-global grants. Export `AuthorizationPolicy`,
-`replace`, and `LEGACY` from the regular `hydra.authorization` module. Its grant
-fields are `config_sources`, `plugins`, and `execution_whitelist`. Do not also
+`replace`, `LEGACY` and `UNSAFE_DISABLE_AUTHORIZATION_CHECKS` from the regular
+`hydra.authorization` module. Its grant fields are `allowed_search_path_entries`,
+`plugins` and `execution_whitelist`. The first permits config-requested entries;
+`config_search_path` on main/initialize selects and authorizes entries. Do not also
 provide a callable `hydra.authorization(...)` factory.
 
 Omitted or None fields inherit. Ordinary lists add grants; an empty list adds no
 grants and does not clear an inherited list. `replace([...])` replaces inherited
 grants only for its category; `replace([])` clears them. A list under LEGACY
-enables checking. An inherited execution unsafe sentinel remains active under
-additive combination and can be replaced with `replace([...])`. Restore the outer
+enables checking. An inherited unsafe value remains active under additive
+combination in every category and can be replaced with `replace([...])`. Restore the outer
 policy on exit. Keep the existing execution context's `reset=True` behavior.
 
 Preserve trusted Python callers' ability to authorize an individual
@@ -292,7 +302,7 @@ execution. The HLD must account for existing resource-loader compatibility rathe
 than assume every package resource has a filesystem path.
 
 The source-authorization compatibility mode must not postpone the required 1.4
-containment errors. The HLD must define the unsafe source option's interaction
+containment errors. The HLD must define the source opt-out's interaction
 with containment rather than silently make that option disable it. Runtime
 overhead should be assessed against existing path resolution; no benchmark or
 performance guarantee is claimed by these requirements.
@@ -306,6 +316,10 @@ cannot retrospectively authorize discovery. Application declarations, surroundin
 authorization contexts, and dedicated user selections must support framework
 users choosing plugins without editing framework code. Ordinary config content
 and config overrides cannot grant plugin permission.
+
+Compose must reject a plugin-policy change requiring discovery outside the
+initialized selection, before imports, with guidance to authorize during
+initialization. Reusing or narrowing the initialized selection remains supported.
 
 In restricted operation, do not import an unauthorized external plugin merely to
 discover its classes or determine whether it is allowed. A cached class or module
@@ -323,8 +337,9 @@ Use installed `hydra.plugins` entry-point names as the normal selector. Resolve
 metadata and reject ambiguous names before importing plugin code. Also support
 explicit `module:Class` selectors for plugins without an entry point. Python
 policy lists and the CLI use the same selectors. Accept both comma-separated
-values and repeated occurrences of `--authorize-plugin`. A grant covers the
-selected class, not every class in its module or distribution.
+values and repeated occurrences of `--authorize-plugin`. An ordinary explicit
+grant covers the selected class. The shared unsafe value disables plugin
+authorization while retaining plugin validation and discovery settings.
 
 ### R12. Restore Hydra-owned plugin state across initialization contexts
 
@@ -363,7 +378,10 @@ switch's scope.
 
 Expose `legacy_plugin_discovery` on the policy. Its omitted value inherits;
 automatic scanning is allowed by default only under the 1.4 LEGACY plugin
-policy. Checked plugin selection never requires an unrestricted namespace walk.
+policy. The shared unsafe value does not itself enable namespace scanning;
+an explicit scan request still needs a permissive plugin policy, and False
+always disables the scan. Checked plugin selection never requires an
+unrestricted namespace walk.
 Once namespace discovery is removed, this switch may become a deprecated no-op.
 Removing legacy authorization does not remove explicit `module:Class` use of
 namespace packages; no package-namespace removal release is selected here.
@@ -396,13 +414,14 @@ namespace packages; no package-namespace removal release is selected here.
 - **AC7:** Source denial occurs before initialization, including cases where
   composition would later fail for an unrelated reason. Equivalent source URI
   spellings cannot evade a denial.
-- **AC8:** The explicit unsafe Compose option allows the current call's otherwise
-  undeclared source, while the next restricted call refuses it. Config data or an
-  override with the same option name cannot enable it.
-- **AC9:** Granting source permission or using the unsafe source option does not
+- **AC8:** Passing the shared unsafe value in an explicit Compose policy's
+  `allowed_search_path_entries` field permits that call's otherwise undeclared
+  entries; the next restricted call refuses them. Config data and overrides
+  cannot enable it. Main/initializer/context use follows normal policy scope.
+- **AC9:** Granting source permission or disabling source authorization does not
   authorize an otherwise denied instantiated target or logging target.
 - **AC10:** In 1.4, LEGACY retains old selection behavior with deprecation
-  warnings; explicit lists enable checks for their categories. In 1.5, default
+  warnings; explicit lists enable checks under inherited LEGACY. In 1.5, default
   grants are empty and explicit LEGACY is rejected. Diagnostics state which
   checks apply and provide a documentation link and caller-specific example.
 - **AC11:** A caller can use one authorization context for source checks during
@@ -414,8 +433,8 @@ namespace packages; no package-namespace removal release is selected here.
 - **AC12:** Nested authorization contexts restore their previous permissions on
   normal exit and exceptions. Lists add grants, while `replace([...])` replaces
   only its category; `[]` retains an inherited list and `replace([])` clears it.
-  An additive list preserves an inherited execution unsafe opt-out; replacement
-  can enable checks. No permission leaks into unrelated contexts.
+  An additive list preserves an inherited unsafe value in any category;
+  replacement can enable checks. No permission leaks into unrelated contexts.
 - **AC13:** Existing execution-whitelist adapters retain execution-only behavior
   through the shared implementation. Supplying both a policy and the old
   execution argument on one call is an error before side effects, with guidance
@@ -423,6 +442,8 @@ namespace packages; no package-namespace removal release is selected here.
   supported and do not silently authorize config sources.
   With execution checks enabled, instantiate rejects authorization-API targets
   even under exact grants or aliases, before they can create or enter a policy.
+  The old execution unsafe constant aliases the shared value. No parallel
+  main/Compose unsafe-source argument is introduced.
 - **AC14:** A successfully discovered namespace-only plugin remains available and
   emits a visible deprecation warning identifying it and linking to the migration
   guide. A plugin with a working entry point does not receive that warning merely
@@ -455,6 +476,9 @@ namespace packages; no package-namespace removal release is selected here.
   unauthorized discovery; built-in Hydra plugins need no duplicate grants.
   Entry-point-name selectors work in policies and comma-separated or repeated
   CLI arguments. Ambiguous names fail before importing any candidate plugin.
+  The shared unsafe plugin value permits otherwise unauthorized entry-point
+  loads while retaining class validation and namespace discovery settings.
+  Compose rejects changes requiring new discovery before importing anything.
 - **AC22:** Normal context exit, exceptions, and failed initialization restore
   prior Hydra-owned plugin registry visibility and permissions. Later contexts
   cannot inherit authority merely from cached registrations or imports.
