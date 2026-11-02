@@ -253,7 +253,7 @@ def test_logging_rejects_internal_policy_reference() -> None:
 def test_logging_policy_integrity_mismatch_fails_closed(
     monkeypatch: MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(execution_policy, "UNCONTROLLED_EXECUTION_TARGETS", frozenset())
+    monkeypatch.setattr(execution_policy, "LEGACY_EXECUTION_TARGETS", frozenset())
 
     with raises(InstantiationException, match="integrity"):
         configure_log(_logging_config({"class": "logging.StreamHandler"}))
@@ -366,7 +366,7 @@ def test_logging_handler_class_result_uses_execution_whitelist() -> None:
     assert not CallableHandler.configured
 
 
-def test_logging_factory_invocation_uses_argument_checks() -> None:
+def test_logging_authorized_factory_must_return_handler() -> None:
     config = _logging_config(
         {"()": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
     )
@@ -376,11 +376,11 @@ def test_logging_factory_invocation_uses_argument_checks() -> None:
             configure_log(config)
 
     cause = _root_cause(exc_info.value)
-    assert isinstance(cause, InstantiationException)
-    assert "unsafe parameters: return_value" in str(cause)
+    assert isinstance(cause, TypeError)
+    assert "must return a logging.Handler" in str(cause)
 
 
-def test_logging_handler_class_invocation_uses_argument_checks() -> None:
+def test_logging_authorized_handler_class_must_return_handler() -> None:
     config = _logging_config(
         {"class": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
     )
@@ -390,8 +390,8 @@ def test_logging_handler_class_invocation_uses_argument_checks() -> None:
             configure_log(config)
 
     cause = _root_cause(exc_info.value)
-    assert isinstance(cause, InstantiationException)
-    assert "unsafe parameters: return_value" in str(cause)
+    assert isinstance(cause, TypeError)
+    assert "must return a logging.Handler" in str(cause)
 
 
 def test_logging_handler_class_is_resolved_once() -> None:
@@ -554,7 +554,7 @@ def test_logging_str_format_style_factory_is_permanently_blocked() -> None:
         }
     )
 
-    with execution_whitelist("logging.*"):
+    with execution_whitelist("logging.StrFormatStyle"):
         with raises(ValueError, match="Unable to configure formatter") as exc_info:
             configure_log(config)
 
@@ -904,22 +904,28 @@ def test_logging_ext_value_uses_execution_whitelist() -> None:
         configurator.convert("ext://os.environ")
 
 
-def test_logging_resolved_alias_cannot_hide_non_whitelistable_target() -> None:
-    config = _logging_config({"()": "logging.os.system", "command": "must-not-execute"})
+def test_logging_resolved_alias_cannot_hide_unlisted_target(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(sys.modules[__name__], "stdlib_alias", os.system, raising=False)
+    config = _logging_config({"()": f"{__name__}.stdlib_alias"})
 
-    with execution_whitelist("logging.*"):
+    with execution_whitelist(f"{__name__}.*"):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
-    assert "Target 'os.system'" in str(exc_info.value)
-    assert "cannot be authorized" in str(exc_info.value)
+    assert "Logging target 'os.system'" in str(exc_info.value)
+    assert "not in the Hydra execution whitelist" in str(exc_info.value)
     cause = _root_cause(exc_info.value)
     assert isinstance(cause, InstantiationException)
-    assert "Target 'os.system'" in str(cause)
-    assert "cannot be authorized" in str(cause)
+    assert "Logging target 'os.system'" in str(cause)
+    assert "not in the Hydra execution whitelist" in str(cause)
 
 
-def test_logging_cannot_mutate_os_environ(monkeypatch: MonkeyPatch) -> None:
+@mark.filterwarnings("ignore:Hydra configured Python logging:UserWarning")
+def test_logging_cannot_mutate_os_environ_in_legacy_mode(
+    monkeypatch: MonkeyPatch,
+) -> None:
     data: dict[bytes, bytes] = {}
     environ = cast(Any, os._Environ)(  # type: ignore[attr-defined]
         data, os.fsencode, os.fsdecode, os.fsencode, os.fsdecode
@@ -931,7 +937,7 @@ def test_logging_cannot_mutate_os_environ(monkeypatch: MonkeyPatch) -> None:
     target = f"{__name__}.environment_probe.update"
     config = _logging_config({"()": target, "HYDRA_SECURITY_TEST": "tampered"})
 
-    with execution_whitelist(target):
+    with execution_whitelist(None):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
@@ -941,7 +947,8 @@ def test_logging_cannot_mutate_os_environ(monkeypatch: MonkeyPatch) -> None:
     assert data == {}
 
 
-def test_logging_cannot_mutate_os_environ_through_call_wrapper(
+@mark.filterwarnings("ignore:Hydra configured Python logging:UserWarning")
+def test_logging_cannot_mutate_os_environ_through_call_wrapper_in_legacy_mode(
     monkeypatch: MonkeyPatch,
 ) -> None:
     data: dict[bytes, bytes] = {}
@@ -955,7 +962,7 @@ def test_logging_cannot_mutate_os_environ_through_call_wrapper(
     target = f"{__name__}.environment_probe.__setitem__.__call__"
     config = _logging_config({"()": target, "key": "NEW", "value": "tampered"})
 
-    with execution_whitelist([target, "os._Environ.__setitem__"]):
+    with execution_whitelist(None):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
@@ -965,7 +972,8 @@ def test_logging_cannot_mutate_os_environ_through_call_wrapper(
     assert data == {}
 
 
-def test_logging_cannot_mutate_os_environ_through_partial(
+@mark.filterwarnings("ignore:Hydra configured Python logging:UserWarning")
+def test_logging_cannot_mutate_os_environ_through_partial_in_legacy_mode(
     monkeypatch: MonkeyPatch,
 ) -> None:
     data: dict[bytes, bytes] = {}
@@ -974,7 +982,6 @@ def test_logging_cannot_mutate_os_environ_through_partial(
     )
     monkeypatch.setattr(os, "putenv", lambda _key, _value: None)
     factory = partial(environ.update)
-    target = execution_policy._get_resolved_target_name_for_check(factory)
     config = OmegaConf.create(
         {
             "version": 1,
@@ -985,7 +992,7 @@ def test_logging_cannot_mutate_os_environ_through_partial(
         flags={"allow_objects": True},
     )
 
-    with execution_whitelist(target):
+    with execution_whitelist(None):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
@@ -995,7 +1002,8 @@ def test_logging_cannot_mutate_os_environ_through_partial(
     assert data == {}
 
 
-def test_logging_configured_property_cannot_mutate_os_environ(
+@mark.filterwarnings("ignore:Hydra configured Python logging:UserWarning")
+def test_logging_configured_property_cannot_mutate_os_environ_in_legacy_mode(
     monkeypatch: MonkeyPatch,
 ) -> None:
     data: dict[bytes, bytes] = {}
@@ -1024,7 +1032,7 @@ def test_logging_configured_property_cannot_mutate_os_environ(
         }
     )
 
-    with execution_whitelist(["hydra.utils.get_object", probe_path]):
+    with execution_whitelist(None):
         with raises(ValueError, match="Unable to configure filter") as exc_info:
             configure_log(config)
 
@@ -1034,7 +1042,8 @@ def test_logging_configured_property_cannot_mutate_os_environ(
     assert data == {}
 
 
-def test_logging_cannot_mutate_os_environ_with_keyword_receiver(
+@mark.filterwarnings("ignore:Hydra configured Python logging:UserWarning")
+def test_logging_cannot_mutate_os_environ_with_keyword_receiver_in_legacy_mode(
     monkeypatch: MonkeyPatch,
 ) -> None:
     data: dict[bytes, bytes] = {}
@@ -1056,7 +1065,7 @@ def test_logging_cannot_mutate_os_environ_with_keyword_receiver(
         }
     )
 
-    with execution_whitelist([target, probe_path]):
+    with execution_whitelist(None):
         with raises(ValueError, match="Unable to configure handler") as exc_info:
             configure_log(config)
 
@@ -1125,3 +1134,77 @@ def test_hydra_main_execution_whitelist_applies_to_full_invocation() -> None:
 
     assert app(OmegaConf.create()) == ("tests.test_logging_config.CustomHandler",)
     assert _get_active_execution_whitelist() is None
+
+
+@mark.parametrize("policy", [None, ()])
+def test_logging_file_handler_appends_without_application_permissions(
+    tmp_path: Path, policy: Any
+) -> None:
+    path = tmp_path / "application.log"
+    path.write_text("existing\n")
+    config = _logging_config({"class": "logging.FileHandler", "filename": str(path)})
+    config.root.level = "INFO"
+    with execution_whitelist(policy):
+        configure_log(config)
+    handler = logging.getLogger().handlers[0]
+    assert type(handler) is logging.FileHandler
+    logging.getLogger().info("appended")
+    handler.flush()
+    assert path.read_text() == "existing\nappended\n"
+
+
+@mark.parametrize("authorize", [False, True])
+def test_logging_environment_factory_needs_explicit_authorization(
+    monkeypatch: MonkeyPatch, authorize: bool
+) -> None:
+    data: dict[bytes, bytes] = {}
+    environ = cast(Any, os._Environ)(
+        data, os.fsencode, os.fsdecode, os.fsencode, os.fsdecode
+    )
+    monkeypatch.setattr(
+        sys.modules[__name__], "environment_probe", environ, raising=False
+    )
+    monkeypatch.setattr(os, "putenv", lambda _key, _value: None)
+    target = f"{__name__}.environment_probe.update"
+    with execution_whitelist(target if authorize else []):
+        with raises(ValueError, match="Unable to configure handler") as error:
+            configure_log(_logging_config({"()": target, "NEW": "value"}))
+    cause = _root_cause(error.value)
+    if authorize:
+        assert isinstance(cause, TypeError)
+        assert "must return a logging.Handler" in str(cause)
+        assert data == {b"NEW": b"value"}
+    else:
+        assert isinstance(cause, InstantiationException)
+        assert "not in the Hydra execution whitelist" in str(cause)
+        assert data == {}
+
+
+@mark.filterwarnings("ignore:Hydra configured Python logging:UserWarning")
+def test_logging_factory_invocation_uses_argument_checks_in_legacy_mode() -> None:
+    config = _logging_config(
+        {"()": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
+    )
+
+    with execution_whitelist(None):
+        with raises(ValueError, match="Unable to configure handler") as exc_info:
+            configure_log(config)
+
+    cause = _root_cause(exc_info.value)
+    assert isinstance(cause, InstantiationException)
+    assert "unsafe parameters: return_value" in str(cause)
+
+
+@mark.filterwarnings("ignore:Hydra configured Python logging:UserWarning")
+def test_logging_handler_class_invocation_uses_argument_checks_in_legacy_mode() -> None:
+    config = _logging_config(
+        {"class": "unittest.mock.NonCallableMock", "return_value": "unsafe"}
+    )
+
+    with execution_whitelist(None):
+        with raises(ValueError, match="Unable to configure handler") as exc_info:
+            configure_log(config)
+
+    cause = _root_cause(exc_info.value)
+    assert isinstance(cause, InstantiationException)
+    assert "unsafe parameters: return_value" in str(cause)

@@ -1347,6 +1347,24 @@ def test_tag_sweep(value: str, expected: str) -> None:
 
 
 @mark.parametrize(
+    "value",
+    [
+        param("tag(a)", id="tag(a)"),
+        param("tag(choice(a,b),c)", id="tag(choice(a,b),c)"),
+    ],
+)
+def test_tag_sweep_requires_a_sweep(value: str) -> None:
+    with raises(
+        HydraException,
+        match=re.escape(
+            f"ValueError while evaluating '{value}': Last argument to tag() must be"
+            " a choice(), range() or interval(), got str"
+        ),
+    ):
+        parse_rule(value, "function")
+
+
+@mark.parametrize(
     "value, expected",
     [
         # value

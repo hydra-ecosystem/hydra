@@ -284,7 +284,7 @@ def tag(*args: str | Sweep, sweep: Sweep | None = None) -> Sweep:
         return sweep
     else:
         raise ValueError(
-            f"Last argument to tag() must be a choice(), range() or interval(), got {type(sweep).__name__}"
+            f"Last argument to tag() must be a choice(), range() or interval(), got {type(last).__name__}"
         )
 
 

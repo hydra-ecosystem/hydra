@@ -26,13 +26,17 @@ def my_app(cfg):
     ...
 ```
 
+Standard-library and Hydra targets require exact entries. Replace entries such
+as `os.*` or `hydra.utils.*` with the specific targets the application needs.
+Application and third-party package wildcards remain supported.
+
 Hydra automatically permits targets used by its built-in logging
 configurations. Add application-defined handlers, formatters, filters, queues,
 and listeners explicitly.
 
-Logging configuration remains trusted. The execution whitelist does not restrict
-where log files are written. Do not load logging configuration from untrusted
-sources.
+The execution whitelist controls which logging components configuration can
+select. It does not restrict file destinations or sandbox an authorized
+component's behavior.
 
 ## Migrate direct calls
 
@@ -57,14 +61,35 @@ with execution_whitelist("my_app.*"):
     framework_function(cfg)
 ```
 
+## Explicit execution authorization
+
+Trusted Python code can explicitly whitelist execution helpers, including code
+evaluation, process launchers, loaders, callback dispatch, and ordinary callable
+wrappers. This accepts the behavior their arguments can request. Direct access
+to existing code or authorization state remains restricted. See
+[Restricted targets](/docs/advanced/execution_whitelist/restricted_targets).
+
+Explicitly authorizing an environment-mutating target accepts its process-wide
+effect. Ordinary built-in file logging keeps working without application
+permissions; other logging targets are not authorized by that default allowance.
+All existing no-whitelist restrictions remain in place.
+
 ## Temporary legacy behavior
 
 Hydra 1.4 warns when it resolves config-selected targets without an execution
-whitelist; this becomes an error in Hydra 1.5. The no-whitelist path retains
-Hydra's target blacklist as defense-in-depth.
+whitelist. This legacy mode requires trusted configuration, as Hydra 1.3 does.
+Its blacklist is not guaranteed to prevent all attacks and must not be relied
+on as a security boundary.
 
-If unrestricted resolution is intentional and all relevant configuration is
-trusted, pass `UNSAFE_DISABLE_EXECUTION_CHECKS` explicitly. This disables both
-whitelist and blacklist checks and should not be used as a routine migration.
+Hydra 1.5 will remove legacy mode and its blacklist fallback. Applications must
+provide an execution whitelist or explicitly disable checks. Protected-target
+restrictions will remain when using a whitelist.
+
+## Explicit unsafe opt-out
+
+In Hydra 1.4 and 1.5, if unrestricted resolution is intentional and all relevant
+configuration is trusted, pass `UNSAFE_DISABLE_EXECUTION_CHECKS` explicitly.
+This disables both whitelist and blacklist checks and should not be used as a
+routine migration.
 See [Restricted targets](/docs/advanced/execution_whitelist/restricted_targets)
 for the implications of disabling these checks.
