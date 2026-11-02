@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-11-02",
-  "generated_at": "2026-11-02T16:36:39Z",
+  "generated_at": "2026-11-02T17:52:46Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 51,
+    "open_total": 52,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 3.9
+        "percentage": 3.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 44,
-        "percentage": 86.3
+        "count": 45,
+        "percentage": 86.5
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 5.9
+        "percentage": 5.8
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.0
+        "percentage": 1.9
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.0
+        "percentage": 1.9
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 50
+        "count": 51
       },
       {
         "status": "done",
@@ -871,6 +871,19 @@
       "updated": "2026-10-29",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3600"
+    },
+    {
+      "number": 3606,
+      "title": "Authorize config search-path entries and plugins",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-11-02",
+      "updated": "2026-11-02",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3606"
     },
     {
       "number": 385,
@@ -2797,6 +2810,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-11-02T17:52:46Z",
+      "kind": "new",
+      "issue": 3606,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606",
+      "title": "Authorize config search-path entries and plugins"
+    },
+    {
       "ts": "2026-11-02T07:11:04Z",
       "kind": "new",
       "issue": 3569,
@@ -4466,13 +4486,6 @@
       "issue": 3458,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3458",
       "title": "[Bug] What is the correct way to use optuna-sweeper with joblib-sweeper?"
-    },
-    {
-      "ts": "2026-09-21T21:37:45Z",
-      "kind": "new",
-      "issue": 3457,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3457",
-      "title": "[Bug] Provide GitHub tagged release for 1.3.7"
     }
   ]
 }
