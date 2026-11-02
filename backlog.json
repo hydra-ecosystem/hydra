@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-11-02",
-  "generated_at": "2026-11-02T07:11:04Z",
+  "generated_at": "2026-11-02T16:15:05Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 51,
@@ -743,6 +743,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3534"
     },
     {
+      "number": 3569,
+      "title": "Node audit configuration",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-10-21",
+      "updated": "2026-11-02",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3569"
+    },
+    {
       "number": 3575,
       "title": "[Documentation] Explain config loading using a virtual filesystem perspective",
       "category": "Documentation",
@@ -858,19 +871,6 @@
       "updated": "2026-10-29",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3600"
-    },
-    {
-      "number": 3569,
-      "title": "Node audit configuration",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "not started",
-      "status_emoji": "⬜",
-      "prs": [],
-      "created": "2026-10-21",
-      "updated": "2026-11-02",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3569"
     },
     {
       "number": 385,
