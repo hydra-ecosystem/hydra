@@ -1,14 +1,21 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import copy
+import os
 import re
+import subprocess
 import zipfile
+from pathlib import Path
 from typing import Any
+from unittest.mock import Mock
 
-from pytest import mark, param, raises
+from pytest import MonkeyPatch, mark, param, raises, skip
 
 from hydra._internal.config_repository import CachingConfigRepository, ConfigRepository
 from hydra._internal.config_search_path_impl import ConfigSearchPathImpl
-from hydra._internal.core_plugins import importlib_resources_config_source
+from hydra._internal.core_plugins import (
+    file_config_source,
+    importlib_resources_config_source,
+)
 from hydra._internal.core_plugins.file_config_source import FileConfigSource
 from hydra._internal.core_plugins.importlib_resources_config_source import (
     ImportlibResourcesConfigSource,
@@ -53,6 +60,138 @@ state = copy.deepcopy(Singleton.get_state())
 )
 class TestCoreConfigSources(ConfigSourceTestSuite):
     pass
+
+
+@mark.parametrize("operation", ["load_config", "is_config", "is_group", "list"])
+@mark.parametrize("escape", ["parent", "absolute", "same_prefix", "symlink"])
+def test_file_source_rejects_escape(
+    tmp_path: Path, monkeypatch: MonkeyPatch, operation: str, escape: str
+) -> None:
+    root = tmp_path / "conf"
+    root.mkdir()
+    outside = tmp_path / ("conf-sibling" if escape == "same_prefix" else "outside")
+    (outside / "secret").mkdir(parents=True)
+    (outside / "secret.yaml").write_text("value: 7\n")
+    if escape == "symlink":
+        try:
+            (root / "escape").symlink_to(outside, target_is_directory=True)
+        except OSError:
+            skip("Directory symlinks are unavailable")
+        config_path = "escape/secret"
+    elif escape == "parent":
+        config_path = "../outside/secret"
+    else:
+        config_path = str(outside / "secret")
+    source = FileConfigSource(provider="test", path=str(root))
+    read = Mock(side_effect=AssertionError("Outside config was opened"))
+    listing = Mock(side_effect=AssertionError("Outside directory was listed"))
+    monkeypatch.setattr(file_config_source, "open", read, raising=False)
+    monkeypatch.setattr(os, "listdir", listing)
+
+    with raises(ConfigLoadError, match="outside.*root"):
+        if operation == "list":
+            source.list(config_path, None)
+        else:
+            getattr(source, operation)(config_path)
+    read.assert_not_called()
+    listing.assert_not_called()
+
+
+def test_file_source_lists_internal_links_and_omits_external_links(
+    tmp_path: Path,
+) -> None:
+    group = tmp_path / "group"
+    group.mkdir()
+    (group / "config.yaml").write_text("value: 7\n")
+    try:
+        (tmp_path / "alias").symlink_to(group, target_is_directory=True)
+    except OSError:
+        skip("Directory symlinks are unavailable")
+    source = FileConfigSource(provider="test", path=str(tmp_path))
+    assert source.load_config("alias/config").config == {"value": 7}
+    assert source.is_config("alias/config")
+    assert source.is_group("alias")
+    assert source.list("alias", None) == ["config"]
+    (tmp_path / "escape").symlink_to(tmp_path.parent, target_is_directory=True)
+    (tmp_path / "external.yaml").symlink_to(tmp_path.parent / "external.yaml")
+    (tmp_path / "group.yaml").symlink_to(tmp_path.parent / "external.yaml")
+    assert source.list("", None) == ["alias", "group"]
+    assert source.list("", ObjectType.GROUP) == ["alias", "group"]
+    assert source.list("", ObjectType.CONFIG) == []
+    with raises(ConfigLoadError, match="outside.*root"):
+        source.list("escape", None)
+    with raises(ConfigLoadError, match="outside.*root"):
+        source.is_config("external")
+
+
+def test_file_source_listing_propagates_resolution_errors(
+    tmp_path: Path, monkeypatch: MonkeyPatch
+) -> None:
+    (tmp_path / "config.yaml").write_text("value: 7\n")
+    source = FileConfigSource(provider="test", path=str(tmp_path))
+    realpath = os.path.realpath
+
+    def resolve(path: str) -> str:
+        if path.endswith("config.yaml"):
+            raise OSError("Cannot resolve child")
+        return realpath(path)
+
+    monkeypatch.setattr(os.path, "realpath", resolve)
+    with raises(ConfigLoadError, match="Cannot resolve.*source root"):
+        source.list("", None)
+
+
+def test_file_source_root_is_pinned(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
+    root = tmp_path / "conf"
+    root.mkdir()
+    (root / "config.yaml").write_text("value: 7\n")
+    monkeypatch.chdir(tmp_path)
+    source = FileConfigSource(provider="test", path="conf")
+    monkeypatch.chdir(root)
+    assert source.load_config("config").config == {"value": 7}
+    assert source.list("", None) == ["config"]
+
+
+def test_file_source_rejects_unresolvable_path(tmp_path: Path) -> None:
+    source = FileConfigSource(provider="test", path=str(tmp_path))
+    with raises(ConfigLoadError):
+        source.load_config("invalid\0name")
+
+
+@mark.skipif(os.name != "nt", reason="Requires native Windows junctions")
+def test_file_source_windows_junction(tmp_path: Path) -> None:
+    root = tmp_path / "conf"
+    root.mkdir()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (outside / "config.yaml").write_text("value: 7\n")
+    link = root / "escape"
+    subprocess.run(
+        ["cmd", "/c", "mklink", "/J", str(link), str(outside)],
+        check=True,
+        capture_output=True,
+    )
+    try:
+        source = FileConfigSource(provider="test", path=str(root))
+        with raises(ConfigLoadError, match="outside.*root"):
+            source.load_config("escape/config")
+        assert source.list("", None) == []
+        with raises(ConfigLoadError, match="outside.*root"):
+            source.list("escape", None)
+    finally:
+        os.rmdir(link)
+
+
+@mark.skipif(os.name != "nt", reason="Requires native Windows path rules")
+@mark.parametrize("outside", ["Z:\\outside\\config", "\\\\outside\\share\\config"])
+def test_file_source_windows_roots(
+    tmp_path: Path, monkeypatch: MonkeyPatch, outside: str
+) -> None:
+    source = FileConfigSource(provider="test", path=str(tmp_path))
+    # Avoid accessing an actual remote share; exercise native drive/UNC comparison.
+    monkeypatch.setattr(os.path, "realpath", lambda value: value)
+    with raises(ConfigLoadError, match="source root"):
+        source.is_config(outside)
 
 
 def create_config_search_path(path: str) -> ConfigSearchPathImpl:
