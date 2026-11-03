@@ -1,33 +1,33 @@
 {
   "generated_on": "2026-11-03",
-  "generated_at": "2026-11-03T08:25:42Z",
+  "generated_at": "2026-11-03T15:50:53Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 51,
+    "open_total": 52,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 3.9
+        "percentage": 3.8
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 44,
-        "percentage": 86.3
+        "count": 45,
+        "percentage": 86.5
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 5.9
+        "percentage": 5.8
       },
       {
         "category": "Question",
         "emoji": "❓",
         "count": 1,
-        "percentage": 2.0
+        "percentage": 1.9
       },
       {
         "category": "Refactor",
@@ -39,7 +39,7 @@
         "category": "Build",
         "emoji": "🏗️",
         "count": 1,
-        "percentage": 2.0
+        "percentage": 1.9
       }
     ],
     "by_status": [
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 48
+        "count": 49
       },
       {
         "status": "done",
@@ -885,6 +885,19 @@
       "updated": "2026-10-29",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3600"
+    },
+    {
+      "number": 3614,
+      "title": "Add Hydra Landscape project: hydrust",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-11-03",
+      "updated": "2026-11-03",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3614"
     },
     {
       "number": 385,
@@ -2824,6 +2837,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-11-03T15:50:53Z",
+      "kind": "new",
+      "issue": 3614,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3614",
+      "title": "Add Hydra Landscape project: hydrust"
+    },
+    {
       "ts": "2026-11-03T05:06:17Z",
       "kind": "pr",
       "issue": 3606,
@@ -4493,14 +4513,6 @@
       "issue": 3458,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3458",
       "title": "[Bug] What is the correct way to use optuna-sweeper with joblib-sweeper?"
-    },
-    {
-      "ts": "2026-09-22T22:35:58Z",
-      "kind": "label",
-      "issue": 3456,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3456",
-      "title": "[Bug] Casting sweeps drops tags and shuffle settings",
-      "detail": "added \"bug\""
     }
   ]
 }
