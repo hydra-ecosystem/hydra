@@ -4,6 +4,7 @@ import os
 
 from omegaconf import OmegaConf
 
+from hydra._internal.config_source_path import resolve_file_path
 from hydra.core.object_type import ObjectType
 from hydra.plugins.config_source import ConfigLoadError, ConfigResult, ConfigSource
 
@@ -13,6 +14,7 @@ class FileConfigSource(ConfigSource):
         if path.find("://") == -1:
             path = f"{self.scheme()}://{path}"
         super().__init__(provider=provider, path=path)
+        self._root = os.path.realpath(self.path)
 
     @staticmethod
     def scheme() -> str:
@@ -20,7 +22,7 @@ class FileConfigSource(ConfigSource):
 
     def load_config(self, config_path: str) -> ConfigResult:
         normalized_config_path = self._normalize_file_name(config_path)
-        full_path = os.path.realpath(os.path.join(self.path, normalized_config_path))
+        full_path = resolve_file_path(self._root, normalized_config_path)
         if not os.path.exists(full_path):
             raise ConfigLoadError(f"Config not found : {full_path}")
 
@@ -40,19 +42,19 @@ class FileConfigSource(ConfigSource):
         return self.is_group("")
 
     def is_group(self, config_path: str) -> bool:
-        full_path = os.path.realpath(os.path.join(self.path, config_path))
+        full_path = resolve_file_path(self._root, config_path)
         return os.path.isdir(full_path)
 
     def is_config(self, config_path: str) -> bool:
         config_path = self._normalize_file_name(config_path)
-        full_path = os.path.realpath(os.path.join(self.path, config_path))
+        full_path = resolve_file_path(self._root, config_path)
         return os.path.isfile(full_path)
 
     def list(
         self, config_path: str, results_filter: ObjectType | None
     ) -> builtins.list[str]:
         files: list[str] = []
-        full_path = os.path.realpath(os.path.join(self.path, config_path))
+        full_path = resolve_file_path(self._root, config_path)
         for file in os.listdir(full_path):
             file_path = os.path.join(config_path, file)
             self._list_add_result(

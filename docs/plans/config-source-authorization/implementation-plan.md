@@ -1,0 +1,590 @@
+---
+plan_key: config-source-authorization
+slice_convention: hierarchical-v1
+slice_inventory: {"executable": false, "path": "slices.json", "sha256": "59cc1c05b1b8bd3199f63dd35bdedf5fe93ede5e32ba63e6e119252ad59acdca"}
+---
+
+# Config source and plugin authorization: implementation plan
+
+This document specifies the engineering against the owner's current
+[requirements](requirements.md) and [high-level design](high-level-design.md).
+Start with the [overview](overview.md) for the goals, approach and progress.
+
+This plan alone owns `plan_key`; its explicit reference binds the canonical
+[slice inventory](slices.json). Final plan approval, committed delivery readiness
+and implementation remain separate. The accepted API corrections require fresh
+affected review; existing stamps cover earlier versions. Review history is in
+[supporting status](supporting/status.md).
+
+## Final public interfaces
+
+Create the regular public module `hydra/authorization.py`, exporting direct aliases
+of `AuthorizationPolicy`, `LEGACY`, `UNSAFE_DISABLE_AUTHORIZATION_CHECKS` and `replace` from
+`hydra._internal.authorization`. Expose the module from `hydra.__init__`, not a
+second top-level factory or constructor. Canonical implementations remain under
+the existing internal policy protection. Keep imports free of eager external
+plugin discovery; load registry classes and execution normalization lazily.
+
+```text
+AuthorizationPolicy(
+    *, allowed_search_path_entries=None, plugins=None, execution_whitelist=None,
+    legacy_plugin_discovery=None,
+)
+replace(grants)
+LEGACY
+UNSAFE_DISABLE_AUTHORIZATION_CHECKS
+```
+
+Search-path/plugin fields accept sequences of nonempty strings, None, LEGACY or
+the shared unsafe value; reject a bare string rather than iterate its characters.
+Execution retains its existing string/sequence and unsafe-sentinel forms and
+accepts explicit LEGACY. Keep one singleton for the shared unsafe value and the
+old `UNSAFE_DISABLE_EXECUTION_CHECKS` constant, preserving import/pickling identity and
+execution behavior. Do not introduce separate per-category sentinel objects.
+`allowed_search_path_entries` authorizes location entries, not ConfigSource
+implementation classes. `config_search_path` selects and authorizes entries.
+`replace` captures an immutable sequence of grants; field normalization checks
+its contents. Reject nested replacement markers and non-string grant entries.
+None means inherit, not a replacement value. There is no shared `mode` or
+`reset` argument. No caller-owned mutable sequence remains referenced.
+
+Add keyword-only `authorization=None` to main, every initializer, and compose.
+Add keyword-only `config_search_path=None` to main and initialize,
+alongside their existing optional config_path. Preserve existing positional
+arguments and version_base behavior. The deprecated search-path initializer
+adapts to initialize without introducing a new version_base argument.
+Opt-outs use policy fields; do not add a separate main/Compose unsafe-source flag
+or an alias for the superseded, unimplemented `config_sources` policy field.
+
+Use an internal omitted sentinel for the old main execution_whitelist argument.
+If authorization is a policy and the old argument was explicitly supplied,
+including None, raise TypeError before version/discovery/state side effects and
+tell the caller to consolidate. A defaulted old argument is not a conflict;
+authorization=None supplies no policy and preserves old calls. Do not merge
+these two explicit arguments or invent precedence between them.
+
+Keep `execution_whitelist()` and existing arguments. Their adapter applies an
+execution-only delta/reset through the same context implementation. Preserve
+existing accepted input types, unsafe-sentinel identity/pickling, normalization,
+deferred callable capture and reset behavior. None with an ordinary old context
+inherits; reset=True with None explicitly selects LEGACY in 1.4 and is rejected
+in 1.5. Empty sequences remain checked empty grants. No new instantiate argument
+or deprecation warning for the old execution API is needed.
+
+### Combination and lifetime
+
+Store immutable policy deltas and an immutable effective snapshot. The one
+ContextVar holds a stack of unique activation frames, each referring to a delta;
+context entry saves a token and exit restores it. A policy object can be reused/
+nested and cannot store one process-global token. Preserve the existing
+per-context token-stack behavior. Keep activation identity separate from payload:
+update context-local registration overlays by replacing immutable frame values
+in the ContextVar, not by mutating an object shared with a copied context. The
+stable activation identity survives such a payload replacement for de-duplication.
+
+An initialization session captures the resolved policy plus the identities of
+the activation frames it consumed. Later operations start from that captured
+policy and apply only currently active frames not already consumed. Keep those
+identity references alive for the session, so reused policy objects or object-ID
+reuse cannot confuse activations. Frames are internal state, not serializable
+authority. This prevents inherited defaults or an old outer reset from being
+reapplied after an initializer's explicit grants.
+
+The registry/session frame persists for a global initializer, but no lexical
+ContextVar token is held open until clear. Constructor policy activation is
+temporary; GlobalHydra's current session supplies the captured base afterward.
+Thus a global initialize called inside an authorization context still works after
+that context exits, and later clear cannot restore its expired grants. Constructor
+failure restores the prior session; with-initializer exit restores the previous
+session/registries. This is the same policy resolver, not a second global grant path.
+
+- Omitted/None fields inherit. Lists add in first-occurrence order; [] does not
+  clear an inherited list. A list under LEGACY enables checks for that category.
+- replace([...]) replaces only its category, including an inherited
+  unsafe value. replace([]) clears inherited grants; exit restores the parent.
+  Ordinary additive grants preserve an inherited unsafe value in every category.
+  The unsafe value is supported in 1.4 and 1.5 and disables only its category's
+  authorization. It does not disable containment, validity checks or lifecycle.
+- LEGACY explicitly selects legacy behavior in 1.4. Release 1.5 rejects it and
+  defaults all three categories to checked empty grants. Compute the release
+  threshold from the existing version parser and actual Hydra release, never
+  from caller-selected version_base. Do not edit version numbers or release files.
+- The namespace setting inherits when None or explicitly selects a bool. The
+  automatic default permits scanning only for 1.4 plugin LEGACY. Explicit True with checked
+  plugin grants is an error before discovery; False disables the scan. It does
+  not prohibit explicitly selected code under the hydra_plugins package.
+  Preserve automatic None separately from an explicit True in snapshots and
+  bootstrap: opting into a list or the unsafe value keeps automatic scanning disabled rather
+  than treating a former LEGACY default as an explicit scan request.
+  An explicit True requires LEGACY or the unsafe plugin value. The unsafe value
+  itself never switches scanning on, and False always disables it.
+- Resolve surrounding policy, then explicit main/initializer policy, then CLI
+  selections. Source declarations add trusted source identities without changing
+  the category's check/LEGACY setting. Plugin CLI grants use the same list rules
+  as policy.plugins and therefore opt that category into checks under LEGACY.
+- Compose starts from the initialized session, applies the surrounding policy
+  and then its explicit argument. Literal source-selection overrides add
+  call-local declarations. Additional policy source grants are also call-local.
+  Reusing/narrowing initialized plugin visibility remains supported. Reject any
+  plugin-policy change requiring discovery outside that initialized selection,
+  including an unsafe request that would widen discovery, before imports.
+  Reject changing discovery settings in the initialized session too. Diagnostics
+  request authorization during a new initialization session, not silent no-ops.
+- Selected initialization sources and Hydra's sources remain session declarations.
+  Replacing additional source grants does not remove those selections. Source-
+  plugin declarations do not become execution grants or mutate the policy object.
+
+Trusted explicit registration receives the innermost active policy/initialization
+scope. Add its exact class grant to that scope's effective state. With no such
+scope, record an explicit application baseline grant in Plugins. An inherited
+baseline grant is subject to a later plugin-category replace. Cached class presence
+is separate from permission. Scope exit may leave Python imports cached but must
+not leave a scoped grant active.
+An active frame created after session capture receives local registrations first;
+otherwise the current initialization session receives them. Outside initialization,
+an active authorization frame receives them before the application baseline.
+Keep registration grants in the private receiving frame, separate from the
+immutable caller policy object. Apply them after that frame's explicit replacement.
+
+Add shared ContextVars and policy state to existing protected-object capture.
+Block the public hydra.authorization namespace and its canonical implementations
+as non-whitelistable instantiate targets before resolution/invocation. Cover
+construction, context entry/mutation and replacement helpers through the existing
+resolved-identity and receiver/result protections. Include registry/worker control
+objects in the same protections rather than build a parallel policy mechanism.
+Representative exact-grant/alias tests prove the boundary; do not enumerate every
+method spelling or retest the existing pattern matcher across all interfaces.
+Preserve the explicit unsafe execution opt-out and normal trusted Python use.
+
+### Config-load guard
+
+One private nested ContextVar scope marks Hydra-controlled config loading,
+selected config-module imports and structured-config conversion. Reset its token
+on every exit, including exceptions. Grant-making entry paths reject from that
+scope before effects: policy activation, old execution-context activation,
+trusted declaration creation, authorizing plugin/registry registration and
+worker-policy installation. A passive permission read/check is not a new grant.
+Do not reset this guard through clear, nested initialization or copied config.
+
+Enter the scope before source construction can import a selected config module,
+around repository load/inspection callbacks, and around ConfigStore._store/load
+conversion/copy work. Add it to Hydra's structured-input conversion helpers in
+instantiate; supplied caller execution arguments are resolved outside conversion,
+and ordinary authorized target execution is not itself config conversion. Never
+clear an already-active outer config-load guard to invoke a nested target.
+The inspected ConfigStore/instantiate conversion paths both execute dataclass
+default factories; see the supporting probe. ConfigStore data registration stays
+allowed. Returned DictConfig, dataclass objects and policy-looking data do not
+install authority. This is API mediation, not general Python import/side-effect
+containment or instrumentation of arbitrary application OmegaConf calls.
+
+## Source identities and declaration provenance
+
+Implement one pure normalization function in the authorization module. It must
+not import a selected module, resolve a plugin, call a source implementation,
+test availability, or read/list config content.
+
+- File keys use native abspath/normpath/normcase, anchored to the captured
+  initialization/call base directory, never a later job chdir. Existing bare
+  paths mean file sources. Do not expand environment variables or `~` implicitly.
+  Reject drive-relative, malformed and NUL-containing forms. Symlink aliases
+  need separate lexical grants; physical containment is checked separately.
+- Pkg keys retain current slash-to-dot and trailing-dot normalization. Structured
+  keys retain the exact non-relative module name, including the distinct empty
+  ConfigStore source. Reject ambiguous relative/empty module segments before
+  importing. Do not restrict names further than the import mechanism requires.
+- Custom source keys retain exact case-sensitive scheme/body strings. Do not
+  invoke their class to normalize them. No decoding, glob, prefix or descendant
+  permission is implied. Resolve caller:// only at trusted initializer selection.
+
+Keep the SearchPathElement constructor/provider/path API and SearchPathPlugin
+hook interface unchanged. Use a private immutable declaration marker defined
+under the protected internal module, attached to concrete search-path elements
+outside their public constructor. It records the canonical URI and declaration
+kind. Deep copies preserve it. A provider string, dict field or boolean is not a
+marker. Recompute the current URI before trusting the marker; a path changed
+without a trusted declaration becomes a request. The marker and its class are
+protected policy objects, not values configuration can construct or mutate.
+
+Trusted construction declares Hydra/core, primary and additional initializer
+sources. Around each authorized search-path hook, compare before/after canonical
+entries and stamp its new/changed declarations, including get_path() mutations.
+The config-load guard takes precedence: config-loading code cannot acquire the
+hook's declaration authority by calling a source-selection API. Preserve markers
+through repository copies, but never stamp config-requested entries as trusted.
+
+Retain original override provenance in parse_overrides before alias expansion;
+parse the expanded override once and associate its original index/text. A literal
+source-selection override from the real CLI or public Compose call grants only
+the sources selected into that call's effective path. Any config-authored alias
+expansion remains a request, including key aliases. Interpolated source values
+do not become literal grants. Python callers that construct actual URI strings
+own that input trust; do not inspect their call stack or track general taint.
+Keep the existing override selection/ordering semantics; no unrelated override
+grammar or merge change belongs to this feature.
+
+Actual CLI arguments and Compose overrides are trusted invocation inputs.
+Persisted rerun overrides are requests, not a new invocation grant: preserve the
+existing saved/current boundary and alias_start behavior. Trusted worker bootstrap
+preserves original declarations separately from saved job config. Do not infer
+authority from the existing from_shell diagnostic flag or parsed provider labels.
+Controller help, inspection and completion use the same provenance path.
+Keep the trusted raw-input origin in the existing invocation/call frame and add
+private typed markers to parsed Override objects. Do not change custom config-
+loader public signatures or parse every raw alias twice. When the effective
+request lacks that frame/marker, it is a request and cannot acquire a grant by
+using from_shell=True. Config-defined aliases can still expand normally;
+they simply do not supply source authority.
+
+Before SourcesRegistry.resolve or source construction, check each URI against
+session/call declarations plus current source grants. For custom schemes, also
+check the selected implementation class in the receiving plugin registry. A
+LEGACY source category warns before otherwise undeclared construction; a checked
+category raises ConfigCompositionException. The shared unsafe value in
+allowed_search_path_entries permits otherwise undeclared entries for the current
+policy scope. Every category state retains containment and the config-load guard.
+
+Rebuilding a CachingConfigRepository must preserve checked declaration identities.
+Do not reuse a request-created source or cached config across calls as authority.
+Use per-call repository caches; cached primary content may be retained within
+that same call. At source use, recheck receiving-scope permission when policy can
+have narrowed. Completion, --info, config/group lookup and sweep composition use
+these boundaries too. Unknown schemes are denied before revealing/constructing
+their implementation on the unauthorized path.
+
+## Portable containment
+
+Add one small private helper, `hydra._internal.config_source_path`. It owns native
+root/candidate ancestry and package-relative path validation. Config sources keep
+their normal loading/lookup/list responsibilities; no public filesystem abstraction
+or custom-source containment protocol is introduced.
+
+FileConfigSource captures its absolute resolved root at initialization. Resolve
+each requested candidate before is_file/is_dir/open/listdir, after filename
+extension normalization where applicable. Compare normalized path components with
+os.path.commonpath; cross-drive ValueError means refusal. Do not use textual
+startswith. Preserve normal missing-source/config outcomes when no content can be
+read; resolution failures must never result in an unchecked operation.
+
+Keep valid root-relative config names. Hydra's `/group` Defaults List syntax is
+resolved upstream and is not permission for an absolute filesystem path. At the
+source boundary reject physical absolute/drive/UNC escapes and resolved links
+outside the source. Internal links remain valid. Check enumerated child candidates
+before following them for classification. Another authorized root does not widen
+the current one. Use ConfigLoadError for containment failures, including lookup
+and listing; do not downgrade these failures to an availability warning.
+
+Pkg sources authorize first, then import and obtain the package resource root.
+Cache that root per source instance. Retain the existing regular-package check,
+including source/compiled initializers and regular packages under namespace parents.
+Directory roots use the native guard. Archive roots retain the selected package
+prefix and require normalized relative components to remain in that subtree;
+validate before join/open/iterdir and never extract the archive.
+
+Classify roots in this order: pathlib.Path, zipfile.Path, then the standard
+Traversable protocol supplied by a trusted loader. Virtual roots use normalized
+relative components and the root's existing single-string join interface. Require
+the protocol's joinpath/open/is_file/is_dir/iterdir/name operations; missing support
+raises unsupported-containment before read/list. Do not require a virtual root's
+is_dir() to be True: the stdlib legacy ResourceReader adapter has a flat root.
+Validate enumerated child names before traversal; do not inspect private loader
+attributes or convert an unknown Traversable to a filesystem path.
+
+For archive/virtual names, reject physical absolute, drive/UNC and backslash forms;
+normalize dot segments with a component stack and reject a pop above the root.
+Use that relative name for joining. Native directory-backed packages instead
+resolve the original candidate with the filesystem guard, so lexical dot removal
+cannot hide an escaping symlink. If an opaque virtual root returns a concrete
+native/archive candidate without a corresponding established native/archive root,
+refuse that operation rather than guess its containment. Otherwise the virtual
+reader's rooted resource semantics are trusted loader behavior; this does not
+prove its internal file provenance. Known native roots always take native checks.
+
+Containment runs in compatibility/restricted/unsafe-source operation from 1.4.
+Keep existing Defaults List validation; this work does not relax group traversal
+rules. No directory locks, native bindings, import rollback or race protection.
+
+## Plugin discovery and initialization state
+
+Make Plugins construction allocate registry state without external discovery.
+Existing discover, get_stats and instantiation consumers call one idempotent
+discovery routine. Register validates and registers its supplied class directly.
+Core plugins remain trusted; external discovery follows the current effective
+selection. This preserves normal compatibility discovery while fixing registration
+that currently imports unrelated modules first.
+
+Resolve normal selectors by exact name within installed hydra.plugins metadata.
+Group a name by module/attribute identity without load(); repeated metadata for
+the same identity is one selection, while different identities make the name
+ambiguous and fail before any candidate import. Unknown names likewise fail with
+the entry-point name and guide. Explicit module:attribute.path selectors support
+uninstalled and namespace-only code. Validate nonempty module/attribute components,
+compare EntryPoint.module/attr, and resolve normal imports/attributes only after
+permission. No wildcard or distribution-name grant is introduced.
+
+For an unsafe plugin policy, installed entry points need no individual grant.
+Retain metadata resolution, concrete-class validation and error diagnostics;
+the opt-out does not manufacture classes or widen a Compose discovery session.
+Explicit name selections still require unambiguous resolution.
+
+Validate a concrete Plugin and retain selected-selector-to-actual-class identity,
+including an exported alias for a class defined elsewhere. Deduplicate by resolved
+identity without authorizing other classes in the imported module. Carry resolved
+identities to workers; re-resolving an entry name there cannot silently choose a
+different module/class. This is identity matching, not package authenticity.
+
+Unselected metadata is ignored without import. Config requests to use an
+unselected class fail. Recheck permission before registry listing, discovery use,
+scheme resolution and plugin instantiation; don't infer grants from class caches.
+Inside an existing initialization session, intersect visibility with its initialized
+selection; new grants alone cannot cause late discovery. Trusted explicit register
+is the supported programmatic addition in the receiving scope.
+
+Plugin LEGACY discovery may scan the namespace unless disabled. Warn before the
+scan imports the namespace or descendants, and before undeclared entry-point loads.
+After all successful entry-point loads, compare actual class coverage and emit
+one FutureWarning per successfully loaded namespace-only class. Do not warn merely
+for a hydra_plugins prefix, and do not treat a failed/invalid entry point as coverage.
+The scan-disable switch suppresses that scan and its imports, not normal imports
+made by an authorized direct selector or entry point. The shared unsafe plugin
+value changes authorization only and leaves the scan setting intact.
+
+One idempotent initialization frame captures GlobalHydra's prior instance/hydra
+reference, Plugins' owned maps/explicit registrations, and SourcesRegistry's types.
+Snapshot containers without deep-copying application classes or objects. Enter
+before constructor-time initialization; close on constructor failure, context exit,
+or global clear. Clear inside a context and its later __exit__ must not double-pop
+tokens. Restore prior absence as well as prior presence. Preserve the outer frame
+when an attempted nested initialization is refused. Do not add concurrent
+independent initialization support or unload modules/ConfigStore registrations.
+The frame closes registry/session ownership idempotently; only truly lexical
+authorization contexts pop ContextVar tokens. Include the global-initializer
+inside-an-outer-policy case in restoration tests.
+
+## Worker contract
+
+Add an internal immutable bootstrap value to HydraContext and singleton transport.
+It contains effective per-category grants/LEGACY/unsafe values and namespace setting,
+pinned file identities,
+trusted source declarations and scoped explicit plugin registrations. Unsafe
+state is carried in its category, with no parallel source boolean. Store the
+bootstrap separately from job DictConfig and
+runtime.config_sources. Transport existing
+unsafe sentinel/class identities through the launcher's trusted Python serializer;
+serialize no ContextVar tokens or live context managers.
+Do not serialize activation-frame identities. Worker installation captures its
+own receiving activation frontier before rebuilding the restored session.
+Give the initialization session an explicit transport representation that omits
+its local restoration frame and activation references before deepcopy/pickling;
+do not deepcopy a live token and remove it afterward. Preserve ConfigStore and
+other already-supported singleton data under their existing trusted transport.
+This ordering governs Hydra restoration, not arbitrary Python imports performed
+by an already-trusted serializer.
+
+Define one `authorization_worker_context(bootstrap)` helper in the internal
+authorization module. It installs policy and a restoration frame before singleton
+restore, discovery, source reconstruction, setup logging or sweep composition.
+Close it after each job on success/failure. Singleton.set_state must honor this
+receiving state and rebuild only permitted plugin visibility; never rediscover
+everything first. Get_state includes the bootstrap marker so a restricted snapshot
+cannot silently take an old no-policy restore path. Missing/inconsistent restricted
+state raises HydraException before discovery; it is not a compatibility fallback.
+Evaluate categories independently: any explicit non-LEGACY policy, including an
+unsafe value, still needs exact bootstrap transport. Missing bootstrap cannot be
+downgraded to LEGACY because authorization was disabled in one category. Only
+all-LEGACY 1.4 with legacy_plugin_discovery not False can use the compatibility
+fallback; 1.5 never uses it. Explicitly disabling namespace discovery requires
+bootstrap transport even when every grant category is LEGACY. Without that
+transport, reject before dispatch rather than let worker restore scan plugins.
+
+BasicLauncher, Joblib execute_job and Submitit __call__/checkpoint paths use this
+helper before their existing restore/setup calls. Do not remap file roots from job
+YAML. Any cross-host mapping belongs to trusted launcher/bootstrap code and updates
+selections and grants together.
+
+Add `Launcher.supports_authorization_bootstrap = False`; updated launchers declare
+True. Before multirun dispatch, reject a nonparticipating launcher whenever any
+required category is non-LEGACY or legacy_plugin_discovery is False. Only
+all-LEGACY 1.4 with namespace scanning permitted may warn and retain the old
+contract. This is a trusted
+code capability declaration, not proof against a dishonest plugin. Document the
+wrapper/transport/restoration contract for external launcher authors.
+Basic, Joblib and Submitit receiving paths are the integrations owned here.
+Other launchers must implement the same contract before checked use; installing
+or authorizing an entry point is not a bootstrap capability declaration. This
+is a fail-closed compatibility limit, not permission to run an unchecked worker.
+
+Own the reusable worker-policy tests in the existing
+`hydra/test_utils/launcher_common_tests.py` `LauncherTestSuite`, inherited by
+Basic, Joblib, Submitit, Ray and RQ tests. Launchers declaring bootstrap support
+must demonstrate that the effective policy and namespace-scan setting apply
+before worker restore/discovery, using harmless import sentinels rather than only
+checking policy after the task starts. Verify that worker execution retains its
+restrictions and that reused workers restore their previous scope after success
+or failure. Launchers without support must produce the required pre-dispatch
+refusal when the contract is needed; the capability flag alone is not a passing
+result. Keep backend-specific restore/resubmission checks in the existing plugin
+test modules. This shares the already-planned slice-8 coverage rather than
+duplicating the same contract for each launcher.
+
+## Public activation and user migration
+
+Export the public module and wire authorization= only once category checks
+and worker handling exist. Decorator policy begins after argument parsing, before
+Hydra creation, and lasts through task/logging/multirun. The cfg-passthrough path
+applies execution policy without claiming source composition.
+
+Add repeatable --authorize-plugin selectors accepting comma-separated values;
+strip surrounding item whitespace, reject empty items and deduplicate in first
+occurrence order. Repeated flags and comma lists share one parser and selector
+vocabulary with policy.plugins. Apply these grants before discovery. No
+--config-source option is added. Keep --config-path/--config-dir behavior and
+their current insertion positions. Literal hydra.searchpath selections in real
+CLI and Compose overrides activate and authorize through the origin rules above.
+
+Main/initialize build [primary if present] + config_search_path before current
+SearchPathPlugin adjustments; first match wins. Resolve caller:// using the
+task's existing calling file/module for main and caller_stack_depth for initialize.
+The new list accepts existing URI forms and []/None as no extra sources. Bare
+file paths remain supported through the old config_path/config-dir interfaces;
+the new URI list requires absolute file:// values or caller:// for relative paths.
+Resolve caller:// only in these trusted declarations, not in policy source grants
+or config requests. Pin normalized file identities before later job chdir.
+
+The deprecated initialize_config_search_path class keeps its old nonempty-sequence
+validation, job_name='app', global/context behavior and no version_base parameter.
+It accepts keyword-only authorization=None, emits one migration warning and
+delegates to initialize(config_path=None, config_search_path=...,
+authorization=authorization, caller_stack_depth=2), establishing policy before
+discovery and ensuring the wrapper's own file is not
+mistaken for the user's caller. Remove its duplicate source parsing/initialization
+path. No removal release is chosen. Compose gets no config_search_path parameter.
+
+Opt-outs use `authorization=AuthorizationPolicy(...)` or the same surrounding
+context as ordinary grants. An explicit Compose argument with
+allowed_search_path_entries=UNSAFE_DISABLE_AUTHORIZATION_CHECKS lasts for that
+call; main uses its invocation and initialize captures its session normally.
+Only the shared singleton has this meaning; strings or policy-looking config
+data cannot enable it. Do not reuse unsafe-call repositories as later permission.
+A source opt-out leaves plugin/execution authorization and containment intact.
+
+Use one authorization guide URL, https://hydra.cc/docs/advanced/authorization/.
+Diagnostics identify the request, active category checks and caller-specific remedy,
+with this link. LEGACY remains warning-only; no separate default-False flag
+implies enforcement. Examples
+cover multiple CLI sources, a framework-owned main, Compose initialization, platform
+SearchPathPlugin declarations, local execution-only grants/resets, worker migration
+and source/plugin separation. Link the existing namespace migration guide in every
+namespace-only warning. Retain legacy execution warnings and the accepted 1.3/1.4
+threat-model distinctions. Implement the accepted 1.4 LEGACY warnings and 1.5
+empty defaults/LEGACY rejection through the central release policy, without
+editing version numbers, supported versions or release automation. Explain the
+deprecated initializer adapter separately; it has no selected removal release.
+Missing-config errors show skipped entry-point metadata without claiming which
+plugin would have registered the missing option. Ambiguous names show candidate
+identities and the explicit class form. All warnings/errors use the one guide;
+namespace-author warnings also use the existing plugin migration guide.
+Warn once per invocation/category at its first relevant LEGACY operation, before
+an otherwise unauthorized import or source initialization. Preserve the existing
+execution-warning behavior and deduplicate repeated use. Type-check policy and
+field values before entering scopes; arbitrary DictConfig/dict objects are
+not AuthorizationPolicy merely because their fields resemble one.
+
+## Canonical slice inventory
+
+Each item names one implementation responsibility, exact owned code/doc/test
+paths, dependencies and observable checks. Shared paths are edited sequentially
+under the dependency chain; ownership does not authorize unrelated cleanup.
+Core implementer responsibility includes its tests and user documentation.
+
+The canonical definitions are in [slices.json](slices.json), bound by the exact
+`slice_inventory` reference in this document's front matter. The
+[overview](overview.md#slices) renders their descriptions, estimates and current
+implementation status. Do not embed a second inventory or edit generated rows.
+
+## Requirement and integrated-journey coverage
+
+| Obligation | Owning slices and observable result |
+| --- | --- |
+| R1–R4; AC1–AC7 | 7 owns normalization/provenance, source-load/conversion guard and check ordering; 9 owns trusted CLI/init/Compose entry. Unauthorized sentinel constructors/imports remain untouched. |
+| R5–R7; AC8–AC10 | 5 owns 1.4/1.5 per-category defaults and LEGACY rejection; 9 owns scoped unsafe use, warnings and guide; 7 supplies checked repository use. |
+| R8; AC11–AC13/AC25 | 5 owns shared state, replace, adapter behavior and non-whitelistable controls; 9 owns exports and argument-conflict handling. Local execution grants leave other categories intact. |
+| R9; AC14–AC15 | 4 owns visible warning/coverage and author guide. |
+| R10; AC17–AC20 | 1–2 own all native/package resource operations; 9 proves neither mode nor unsafe-source disables them. |
+| R11/R14; AC21/AC24 | 3 owns non-discovering registration, 6 owns exact selection/visibility and scan refusal, 9 supplies early caller policy. |
+| R12; AC12/AC22 | 3 owns registry restoration; 5 adds policy tokens; 8 verifies reuse across workers. |
+| R13; AC23 | 8 owns transport/order/launcher failure and restoration; 9 exercises public multirun entry. |
+| Platform activation; AC16 | 7 owns trusted hook declarations; 9 demonstrates the high-priority env source without a duplicate grant. |
+
+Slice 9 owns the final integrated checks, reusing lower-level fixtures rather than
+repeating every combination: framework main plus user config directory; ordered
+additional sources and deprecated adapter; literal CLI/Compose source selection
+followed by denial of an ungranted config-derived source; a config-defined alias
+that requests rather than grants; platform hook plus an undeclared env-profile
+request; unsafe call followed by checked refusal; local execution replacement
+under source/plugin policy; failed init then independent context; Basic and
+process worker propagation with namespace scanning disabled. Include the public
+authorization API's rejection through instantiate under an ordinary exact grant.
+Include a ConfigStore-only flow shaped like IsaacLab's integration: trusted Python
+registers a ready config, then main(config_path=None) composes it without extra
+source permission. Do not import/install IsaacLab to perform that Hydra test.
+
+## Estimates
+
+Ranges are incremental final delivered feature-owned lines, not additions plus
+removals or entire untouched surrounding files. Rewritten/moved feature code is
+counted once in its owning slice; later slices count only distinct final portions.
+Count nonblank physical lines excluding comment-only lines; docstrings and
+multiline statements count physically. Production includes shipped configuration,
+workflow instructions, packaging, user-facing docs and news. Test ranges include
+helpers/generators and integration, platform and failure coverage. Exclude this
+development design/support, static fixture data, generated outputs and dependencies.
+No new packaging, CI matrix or release automation work is planned.
+
+The [slice table](overview.md#slices) lists the per-slice ranges and project totals.
+
+Estimates reflect inspected small source implementations, existing context and
+plugin registries, three worker receiving paths and current fixture coverage.
+The revised ranges include the config-load/conversion guard, protected public
+API, entry-name ambiguity handling and source-list/deprecation integration.
+They replace the earlier estimates rather than add another reserve. Shared guard
+and normalization logic is counted in slices 5/7 once; slice 9 counts its public
+wiring, documentation and representative integration checks only.
+The largest uncertainty is preservation of custom resource-reader and launcher
+behavior. Integration/platform/failure work is included in each owning range,
+not an additional reserve. If implementation reveals a new trust decision or
+missing foundation, return to the affected approved design; do not silently add
+exceptions, unsupported guarantees or more policy mechanisms to fit the range.
+
+## Validation and delivery prerequisites
+
+At implementation, run focused pytest on the owned existing modules, then the
+relevant current nox sessions. Core uses `.venv/bin/nox -s test_core-3.14` locally
+where available; existing CI covers supported 3.10–3.14 and platforms. Launcher
+work uses the existing plugin test sessions with PLUGINS selecting Joblib and
+Submitit and a supported interpreter. Run existing lint sessions for affected
+core/plugins. Do not alter supported versions, matrices, dependency metadata,
+workflow triggers or release files. Documentation-only changes need no new tests.
+
+Use harmless import/constructor/read/list sentinels for denied boundaries. Generic
+merge/path behavior is tested once; use representative integration cases instead
+of multiplying all selectors across every interface. Native Windows junction and
+drive/UNC checks require actual Windows evidence; emulation/all-skipped tests do
+not establish that result. Standard-library probes in supporting evidence are not
+product implementation tests. No such product validation has run during authoring.
+
+Before delivery, obtain final plan approval, commit the accepted documents,
+durable support and helper-owned sidecars at a chosen baseline, and establish
+the existing growth-policy setup. Account for all tracked/untracked work.
+The tracking issue is [#3606](https://github.com/hydra-ecosystem/hydra/issues/3606).
+Exact news paths are pinned in the canonical inventory: containment uses bugfix,
+registry cleanup maintenance, namespace deprecation api_change, and integrated
+authorization feature. Joblib and Submitit have their own feature fragments.
+Internal authorization foundation commits are part of the final integrated group;
+they do not publish its feature claim before slice 9. Refresh affected review
+before admission. Create the actual fragments with the owning implementation,
+not empty planning placeholders. See [engineering evidence](supporting/engineering-notes.md).
+
+The runtime engineering is specified here; publication data and committed delivery
+readiness remain explicit prerequisites. Neither this draft nor its eventual clean
+review starts a campaign, authorizes implementation, creates PRs, or cuts a release.
