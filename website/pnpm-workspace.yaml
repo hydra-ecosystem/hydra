@@ -43,7 +43,7 @@ overrides:
   follow-redirects: "^1.15.6"
   http-proxy-middleware: "3.0.7"
   js-yaml: "4.3.2"
-  launch-editor: "2.14.1"
+  launch-editor: "2.14.2"
   micromatch: "^4.0.8"
   nanoid: "3.3.18"
   path-to-regexp: "^1.9.0"
