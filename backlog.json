@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-11-03",
-  "generated_at": "2026-11-03T05:06:17Z",
+  "generated_at": "2026-11-03T05:11:29Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 51,
@@ -2738,6 +2738,19 @@
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3568"
     },
     {
+      "number": 3569,
+      "title": "Node audit configuration",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "done",
+      "status_emoji": "✅",
+      "prs": [],
+      "created": "2026-10-21",
+      "updated": "2026-11-02",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3569"
+    },
+    {
       "number": 3579,
       "title": "[Bug] instantiate() fails with TypeError: 'UnionNode' object is not subscriptable for union-typed configs",
       "category": "Bug",
@@ -2807,19 +2820,6 @@
       "updated": "2026-10-29",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3598"
-    },
-    {
-      "number": 3569,
-      "title": "Node audit configuration",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "done",
-      "status_emoji": "✅",
-      "prs": [],
-      "created": "2026-10-21",
-      "updated": "2026-11-02",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3569"
     }
   ],
   "updates": [
