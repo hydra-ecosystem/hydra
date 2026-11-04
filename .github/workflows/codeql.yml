@@ -6,6 +6,7 @@ on:
   pull_request:
     branches:
       - main
+      - 'pr[0-9]+'
   schedule:
     - cron: "33 9 * * 0"
 
@@ -14,7 +15,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Require a repository collaborator for stacked PRs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BASE_REF: ${{ github.base_ref }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == pull_request && "$BASE_REF" =~ ^pr[0-9]+$ ]]; then
+            gh api --silent "repos/$GH_REPO/collaborators/$PR_AUTHOR"
+          fi
   analyze:
+    needs: authorize
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
