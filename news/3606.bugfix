@@ -1,1 +1,1 @@
-Keep filesystem config reads and listings inside the selected source root.
+Keep file and package config reads and listings inside their source roots.
