@@ -1053,3 +1053,4 @@
 {"ts": "2026-11-03T05:06:17Z", "kind": "pr", "issue": 3594, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3594", "title": "[Bug] Multirun drops the quotes from choice() and str() values, so '1.10' runs as 1.1", "detail": "linked #3609"}
 {"ts": "2026-11-03T05:06:17Z", "kind": "pr", "issue": 3606, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606", "title": "Authorize config search-path entries and plugins", "detail": "linked #3612"}
 {"ts": "2026-11-03T15:50:53Z", "kind": "new", "issue": 3614, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3614", "title": "Add Hydra Landscape project: hydrust"}
+{"ts": "2026-11-04T10:05:40Z", "kind": "pr", "issue": 3606, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606", "title": "Authorize config search-path entries and plugins", "detail": "linked #3615"}

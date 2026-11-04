@@ -116,7 +116,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-11-04T07:33:20Z",
+  "generated_at": "2026-11-04T10:05:40Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -644,7 +644,8 @@
         "plugin"
       ],
       "pr_numbers": [
-        "3612"
+        "3612",
+        "3615"
       ],
       "state": "OPEN",
       "status": "in progress",

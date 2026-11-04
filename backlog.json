@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-11-04",
-  "generated_at": "2026-11-04T07:33:20Z",
+  "generated_at": "2026-11-04T10:05:40Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 52,
@@ -82,6 +82,10 @@
         {
           "number": 3612,
           "url": "https://github.com/hydra-ecosystem/hydra/pull/3612"
+        },
+        {
+          "number": 3615,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3615"
         }
       ],
       "created": "2026-11-02",
@@ -2837,6 +2841,14 @@
   ],
   "updates": [
     {
+      "ts": "2026-11-04T10:05:40Z",
+      "kind": "pr",
+      "issue": 3606,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606",
+      "title": "Authorize config search-path entries and plugins",
+      "detail": "linked #3615"
+    },
+    {
       "ts": "2026-11-03T15:50:53Z",
       "kind": "new",
       "issue": 3614,
@@ -4506,13 +4518,6 @@
       "issue": 3461,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3461",
       "title": "Hydra 1.4: drop Python 3.10 and evaluate Python 3.15"
-    },
-    {
-      "ts": "2026-09-22T22:41:27Z",
-      "kind": "closed",
-      "issue": 3458,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3458",
-      "title": "[Bug] What is the correct way to use optuna-sweeper with joblib-sweeper?"
     }
   ]
 }
