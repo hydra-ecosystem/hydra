@@ -1,9 +1,9 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-import copy
 import os
 from typing import Any, Sequence
 
 from hydra import version
+from hydra._internal.authorization import _InitializationFrame
 from hydra._internal.hydra import Hydra
 from hydra._internal.utils import (
     compute_search_path_dir,
@@ -12,23 +12,7 @@ from hydra._internal.utils import (
     detect_calling_file_or_module_from_stack_frame,
     detect_task_name,
 )
-from hydra.core.global_hydra import GlobalHydra
-from hydra.core.singleton import Singleton
 from hydra.errors import HydraException
-
-
-def get_gh_backup() -> Any:
-    if GlobalHydra in Singleton._instances:
-        return copy.deepcopy(Singleton._instances[GlobalHydra])
-    else:
-        return None
-
-
-def restore_gh_from_backup(_gh_backup: Any) -> Any:
-    if _gh_backup is None:
-        del Singleton._instances[GlobalHydra]
-    else:
-        Singleton._instances[GlobalHydra] = _gh_backup
 
 
 class initialize:
@@ -55,29 +39,28 @@ class initialize:
         caller_stack_depth: int = 1,
         version_base: str | None = version._UNSPECIFIED_,
     ) -> None:
-        self._gh_backup = get_gh_backup()
+        with _InitializationFrame() as self._initialization_frame:
+            version.setbase(version_base)
 
-        version.setbase(version_base)
-
-        calling_file, calling_module = detect_calling_file_or_module_from_stack_frame(
-            caller_stack_depth + 1
-        )
-        if job_name is None:
-            job_name = detect_task_name(
-                calling_file=calling_file, calling_module=calling_module
+            calling_file, calling_module = (
+                detect_calling_file_or_module_from_stack_frame(caller_stack_depth + 1)
             )
+            if job_name is None:
+                job_name = detect_task_name(
+                    calling_file=calling_file, calling_module=calling_module
+                )
 
-        Hydra.create_main_hydra_file_or_module(
-            calling_file=calling_file,
-            calling_module=calling_module,
-            config_path=config_path,
-            job_name=job_name,
-        )
+            Hydra.create_main_hydra_file_or_module(
+                calling_file=calling_file,
+                calling_module=calling_module,
+                config_path=config_path,
+                job_name=job_name,
+            )
 
     def __enter__(self, *args: Any, **kwargs: Any) -> None: ...
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        restore_gh_from_backup(self._gh_backup)
+        self._initialization_frame.close()
 
     def __repr__(self) -> str:
         return "hydra.initialize()"
@@ -98,21 +81,20 @@ class initialize_config_module:
         job_name: str = "app",
         version_base: str | None = version._UNSPECIFIED_,
     ):
-        self._gh_backup = get_gh_backup()
+        with _InitializationFrame() as self._initialization_frame:
+            version.setbase(version_base)
 
-        version.setbase(version_base)
-
-        Hydra.create_main_hydra_file_or_module(
-            calling_file=None,
-            calling_module=f"{config_module}.{job_name}",
-            config_path=None,
-            job_name=job_name,
-        )
+            Hydra.create_main_hydra_file_or_module(
+                calling_file=None,
+                calling_module=f"{config_module}.{job_name}",
+                config_path=None,
+                job_name=job_name,
+            )
 
     def __enter__(self, *args: Any, **kwargs: Any) -> None: ...
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        restore_gh_from_backup(self._gh_backup)
+        self._initialization_frame.close()
 
     def __repr__(self) -> str:
         return "hydra.initialize_config_module()"
@@ -133,24 +115,23 @@ class initialize_config_dir:
         job_name: str = "app",
         version_base: str | None = version._UNSPECIFIED_,
     ) -> None:
-        self._gh_backup = get_gh_backup()
+        with _InitializationFrame() as self._initialization_frame:
+            version.setbase(version_base)
 
-        version.setbase(version_base)
-
-        # Relative here would be interpreted as relative to cwd, which - depending on when it run
-        # may have unexpected meaning. best to force an absolute path to avoid confusion.
-        # Can consider using hydra.utils.to_absolute_path() to convert it at a future point if there is demand.
-        if not os.path.isabs(config_dir):
-            raise HydraException(
-                "initialize_config_dir() requires an absolute config_dir as input"
-            )
-        csp = create_config_search_path(search_path_dir=config_dir)
-        Hydra.create_main_hydra2(task_name=job_name, config_search_path=csp)
+            # Relative here would be interpreted as relative to cwd, which - depending on when it run
+            # may have unexpected meaning. best to force an absolute path to avoid confusion.
+            # Can consider using hydra.utils.to_absolute_path() to convert it at a future point if there is demand.
+            if not os.path.isabs(config_dir):
+                raise HydraException(
+                    "initialize_config_dir() requires an absolute config_dir as input"
+                )
+            csp = create_config_search_path(search_path_dir=config_dir)
+            Hydra.create_main_hydra2(task_name=job_name, config_search_path=csp)
 
     def __enter__(self, *args: Any, **kwargs: Any) -> None: ...
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        restore_gh_from_backup(self._gh_backup)
+        self._initialization_frame.close()
 
     def __repr__(self) -> str:
         return "hydra.initialize_config_dir()"
@@ -205,16 +186,16 @@ class initialize_config_search_path:
                 )
             sources.append(entry)
 
-        self._gh_backup = get_gh_backup()
-        version.setbase(version._UNSPECIFIED_)
-        csp = create_config_search_path_from_sources(sources)
-        Hydra.create_main_hydra2(task_name=job_name, config_search_path=csp)
+        with _InitializationFrame() as self._initialization_frame:
+            version.setbase(version._UNSPECIFIED_)
+            csp = create_config_search_path_from_sources(sources)
+            Hydra.create_main_hydra2(task_name=job_name, config_search_path=csp)
 
     def __enter__(self, *args: Any, **kwargs: Any) -> None:
         return None
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        restore_gh_from_backup(self._gh_backup)
+        self._initialization_frame.close()
 
     def __repr__(self) -> str:
         return "hydra.initialize_config_search_path()"
