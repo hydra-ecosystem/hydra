@@ -13,13 +13,15 @@
           "hydra/_internal/config_source_path.py",
           "hydra/_internal/core_plugins/file_config_source.py",
           "tests/test_config_repository.py",
-          "website/docs/upgrades/1.3_to_1.4/breaking_changes.md"
+          "website/docs/upgrades/1.3_to_1.4/breaking_changes.md",
+          "news/3606.bugfix"
         ],
         "dependencies": [],
         "acceptance": [
           "AC17-AC19: in-root files and links work; traversal, same-prefix siblings and external links fail before read/list in load/group/config/list paths.",
           "AC18: native Windows drive/UNC/junction cases pass on Windows; all-skipped native coverage is not a Windows verification result.",
-          "AC20: document the stable-filesystem limit, immediate 1.4 break and separate-source migration; numeric news fragment is required before publication."
+          "AC20: document the stable-filesystem limit, immediate 1.4 break and separate-source migration; numeric news fragment is required before publication.",
+          "R10/HLD overhead assessment: record a bounded before/after comparison for native config load, lookup and listing with existing representative fixtures; assess added resolution/check work without a performance guarantee or new benchmark suite."
         ]
       },
       "display": {
@@ -46,7 +48,8 @@
           "hydra/_internal/config_source_path.py",
           "hydra/_internal/core_plugins/importlib_resources_config_source.py",
           "tests/test_pkg_config_source.py",
-          "website/docs/upgrades/1.3_to_1.4/breaking_changes.md"
+          "website/docs/upgrades/1.3_to_1.4/breaking_changes.md",
+          "news/3606.bugfix"
         ],
         "dependencies": [
           "config-source-authorization/1"
@@ -54,7 +57,8 @@
         "acceptance": [
           "AC17-AC19: package load/lookup/list cannot reach sibling packages or archive subtrees; internal links still work and external links fail.",
           "Existing source, compiled-initializer, zip and namespace-parent fixtures pass; exercise a rooted ResourceReader without coercing it to Path.",
-          "Unestablished roots fail before read/list; compatibility and later source-unsafe operation cannot disable containment."
+          "Unestablished roots fail before read/list; compatibility and later source-unsafe operation cannot disable containment.",
+          "Extend slice 1 overhead evidence to representative package resource load, lookup and listing, reusing the same measurement approach."
         ]
       },
       "display": {
@@ -85,7 +89,8 @@
           "hydra/initialize.py",
           "tests/test_plugin_interface.py",
           "tests/test_compose.py",
-          "website/docs/advanced/compose_api.md"
+          "website/docs/advanced/compose_api.md",
+          "news/3606.maintenance"
         ],
         "dependencies": [],
         "acceptance": [
@@ -117,7 +122,8 @@
         "paths": [
           "hydra/core/plugins.py",
           "tests/test_plugin_interface.py",
-          "website/docs/upgrades/1.3_to_1.4/plugin_discovery.md"
+          "website/docs/upgrades/1.3_to_1.4/plugin_discovery.md",
+          "news/3606.api_change"
         ],
         "dependencies": [
           "config-source-authorization/3"
@@ -147,7 +153,7 @@
       "role": "implementation",
       "intent": {
         "title": "[config-source-authorization/5] Unify effective authorization state",
-        "responsibility": "Hydra core implementer: unify immutable per-category policy, replacement, release defaults and config-load guard state while preserving execution adapters and non-whitelistable authorization controls.",
+        "responsibility": "Hydra core implementer: unify immutable per-category policy, shared unsafe value, replacement, release defaults and config-load guard state while preserving execution adapters and protected authorization controls.",
         "paths": [
           "hydra/_internal/authorization.py",
           "hydra/_internal/execution_policy.py",
@@ -159,8 +165,8 @@
           "config-source-authorization/3"
         ],
         "acceptance": [
-          "AC10-AC13: ordinary lists add, replace changes one category, [] differs from replace([]), explicit lists enable checks under LEGACY, unsafe inheritance/replacement and context restoration follow the accepted rules.",
-          "Existing execution calls/context reset remain equivalent for the release; omitted values inherit, 1.5 defaults are empty and explicit LEGACY is rejected. Reused/overlapping policies do not leak mutable overlays or tokens.",
+          "AC10-AC13: ordinary lists add, replace changes one category, [] differs from replace([]), explicit lists enable checks under LEGACY, and the shared unsafe value follows the same inheritance/replacement rules in all three fields.",
+          "Existing execution calls/context reset remain equivalent; the old execution unsafe constant aliases the shared singleton. Omitted fields inherit, 1.5 defaults are empty, LEGACY is rejected there, and explicit unsafe values remain supported. Contexts do not leak overlays or tokens.",
           "Authorization construction/context/helpers and canonical aliases are non-whitelistable instantiate targets even with exact grants. The config-load guard rejects grant-making API entry but passive checks and normal trusted Python use remain supported."
         ]
       },
@@ -195,9 +201,9 @@
           "config-source-authorization/5"
         ],
         "acceptance": [
-          "AC21: denied initializers stay untouched; entry-point names, explicit classes and exported aliases work. Unknown or ambiguous names fail before import; identical metadata identities deduplicate.",
-          "AC24: disabled scanning makes no scan imports; authorized entry points may remain under hydra_plugins. Explicit scan=True with checked plugin grants fails before discovery.",
-          "Cached class/scheme presence and later Compose grants do not widen initialized discovery. Config-load-time register cannot grant; scoped trusted application registration remains usable and restores correctly."
+          "AC21: denied initializers stay untouched; entry names, explicit classes and aliases work. Unknown/ambiguous selectors fail before import. The shared unsafe value allows installed entry-point loads without individual grants while retaining concrete-class validation.",
+          "AC24: disabled scanning makes no scan imports; authorized entry points may remain under hydra_plugins. Explicit scan=True requires LEGACY or the unsafe plugin value; unsafe alone does not enable scanning.",
+          "Cached class/scheme presence cannot grant permission. Compose rejects changes requiring discovery outside the initialized selection. Config-load-time register cannot grant; scoped trusted registration remains usable and restores correctly."
         ]
       },
       "display": {
@@ -242,7 +248,7 @@
           "config-source-authorization/6"
         ],
         "acceptance": [
-          "AC3-AC7: deny undeclared file/pkg/named structured/custom requests before implementation resolution, construction, availability or imports. Source/data conversion cannot expand grants; normal ConfigStore registration works.",
+          "AC3-AC8: allowed_search_path_entries authorizes exact file/pkg/structured/custom locations before resolution, construction or imports. The shared source unsafe value permits undeclared entries only within its policy scope. Config conversion cannot expand grants; ConfigStore registration works.",
           "AC4/AC6/AC16: literal CLI/Compose selections and trusted initialization/hooks authorize once; config aliases/interpolations, provider strings, changed markers and saved rerun values cannot forge that provenance.",
           "AC19: inspection/completion/sweep and per-call caches preserve checks and scopes; custom schemes also need implementation permission. Guard restoration handles nested conversion and failure without suppressing normal authorized target execution."
         ]
@@ -280,17 +286,21 @@
           "plugins/hydra_submitit_launcher/hydra_plugins/hydra_submitit_launcher/submitit_launcher.py",
           "tests/test_basic_launcher.py",
           "tests/test_core_utils.py",
+          "hydra/test_utils/launcher_common_tests.py",
           "plugins/hydra_joblib_launcher/tests/test_joblib_launcher.py",
           "plugins/hydra_submitit_launcher/tests/test_submitit_launcher.py",
-          "website/docs/advanced/plugins/develop.md"
+          "website/docs/advanced/plugins/develop.md",
+          "plugins/hydra_joblib_launcher/news/3606.feature",
+          "plugins/hydra_submitit_launcher/news/3606.feature"
         ],
         "dependencies": [
           "config-source-authorization/7"
         ],
         "acceptance": [
           "AC23: Basic, Joblib process backends and Submitit receiving paths establish policy before singleton/discovery/source/sweep/logging operations, including resubmission and resolved plugin identities.",
-          "Reused workers and failures restore prior permissions/visibility. Job config cannot broaden transported grants, forge origin markers or enable namespace scanning; no live ContextVar token is serialized.",
-          "Missing/inconsistent bootstrap and unsupported launchers fail before dispatch whenever any required category is checked; only all-LEGACY 1.4 may warn and use the old contract."
+          "Reused workers and failures restore prior permissions/visibility. Transport unsafe state in each category without a parallel source boolean. Job config cannot broaden grants or scanning; no live ContextVar token is serialized.",
+          "Missing/inconsistent bootstrap and unsupported launchers fail before dispatch for non-LEGACY policy, explicit unsafe values, or legacy_plugin_discovery=False. An all-LEGACY worker with scanning disabled must make no namespace-scan imports. Only all-LEGACY 1.4 with namespace scanning permitted may warn and use the old contract.",
+          "Own common worker-policy checks in the existing LauncherTestSuite: supported launchers prove pre-restore policy/scan enforcement and worker restriction/restoration behavior; unsupported launchers prove required pre-dispatch refusal. Keep only backend-specific restore/resubmission checks in plugin tests; do not treat a capability declaration or skipped checks as behavioral proof."
         ]
       },
       "display": {
@@ -312,7 +322,7 @@
       "role": "implementation",
       "intent": {
         "title": "[config-source-authorization/9] Expose and document the integrated policy",
-        "responsibility": "Hydra core implementer: expose the approved module API, main/initialize source list, initializer deprecation, CLI plugin lists and scoped unsafe options, then document and verify the integrated journeys.",
+        "responsibility": "Hydra core implementer: expose the approved module API, allowed search-path permissions, main/initialize declarations, initializer deprecation, CLI plugin lists and policy-scoped opt-outs, then verify the integrated journeys.",
         "paths": [
           "hydra/__init__.py",
           "hydra/authorization.py",
@@ -332,15 +342,16 @@
           "website/docs/advanced/search_path/hydra_searchpath.md",
           "website/docs/advanced/execution_whitelist/scopes.md",
           "website/docs/configure_hydra/logging.md",
-          "website/docs/upgrades/1.3_to_1.4/breaking_changes.md"
+          "website/docs/upgrades/1.3_to_1.4/breaking_changes.md",
+          "news/3606.feature"
         ],
         "dependencies": [
           "config-source-authorization/8"
         ],
         "acceptance": [
           "AC1-AC2/AC6/AC25: main/initialize declare primary plus ordered additional sources and authorize once; caller-relative and global/context adapter behavior is preserved with a deprecation warning.",
-          "Public AuthorizationPolicy/replace/LEGACY exports match the approved module API. Same-call explicit policy plus old execution argument fails before side effects; local adapters remain valid. Plugin CLI accepts entry names, comma lists and repeated flags.",
-          "AC4/AC8-AC13: literal Compose/CLI source overrides authorize only the call; config-derived requests do not. Unsafe source use is scoped, 1.4 warnings and 1.5 defaults/rejection match policy, and the next checked call refuses ungranted sources.",
+          "Public AuthorizationPolicy/replace/LEGACY/shared unsafe exports match the API. The source field is allowed_search_path_entries; no parallel unsafe-source flag is added. Same-call policy plus old execution argument errors; adapters and comma/repeated plugin flags remain valid.",
+          "AC4/AC8-AC13: literal Compose/CLI entries authorize only the call; config-derived requests do not. Unsafe source policy is scoped, 1.4 warnings and 1.5 defaults/rejection match policy, and the next checked call refuses ungranted entries. Compose rejects plugin changes requiring new discovery.",
           "AC9/AC20: category grants and source-unsafe options do not permit logging/instantiate policy controls or disable containment. Run representative integrated journeys and current validation; exact numeric news paths and refreshed review are delivery prerequisites."
         ]
       },

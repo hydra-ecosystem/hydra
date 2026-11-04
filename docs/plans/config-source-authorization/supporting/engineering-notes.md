@@ -1,8 +1,9 @@
 # Detailed-design evidence
 
-Inputs are the approved requirements and HLD. Their exact hashes remain in
-[status](status.md); detailed authoring does not edit either input.
-The refreshed plan uses requirements
+These notes retain engineering evidence from the earlier approved requirements
+and HLD. The 2026-11-03 API correction is incorporated in the current documents;
+affected reviews and final owner approval are complete. See [status](status.md).
+The pre-correction plan used requirements
 `2052ba2d84fc04b98c5485b1561dcab752840b1e3f0e131908233566b98241e7`
 and HLD `4aac3ec633f26ff49327e0374f5fdbb96a592815011e90a62d1ee5c2dfa03a48`.
 
@@ -82,11 +83,11 @@ Keep authorization commits together until source/plugin checks, workers and the
 public activation are integrated. Do not publish a restricted-mode promise from
 an intermediate commit. This avoids temporary flags or duplicated implementations.
 
-Issue/PR numbers have not been allocated for this feature. Opening an issue or PR
-is outside authoring authorization. News fragments remain required at delivery.
-Before admitting a delivery slice, allocate the authorized publication identifiers,
-add its exact numeric fragment path to the owning inventory item, and refresh the
-affected plan review. Do not invent an issue number or commit a placeholder file.
-This is external publication data, not an unresolved runtime rule or permission
-to begin delivery. Uncommitted documents and growth-policy readiness are separate
-pre-delivery prerequisites.
+The owner approved posting the prepared public issue. It is now
+[#3606](https://github.com/hydra-ecosystem/hydra/issues/3606), with exact core and
+Joblib/Submitit news paths pinned in the owning inventory entries. No fragment
+placeholders were created. The source/package containment group has one shared
+bugfix fragment; registry cleanup, namespace deprecation and integrated
+authorization have distinct core maintenance/api_change/feature fragments.
+Affected review and a refreshed committed baseline remain prerequisites before
+slice admission. Publication metadata grants no product-review acceptance.
