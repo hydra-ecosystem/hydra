@@ -1,0 +1,22 @@
+{
+  "archive": {
+    "is_zip_path": true,
+    "root_at": "probe_archive_resources/",
+    "value": "value: 2"
+  },
+  "directory": {
+    "is_path": true,
+    "value": "value: 1"
+  },
+  "metadata_without_import": {
+    "attribute": "Plugin.Inner",
+    "module": "not_imported_plugin.module",
+    "module_imported": false
+  },
+  "python": "3.14.0",
+  "structured_conversion": {
+    "config_store_factory_calls": 1,
+    "converted_value": 1,
+    "instantiate_factory_calls": 1
+  }
+}
