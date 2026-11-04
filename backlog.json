@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-11-04",
-  "generated_at": "2026-11-04T21:05:40Z",
+  "generated_at": "2026-11-04T21:15:13Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 52,
@@ -86,6 +86,10 @@
         {
           "number": 3615,
           "url": "https://github.com/hydra-ecosystem/hydra/pull/3615"
+        },
+        {
+          "number": 3618,
+          "url": "https://github.com/hydra-ecosystem/hydra/pull/3618"
         }
       ],
       "created": "2026-11-02",
@@ -2841,6 +2845,14 @@
   ],
   "updates": [
     {
+      "ts": "2026-11-04T21:15:13Z",
+      "kind": "pr",
+      "issue": 3606,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606",
+      "title": "Authorize config search-path entries and plugins",
+      "detail": "linked #3618"
+    },
+    {
       "ts": "2026-11-04T10:05:40Z",
       "kind": "pr",
       "issue": 3606,
@@ -4511,13 +4523,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3361",
       "title": "Show user frames in default instantiation error tracebacks",
       "detail": "in progress → not started"
-    },
-    {
-      "ts": "2026-09-23T20:59:23Z",
-      "kind": "new",
-      "issue": 3461,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3461",
-      "title": "Hydra 1.4: drop Python 3.10 and evaluate Python 3.15"
     }
   ]
 }
