@@ -24,6 +24,10 @@ class Quote(Enum):
 
 @dataclass(frozen=True)
 class QuotedString:
+    """
+    A string that is written to override text in quotes.
+    """
+
     text: str
 
     quote: Quote
@@ -186,6 +190,10 @@ class IntervalSweep(Sweep):
 # Ideally we would use List[ElementType] and Dict[str, ElementType] but Python does not seem
 # to support recursive type definitions.
 ElementType = str | int | float | bool | list[Any] | dict[str, Any]
+# In a parsed element, a plain str is a string that was written without quotes, and
+# every other string is a QuotedString. Override._convert_value() returns the Python
+# value of a parsed element, and Override._get_value_element_as_str() returns its
+# override text.
 ParsedElementType = ElementType | QuotedString | None
 TransformerType = Callable[[ParsedElementType], Any]
 

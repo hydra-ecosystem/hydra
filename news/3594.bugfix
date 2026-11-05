@@ -1,0 +1,1 @@
+Keep strings returned by override functions as strings in multirun jobs.
