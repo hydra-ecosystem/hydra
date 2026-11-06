@@ -1,9 +1,9 @@
 {
   "generated_on": "2026-11-06",
-  "generated_at": "2026-11-06T07:09:36Z",
+  "generated_at": "2026-11-06T08:26:30Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 52,
+    "open_total": 53,
     "by_category": [
       {
         "category": "Bug",
@@ -15,13 +15,13 @@
         "category": "Enhancement",
         "emoji": "✨",
         "count": 45,
-        "percentage": 86.5
+        "percentage": 84.9
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 5.8
+        "percentage": 5.7
       },
       {
         "category": "Question",
@@ -32,8 +32,8 @@
       {
         "category": "Refactor",
         "emoji": "🔧",
-        "count": 0,
-        "percentage": 0.0
+        "count": 1,
+        "percentage": 1.9
       },
       {
         "category": "Build",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 49
+        "count": 50
       },
       {
         "status": "done",
@@ -906,6 +906,21 @@
       "updated": "2026-11-03",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3614"
+    },
+    {
+      "number": 3619,
+      "title": "Reduce redundant Nox environments and document stale-environment cleanup",
+      "category": "Refactor",
+      "category_emoji": "🔧",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-11-06",
+      "updated": "2026-11-06",
+      "labels": [
+        "maintenance"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3619"
     },
     {
       "number": 385,
@@ -2845,6 +2860,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-11-06T08:26:30Z",
+      "kind": "new",
+      "issue": 3619,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3619",
+      "title": "Reduce redundant Nox environments and document stale-environment cleanup"
+    },
+    {
       "ts": "2026-11-04T21:15:13Z",
       "kind": "pr",
       "issue": 3606,
@@ -4515,14 +4537,6 @@
         "number": 3462,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3462"
       }
-    },
-    {
-      "ts": "2026-09-24T18:59:27Z",
-      "kind": "status",
-      "issue": 3361,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3361",
-      "title": "Show user frames in default instantiation error tracebacks",
-      "detail": "in progress → not started"
     }
   ]
 }

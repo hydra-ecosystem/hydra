@@ -1055,3 +1055,4 @@
 {"ts": "2026-11-03T15:50:53Z", "kind": "new", "issue": 3614, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3614", "title": "Add Hydra Landscape project: hydrust"}
 {"ts": "2026-11-04T10:05:40Z", "kind": "pr", "issue": 3606, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606", "title": "Authorize config search-path entries and plugins", "detail": "linked #3615"}
 {"ts": "2026-11-04T21:15:13Z", "kind": "pr", "issue": 3606, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3606", "title": "Authorize config search-path entries and plugins", "detail": "linked #3618"}
+{"ts": "2026-11-06T08:26:30Z", "kind": "new", "issue": 3619, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3619", "title": "Reduce redundant Nox environments and document stale-environment cleanup"}
