@@ -1,14 +1,22 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from hydra._internal.hydra import Hydra
 from hydra.core.config_loader import ConfigLoader
 from hydra.core.singleton import Singleton
 
+if TYPE_CHECKING:
+    from hydra._internal.authorization import _InitializationFrame
+
 
 class GlobalHydra(metaclass=Singleton):
     def __init__(self) -> None:
         self.hydra: Hydra | None = None
+        self._initialization_frame: _InitializationFrame | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        # Rollback snapshots belong to the local initialization context.
+        return {**self.__dict__, "_initialization_frame": None}
 
     def initialize(self, hydra: "Hydra") -> None:
         assert isinstance(hydra, Hydra), f"Unexpected Hydra type : {type(hydra)}"
@@ -27,6 +35,10 @@ class GlobalHydra(metaclass=Singleton):
 
     def clear(self) -> None:
         self.hydra = None
+        frame = self._initialization_frame
+        self._initialization_frame = None
+        if frame is not None:
+            frame.close()
 
     @staticmethod
     def instance(*args: Any, **kwargs: Any) -> "GlobalHydra":
