@@ -116,7 +116,7 @@
     "753": "2026-09-05",
     "845": "2026-09-29"
   },
-  "generated_at": "2026-11-18T07:10:14Z",
+  "generated_at": "2026-11-19T07:10:01Z",
   "issues": {
     "1085": {
       "category": "Enhancement",
@@ -673,7 +673,7 @@
       "state": "OPEN",
       "status": "not started",
       "title": "Reduce redundant Nox environments and document stale-environment cleanup",
-      "updated_at": "2026-11-06T08:25:11Z"
+      "updated_at": "2026-11-18T09:18:05Z"
     },
     "468": {
       "category": "Enhancement",
