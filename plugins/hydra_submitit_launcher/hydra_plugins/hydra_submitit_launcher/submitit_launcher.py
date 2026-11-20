@@ -78,15 +78,15 @@ class BaseSubmititLauncher(Launcher):
     def checkpoint(self, *args: Any, **kwargs: Any) -> Any:
         """Resubmit the current callable at its current state with the same initial arguments."""
         # lazy import to ensure plugin discovery remains fast
-        import submitit
+        from ._serialization import SourceSubmission
 
-        return submitit.helpers.DelayedSubmission(self, *args, **kwargs)
+        return SourceSubmission(self, *args, **kwargs)
 
     def launch(
         self, job_overrides: Sequence[Sequence[str]], initial_job_idx: int
     ) -> Sequence[JobReturn]:
         # lazy import to ensure plugin discovery remains fast
-        import submitit
+        from ._serialization import SourceExecutor
 
         assert self.config is not None
 
@@ -105,7 +105,7 @@ class BaseSubmititLauncher(Launcher):
             }
         )
         init_keys = specific_init_keys | {"submitit_folder"}
-        executor = submitit.AutoExecutor(cluster=self._EXECUTOR, **init_params)
+        executor = SourceExecutor(cluster=self._EXECUTOR, **init_params)
 
         # specify resources/parameters
         baseparams = set(OmegaConf.structured(BaseQueueConf).keys())
