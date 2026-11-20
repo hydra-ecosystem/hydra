@@ -35,6 +35,7 @@ setup(
     install_requires=[
         "hydra-core>=1.4.0.dev1,<1.5.0.dev0",
         "joblib>=1.5.3",
+        "cloudpickle<3.1.3",
     ],
     include_package_data=True,
 )
