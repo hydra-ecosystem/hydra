@@ -1,5 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 from pathlib import Path
+from typing import Any, cast
 from unittest.mock import MagicMock, patch
 
 import submitit
@@ -15,6 +16,10 @@ from omegaconf import OmegaConf
 from pytest import mark
 
 from hydra_plugins.hydra_submitit_launcher import submitit_launcher
+from hydra_plugins.hydra_submitit_launcher._serialization import (
+    SourceExecutor,
+    SourceSubmission,
+)
 from hydra_plugins.hydra_submitit_launcher.config import SlurmQueueConf
 
 chdir_plugin_root()
@@ -81,7 +86,10 @@ def test_slurm_python_parameter(tmp_path: Path, python: str | None) -> None:
     )
     launcher.config = config
 
-    with patch.object(submitit, "AutoExecutor", auto_executor):
+    with patch(
+        "hydra_plugins.hydra_submitit_launcher._serialization.SourceExecutor",
+        auto_executor,
+    ):
         assert launcher.launch([[]], initial_job_idx=0) == []
 
     auto_executor.assert_called_once_with(
@@ -119,7 +127,10 @@ def test_slurm_tasks_per_node_is_optional_with_compatible_default(
     )
     launcher.config = config
 
-    with patch.object(submitit, "AutoExecutor", return_value=executor):
+    with patch(
+        "hydra_plugins.hydra_submitit_launcher._serialization.SourceExecutor",
+        return_value=executor,
+    ):
         assert launcher.launch([[]], initial_job_idx=0) == []
 
     assert (
@@ -151,7 +162,10 @@ def test_slurm_use_srun_parameter(tmp_path: Path, use_srun: bool) -> None:
     )
     launcher.config = config
 
-    with patch.object(submitit, "AutoExecutor", return_value=executor):
+    with patch(
+        "hydra_plugins.hydra_submitit_launcher._serialization.SourceExecutor",
+        return_value=executor,
+    ):
         assert launcher.launch([[]], initial_job_idx=0) == []
 
     assert executor.update_parameters.call_args.kwargs["slurm_use_srun"] is use_srun
@@ -191,3 +205,73 @@ def test_failure_preserves_remote_traceback(tmp_path: Path) -> None:
     assert "in main" in stderr
     assert 'raise RuntimeError(f"submitit remote failure {cfg.job}")' in stderr
     assert "RuntimeError: submitit remote failure 0" in stderr
+    worker_log = (tmp_path / "0" / "failing_app.log").read_text()
+    assert 'raise RuntimeError(f"submitit remote failure {cfg.job}")' in worker_log
+    assert 'raise ValueError(f"submitit remote cause {cfg.job}")' in worker_log
+    assert "<dynamic-code>" not in worker_log
+
+
+def test_submission_preserves_source_and_shared_state_once(tmp_path: Path) -> None:
+    class Once:
+        calls = 0
+
+        def __reduce__(self) -> Any:
+            self.calls += 1
+            assert self.calls == 1
+            return list, ()
+
+    shared = Once()
+
+    def task(other: Any) -> tuple[bool, str]:
+        return shared is other, task.__code__.co_filename
+
+    submission = SourceSubmission(task, other=shared)
+    submission.set_timeout(13, 2)
+    path = tmp_path / "submission.pkl"
+    submission.dump(path)
+    restored = submitit.helpers.DelayedSubmission.load(path)
+
+    assert restored.__class__.__name__ == "DelayedSubmission"
+    assert restored._timeout_min == 13
+    assert restored._timeout_countdown == 2
+    assert restored.result() == (True, __file__)
+    assert shared.calls == 1
+
+
+def test_checkpoint_preserves_task_source(tmp_path: Path) -> None:
+    launcher = submitit_launcher.LocalLauncher()
+
+    def task(cfg: Any) -> None:
+        pass
+
+    launcher.task_function = task
+    submission = launcher.checkpoint([], "hydra.sweep.dir", 0, "job", {})
+    assert isinstance(submission, SourceSubmission)
+    path = tmp_path / "checkpoint.pkl"
+    submission.dump(path)
+    restored = submitit.helpers.DelayedSubmission.load(path)
+
+    restored_launcher = cast(submitit_launcher.LocalLauncher, restored.function)
+    assert restored_launcher.task_function is not None
+    assert getattr(restored_launcher.task_function, "__code__").co_filename == __file__
+
+
+@mark.parametrize("count", [1, 2])
+def test_slurm_submissions_preserve_source(tmp_path: Path, count: int) -> None:
+    def task(value: int) -> tuple[int, str]:
+        return value, task.__code__.co_filename
+
+    with patch.object(submitit.SlurmExecutor, "affinity", return_value=2):
+        executor = SourceExecutor(folder=tmp_path, cluster="slurm")
+        executor.update_parameters(timeout_min=1)
+        with patch.object(
+            submitit.SlurmExecutor,
+            "_submit_command",
+            return_value=submitit.SlurmJob(folder=tmp_path, job_id="123", tasks=[0]),
+        ):
+            jobs = executor.map_array(task, range(count))
+
+    assert len(jobs) == count
+    for index, job in enumerate(jobs):
+        restored = submitit.helpers.DelayedSubmission.load(job.paths.submitted_pickle)
+        assert restored.result() == (index, __file__)

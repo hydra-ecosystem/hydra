@@ -2,8 +2,10 @@
 import logging
 import sys
 from pathlib import Path
+from types import CodeType
 from typing import Any, Sequence, cast
 
+from hydra._internal.cloudpickle import reduce_code
 from hydra.core.hydra_config import HydraConfig
 from hydra.core.singleton import Singleton
 from hydra.core.utils import (
@@ -210,6 +212,8 @@ def launch(
     task_function = launcher.task_function
     task_function_unwrap_depth = 0
     wrap_for_multiprocessing = selected_backend == "multiprocessing"
+    if not wrap_for_multiprocessing:
+        parallel_cfg["forward_reducers"] = {CodeType: reduce_code}
     if wrap_for_multiprocessing:
         singleton_state = wrap_non_picklable_objects(
             singleton_state, keep_wrapper=False
