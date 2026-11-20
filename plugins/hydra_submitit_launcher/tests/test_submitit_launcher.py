@@ -1,4 +1,5 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+import inspect
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -12,7 +13,7 @@ from hydra.test_utils.launcher_common_tests import (
 from hydra.test_utils.test_utils import chdir_plugin_root, run_python_script
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
-from pytest import mark
+from pytest import mark, raises
 
 from hydra_plugins.hydra_submitit_launcher import submitit_launcher
 from hydra_plugins.hydra_submitit_launcher.config import SlurmQueueConf
@@ -20,6 +21,17 @@ from hydra_plugins.hydra_submitit_launcher.config import SlurmQueueConf
 chdir_plugin_root()
 
 pytestmark = mark.filterwarnings("ignore:pkg_resources is deprecated as an API:Warning")
+
+
+def test_launcher_base_is_abstract() -> None:
+    assert inspect.isabstract(submitit_launcher.BaseSubmititLauncher)
+    with raises(TypeError, match="abstract"):
+        submitit_launcher.BaseSubmititLauncher()  # type: ignore[bad-instantiation]
+    launchers = Plugins.instance().discover(Launcher)
+    assert submitit_launcher.BaseSubmititLauncher not in launchers
+    for cls in (submitit_launcher.LocalLauncher, submitit_launcher.SlurmLauncher):
+        assert not inspect.isabstract(cls)
+        assert cls()._EXECUTOR in {"local", "slurm"}
 
 
 @mark.parametrize(
