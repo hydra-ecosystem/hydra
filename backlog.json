@@ -1,6 +1,6 @@
 {
   "generated_on": "2026-11-21",
-  "generated_at": "2026-11-21T06:20:55Z",
+  "generated_at": "2026-11-21T06:39:58Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
     "open_total": 54,
@@ -46,7 +46,7 @@
       {
         "status": "in progress",
         "emoji": "🔄",
-        "count": 2
+        "count": 1
       },
       {
         "status": "community PR",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 50
+        "count": 51
       },
       {
         "status": "done",
@@ -100,24 +100,6 @@
         "compose_api"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3606"
-    },
-    {
-      "number": 3622,
-      "title": "Revisit missing source filenames in launcher tracebacks",
-      "category": "Enhancement",
-      "category_emoji": "✨",
-      "status": "in progress",
-      "status_emoji": "🔄",
-      "prs": [
-        {
-          "number": 3623,
-          "url": "https://github.com/hydra-ecosystem/hydra/pull/3623"
-        }
-      ],
-      "created": "2026-11-21",
-      "updated": "2026-11-21",
-      "labels": [],
-      "url": "https://github.com/hydra-ecosystem/hydra/issues/3622"
     },
     {
       "number": 3593,
@@ -939,6 +921,19 @@
         "maintenance"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3619"
+    },
+    {
+      "number": 3622,
+      "title": "Revisit missing source filenames in launcher tracebacks",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-11-21",
+      "updated": "2026-11-21",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3622"
     },
     {
       "number": 385,
@@ -2878,6 +2873,22 @@
   ],
   "updates": [
     {
+      "ts": "2026-11-21T06:39:58Z",
+      "kind": "pr",
+      "issue": 3622,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3622",
+      "title": "Revisit missing source filenames in launcher tracebacks",
+      "detail": "unlinked #3623"
+    },
+    {
+      "ts": "2026-11-21T06:39:58Z",
+      "kind": "status",
+      "issue": 3622,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3622",
+      "title": "Revisit missing source filenames in launcher tracebacks",
+      "detail": "in progress → not started"
+    },
+    {
       "ts": "2026-11-21T05:55:24Z",
       "kind": "pr",
       "issue": 3622,
@@ -4539,21 +4550,6 @@
         "number": 3467,
         "url": "https://github.com/hydra-ecosystem/hydra/pull/3467"
       }
-    },
-    {
-      "ts": "2026-09-25T07:07:48Z",
-      "kind": "closed",
-      "issue": 3403,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3403",
-      "title": "Accept an instantiate whitelist on @hydra.main"
-    },
-    {
-      "ts": "2026-09-25T06:13:53Z",
-      "kind": "pr",
-      "issue": 3456,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3456",
-      "title": "[Bug] Casting sweeps drops tags and shuffle settings",
-      "detail": "linked #3465, #3466"
     }
   ]
 }
