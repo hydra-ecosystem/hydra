@@ -181,6 +181,29 @@ def test_null_backend_defaults_to_loky() -> None:
     assert config["backend"] == "loky"
 
 
+def test_failure_preserves_remote_traceback(tmp_path: Path) -> None:
+    _stdout, stderr = run_python_script(
+        [
+            "tests/apps/failing_app.py",
+            "--multirun",
+            "hydra/launcher=joblib",
+            "hydra.launcher.n_jobs=2",
+            f'hydra.sweep.dir="{tmp_path}"',
+        ],
+        print_error=False,
+        raise_exception=False,
+    )
+
+    for output in (stderr, (tmp_path / "0" / "failing_app.log").read_text()):
+        assert "ValueError: joblib remote cause" in output
+        assert "The above exception was the direct cause" in output
+        assert "RuntimeError: joblib remote failure" in output
+        assert any(
+            f'{filename}", line 12, in main' in output
+            for filename in ("failing_app.py", "<dynamic-code>")
+        )
+
+
 def test_multiprocessing_enforces_process_isolation() -> None:
     config = {"backend": "multiprocessing", "batch_size": "auto"}
 
