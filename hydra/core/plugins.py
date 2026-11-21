@@ -53,7 +53,15 @@ class Plugins(metaclass=Singleton):
         self.plugin_type_to_subclass_list: dict[type[Plugin], list[type[Plugin]]] = {}
         self.class_name_to_class: dict[str, type[Plugin]] = {}
         self.stats: ScanStats | None = None
-        self._initialize()
+        self._discovery_complete = False
+        self._explicit_plugins: list[type[Plugin]] = []
+        core_plugins = importlib.import_module("hydra._internal.core_plugins")
+        for clazz in self._scan_all_plugins([core_plugins])[0]:
+            self._register(clazz)
+
+    def _ensure_discovered(self) -> None:
+        if not self._discovery_complete:
+            self._initialize()
 
     def _initialize(self) -> None:
         top_level: list[Any] = []
@@ -104,8 +112,9 @@ class Plugins(metaclass=Singleton):
             _warn_unenumerable_editable_namespace(
                 hydra_plugins.__path__, plugin_entry_points
             )
-        for clazz in scanned_plugins:
+        for clazz in scanned_plugins + self._explicit_plugins:
             self._register(clazz)
+        self._discovery_complete = True
 
     def register(self, clazz: type[Plugin]) -> None:
         """
@@ -113,14 +122,17 @@ class Plugins(metaclass=Singleton):
         """
         if not _is_concrete_plugin_type(clazz):
             raise ValueError("Not a valid Hydra Plugin")
+        if clazz not in self._explicit_plugins:
+            self._explicit_plugins.append(clazz)
         self._register(clazz)
 
     def _register(self, clazz: type[Plugin]) -> None:
         assert _is_concrete_plugin_type(clazz)
         for plugin_type in PLUGIN_TYPES:
             if issubclass(clazz, plugin_type):
-                if clazz not in self.plugin_type_to_subclass_list[plugin_type]:
-                    self.plugin_type_to_subclass_list[plugin_type].append(clazz)
+                classes = self.plugin_type_to_subclass_list.setdefault(plugin_type, [])
+                if clazz not in classes:
+                    classes.append(clazz)
         name = f"{clazz.__module__}.{clazz.__name__}"
         self.class_name_to_class[name] = clazz
         if issubclass(clazz, ConfigSource):
@@ -129,6 +141,7 @@ class Plugins(metaclass=Singleton):
     def _instantiate(self, config: DictConfig) -> Plugin:
         from hydra._internal import utils as internal_utils
 
+        self._ensure_discovered()
         classname = internal_utils._get_cls_name(config, pop=False)
         try:
             if classname is None:
@@ -249,6 +262,7 @@ class Plugins(metaclass=Singleton):
         return scanned_plugins, stats
 
     def get_stats(self) -> ScanStats | None:
+        self._ensure_discovered()
         return self.stats
 
     def discover(self, plugin_type: type[Plugin] | None = None) -> list[type[Plugin]]:
@@ -257,6 +271,7 @@ class Plugins(metaclass=Singleton):
         :return: a list of plugins implementing the plugin type (or all if plugin type is None)
         """
         Plugins.check_usage(self)
+        self._ensure_discovered()
         ret: list[type[Plugin]] = []
         if plugin_type is None:
             plugin_type = Plugin

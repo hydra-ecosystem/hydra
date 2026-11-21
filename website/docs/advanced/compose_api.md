@@ -40,6 +40,11 @@ There are 4 initialization methods:
 All 4 can be used as methods or contexts.
 When used as methods, they are initializing Hydra globally and should only be called once.
 When used as contexts, they are initializing Hydra within the context and can be used multiple times.
+Context exit and initialization failure restore Hydra's prior plugin and config
+source registries. Plugins registered inside the context do not remain registered
+afterward. Global initialization retains these registrations until
+`GlobalHydra.instance().clear()`. Restoration preserves earlier application
+registrations; it does not unload Python modules or undo ConfigStore entries.
 Like <b>@hydra.main()</b>, the original three still accept the deprecated `version_base`
 parameter in Hydra 1.4. Remove it after upgrading; see the
 [Hydra 1.4 preparation guide](../upgrades/1.3_to_1.4/prepare_for_1_4.md).
