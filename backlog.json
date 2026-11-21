@@ -1,27 +1,27 @@
 {
-  "generated_on": "2026-11-20",
-  "generated_at": "2026-11-20T21:43:04Z",
+  "generated_on": "2026-11-21",
+  "generated_at": "2026-11-21T05:37:37Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 53,
+    "open_total": 54,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
         "count": 2,
-        "percentage": 3.8
+        "percentage": 3.7
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
-        "count": 45,
-        "percentage": 84.9
+        "count": 46,
+        "percentage": 85.2
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 5.7
+        "percentage": 5.6
       },
       {
         "category": "Question",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 50
+        "count": 51
       },
       {
         "status": "done",
@@ -921,6 +921,19 @@
         "maintenance"
       ],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3619"
+    },
+    {
+      "number": 3622,
+      "title": "Revisit missing source filenames in launcher tracebacks",
+      "category": "Enhancement",
+      "category_emoji": "✨",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-11-21",
+      "updated": "2026-11-21",
+      "labels": [],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3622"
     },
     {
       "number": 385,
@@ -2860,6 +2873,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-11-21T05:37:37Z",
+      "kind": "new",
+      "issue": 3622,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3622",
+      "title": "Revisit missing source filenames in launcher tracebacks"
+    },
+    {
       "ts": "2026-11-06T08:26:30Z",
       "kind": "new",
       "issue": 3619,
@@ -4525,18 +4545,6 @@
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3361",
       "title": "Show user frames in default instantiation error tracebacks",
       "detail": "unlinked #3455"
-    },
-    {
-      "ts": "2026-09-24T18:59:27Z",
-      "kind": "status",
-      "issue": 3456,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3456",
-      "title": "[Bug] Casting sweeps drops tags and shuffle settings",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3462,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3462"
-      }
     }
   ]
 }
