@@ -1,4 +1,12 @@
-# Revised architecture for owner review
+# Historical HLD approval summary
+
+This summary records the previously accepted HLD
+`4aac3ec633f26ff49327e0374f5fdbb96a592815011e90a62d1ee5c2dfa03a48`.
+Its API names, opt-outs and next-step statements are historical. Use the current
+[overview](../overview.md) and [HLD](../high-level-design.md) for the revised
+contract. The text below does not approve those later changes.
+
+## Earlier summary
 
 The [HLD](../high-level-design.md) now incorporates the individually accepted
 [API decisions](hld-api-discussion.md). The
