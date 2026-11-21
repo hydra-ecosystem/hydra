@@ -1,14 +1,28 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import builtins
-import os
+import posixpath
+import sys
 import zipfile
 from importlib import import_module, resources
+from pathlib import Path
 from typing import Any
 
 from omegaconf import OmegaConf
 
+from hydra._internal.config_source_path import (
+    ConfigPathOutsideRootError,
+    package_resource_name,
+    package_resource_root,
+    require_package_reader,
+    resolve_package_path,
+)
 from hydra.core.object_type import ObjectType
 from hydra.plugins.config_source import ConfigLoadError, ConfigResult, ConfigSource
+
+if sys.version_info >= (3, 12):
+    from importlib.resources.abc import TraversalError
+else:
+    TraversalError = FileNotFoundError
 
 
 class ImportlibResourcesConfigSource(ConfigSource):
@@ -16,12 +30,21 @@ class ImportlibResourcesConfigSource(ConfigSource):
         super().__init__(provider=provider, path=path)
         # normalize to pkg format
         self.path = self.path.replace("/", ".").rstrip(".")
+        self._resources: Any = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        # Each copied source establishes its own root; readers need not be copyable.
+        state = self.__dict__.copy()
+        state["_resources"] = None
+        return state
 
     @staticmethod
     def scheme() -> str:
         return "pkg"
 
     def _get_resources(self) -> Any:
+        if self._resources is not None:
+            return self._resources
         package = import_module(self.path)
         spec = package.__spec__
         if (
@@ -30,7 +53,8 @@ class ImportlibResourcesConfigSource(ConfigSource):
             or spec.origin is None
         ):
             raise ValueError(f"'{self.path}' is not a regular Python package")
-        return resources.files(package)
+        self._resources = package_resource_root(resources.files(package))
+        return self._resources
 
     def _read_config(self, res: Any) -> ConfigResult:
         try:
@@ -59,10 +83,14 @@ class ImportlibResourcesConfigSource(ConfigSource):
 
     def load_config(self, config_path: str) -> ConfigResult:
         normalized_config_path = self._normalize_file_name(config_path)
-        res = self._get_resources().joinpath(normalized_config_path)
+        try:
+            res = resolve_package_path(self._get_resources(), normalized_config_path)
+        except (FileNotFoundError, TraversalError):
+            raise ConfigLoadError(f"Config not found : {normalized_config_path}")
         if not (res.is_file() or res.is_dir()):
             raise ConfigLoadError(f"Config not found : {normalized_config_path}")
 
+        require_package_reader(self._get_resources(), res)
         return self._read_config(res)
 
     def available(self) -> bool:
@@ -78,7 +106,10 @@ class ImportlibResourcesConfigSource(ConfigSource):
         except (ValueError, ModuleNotFoundError, TypeError):
             return False
 
-        res = files.joinpath(config_path)
+        try:
+            res = resolve_package_path(files, config_path)
+        except (FileNotFoundError, TraversalError):
+            return False
         ret = res.is_dir()
         assert isinstance(ret, bool)
         return ret
@@ -89,7 +120,10 @@ class ImportlibResourcesConfigSource(ConfigSource):
             files = self._get_resources()
         except (ValueError, ModuleNotFoundError, TypeError):
             return False
-        res = files.joinpath(config_path)
+        try:
+            res = resolve_package_path(files, config_path)
+        except (FileNotFoundError, TraversalError):
+            return False
         ret = res.is_file()
         assert isinstance(ret, bool)
         return ret
@@ -98,14 +132,29 @@ class ImportlibResourcesConfigSource(ConfigSource):
         self, config_path: str, results_filter: ObjectType | None
     ) -> builtins.list[str]:
         files: list[str] = []
-        for file in self._get_resources().joinpath(config_path).iterdir():
-            fname = file.name
-            fpath = os.path.join(config_path, fname)
-            self._list_add_result(
-                files=files,
-                file_path=fpath,
-                file_name=fname,
-                results_filter=results_filter,
-            )
+        root = self._get_resources()
+        directory = resolve_package_path(root, config_path)
+        require_package_reader(root, directory)
+        for file in directory.iterdir():
+            fname = file.name if isinstance(root, Path) else package_resource_name(file)
+            if fname in ("__pycache__", "__init__.py"):
+                continue
+            fpath = posixpath.join(config_path, fname)
+            for object_type, check in (
+                (ObjectType.GROUP, self.is_group),
+                (ObjectType.CONFIG, self.is_config),
+            ):
+                try:
+                    matches = check(fpath)
+                except ConfigPathOutsideRootError:
+                    continue
+                if matches and (
+                    results_filter is None or results_filter == object_type
+                ):
+                    files.append(
+                        fname.rsplit(".", 1)[0]
+                        if object_type == ObjectType.CONFIG
+                        else fname
+                    )
 
         return sorted(list(set(files)))

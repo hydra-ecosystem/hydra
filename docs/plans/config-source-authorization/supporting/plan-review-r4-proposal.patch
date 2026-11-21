@@ -1,0 +1,66 @@
+--- a/docs/plans/config-source-authorization/implementation-plan.md
++++ b/docs/plans/config-source-authorization/implementation-plan.md
+@@ -1,7 +1,7 @@
+ ---
+ plan_key: config-source-authorization
+ slice_convention: hierarchical-v1
+-slice_inventory: {"executable": false, "path": "slices.json", "sha256": "67c23159ccacb836b73c5acbb63b0a097e6a2481a911867a6adfc7bc74dd7b80"}
++slice_inventory: {"executable": false, "path": "slices.json", "sha256": "59cc1c05b1b8bd3199f63dd35bdedf5fe93ede5e32ba63e6e119252ad59acdca"}
+ ---
+ 
+ # Config source and plugin authorization: implementation plan
+@@ -392,7 +392,10 @@
+ Evaluate categories independently: any explicit non-LEGACY policy, including an
+ unsafe value, still needs exact bootstrap transport. Missing bootstrap cannot be
+ downgraded to LEGACY because authorization was disabled in one category. Only
+-all-LEGACY 1.4 can use the compatibility fallback; 1.5 never uses it.
++all-LEGACY 1.4 with legacy_plugin_discovery not False can use the compatibility
++fallback; 1.5 never uses it. Explicitly disabling namespace discovery requires
++bootstrap transport even when every grant category is LEGACY. Without that
++transport, reject before dispatch rather than let worker restore scan plugins.
+ 
+ BasicLauncher, Joblib execute_job and Submitit __call__/checkpoint paths use this
+ helper before their existing restore/setup calls. Do not remap file roots from job
+@@ -401,8 +404,9 @@
+ 
+ Add `Launcher.supports_authorization_bootstrap = False`; updated launchers declare
+ True. Before multirun dispatch, reject a nonparticipating launcher whenever any
+-required category is non-LEGACY. Only all-LEGACY 1.4 operation may warn and
+-retain the old contract. This is a trusted
++required category is non-LEGACY or legacy_plugin_discovery is False. Only
++all-LEGACY 1.4 with namespace scanning permitted may warn and retain the old
++contract. This is a trusted
+ code capability declaration, not proof against a dishonest plugin. Document the
+ wrapper/transport/restoration contract for external launcher authors.
+ Basic, Joblib and Submitit receiving paths are the integrations owned here.
+--- a/docs/plans/config-source-authorization/slices.json
++++ b/docs/plans/config-source-authorization/slices.json
+@@ -20,7 +20,8 @@
+         "acceptance": [
+           "AC17-AC19: in-root files and links work; traversal, same-prefix siblings and external links fail before read/list in load/group/config/list paths.",
+           "AC18: native Windows drive/UNC/junction cases pass on Windows; all-skipped native coverage is not a Windows verification result.",
+-          "AC20: document the stable-filesystem limit, immediate 1.4 break and separate-source migration; numeric news fragment is required before publication."
++          "AC20: document the stable-filesystem limit, immediate 1.4 break and separate-source migration; numeric news fragment is required before publication.",
++          "R10/HLD overhead assessment: record a bounded before/after comparison for native config load, lookup and listing with existing representative fixtures; assess added resolution/check work without a performance guarantee or new benchmark suite."
+         ]
+       },
+       "display": {
+@@ -56,7 +57,8 @@
+         "acceptance": [
+           "AC17-AC19: package load/lookup/list cannot reach sibling packages or archive subtrees; internal links still work and external links fail.",
+           "Existing source, compiled-initializer, zip and namespace-parent fixtures pass; exercise a rooted ResourceReader without coercing it to Path.",
+-          "Unestablished roots fail before read/list; compatibility and later source-unsafe operation cannot disable containment."
++          "Unestablished roots fail before read/list; compatibility and later source-unsafe operation cannot disable containment.",
++          "Extend slice 1 overhead evidence to representative package resource load, lookup and listing, reusing the same measurement approach."
+         ]
+       },
+       "display": {
+@@ -297,7 +299,7 @@
+         "acceptance": [
+           "AC23: Basic, Joblib process backends and Submitit receiving paths establish policy before singleton/discovery/source/sweep/logging operations, including resubmission and resolved plugin identities.",
+           "Reused workers and failures restore prior permissions/visibility. Transport unsafe state in each category without a parallel source boolean. Job config cannot broaden grants or scanning; no live ContextVar token is serialized.",
+-          "Missing/inconsistent bootstrap and unsupported launchers fail before dispatch for non-LEGACY policy, including explicit unsafe values; only all-LEGACY 1.4 may warn and use the old contract.",
++          "Missing/inconsistent bootstrap and unsupported launchers fail before dispatch for non-LEGACY policy, explicit unsafe values, or legacy_plugin_discovery=False. An all-LEGACY worker with scanning disabled must make no namespace-scan imports. Only all-LEGACY 1.4 with namespace scanning permitted may warn and use the old contract.",
+           "Own common worker-policy checks in the existing LauncherTestSuite: supported launchers prove pre-restore policy/scan enforcement and worker restriction/restoration behavior; unsupported launchers prove required pre-dispatch refusal. Keep only backend-specific restore/resubmission checks in plugin tests; do not treat a capability declaration or skipped checks as behavioral proof."
+         ]
+       },

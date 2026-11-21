@@ -7,6 +7,12 @@ Hydra 1.4 supports Python package entry points for plugin discovery. The old
 `hydra_plugins` namespace scan still works in 1.4, but is deprecated and may
 be removed in a later release.
 
+Hydra emits a `FutureWarning` for each plugin class found only through the
+namespace scan. The warning names the class and links here. A working entry
+point for that same class suppresses the warning, even when the class remains
+under `hydra_plugins`. A failed entry point or one that does not load a concrete
+plugin class does not count as migration.
+
 Modern setuptools editable installs can make a namespace plugin importable
 without making it visible to Hydra's namespace scan. For example,
 `import hydra_plugins.my_plugin` can work while `hydra/launcher=my_plugin`

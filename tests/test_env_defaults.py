@@ -6,19 +6,29 @@ from hydra.test_utils.test_utils import chdir_hydra_root, run_python_script
 chdir_hydra_root()
 
 
+def _run_app(arguments: list[str]) -> tuple[str, str]:
+    stdout, stderr = run_python_script(
+        [
+            "-Wdefault:Hydra plugin:FutureWarning",
+            "tests/test_apps/custom_env_defaults/my_app.py",
+            *arguments,
+        ]
+    )
+    assert "TestEnvDefaultSearchPathPlugin' relies on deprecated" in stderr
+    return stdout, stderr
+
+
 def test_env_defaults(tmpdir: Path) -> None:
     cmd = [
-        "tests/test_apps/custom_env_defaults/my_app.py",
         f'hydra.run.dir="{str(tmpdir)}"',
         "hydra.job.chdir=True",
     ]
-    run_python_script(cmd)
+    _run_app(cmd)
 
 
 def test_named_env_defaults() -> None:
-    stdout, _ = run_python_script(
+    stdout, _ = _run_app(
         [
-            "tests/test_apps/custom_env_defaults/my_app.py",
             "hydra/env=campus",
             "--cfg",
             "hydra",
@@ -29,9 +39,8 @@ def test_named_env_defaults() -> None:
 
 
 def test_named_env_defaults_from_application_config() -> None:
-    stdout, _ = run_python_script(
+    stdout, _ = _run_app(
         [
-            "tests/test_apps/custom_env_defaults/my_app.py",
             "--config-path=conf",
             "--config-name=config",
             "--cfg",
@@ -42,9 +51,8 @@ def test_named_env_defaults_from_application_config() -> None:
 
 
 def test_application_overrides_env_defaults() -> None:
-    stdout, _ = run_python_script(
+    stdout, _ = _run_app(
         [
-            "tests/test_apps/custom_env_defaults/my_app.py",
             "--config-path=conf",
             "--config-name=app_override",
             "--cfg",

@@ -53,7 +53,15 @@ class Plugins(metaclass=Singleton):
         self.plugin_type_to_subclass_list: dict[type[Plugin], list[type[Plugin]]] = {}
         self.class_name_to_class: dict[str, type[Plugin]] = {}
         self.stats: ScanStats | None = None
-        self._initialize()
+        self._discovery_complete = False
+        self._explicit_plugins: list[type[Plugin]] = []
+        core_plugins = importlib.import_module("hydra._internal.core_plugins")
+        for clazz in self._scan_all_plugins([core_plugins])[0]:
+            self._register(clazz)
+
+    def _ensure_discovered(self) -> None:
+        if not self._discovery_complete:
+            self._initialize()
 
     def _initialize(self) -> None:
         top_level: list[Any] = []
@@ -71,7 +79,11 @@ class Plugins(metaclass=Singleton):
         self.plugin_type_to_subclass_list = defaultdict(list)
         self.class_name_to_class = {}
 
-        scanned_plugins, self.stats = self._scan_all_plugins(modules=top_level)
+        namespace_plugins: dict[int, type[Plugin]] = {}
+        scanned_plugins, self.stats = self._scan_all_plugins(
+            modules=top_level, namespace_plugins=namespace_plugins
+        )
+        entry_point_plugins: set[int] = set()
         plugin_entry_points = entry_points(group="hydra.plugins")
         for entry_point in plugin_entry_points:
             load_start = timer()
@@ -99,13 +111,31 @@ class Plugins(metaclass=Singleton):
                 )
                 continue
             scanned_plugins.append(clazz)
+            entry_point_plugins.add(id(clazz))
+
+        for clazz in sorted(
+            (
+                clazz
+                for identity, clazz in namespace_plugins.items()
+                if identity not in entry_point_plugins
+            ),
+            key=lambda cls: f"{cls.__module__}.{cls.__qualname__}",
+        ):
+            warnings.warn(
+                f"Hydra plugin '{clazz.__module__}.{clazz.__qualname__}' relies on "
+                "deprecated hydra_plugins namespace discovery. Plugin authors "
+                "should declare a hydra.plugins entry point for this class. See "
+                "https://hydra.cc/docs/upgrades/1.3_to_1.4/plugin_discovery/.",
+                FutureWarning,
+            )
 
         if hydra_plugins is not None:
             _warn_unenumerable_editable_namespace(
                 hydra_plugins.__path__, plugin_entry_points
             )
-        for clazz in scanned_plugins:
+        for clazz in scanned_plugins + self._explicit_plugins:
             self._register(clazz)
+        self._discovery_complete = True
 
     def register(self, clazz: type[Plugin]) -> None:
         """
@@ -113,14 +143,17 @@ class Plugins(metaclass=Singleton):
         """
         if not _is_concrete_plugin_type(clazz):
             raise ValueError("Not a valid Hydra Plugin")
+        if clazz not in self._explicit_plugins:
+            self._explicit_plugins.append(clazz)
         self._register(clazz)
 
     def _register(self, clazz: type[Plugin]) -> None:
         assert _is_concrete_plugin_type(clazz)
         for plugin_type in PLUGIN_TYPES:
             if issubclass(clazz, plugin_type):
-                if clazz not in self.plugin_type_to_subclass_list[plugin_type]:
-                    self.plugin_type_to_subclass_list[plugin_type].append(clazz)
+                classes = self.plugin_type_to_subclass_list.setdefault(plugin_type, [])
+                if clazz not in classes:
+                    classes.append(clazz)
         name = f"{clazz.__module__}.{clazz.__name__}"
         self.class_name_to_class[name] = clazz
         if issubclass(clazz, ConfigSource):
@@ -129,6 +162,7 @@ class Plugins(metaclass=Singleton):
     def _instantiate(self, config: DictConfig) -> Plugin:
         from hydra._internal import utils as internal_utils
 
+        self._ensure_discovered()
         classname = internal_utils._get_cls_name(config, pop=False)
         try:
             if classname is None:
@@ -189,6 +223,8 @@ class Plugins(metaclass=Singleton):
     @staticmethod
     def _scan_all_plugins(
         modules: list[Any],
+        *,
+        namespace_plugins: dict[int, type[Plugin]] | None = None,
     ) -> tuple[list[type[Plugin]], ScanStats]:
         stats = ScanStats()
         stats.total_time = timer()
@@ -234,6 +270,15 @@ class Plugins(metaclass=Singleton):
                     if loaded_mod is not None:
                         for name, obj in inspect.getmembers(loaded_mod):
                             if _is_concrete_plugin_type(obj):
+                                if (
+                                    namespace_plugins is not None
+                                    and mdl.__name__ == "hydra_plugins"
+                                    and not any(
+                                        obj is clazz for clazz in scanned_plugins
+                                    )
+                                    and not any(obj is clazz for clazz in PLUGIN_TYPES)
+                                ):
+                                    namespace_plugins[id(obj)] = obj
                                 scanned_plugins.append(obj)
                 except ImportError as e:
                     warnings.warn(
@@ -249,6 +294,7 @@ class Plugins(metaclass=Singleton):
         return scanned_plugins, stats
 
     def get_stats(self) -> ScanStats | None:
+        self._ensure_discovered()
         return self.stats
 
     def discover(self, plugin_type: type[Plugin] | None = None) -> list[type[Plugin]]:
@@ -257,6 +303,7 @@ class Plugins(metaclass=Singleton):
         :return: a list of plugins implementing the plugin type (or all if plugin type is None)
         """
         Plugins.check_usage(self)
+        self._ensure_discovered()
         ret: list[type[Plugin]] = []
         if plugin_type is None:
             plugin_type = Plugin

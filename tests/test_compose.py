@@ -69,6 +69,153 @@ def test_initialize(hydra_restore_singletons: Any) -> None:
     assert GlobalHydra().is_initialized()
 
 
+def test_initialization_state_transport_excludes_local_rollback(
+    hydra_restore_singletons: Any,
+) -> None:
+    from threading import Lock
+
+    from pytest import importorskip
+
+    from hydra.core.plugins import Plugins
+    from hydra.core.singleton import Singleton
+    from hydra.plugins.search_path_plugin import SearchPathPlugin
+
+    cloudpickle = importorskip("cloudpickle")
+
+    class LocalPlugin(SearchPathPlugin):
+        lock = Lock()
+
+        def manipulate_search_path(self, search_path: Any) -> None: ...
+
+    plugins = Plugins.instance()
+    plugins.register(LocalPlugin)
+    classes = dict(plugins.class_name_to_class)
+    with initialize(config_path=None):
+        local_hydra = GlobalHydra.instance()
+        frame = local_hydra._initialization_frame
+        state = cloudpickle.loads(cloudpickle.dumps(Singleton.get_state()))
+        assert local_hydra._initialization_frame is frame
+        assert frame is not None
+        assert not frame._closed
+
+    assert frame._closed
+    assert Plugins.instance() is plugins
+    assert plugins.class_name_to_class == classes
+    Singleton.set_state(state)
+    assert GlobalHydra.instance()._initialization_frame is None
+    assert compose(overrides=["+transported=true"]).transported is True
+    GlobalHydra.instance().clear()
+    assert not GlobalHydra.instance().is_initialized()
+
+
+@mark.parametrize("initializer", ["path", "module", "directory", "search_path"])
+def test_initialization_restores_plugin_registries(
+    initializer: str, tmp_path: Path, hydra_restore_singletons: Any
+) -> None:
+    from hydra._internal.core_plugins.file_config_source import FileConfigSource
+    from hydra._internal.sources_registry import SourcesRegistry
+    from hydra.core.plugins import Plugins
+    from hydra.plugins.search_path_plugin import SearchPathPlugin
+
+    class ExistingPlugin(SearchPathPlugin):
+        def manipulate_search_path(self, search_path: Any) -> None: ...
+
+    class ScopedPlugin(SearchPathPlugin):
+        def manipulate_search_path(self, search_path: Any) -> None: ...
+
+    class ScopedSource(FileConfigSource):
+        @staticmethod
+        def scheme() -> str:
+            return "scoped"
+
+    plugins = Plugins.instance()
+    plugins.register(ExistingPlugin)
+    classes = dict(plugins.class_name_to_class)
+    plugin_types = {
+        kind: list(registered)
+        for kind, registered in plugins.plugin_type_to_subclass_list.items()
+    }
+    sources = SourcesRegistry.instance()
+    source_types = dict(sources.types)
+    factories = {
+        "path": lambda: initialize(),
+        "module": lambda: initialize_config_module("hydra.test_utils.configs"),
+        "directory": lambda: initialize_config_dir(str(tmp_path)),
+        "search_path": lambda: initialize_config_search_path([f"file://{tmp_path}"]),
+    }
+    with factories[initializer]():
+        assert Plugins.instance() is plugins
+        plugins.register(ScopedPlugin)
+        plugins.register(ScopedSource)
+        assert sources.resolve("scoped") is ScopedSource
+
+    assert Plugins.instance() is plugins
+    assert plugins.class_name_to_class == classes
+    assert plugins.plugin_type_to_subclass_list == plugin_types
+    assert SourcesRegistry.instance() is sources
+    assert sources.types == source_types
+    with raises(ValueError, match="No config source registered"):
+        sources.resolve("scoped")
+
+
+def test_initialization_restores_absence_after_clear(
+    hydra_restore_singletons: Any,
+) -> None:
+    from hydra._internal.sources_registry import SourcesRegistry
+    from hydra.core.plugins import Plugins
+    from hydra.core.singleton import Singleton
+
+    for kind in (GlobalHydra, Plugins, SourcesRegistry):
+        Singleton._instances.pop(kind, None)
+    with initialize():
+        GlobalHydra.instance().clear()
+        assert all(
+            kind not in Singleton._instances
+            for kind in (GlobalHydra, Plugins, SourcesRegistry)
+        )
+    assert all(
+        kind not in Singleton._instances
+        for kind in (GlobalHydra, Plugins, SourcesRegistry)
+    )
+
+
+def test_failed_initialization_restores_registries(
+    hydra_restore_singletons: Any, monkeypatch: Any
+) -> None:
+    from hydra._internal.sources_registry import SourcesRegistry
+    from hydra.core.plugins import Plugins
+    from hydra.core.singleton import Singleton
+
+    for kind in (GlobalHydra, Plugins, SourcesRegistry):
+        Singleton._instances.pop(kind, None)
+
+    def fail_discovery(self: Plugins) -> Any:
+        SourcesRegistry.instance()
+        raise RuntimeError("discovery failed")
+
+    monkeypatch.setattr(Plugins, "_initialize", fail_discovery)
+    with raises(RuntimeError, match="discovery failed"):
+        initialize()
+    assert all(
+        kind not in Singleton._instances
+        for kind in (GlobalHydra, Plugins, SourcesRegistry)
+    )
+
+
+def test_refused_nested_initialization_preserves_outer(
+    hydra_restore_singletons: Any,
+) -> None:
+    from hydra.core.plugins import Plugins
+
+    with initialize():
+        hydra = GlobalHydra.instance().hydra
+        plugins = Plugins.instance()
+        with raises(ValueError, match="already initialized"):
+            initialize()
+        assert GlobalHydra.instance().hydra is hydra
+        assert Plugins.instance() is plugins
+
+
 @mark.parametrize(
     "version_base", ["1.0", "1.1", "1.2", "1.2.0", "1.2.0.dev2", "1.2.0rc1"]
 )
