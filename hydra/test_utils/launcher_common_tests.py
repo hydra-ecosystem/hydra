@@ -95,7 +95,8 @@ class LauncherTestSuite:
         frames = traceback.extract_tb(failure.__traceback__)
         assert any(
             frame.name == "task_func"
-            and Path(frame.filename).name == Path(__file__).name
+            # cloudpickle 3.1.3 normalizes filenames for code pickled by value.
+            and Path(frame.filename).name in {Path(__file__).name, "<dynamic-code>"}
             for frame in frames
         )
         formatted = "".join(

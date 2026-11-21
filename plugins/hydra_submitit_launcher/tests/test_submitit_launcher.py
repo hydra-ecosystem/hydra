@@ -186,8 +186,11 @@ def test_failure_preserves_remote_traceback(tmp_path: Path) -> None:
         raise_exception=False,
     )
 
-    assert "ValueError: submitit remote cause 0" in stderr
-    assert "The above exception was the direct cause" in stderr
-    assert "in main" in stderr
-    assert 'raise RuntimeError(f"submitit remote failure {cfg.job}")' in stderr
-    assert "RuntimeError: submitit remote failure 0" in stderr
+    for output in (stderr, (tmp_path / "0" / "failing_app.log").read_text()):
+        assert "ValueError: submitit remote cause 0" in output
+        assert "The above exception was the direct cause" in output
+        assert "RuntimeError: submitit remote failure 0" in output
+        assert any(
+            f'{filename}", line 12, in main' in output
+            for filename in ("failing_app.py", "<dynamic-code>")
+        )
