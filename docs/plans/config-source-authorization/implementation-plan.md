@@ -1,24 +1,25 @@
 ---
 plan_key: config-source-authorization
 slice_convention: hierarchical-v1
-slice_inventory: {"executable": false, "path": "slices.json", "sha256": "0424e15ad1b0d28984cefd7c3bfdecc70bd43a0960683b4cdb1e10721c911551"}
+slice_inventory: {"executable": false, "path": "slices.json", "sha256": "59cc1c05b1b8bd3199f63dd35bdedf5fe93ede5e32ba63e6e119252ad59acdca"}
 ---
 
 # Config source and plugin authorization: implementation plan
 
-This document specifies the engineering against the accepted
+This document specifies the engineering against the owner's current
 [requirements](requirements.md) and [high-level design](high-level-design.md).
 Start with the [overview](overview.md) for the goals, approach and progress.
 
 This plan alone owns `plan_key`; its explicit reference binds the canonical
-[slice inventory](slices.json). Final plan approval, committed delivery readiness
-and implementation remain separate. Review history is in
-[supporting status](supporting/status.md).
+[slice inventory](slices.json). The owner approved the aligned requirements, HLD
+and plan, and separately authorized delivery. The design baseline is committed;
+delivery readiness and implementation validation remain separate checks. Review
+history and current progress are in [supporting status](supporting/status.md).
 
 ## Final public interfaces
 
 Create the regular public module `hydra/authorization.py`, exporting direct aliases
-of `AuthorizationPolicy`, `LEGACY` and `replace` from
+of `AuthorizationPolicy`, `LEGACY`, `UNSAFE_DISABLE_AUTHORIZATION_CHECKS` and `replace` from
 `hydra._internal.authorization`. Expose the module from `hydra.__init__`, not a
 second top-level factory or constructor. Canonical implementations remain under
 the existing internal policy protection. Keep imports free of eager external
@@ -26,28 +27,34 @@ plugin discovery; load registry classes and execution normalization lazily.
 
 ```text
 AuthorizationPolicy(
-    *, config_sources=None, plugins=None, execution_whitelist=None,
+    *, allowed_search_path_entries=None, plugins=None, execution_whitelist=None,
     legacy_plugin_discovery=None,
 )
 replace(grants)
 LEGACY
+UNSAFE_DISABLE_AUTHORIZATION_CHECKS
 ```
 
-Source/plugin fields accept sequences of nonempty strings, None or LEGACY;
-reject a bare string rather than iterate its characters. Execution retains its
-existing string/sequence and unsafe-sentinel forms and accepts explicit LEGACY.
+Search-path/plugin fields accept sequences of nonempty strings, None, LEGACY or
+the shared unsafe value; reject a bare string rather than iterate its characters.
+Execution retains its existing string/sequence and unsafe-sentinel forms and
+accepts explicit LEGACY. Keep one singleton for the shared unsafe value and the
+old `UNSAFE_DISABLE_EXECUTION_CHECKS` constant, preserving import/pickling identity and
+execution behavior. Do not introduce separate per-category sentinel objects.
+`allowed_search_path_entries` authorizes location entries, not ConfigSource
+implementation classes. `config_search_path` selects and authorizes entries.
 `replace` captures an immutable sequence of grants; field normalization checks
 its contents. Reject nested replacement markers and non-string grant entries.
 None means inherit, not a replacement value. There is no shared `mode` or
 `reset` argument. No caller-owned mutable sequence remains referenced.
 
 Add keyword-only `authorization=None` to main, every initializer, and compose.
-Add keyword-only `unsafe_allow_undeclared_config_sources=False` to main and
-compose. Add keyword-only `config_search_path=None` to main and initialize,
+Add keyword-only `config_search_path=None` to main and initialize,
 alongside their existing optional config_path. Preserve existing positional
 arguments and version_base behavior. The deprecated search-path initializer
 adapts to initialize without introducing a new version_base argument.
-The unsafe boolean is a trusted Python argument, not a config field.
+Opt-outs use policy fields; do not add a separate main/Compose unsafe-source flag
+or an alias for the superseded, unimplemented `config_sources` policy field.
 
 Use an internal omitted sentinel for the old main execution_whitelist argument.
 If authorization is a policy and the old argument was explicitly supplied,
@@ -93,20 +100,24 @@ session/registries. This is the same policy resolver, not a second global grant 
 
 - Omitted/None fields inherit. Lists add in first-occurrence order; [] does not
   clear an inherited list. A list under LEGACY enables checks for that category.
-- replace([...]) replaces only its category, including an inherited execution
+- replace([...]) replaces only its category, including an inherited
   unsafe value. replace([]) clears inherited grants; exit restores the parent.
-  Ordinary additive execution grants preserve an inherited unsafe sentinel.
+  Ordinary additive grants preserve an inherited unsafe value in every category.
+  The unsafe value is supported in 1.4 and 1.5 and disables only its category's
+  authorization. It does not disable containment, validity checks or lifecycle.
 - LEGACY explicitly selects legacy behavior in 1.4. Release 1.5 rejects it and
   defaults all three categories to checked empty grants. Compute the release
   threshold from the existing version parser and actual Hydra release, never
   from caller-selected version_base. Do not edit version numbers or release files.
 - The namespace setting inherits when None or explicitly selects a bool. The
-  default permits scanning only for 1.4 plugin LEGACY. Explicit True with checked
+  automatic default permits scanning only for 1.4 plugin LEGACY. Explicit True with checked
   plugin grants is an error before discovery; False disables the scan. It does
   not prohibit explicitly selected code under the hydra_plugins package.
   Preserve automatic None separately from an explicit True in snapshots and
-  bootstrap: opting into a list recomputes automatic scanning as disabled rather
+  bootstrap: opting into a list or the unsafe value keeps automatic scanning disabled rather
   than treating a former LEGACY default as an explicit scan request.
+  An explicit True requires LEGACY or the unsafe plugin value. The unsafe value
+  itself never switches scanning on, and False always disables it.
 - Resolve surrounding policy, then explicit main/initializer policy, then CLI
   selections. Source declarations add trusted source identities without changing
   the category's check/LEGACY setting. Plugin CLI grants use the same list rules
@@ -114,9 +125,11 @@ session/registries. This is the same policy resolver, not a second global grant 
 - Compose starts from the initialized session, applies the surrounding policy
   and then its explicit argument. Literal source-selection overrides add
   call-local declarations. Additional policy source grants are also call-local.
-  Plugin grants cannot trigger new discovery in that existing session. Deny an
-  explicit attempt to change discovery settings for an already initialized
-  registry; the diagnostic requests a new initialization session.
+  Reusing/narrowing initialized plugin visibility remains supported. Reject any
+  plugin-policy change requiring discovery outside that initialized selection,
+  including an unsafe request that would widen discovery, before imports.
+  Reject changing discovery settings in the initialized session too. Diagnostics
+  request authorization during a new initialization session, not silent no-ops.
 - Selected initialization sources and Hydra's sources remain session declarations.
   Replacing additional source grants does not remove those selections. Source-
   plugin declarations do not become execution grants or mutate the policy object.
@@ -227,8 +240,9 @@ Before SourcesRegistry.resolve or source construction, check each URI against
 session/call declarations plus current source grants. For custom schemes, also
 check the selected implementation class in the receiving plugin registry. A
 LEGACY source category warns before otherwise undeclared construction; a checked
-category raises ConfigCompositionException. An explicit source opt-out permits
-that call's otherwise undeclared URIs only. Every category state retains containment.
+category raises ConfigCompositionException. The shared unsafe value in
+allowed_search_path_entries permits otherwise undeclared entries for the current
+policy scope. Every category state retains containment and the config-load guard.
 
 Rebuilding a CachingConfigRepository must preserve checked declaration identities.
 Do not reuse a request-created source or cached config across calls as authority.
@@ -308,6 +322,11 @@ uninstalled and namespace-only code. Validate nonempty module/attribute componen
 compare EntryPoint.module/attr, and resolve normal imports/attributes only after
 permission. No wildcard or distribution-name grant is introduced.
 
+For an unsafe plugin policy, installed entry points need no individual grant.
+Retain metadata resolution, concrete-class validation and error diagnostics;
+the opt-out does not manufacture classes or widen a Compose discovery session.
+Explicit name selections still require unambiguous resolution.
+
 Validate a concrete Plugin and retain selected-selector-to-actual-class identity,
 including an exported alias for a class defined elsewhere. Deduplicate by resolved
 identity without authorizing other classes in the imported module. Carry resolved
@@ -327,7 +346,8 @@ After all successful entry-point loads, compare actual class coverage and emit
 one FutureWarning per successfully loaded namespace-only class. Do not warn merely
 for a hydra_plugins prefix, and do not treat a failed/invalid entry point as coverage.
 The scan-disable switch suppresses that scan and its imports, not normal imports
-made by an authorized direct selector or entry point. No unsafe plugin option.
+made by an authorized direct selector or entry point. The shared unsafe plugin
+value changes authorization only and leaves the scan setting intact.
 
 One idempotent initialization frame captures GlobalHydra's prior instance/hydra
 reference, Plugins' owned maps/explicit registrations, and SourcesRegistry's types.
@@ -344,11 +364,11 @@ inside-an-outer-policy case in restoration tests.
 ## Worker contract
 
 Add an internal immutable bootstrap value to HydraContext and singleton transport.
-It contains effective per-category grants/LEGACY values and namespace setting,
+It contains effective per-category grants/LEGACY/unsafe values and namespace setting,
 pinned file identities,
-trusted source declarations, scoped explicit plugin registrations and the active
-invocation's unsafe-source boolean. The latter remains a temporary receiving-job
-option, never a durable grant. Store it separately from job DictConfig and
+trusted source declarations and scoped explicit plugin registrations. Unsafe
+state is carried in its category, with no parallel source boolean. Store the
+bootstrap separately from job DictConfig and
 runtime.config_sources. Transport existing
 unsafe sentinel/class identities through the launcher's trusted Python serializer;
 serialize no ContextVar tokens or live context managers.
@@ -369,9 +389,13 @@ receiving state and rebuild only permitted plugin visibility; never rediscover
 everything first. Get_state includes the bootstrap marker so a restricted snapshot
 cannot silently take an old no-policy restore path. Missing/inconsistent restricted
 state raises HydraException before discovery; it is not a compatibility fallback.
-Evaluate categories independently: if any required source, plugin or execution
-check is active, missing bootstrap cannot be downgraded to LEGACY merely because
-another category is LEGACY. Release 1.5 therefore never uses that fallback.
+Evaluate categories independently: any explicit non-LEGACY policy, including an
+unsafe value, still needs exact bootstrap transport. Missing bootstrap cannot be
+downgraded to LEGACY because authorization was disabled in one category. Only
+all-LEGACY 1.4 with legacy_plugin_discovery not False can use the compatibility
+fallback; 1.5 never uses it. Explicitly disabling namespace discovery requires
+bootstrap transport even when every grant category is LEGACY. Without that
+transport, reject before dispatch rather than let worker restore scan plugins.
 
 BasicLauncher, Joblib execute_job and Submitit __call__/checkpoint paths use this
 helper before their existing restore/setup calls. Do not remap file roots from job
@@ -380,14 +404,28 @@ selections and grants together.
 
 Add `Launcher.supports_authorization_bootstrap = False`; updated launchers declare
 True. Before multirun dispatch, reject a nonparticipating launcher whenever any
-required category has checks enabled. Only all-LEGACY 1.4 operation may warn and
-retain the old contract. This is a trusted
+required category is non-LEGACY or legacy_plugin_discovery is False. Only
+all-LEGACY 1.4 with namespace scanning permitted may warn and retain the old
+contract. This is a trusted
 code capability declaration, not proof against a dishonest plugin. Document the
 wrapper/transport/restoration contract for external launcher authors.
 Basic, Joblib and Submitit receiving paths are the integrations owned here.
 Other launchers must implement the same contract before checked use; installing
 or authorizing an entry point is not a bootstrap capability declaration. This
 is a fail-closed compatibility limit, not permission to run an unchecked worker.
+
+Own the reusable worker-policy tests in the existing
+`hydra/test_utils/launcher_common_tests.py` `LauncherTestSuite`, inherited by
+Basic, Joblib, Submitit, Ray and RQ tests. Launchers declaring bootstrap support
+must demonstrate that the effective policy and namespace-scan setting apply
+before worker restore/discovery, using harmless import sentinels rather than only
+checking policy after the task starts. Verify that worker execution retains its
+restrictions and that reused workers restore their previous scope after success
+or failure. Launchers without support must produce the required pre-dispatch
+refusal when the contract is needed; the capability flag alone is not a passing
+result. Keep backend-specific restore/resubmission checks in the existing plugin
+test modules. This shares the already-planned slice-8 coverage rather than
+duplicating the same contract for each launcher.
 
 ## Public activation and user migration
 
@@ -415,20 +453,25 @@ or config requests. Pin normalized file identities before later job chdir.
 
 The deprecated initialize_config_search_path class keeps its old nonempty-sequence
 validation, job_name='app', global/context behavior and no version_base parameter.
-It emits one migration warning and delegates to initialize(config_path=None,
-config_search_path=..., caller_stack_depth=2) so the wrapper's own file is not
+It accepts keyword-only authorization=None, emits one migration warning and
+delegates to initialize(config_path=None, config_search_path=...,
+authorization=authorization, caller_stack_depth=2), establishing policy before
+discovery and ensuring the wrapper's own file is not
 mistaken for the user's caller. Remove its duplicate source parsing/initialization
 path. No removal release is chosen. Compose gets no config_search_path parameter.
 
-Compose's unsafe source bool defaults False and lasts only for that call. Main's
-equivalent lasts only for that invocation. Reject a non-bool rather than coerce
-an arbitrary object; no config value can enable either argument. Do not reuse unsafe
-call repositories in the next call. Source unsafe never bypasses plugin checks,
-containment, logging or instantiation authorization.
+Opt-outs use `authorization=AuthorizationPolicy(...)` or the same surrounding
+context as ordinary grants. An explicit Compose argument with
+allowed_search_path_entries=UNSAFE_DISABLE_AUTHORIZATION_CHECKS lasts for that
+call; main uses its invocation and initialize captures its session normally.
+Only the shared singleton has this meaning; strings or policy-looking config
+data cannot enable it. Do not reuse unsafe-call repositories as later permission.
+A source opt-out leaves plugin/execution authorization and containment intact.
 
 Use one authorization guide URL, https://hydra.cc/docs/advanced/authorization/.
 Diagnostics identify the request, active category checks and caller-specific remedy,
-with this link. LEGACY is warning-only, even when unsafe=False. Examples
+with this link. LEGACY remains warning-only; no separate default-False flag
+implies enforcement. Examples
 cover multiple CLI sources, a framework-owned main, Compose initialization, platform
 SearchPathPlugin declarations, local execution-only grants/resets, worker migration
 and source/plugin separation. Link the existing namespace migration guide in every
@@ -444,7 +487,7 @@ namespace-author warnings also use the existing plugin migration guide.
 Warn once per invocation/category at its first relevant LEGACY operation, before
 an otherwise unauthorized import or source initialization. Preserve the existing
 execution-warning behavior and deduplicate repeated use. Type-check policy and
-unsafe arguments before entering scopes; arbitrary DictConfig/dict objects are
+field values before entering scopes; arbitrary DictConfig/dict objects are
 not AuthorizationPolicy merely because their fields resemble one.
 
 ## Canonical slice inventory
@@ -530,15 +573,20 @@ drive/UNC checks require actual Windows evidence; emulation/all-skipped tests do
 not establish that result. Standard-library probes in supporting evidence are not
 product implementation tests. No such product validation has run during authoring.
 
-Before delivery, obtain final plan approval, commit the accepted documents,
-durable support and helper-owned sidecars at a chosen baseline, and establish
-the existing growth-policy setup. Account for all tracked/untracked work. Allocate
-authorized issue/PR identifiers and insert exact numeric news-fragment paths in
-the owning inventory entries, then refresh affected plan review before slice
-admission. Fragments are required per landed user-visible PR, including the
-relevant Joblib/Submitit news directories for their user-visible changes. Don't
-invent numbers or create placeholders. See [engineering evidence](supporting/engineering-notes.md).
+Delivery requires an approved plan, committed accepted documents, durable support
+and helper-owned sidecars, and the existing growth-policy setup. The initial
+baseline and campaign are established; retain these checks for later revisions.
+Account for all tracked/untracked work.
+The tracking issue is [#3606](https://github.com/hydra-ecosystem/hydra/issues/3606).
+Exact news paths are pinned in the canonical inventory: containment uses bugfix,
+registry cleanup maintenance, namespace deprecation api_change, and integrated
+authorization feature. Joblib and Submitit have their own feature fragments.
+Internal authorization foundation commits are part of the final integrated group;
+they do not publish its feature claim before slice 9. Refresh affected review
+before admission. Create the actual fragments with the owning implementation,
+not empty planning placeholders. See [engineering evidence](supporting/engineering-notes.md).
 
 The runtime engineering is specified here; publication data and committed delivery
-readiness remain explicit prerequisites. Neither this draft nor its eventual clean
-review starts a campaign, authorizes implementation, creates PRs, or cuts a release.
+readiness remain explicit prerequisites. The owner separately authorized the
+current delivery campaign. Document approval or a clean review alone does not
+start a campaign, authorize implementation, create PRs, or cut a release.
