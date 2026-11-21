@@ -8,5 +8,11 @@ setup(
     author_email="omry@yadan.net",
     url="https://github.com/hydra-ecosystem/hydra/",
     packages=find_namespace_packages(include=["hydra_plugins.*"]),
+    entry_points={
+        "hydra.plugins": [
+            "discovery_test = hydra_plugins.discovery_test.discovery_test:DiscoveryTestPlugin",
+            "not_hidden_test = hydra_plugins.discovery_test.__not_hidden_plugin:NotHiddenTestPlugin",
+        ]
+    },
     install_requires=["hydra-core"],
 )

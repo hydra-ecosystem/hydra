@@ -79,7 +79,11 @@ class Plugins(metaclass=Singleton):
         self.plugin_type_to_subclass_list = defaultdict(list)
         self.class_name_to_class = {}
 
-        scanned_plugins, self.stats = self._scan_all_plugins(modules=top_level)
+        namespace_plugins: dict[int, type[Plugin]] = {}
+        scanned_plugins, self.stats = self._scan_all_plugins(
+            modules=top_level, namespace_plugins=namespace_plugins
+        )
+        entry_point_plugins: set[int] = set()
         plugin_entry_points = entry_points(group="hydra.plugins")
         for entry_point in plugin_entry_points:
             load_start = timer()
@@ -107,6 +111,23 @@ class Plugins(metaclass=Singleton):
                 )
                 continue
             scanned_plugins.append(clazz)
+            entry_point_plugins.add(id(clazz))
+
+        for clazz in sorted(
+            (
+                clazz
+                for identity, clazz in namespace_plugins.items()
+                if identity not in entry_point_plugins
+            ),
+            key=lambda cls: f"{cls.__module__}.{cls.__qualname__}",
+        ):
+            warnings.warn(
+                f"Hydra plugin '{clazz.__module__}.{clazz.__qualname__}' relies on "
+                "deprecated hydra_plugins namespace discovery. Plugin authors "
+                "should declare a hydra.plugins entry point for this class. See "
+                "https://hydra.cc/docs/upgrades/1.3_to_1.4/plugin_discovery/.",
+                FutureWarning,
+            )
 
         if hydra_plugins is not None:
             _warn_unenumerable_editable_namespace(
@@ -202,6 +223,8 @@ class Plugins(metaclass=Singleton):
     @staticmethod
     def _scan_all_plugins(
         modules: list[Any],
+        *,
+        namespace_plugins: dict[int, type[Plugin]] | None = None,
     ) -> tuple[list[type[Plugin]], ScanStats]:
         stats = ScanStats()
         stats.total_time = timer()
@@ -247,6 +270,15 @@ class Plugins(metaclass=Singleton):
                     if loaded_mod is not None:
                         for name, obj in inspect.getmembers(loaded_mod):
                             if _is_concrete_plugin_type(obj):
+                                if (
+                                    namespace_plugins is not None
+                                    and mdl.__name__ == "hydra_plugins"
+                                    and not any(
+                                        obj is clazz for clazz in scanned_plugins
+                                    )
+                                    and not any(obj is clazz for clazz in PLUGIN_TYPES)
+                                ):
+                                    namespace_plugins[id(obj)] = obj
                                 scanned_plugins.append(obj)
                 except ImportError as e:
                     warnings.warn(
