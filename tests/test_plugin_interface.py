@@ -106,6 +106,31 @@ def test_register_bad_plugin() -> None:
         Plugins.instance().register(NotAPlugin)  # type: ignore
 
 
+def test_registration_defers_external_discovery(
+    monkeypatch: MonkeyPatch, hydra_restore_singletons: Any
+) -> None:
+    from hydra.core.singleton import Singleton
+
+    loaded: list[str] = []
+    entry = types.SimpleNamespace(
+        name="external",
+        load=lambda: loaded.append("external") or ExternalSweeper,
+    )
+    monkeypatch.setattr("hydra.core.plugins.entry_points", lambda **kwargs: [entry])
+    monkeypatch.setattr(
+        "hydra.core.plugins._warn_unenumerable_editable_namespace", lambda *args: None
+    )
+    Singleton._instances.pop(Plugins, None)
+    plugins = Plugins.instance()
+    plugins.register(ExternalLauncher)
+    assert loaded == []
+
+    assert ExternalLauncher in plugins.discover(Launcher)
+    assert ExternalSweeper in plugins.discover(Sweeper)
+    assert plugins.get_stats() is not None
+    assert loaded == ["external"]
+
+
 def test_discovery_preserves_imported_plugin_and_config(
     hydra_restore_singletons: Any,
 ) -> None:
@@ -293,14 +318,14 @@ def test_plugin_constructor_import_error_is_preserved(
         )
 
 
-def test_plugin_instantiation_is_not_recursive(monkeypatch: MonkeyPatch) -> None:
+def test_plugin_instantiation_is_not_recursive(
+    monkeypatch: MonkeyPatch, hydra_restore_singletons: Any
+) -> None:
     classname = "hydra._internal.core_plugins.test_plugin.PluginWithNestedTarget"
     module = types.ModuleType("hydra._internal.core_plugins.test_plugin")
     setattr(module, "PluginWithNestedTarget", PluginWithNestedTarget)
     monkeypatch.setitem(sys.modules, module.__name__, module)
-    monkeypatch.setitem(
-        Plugins.instance().class_name_to_class, classname, PluginWithNestedTarget
-    )
+    Plugins.instance().register(PluginWithNestedTarget)
 
     plugin = Plugins.instance()._instantiate(
         OmegaConf.create(
