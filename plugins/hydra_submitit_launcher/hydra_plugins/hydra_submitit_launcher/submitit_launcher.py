@@ -1,6 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import logging
 import os
+from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -16,7 +17,9 @@ log = logging.getLogger(__name__)
 
 
 class BaseSubmititLauncher(Launcher):
-    _EXECUTOR = "abstract"
+    @property
+    @abstractmethod
+    def _EXECUTOR(self) -> str: ...
 
     def __init__(self, **params: Any) -> None:
         self.params = {}

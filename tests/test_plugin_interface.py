@@ -1,8 +1,11 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 import importlib
+import pkgutil
 import sys
 import types
 import warnings
+from abc import ABCMeta
+from importlib.metadata import entry_points
 from typing import Any, Sequence
 
 from omegaconf import DictConfig, OmegaConf
@@ -116,7 +119,10 @@ def test_registration_defers_external_discovery(
         name="external",
         load=lambda: loaded.append("external") or ExternalSweeper,
     )
-    monkeypatch.setattr("hydra.core.plugins.entry_points", lambda **kwargs: [entry])
+    installed_entries = entry_points(group="hydra.plugins")
+    monkeypatch.setattr(
+        "hydra.core.plugins.entry_points", lambda **kwargs: [*installed_entries, entry]
+    )
     monkeypatch.setattr(
         "hydra.core.plugins._warn_unenumerable_editable_namespace", lambda *args: None
     )
@@ -219,6 +225,144 @@ def test_bad_entry_point_does_not_stop_discovery(
         stats = Plugins.instance().get_stats()
         assert stats is not None
         assert "entry point: missing" in stats.modules_import_time
+
+
+@mark.parametrize("entry_kind", ["absent", "same", "unrelated", "invalid", "failed"])
+def test_namespace_plugin_migration_warning(
+    monkeypatch: MonkeyPatch, hydra_restore_singletons: Any, entry_kind: str
+) -> None:
+    original_import = importlib.import_module
+    original_walk = pkgutil.walk_packages
+    namespace_path = ["test namespace"]
+    namespace = types.SimpleNamespace(__name__="hydra_plugins", __path__=namespace_path)
+    # The scanner can find aliases for a class defined outside hydra_plugins.
+    module = types.SimpleNamespace(
+        first=ExternalLauncher, alias=ExternalLauncher, imported_core_base=Plugin
+    )
+
+    def import_module(name: str) -> Any:
+        if name == "hydra_plugins":
+            return namespace
+        if name == "hydra_plugins.legacy":
+            return module
+        return original_import(name)
+
+    def walk_packages(path: Any, **kwargs: Any) -> Any:
+        if path is namespace_path:
+            return [(None, "hydra_plugins.legacy", False)]
+        return original_walk(path=path, **kwargs)
+
+    class EntryPoint:
+        name = "legacy"
+
+        def load(self) -> Any:
+            if entry_kind == "failed":
+                raise ImportError("missing plugin")
+            return {
+                "same": ExternalLauncher,
+                "unrelated": ExternalSweeper,
+                "invalid": object(),
+            }[entry_kind]
+
+    monkeypatch.setattr("hydra.core.plugins.importlib.import_module", import_module)
+    monkeypatch.setattr("hydra.core.plugins.pkgutil.walk_packages", walk_packages)
+    monkeypatch.setattr(
+        "hydra.core.plugins.entry_points",
+        lambda **kwargs: [] if entry_kind == "absent" else [EntryPoint()],
+    )
+    with warnings.catch_warnings(record=True) as recorded:
+        warnings.simplefilter("always")
+        plugins = Plugins.instance()
+        plugins._initialize()
+        assert ExternalLauncher in plugins.discover(Launcher)
+        plugins.get_stats()
+    migration = [item for item in recorded if item.category is FutureWarning]
+    if entry_kind == "same":
+        assert migration == []
+    else:
+        assert len(migration) == 1
+        message = str(migration[0].message)
+        assert (
+            f"{ExternalLauncher.__module__}.{ExternalLauncher.__qualname__}" in message
+        )
+        assert "https://hydra.cc/docs/upgrades/1.3_to_1.4/plugin_discovery/" in message
+    if entry_kind in {"invalid", "failed"}:
+        assert any(item.category is UserWarning for item in recorded)
+
+
+@mark.parametrize(
+    "entry_kind,expected_names",
+    [
+        ("absent", ["NamespaceOne", "NamespaceTwo"]),
+        ("same", ["NamespaceTwo"]),
+        ("equal", ["NamespaceOne", "NamespaceTwo"]),
+    ],
+)
+def test_namespace_warning_uses_class_identity(
+    monkeypatch: MonkeyPatch,
+    hydra_restore_singletons: Any,
+    entry_kind: str,
+    expected_names: list[str],
+) -> None:
+    class EqualMeta(ABCMeta):
+        def __hash__(cls) -> int:
+            return 1
+
+        def __eq__(cls, other: object) -> bool:
+            return isinstance(other, EqualMeta)
+
+    class NamespaceOne(ExternalLauncher, metaclass=EqualMeta):
+        pass
+
+    class NamespaceTwo(ExternalLauncher, metaclass=EqualMeta):
+        pass
+
+    class DistinctEntryPlugin(ExternalLauncher, metaclass=EqualMeta):
+        pass
+
+    assert NamespaceOne is not NamespaceTwo
+    assert NamespaceOne == NamespaceTwo == DistinctEntryPlugin
+    original_import = importlib.import_module
+    original_walk = pkgutil.walk_packages
+    namespace_path = ["identity test namespace"]
+    namespace = types.SimpleNamespace(__name__="hydra_plugins", __path__=namespace_path)
+    module = types.SimpleNamespace(
+        one=NamespaceOne, alias=NamespaceOne, two=NamespaceTwo
+    )
+
+    def import_module(name: str) -> Any:
+        if name == "hydra_plugins":
+            return namespace
+        if name == "hydra_plugins.identity":
+            return module
+        return original_import(name)
+
+    def walk_packages(path: Any, **kwargs: Any) -> Any:
+        if path is namespace_path:
+            return [(None, "hydra_plugins.identity", False)]
+        return original_walk(path=path, **kwargs)
+
+    class EntryPoint:
+        name = "identity"
+
+        def load(self) -> type[Launcher]:
+            return NamespaceOne if entry_kind == "same" else DistinctEntryPlugin
+
+    monkeypatch.setattr("hydra.core.plugins.importlib.import_module", import_module)
+    monkeypatch.setattr("hydra.core.plugins.pkgutil.walk_packages", walk_packages)
+    monkeypatch.setattr(
+        "hydra.core.plugins.entry_points",
+        lambda **kwargs: [] if entry_kind == "absent" else [EntryPoint()],
+    )
+    with warnings.catch_warnings(record=True) as recorded:
+        warnings.simplefilter("always")
+        Plugins.instance()._initialize()
+    migration = [
+        str(item.message) for item in recorded if item.category is FutureWarning
+    ]
+    assert len(migration) == len(expected_names)
+    for name, message in zip(expected_names, migration, strict=True):
+        assert f".{name}' relies on" in message
 
 
 def test_editable_namespace_without_enumerable_plugins_warns() -> None:
