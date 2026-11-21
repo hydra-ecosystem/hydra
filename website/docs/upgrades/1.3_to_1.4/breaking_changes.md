@@ -25,12 +25,17 @@ alongside this guide.
   application or a custom `on_job_end` callback if needed. Remove the callback
   from your configuration; it will be removed in Hydra 1.5.
 - Parent traversal in Defaults List config paths is no longer accepted.
-- Filesystem config sources now reject reads, lookups and listings outside their
-  selected root, including through symlinks or Windows junctions. Select shared
-  configs as another search-path entry instead of linking outside the root.
+- Filesystem and package config sources now reject reads, lookups and listings
+  outside their selected root, including through symlinks or Windows junctions.
+  Package resources stay within the selected package, including inside archives.
+  Custom resource readers must support rooted traversal without exposing an
+  unestablished filesystem or archive path. Select shared configs as another
+  search-path entry instead of linking outside the root.
   Listings omit links outside the root; accessing them directly raises an error.
   Links within the root remain supported. This check assumes a trusted, stable
-  filesystem; it does not protect against concurrent path replacement.
+  filesystem; it does not protect against concurrent path replacement. Hydra
+  trusts a Python resource reader's implementation; it does not verify where an
+  opaque reader obtains its data.
 - Backslashes in Defaults List config paths are no longer accepted. `/` is the
   only supported config group separator. Paths that used `\` previously
   composed on Windows only, where the operating system resolved the backslash
