@@ -161,7 +161,10 @@ def check_distribution(expected: BaseDistribution, actual: BaseDistribution) -> 
     [
         ("key=choice(1,2)", CategoricalDistribution([1, 2])),
         ("key=choice(true, false)", CategoricalDistribution([True, False])),
-        ("key=choice('hello', 'world')", CategoricalDistribution(["hello", "world"])),
+        (
+            "key=choice('hello', 'world')",
+            CategoricalDistribution(["'hello'", "'world'"]),
+        ),
         ("key=shuffle(range(1,3))", CategoricalDistribution((1, 2))),
         ("key=range(1,3)", IntDistribution(1, 2)),
         ("key=interval(1, 5)", FloatDistribution(1, 5)),
@@ -428,7 +431,7 @@ def test_example_with_grid_sampler(
         assert bv == 1 and abs(bx) == 1 and by == 0
     else:
         assert bx in [-1, 1] and by in [-1, 0]
-    assert bz in ["foo", "bar"]
+    assert bz in ['"foo"', '"bar"']
 
 
 @mark.parametrize("sampler", ("random", "nsgaiii"))

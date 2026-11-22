@@ -84,11 +84,11 @@ def test_create_nevergrad_parameter_from_config(
     "input, expected",
     [
         ("key=choice(1,2)", ng.p.Choice([1, 2])),
-        ("key=choice('hello','world')", ng.p.Choice(["hello", "world"])),
+        ("key=choice('hello','world')", ng.p.Choice(["'hello'", "'world'"])),
         ("key=tag(ordered, choice(1,2,3))", ng.p.TransitionChoice([1, 2, 3])),
         (
             "key=tag(ordered, choice('hello','world', 'nevergrad'))",
-            ng.p.TransitionChoice(["hello", "world", "nevergrad"]),
+            ng.p.TransitionChoice(["'hello'", "'world'", "'nevergrad'"]),
         ),
         ("key=range(1,3)", ng.p.Choice([1, 2])),
         ("key=shuffle(range(1,3))", ng.p.Choice([1, 2])),
