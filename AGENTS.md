@@ -102,7 +102,8 @@ workflow state, unique evidence, or drafts awaiting use there.
 
 ## Linting and formatting
 
-Run linting through `nox -s lint lint_plugins` when validating broad changes.
+Run linting through `nox -s lint` when validating broad changes. It covers Hydra
+core and all plugins; use `nox -t lint-core` or `nox -t lint-plugins` for a subset.
 The repo's lint sessions include formatting, import sorting, type checks, style,
 YAML linting, and security checks.
 
