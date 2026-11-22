@@ -164,9 +164,12 @@ def create_params_from_overrides(
             continue
         param_name = override.get_key_element()
         value = create_optuna_distribution_from_override(override)
+        # The last override for a key wins, whether it is a sweep or a fixed value.
         if isinstance(value, BaseDistribution):
+            fixed_params.pop(param_name, None)
             search_space_distributions[param_name] = value
         else:
+            search_space_distributions.pop(param_name, None)
             fixed_params[param_name] = value
     return search_space_distributions, fixed_params, fixed_overrides
 
@@ -337,11 +340,6 @@ class OptunaSweeperImpl(Sweeper):
             log.info(
                 f"Updating num of trials to {self.n_trials} due to using GridSampler."
             )
-
-        # Remove fixed parameters from Optuna search space.
-        for param_name in fixed_params:
-            if param_name in search_space_distributions:
-                del search_space_distributions[param_name]
 
         directions = self._get_directions()
 

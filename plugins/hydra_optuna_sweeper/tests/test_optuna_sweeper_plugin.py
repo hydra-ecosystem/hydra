@@ -431,6 +431,49 @@ def test_example_with_grid_sampler(
     assert bz in ["foo", "bar"]
 
 
+def test_command_line_sweep_replaces_fixed_sweeper_param(tmpdir: Path) -> None:
+    storage = "sqlite:///" + os.path.join(str(tmpdir), "test.db")
+    study_name = "test-cli-sweep-over-fixed"
+    cmd = [
+        "example/sphere.py",
+        "--multirun",
+        "hydra.sweep.dir=" + str(tmpdir),
+        "hydra.job.chdir=False",
+        "hydra.sweeper.n_trials=4",
+        "hydra.sweeper.n_jobs=1",
+        f"hydra.sweeper.storage={storage}",
+        f"hydra.sweeper.study_name={study_name}",
+        "hydra.sweeper.sampler.seed=123",
+        "hydra.sweeper.params.y=0",
+        "y=choice(5,6)",
+    ]
+    run_optuna_script(cmd)
+    study = optuna.load_study(storage=storage, study_name=study_name)
+    assert {t.params.get("y") for t in study.trials} <= {5, 6}
+
+
+def test_grid_sampler_excludes_command_line_fixed_param(tmpdir: Path) -> None:
+    storage = "sqlite:///" + os.path.join(str(tmpdir), "test.db")
+    study_name = "test-grid-fixed"
+    cmd = [
+        "example/sphere.py",
+        "--multirun",
+        "--config-dir=tests/conf",
+        "--config-name=test_grid",
+        "hydra.sweep.dir=" + str(tmpdir),
+        "hydra.job.chdir=False",
+        "hydra.sweeper.n_jobs=1",
+        f"hydra.sweeper.storage={storage}",
+        f"hydra.sweeper.study_name={study_name}",
+        "hydra.sweeper.sampler.seed=123",
+        "x=1",
+    ]
+    run_optuna_script(cmd)
+    study = optuna.load_study(storage=storage, study_name=study_name)
+    points = [(t.params["y"], t.params["z"]) for t in study.trials]
+    assert sorted(points) == [(-1.0, "bar"), (-1.0, "foo"), (0.0, "bar"), (0.0, "foo")]
+
+
 @mark.parametrize("sampler", ("random", "nsgaiii"))
 @mark.parametrize("with_commandline", (True, False))
 def test_optuna_multi_objective_example(
