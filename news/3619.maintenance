@@ -1,0 +1,1 @@
+Remove redundant lint-core and lint-plugins Nox sessions and document stale .nox cleanup
