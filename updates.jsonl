@@ -1064,3 +1064,4 @@
 {"ts": "2026-11-22T17:51:59Z", "kind": "new", "issue": 3625, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3625", "title": "[Bug] Concurrent instantiate() leaves the source config read-only"}
 {"ts": "2026-11-22T17:51:59Z", "kind": "status", "issue": 3619, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3619", "title": "Reduce redundant Nox environments and document stale-environment cleanup", "detail": "not started → community PR", "pr": {"number": 3624, "url": "https://github.com/hydra-ecosystem/hydra/pull/3624"}}
 {"ts": "2026-11-22T17:51:59Z", "kind": "pr", "issue": 3619, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3619", "title": "Reduce redundant Nox environments and document stale-environment cleanup", "detail": "linked #3624"}
+{"ts": "2026-11-26T07:58:49Z", "kind": "new", "issue": 3627, "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3627", "title": "[Bug]lucky"}

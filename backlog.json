@@ -1,27 +1,27 @@
 {
   "generated_on": "2026-11-26",
-  "generated_at": "2026-11-26T07:10:02Z",
+  "generated_at": "2026-11-26T07:58:49Z",
   "repo": "hydra-ecosystem/hydra",
   "summary": {
-    "open_total": 55,
+    "open_total": 56,
     "by_category": [
       {
         "category": "Bug",
         "emoji": "🐛",
-        "count": 3,
-        "percentage": 5.5
+        "count": 4,
+        "percentage": 7.1
       },
       {
         "category": "Enhancement",
         "emoji": "✨",
         "count": 46,
-        "percentage": 83.6
+        "percentage": 82.1
       },
       {
         "category": "Documentation",
         "emoji": "📄",
         "count": 3,
-        "percentage": 5.5
+        "percentage": 5.4
       },
       {
         "category": "Question",
@@ -61,7 +61,7 @@
       {
         "status": "not started",
         "emoji": "⬜",
-        "count": 51
+        "count": 52
       },
       {
         "status": "done",
@@ -952,6 +952,21 @@
       "updated": "2026-11-22",
       "labels": [],
       "url": "https://github.com/hydra-ecosystem/hydra/issues/3625"
+    },
+    {
+      "number": 3627,
+      "title": "[Bug]lucky",
+      "category": "Bug",
+      "category_emoji": "🐛",
+      "status": "not started",
+      "status_emoji": "⬜",
+      "prs": [],
+      "created": "2026-11-26",
+      "updated": "2026-11-26",
+      "labels": [
+        "bug"
+      ],
+      "url": "https://github.com/hydra-ecosystem/hydra/issues/3627"
     },
     {
       "number": 385,
@@ -2891,6 +2906,13 @@
   ],
   "updates": [
     {
+      "ts": "2026-11-26T07:58:49Z",
+      "kind": "new",
+      "issue": 3627,
+      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3627",
+      "title": "[Bug]lucky"
+    },
+    {
       "ts": "2026-11-22T17:51:59Z",
       "kind": "pr",
       "issue": 3619,
@@ -4556,18 +4578,6 @@
       "issue": 3456,
       "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3456",
       "title": "[Bug] Casting sweeps drops tags and shuffle settings"
-    },
-    {
-      "ts": "2026-09-25T22:29:41Z",
-      "kind": "status",
-      "issue": 3408,
-      "issue_url": "https://github.com/hydra-ecosystem/hydra/issues/3408",
-      "title": "Pin GitHub Actions to commit SHAs and enable Dependabot github-actions updates",
-      "detail": "not started → community PR",
-      "pr": {
-        "number": 3468,
-        "url": "https://github.com/hydra-ecosystem/hydra/pull/3468"
-      }
     }
   ]
 }
