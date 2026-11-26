@@ -404,19 +404,28 @@ LINT_TARGET_IDS = [
 ]
 
 
+# A single parametrized `lint` session covers Hydra core and every plugin.
+# Each target keeps its own virtualenv so plugin dependencies stay isolated,
+# but there is exactly one environment per (Python version, target) pair.
+# Select a subset with tags: `nox -t lint-core` or `nox -t lint-plugins`.
+LINT_PARAMS = [
+    nox.param(
+        target,
+        id=target_id,
+        tags=["lint-core"] if target == "core" else ["lint-plugins"],
+    )
+    for target, target_id in zip(LINT_TARGETS, LINT_TARGET_IDS)
+]
+
+
 @nox.session(python=LINT_PYTHON_VERSIONS, name="lint")  # type: ignore
-@nox.parametrize("target", LINT_TARGETS, ids=LINT_TARGET_IDS)  # type: ignore
+@nox.parametrize("target", LINT_PARAMS)  # type: ignore
 def lint(session: Session, target: str | Plugin) -> None:
     if target == "core":
         lint_core_impl(session)
         return
     assert isinstance(target, Plugin)
     lint_plugin_if_compatible(session, target)
-
-
-@nox.session(python=LINT_PYTHON_VERSIONS, name="lint-core")  # type: ignore
-def lint_core(session: Session) -> None:
-    lint_core_impl(session)
 
 
 def lint_core_impl(session: Session) -> None:
@@ -481,12 +490,6 @@ def lint_core_impl(session: Session) -> None:
 
     # bandit static security analysis
     session.run(*_bandit_cmd(*CORE_BANDIT_PATHS), silent=SILENT)
-
-
-@nox.session(python=LINT_PYTHON_VERSIONS, name="lint-plugins")  # type: ignore
-@nox.parametrize("plugin", LINT_PLUGINS, ids=[p.name for p in LINT_PLUGINS])  # type: ignore
-def lint_plugins(session: Session, plugin: Plugin) -> None:
-    lint_plugin_if_compatible(session, plugin)
 
 
 def lint_plugin_if_compatible(session: Session, plugin: Plugin) -> None:
