@@ -27,6 +27,12 @@ Use the `FIX` environment variable to automatically format code and apply safe l
 $ FIX=1 nox -t lint-plugins
 ```
 
+It is also recommended that you install pre-commit hooks (use `pre-commit install`).
+pre-commit will execute some of the above tests when you commit your code locally. 
+You can disable it by appending `-n` to your commit command: `git commit -m wip -n`
+
+Pull requests that do not lint will fail the automated testing.
+
 ### Cleaning up stale Nox environments
 
 Nox creates one virtualenv under `.nox/` per session, Python version and parameter, and
@@ -34,9 +40,15 @@ never deletes them. Environments are left behind when a session is renamed (for 
 the former `lint-core`, `lint-plugins` and `lint_plugins` sessions) or when a Python version
 is dropped from the test matrix, and they can add up to tens of gigabytes.
 
-To see which environments the current noxfile would use, list the sessions:
+To see which environments the current noxfile would use, list the sessions with no
+matrix override in effect. `NOX_PYTHON_VERSIONS` narrows the test matrix, so unset it
+first or `nox --list` will omit environments that are still in use:
 ```
-$ nox --list
+# Linux / macOS
+$ env -u NOX_PYTHON_VERSIONS nox --list
+
+# Windows (PowerShell)
+> Remove-Item Env:NOX_PYTHON_VERSIONS -ErrorAction SilentlyContinue; nox --list
 ```
 Any directory under `.nox/` that does not correspond to one of the listed sessions is stale.
 Common examples are directories starting with `lint-core-`, `lint-plugins-` or `lint_plugins-`,
@@ -51,15 +63,14 @@ $ du -sh .nox/* | sort -h
 > Get-ChildItem .nox -Directory | ForEach-Object { "{0,8:N0} MB  {1}" -f ((Get-ChildItem $_.FullName -Recurse -File | Measure-Object Length -Sum).Sum / 1MB), $_.Name }
 ```
 
-Remove stale environments individually, for example:
+Remove stale environments individually. These commands only delete directories that
+exist, so they work even when some of the patterns match nothing:
 ```
-$ rm -rf .nox/lint-core-* .nox/lint-plugins-* .nox/lint_plugins-*
+# Linux / macOS (any shell)
+$ find .nox -maxdepth 1 -type d \( -name 'lint-core-*' -o -name 'lint-plugins-*' -o -name 'lint_plugins-*' \) -exec rm -rf {} +
+
+# Windows (PowerShell)
+> Get-ChildItem .nox -Directory | Where-Object Name -Match '^(lint-core|lint-plugins|lint_plugins)-' | Remove-Item -Recurse -Force
 ```
 Deleting the whole `.nox` directory is always safe, but Nox will recreate every environment
 the next time the full suite runs.
-
-It is also recommended that you install pre-commit hooks (use `pre-commit install`).
-pre-commit will execute some of the above tests when you commit your code locally. 
-You can disable it by appending `-n` to your commit command: `git commit -m wip -n`
-
-Pull requests that do not lint will fail the automated testing.
